@@ -1,4 +1,6 @@
 import type { Children, Refkey } from "@alloy-js/core";
+import type { TypeProps } from "./components/TypeExpression.jsx";
+
 
 /**
  * Information for a Python function parameter.
@@ -12,7 +14,7 @@ export interface ParameterDescriptor {
   /**
    * The type of the parameter.
    */
-  readonly type?: Children;
+  readonly type?: TypeProps;
 
   /**
    * The refkey for this parameter.

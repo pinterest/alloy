@@ -148,7 +148,7 @@ describe("GoogleStyleDocParam", () => {
   it("name and type", () => {
     const res = toSourceText([
       <py.PyDoc>
-        <py.GoogleStyleDocParam name="somebody" type="str" />
+        <py.GoogleStyleDocParam name="somebody" type={{ children: "str" }} />
       </py.PyDoc>,
     ]);
     expect(res).toRenderTo(
@@ -164,7 +164,7 @@ describe("GoogleStyleDocParam", () => {
   it("name, type and description", () => {
     const res = toSourceText([
       <py.PyDoc>
-        <py.GoogleStyleDocParam name="somebody" type="str">
+        <py.GoogleStyleDocParam name="somebody" type={{ children: "str" }}>
           Somebody's name.
         </py.GoogleStyleDocParam>
       </py.PyDoc>,
@@ -182,7 +182,7 @@ describe("GoogleStyleDocParam", () => {
   it("name, type, description, and optional", () => {
     const res = toSourceText([
       <py.PyDoc>
-        <py.GoogleStyleDocParam name="somebody" type="str" optional>
+        <py.GoogleStyleDocParam name="somebody" type={{ children: "str" }} optional>
           Somebody's name.
         </py.GoogleStyleDocParam>
       </py.PyDoc>,
@@ -202,7 +202,7 @@ describe("GoogleStyleDocParam", () => {
       <py.PyDoc>
         <py.GoogleStyleDocParam
           name="somebody"
-          type="str"
+          type={{ children: "str" }}
           optional
           defaultValue="John Doe"
         >
@@ -226,7 +226,7 @@ describe("GoogleStyleDocParam", () => {
         <py.PyDoc>
           <py.GoogleStyleDocParam
             name="somebody"
-            type="str"
+            type={{ children: "str" }}
             optional
             defaultValue="John Doe"
           >
@@ -236,7 +236,7 @@ describe("GoogleStyleDocParam", () => {
             logging, or greeting messages and is not required to be unique or
             validated unless specified by the caller.
           </py.GoogleStyleDocParam>
-          <py.GoogleStyleDocParam name="somebody2" type="str">
+          <py.GoogleStyleDocParam name="somebody2" type={{ children: "str" }}>
             Somebody's name. This can be any string representing a person,
             whether it's a first name, full name, nickname, or even a codename
             (e.g., "Agent X"). It's used primarily for display purposes,
@@ -273,7 +273,7 @@ describe("GoogleStyleDocParam", () => {
         <py.PyDoc>
           <py.GoogleStyleDocParam
             name="somebody"
-            type="str"
+            type={{ children: "str" }}
             optional
             defaultValue="John Doe"
           >
@@ -318,14 +318,14 @@ describe("Full example", () => {
         parameters={[
           {
             name: "somebody",
-            type: "str",
+            type: { children: "str" },
             optional: true,
             default: "John Doe",
             doc: "Somebody's name. This can be any string representing a person, whether it's a first name, full name, nickname, or even a codename (e.g., 'Agent X'). It's used primarily for display purposes, logging, or greeting messages and is not required to be unique or validated unless specified by the caller. Defaults to \"John Doe\".",
           },
           {
             name: "somebody2",
-            type: "str",
+            type: { children: "str" },
             doc: "Somebody's name. This can be any string representing a person, whether it's a first name, full name, nickname, or even a codename (e.g., 'Agent X'). It's used primarily for display purposes, logging, or greeting messages and is not required to be unique or validated unless specified by the caller.",
           },
         ]}
@@ -337,10 +337,10 @@ describe("Full example", () => {
         <py.ClassDeclaration name="A" doc={doc}>
           <py.StatementList>
             <py.VariableDeclaration name="just_name" />
-            <py.VariableDeclaration name="name_and_type" type="number" />
+            <py.VariableDeclaration name="name_and_type" type={{ children: "int" }} />
             <py.VariableDeclaration
               name="name_type_and_value"
-              type="number"
+              type={{ children: "int" }}
               initializer={12}
             />
           </py.StatementList>
@@ -375,8 +375,8 @@ describe("Full example", () => {
                       unique or validated unless specified by the caller.
               """
               just_name = None
-              name_and_type: number = None
-              name_type_and_value: number = 12
+              name_and_type: int = None
+              name_type_and_value: int = 12
 
 
           `,
@@ -402,14 +402,14 @@ describe("Full example", () => {
         parameters={[
           {
             name: "somebody",
-            type: "str",
+            type: { children: "str" },
             optional: true,
             default: "John Doe",
             doc: "Somebody's name. This can be any string representing a person, whether it's a first name, full name, nickname, or even a codename (e.g., 'Agent X'). It's used primarily for display purposes, logging, or greeting messages and is not required to be unique or validated unless specified by the caller. Defaults to \"John Doe\".",
           },
           {
             name: "somebody2",
-            type: "str",
+            type: { children: "str" },
             doc: "Somebody's name. This can be any string representing a person, whether it's a first name, full name, nickname, or even a codename (e.g., 'Agent X'). It's used primarily for display purposes, logging, or greeting messages and is not required to be unique or validated unless specified by the caller.",
           },
         ]}
@@ -423,10 +423,10 @@ describe("Full example", () => {
         <py.FunctionDeclaration name="some_function" doc={doc}>
           <py.StatementList>
             <py.VariableDeclaration name="just_name" />
-            <py.VariableDeclaration name="name_and_type" type="number" />
+            <py.VariableDeclaration name="name_and_type" type={{ children: "number" }} />
             <py.VariableDeclaration
               name="name_type_and_value"
-              type="number"
+              type={{ children: "number" }}
               initializer={12}
             />
           </py.StatementList>

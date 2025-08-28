@@ -15,7 +15,7 @@ import {
 import { createPythonSymbol } from "../symbol-creation.js";
 import { Atom } from "./Atom.jsx";
 import { BaseDeclarationProps } from "./Declaration.jsx";
-import { SimpleCommentBlock } from "./index.js";
+import { SimpleCommentBlock, TypeExpression, type TypeProps } from "./index.js";
 
 export interface VariableDeclarationProps extends BaseDeclarationProps {
   /**
@@ -25,7 +25,7 @@ export interface VariableDeclarationProps extends BaseDeclarationProps {
   /**
    * The type of the variable. Used only for type annotation. Optional.
    */
-  type?: Children;
+  type?: TypeProps;
   /**
    * Indicates if we should omit the None assignment. Optional.
    */
@@ -104,7 +104,7 @@ export function VariableDeclaration(props: VariableDeclarationProps) {
     if (!props.type || props.callStatementVar) return undefined;
     return (
       <>
-        : <TypeSymbolSlot>{props.type}</TypeSymbolSlot>
+        : <TypeSymbolSlot><TypeExpression {...props.type} /></TypeSymbolSlot>
       </>
     );
   });

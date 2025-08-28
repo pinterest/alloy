@@ -1,10 +1,10 @@
 import { For, Indent, List, Prose, Show, childrenArray } from "@alloy-js/core";
 import { Children } from "@alloy-js/core/jsx-runtime";
 import { ParameterDescriptor } from "../parameter-descriptor.js";
-import { Atom } from "./index.js";
+import { Atom, TypeProps } from "./index.js";
 
 interface GoogleStyleDocParamTypeProps {
-  type?: Children;
+  type?: TypeProps;
   optional?: boolean;
 }
 
@@ -13,7 +13,7 @@ function GoogleStyleDocParamType(props: GoogleStyleDocParamTypeProps) {
     <>
       <Show when={Boolean(props.type)}>
         {" ("}
-        {props.type}
+        {props.type?.children}
         <Show when={props.optional}>{", optional"}</Show>
         {")"}
       </Show>
@@ -53,7 +53,7 @@ function GoogleStyleDocParamDescription(
 
 export interface GoogleStyleDocParamProps {
   name: Children;
-  type?: Children;
+  type?: TypeProps;
   children?: Children;
   optional?: boolean;
   defaultValue?: Children;

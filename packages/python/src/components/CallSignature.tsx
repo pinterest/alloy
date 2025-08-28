@@ -11,6 +11,7 @@ import { createPythonSymbol } from "../symbol-creation.js";
 import { PythonOutputSymbol } from "../symbols/index.js";
 import { Atom } from "./Atom.jsx";
 import { PythonSourceFileContext } from "./SourceFile.jsx";
+import { TypeProps } from "./index.js";
 
 export interface CallSignatureParametersProps {
   readonly parameters?: ParameterDescriptor[] | string[];
@@ -95,7 +96,7 @@ function parameter(param: DeclaredParameterDescriptor) {
     <group>
       {param.symbol.name}
       <Show when={!!param.type}>
-        : <SymbolSlot>{param.type}</SymbolSlot>
+        : <SymbolSlot>{param.type?.children}</SymbolSlot>
       </Show>
       <Show when={!!param.optional}>
         <Show when={!param.type}>=</Show>
@@ -169,7 +170,7 @@ export interface CallSignatureProps {
    * which don't have a type or a default value. Otherwise, it's an array of
    * {@link ParameterDescriptor}s.
    */
-  parameters?: ParameterDescriptor[] | string[];
+  parameters?: ParameterDescriptor[];
 
   /**
    * The type parameters of the call signature, e.g. for a generic function.
@@ -200,7 +201,7 @@ export interface CallSignatureProps {
   /**
    * The return type of the function.
    */
-  returnType?: Children;
+  returnType?: TypeProps;
 }
 /**
  * A Python call signature, e.g. the part after the `def` keyword and the name in a
@@ -239,7 +240,7 @@ export function CallSignature(props: CallSignatureProps) {
     props.returnType ?
       <>
         {" -> "}
-        {props.returnType}
+        {props.returnType.children}
       </>
     : undefined;
 
