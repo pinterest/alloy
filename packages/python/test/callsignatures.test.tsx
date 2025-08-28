@@ -2,7 +2,6 @@ import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import * as py from "../src/index.js";
 import { toSourceText } from "./utils.jsx";
-import { children } from "../../core/src/utils.jsx";
 
 describe("Call Signature Parameters", () => {
   it("renders simple function parameters", () => {
@@ -67,7 +66,12 @@ describe("Call Signature Parameters", () => {
       <py.CallSignatureParameters
         parameters={[
           { name: "a", type: { children: "int" }, optional: true, default: 5 },
-          { name: "b", type: { children: "str" }, optional: true, default: "hello" },
+          {
+            name: "b",
+            type: { children: "str" },
+            optional: true,
+            default: "hello",
+          },
         ]}
       />,
     ]);
@@ -79,14 +83,20 @@ describe("Call Signature Parameters", () => {
 
 describe("Call Signature", () => {
   it("renders a simple call signature", () => {
-    const result = toSourceText([<py.CallSignature parameters={[{name: "a"}, {name: "b"}]} />]);
+    const result = toSourceText([
+      <py.CallSignature parameters={[{ name: "a" }, { name: "b" }]} />,
+    ]);
     expect(result).toRenderTo(d`
       (a, b)
     `);
   });
   it("renders a simple call signature with args and kwargs", () => {
     const result = toSourceText([
-      <py.CallSignature parameters={[{name: "a"}, {name: "b"}]} args kwargs />,
+      <py.CallSignature
+        parameters={[{ name: "a" }, { name: "b" }]}
+        args
+        kwargs
+      />,
     ]);
     expect(result).toRenderTo(d`
       (a, b, *args, **kwargs)
@@ -94,7 +104,10 @@ describe("Call Signature", () => {
   });
   it("renders a simple call signature with type parameters", () => {
     const result = toSourceText([
-      <py.CallSignature parameters={[{name: "a"}, {name: "b"}]} typeParameters={["T", "U"]} />,
+      <py.CallSignature
+        parameters={[{ name: "a" }, { name: "b" }]}
+        typeParameters={["T", "U"]}
+      />,
     ]);
     expect(result).toRenderTo(d`
       [T, U](a, b)
@@ -102,7 +115,10 @@ describe("Call Signature", () => {
   });
   it("renders a simple call signature with return type", () => {
     const result = toSourceText([
-      <py.CallSignature parameters={[{name: "a"}, {name: "b"}]} returnType={{children: "int"}} />,
+      <py.CallSignature
+        parameters={[{ name: "a" }, { name: "b" }]}
+        returnType={{ children: "int" }}
+      />,
     ]);
     expect(result).toRenderTo(d`
       (a, b) -> int
@@ -110,7 +126,10 @@ describe("Call Signature", () => {
   });
   it("renders a simple call signature for a class function", () => {
     const result = toSourceText([
-      <py.CallSignature parameters={[{name: "a"}, {name: "b"}]} classFunction />,
+      <py.CallSignature
+        parameters={[{ name: "a" }, { name: "b" }]}
+        classFunction
+      />,
     ]);
     expect(result).toRenderTo(d`
       (cls, a, b)
@@ -118,7 +137,10 @@ describe("Call Signature", () => {
   });
   it("renders a simple call signature for an instance function", () => {
     const result = toSourceText([
-      <py.CallSignature parameters={[{name: "a"}, {name: "b"}]} instanceFunction />,
+      <py.CallSignature
+        parameters={[{ name: "a" }, { name: "b" }]}
+        instanceFunction
+      />,
     ]);
     expect(result).toRenderTo(d`
       (self, a, b)
@@ -128,7 +150,7 @@ describe("Call Signature", () => {
     expect(() =>
       toSourceText([
         <py.CallSignature
-          parameters={[{name: "a"}, {name: "b"}]}
+          parameters={[{ name: "a" }, { name: "b" }]}
           instanceFunction
           classFunction
         />,
@@ -138,11 +160,11 @@ describe("Call Signature", () => {
   it("renders a simple call signature with all properties", () => {
     const result = toSourceText([
       <py.CallSignature
-        parameters={[{name: "a"}, {name: "b"}]}
+        parameters={[{ name: "a" }, { name: "b" }]}
         instanceFunction
         args
         kwargs
-        returnType={{children: "int"}}
+        returnType={{ children: "int" }}
       />,
     ]);
     expect(result).toRenderTo(d`
@@ -187,7 +209,7 @@ describe("Call Signature - Parameter Descriptors", () => {
           { name: "a", type: { children: "int" } },
           { name: "b", type: { children: "str" } },
         ]}
-        returnType={{children: "int"}}
+        returnType={{ children: "int" }}
       />,
     ]);
     expect(result).toRenderTo(d`
@@ -232,7 +254,7 @@ describe("Call Signature - Parameter Descriptors", () => {
         instanceFunction
         args
         kwargs
-        returnType={{children: "int"}}
+        returnType={{ children: "int" }}
       />,
     ]);
     expect(result).toRenderTo(d`
@@ -247,7 +269,7 @@ describe("Call Signature - Parameter Descriptors", () => {
           { name: "a", type: { children: "int" } },
           { name: "b", type: { children: "str" }, default: "default_value" },
         ]}
-        returnType={{children: "int"}}
+        returnType={{ children: "int" }}
       />,
     ]);
     expect(result).toRenderTo(d`

@@ -1,4 +1,4 @@
-import { code, refkey } from "@alloy-js/core";
+import { refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import * as py from "../src/index.js";
@@ -11,14 +11,22 @@ import {
 describe("Python Variable", () => {
   it("declares a python variable", () => {
     const res = toSourceText([
-      <py.VariableDeclaration name="myVar" type={{ children: "int" }} initializer={42} />,
+      <py.VariableDeclaration
+        name="myVar"
+        type={{ children: "int" }}
+        initializer={42}
+      />,
     ]);
     expect(res).toBe(`my_var: int = 42`);
   });
 
   it("declares a python variable without value", () => {
     const res = toSourceText([
-      <py.VariableDeclaration name="myVar" type={{ children: "int" }} omitNone />,
+      <py.VariableDeclaration
+        name="myVar"
+        type={{ children: "int" }}
+        omitNone
+      />,
     ]);
     expect(res).toBe(`my_var: int`);
   });
@@ -49,7 +57,7 @@ describe("Python Variable", () => {
     const res = toSourceText([
       <py.VariableDeclaration
         name="numbers"
-        type={{children: "list[int]"}}
+        type={{ children: "list[int]" }}
         initializer={<py.Atom jsValue={[1, 2, 3]} />}
       />,
     ]);
@@ -68,7 +76,11 @@ describe("Python Variable", () => {
 
   it("declares a python variable with omitNone", () => {
     const res = toSourceText([
-      <py.VariableDeclaration name="omitNoneVar" type={{children: "int"}} omitNone={true} />,
+      <py.VariableDeclaration
+        name="omitNoneVar"
+        type={{ children: "int" }}
+        omitNone={true}
+      />,
     ]);
     expect(res).toBe(`omit_none_var: int`);
   });
@@ -98,7 +110,7 @@ describe("Python Variable", () => {
   it("declares a python variable with an optional type", () => {
     const typing = {
       children: [{ children: "int" }],
-      optional: true
+      optional: true,
     };
     const res = toSourceText([
       <py.StatementList>
@@ -112,7 +124,7 @@ describe("Python Variable", () => {
   it("declares a python variable with an optional type omitting none", () => {
     const typing = {
       children: [{ children: "int" }],
-      optional: true
+      optional: true,
     };
     const res = toSourceText([
       <py.StatementList>

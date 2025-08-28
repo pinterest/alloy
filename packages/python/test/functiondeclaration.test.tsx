@@ -23,7 +23,7 @@ describe("Function Declaration", () => {
 
   it("renders a function with no body as 'pass' with return type", () => {
     const result = toSourceText([
-      <py.FunctionDeclaration name="foo" returnType={{children: "int"}} />,
+      <py.FunctionDeclaration name="foo" returnType={{ children: "int" }} />,
     ]);
     expect(result).toRenderTo(d`
       def foo() -> int:
@@ -40,17 +40,17 @@ describe("Function Declaration", () => {
         <py.FunctionDeclaration
           name="foo"
           instanceFunction={true}
-          returnType={{children: "int"}}
+          returnType={{ children: "int" }}
           refkey={refkeyFoo}
         />
         <py.FunctionDeclaration
           name="bar"
           instanceFunction={true}
-          returnType={{children: "int"}}
+          returnType={{ children: "int" }}
         >
           <py.VariableDeclaration
             name="result"
-            type={{children: "int"}}
+            type={{ children: "int" }}
             initializer={
               <py.FunctionCallExpression target={refkeyFoo} args={[]} />
             }
@@ -87,7 +87,7 @@ describe("Function Declaration", () => {
     const result = toSourceText([
       <py.FunctionDeclaration
         name="baz"
-      parameters={[
+        parameters={[
           { name: "x", type: { children: "int" } },
           { name: "y", default: 0 },
           { name: "z", type: { children: "int" }, default: 42 },
@@ -131,7 +131,11 @@ describe("Function Declaration", () => {
   it("can be an async function with returnType", () => {
     expect(
       toSourceText([
-        <py.FunctionDeclaration async name="foo" returnType={{children: "Foo"}} />,
+        <py.FunctionDeclaration
+          async
+          name="foo"
+          returnType={{ children: "Foo" }}
+        />,
       ]),
     ).toBe(d`
       async def foo() -> Foo:
@@ -164,7 +168,10 @@ describe("Function Declaration", () => {
 
   it("supports parameters", () => {
     const decl = (
-      <py.FunctionDeclaration name="foo" parameters={[{name: "a"}, {name: "b"}]}>
+      <py.FunctionDeclaration
+        name="foo"
+        parameters={[{ name: "a" }, { name: "b" }]}
+      >
         return a + b
       </py.FunctionDeclaration>
     );
@@ -179,7 +186,7 @@ describe("Function Declaration", () => {
     const decl = (
       <py.FunctionDeclaration
         name="foo"
-        parameters={[{name: "a"}, {name: "b"}]}
+        parameters={[{ name: "a" }, { name: "b" }]}
         typeParameters={["T", "U"]}
       >
         return a + b
@@ -193,7 +200,7 @@ describe("Function Declaration", () => {
     `);
   });
   it("renders function with parameters", () => {
-    const parameters = [{ name: "x", type: {children: "int"} }];
+    const parameters = [{ name: "x", type: { children: "int" } }];
     const decl = (
       <py.FunctionDeclaration
         name="foo"
@@ -211,7 +218,7 @@ describe("Function Declaration", () => {
     `);
   });
   it("renders __init__ function with parameters", () => {
-    const parameters = [{ name: "x", type: {children: "int"} }];
+    const parameters = [{ name: "x", type: { children: "int" } }];
     const decl = (
       <py.InitFunctionDeclaration parameters={parameters}>
         self.attribute = "value"
@@ -226,9 +233,9 @@ describe("Function Declaration", () => {
   });
 
   it("renders nested functions", () => {
-    const parameters = [{ name: "x", type: {children: "int"} }];
-    const parameters_nested = [{ name: "y", type: {children: "int"} }];
-    const parameters_nested_nested = [{ name: "z", type: {children: "int"} }];
+    const parameters = [{ name: "x", type: { children: "int" } }];
+    const parameters_nested = [{ name: "y", type: { children: "int" } }];
+    const parameters_nested_nested = [{ name: "z", type: { children: "int" } }];
     const fooRef = refkey();
     const barRef = refkey();
     const foobarRef = refkey();
@@ -288,12 +295,18 @@ describe("Function Declaration", () => {
           async
           name="foo"
           parameters={[
-            { name: "x", type: {children: <py.Reference refkey={refkey("A")} /> } },
-            { name: "y", type: {children: <py.Reference refkey={refkey("B")} /> } },
+            {
+              name: "x",
+              type: { children: <py.Reference refkey={refkey("A")} /> },
+            },
+            {
+              name: "y",
+              type: { children: <py.Reference refkey={refkey("B")} /> },
+            },
           ]}
           args={true}
           kwargs={true}
-          returnType={{children: <py.Reference refkey={refkey("Foo")} /> }}
+          returnType={{ children: <py.Reference refkey={refkey("Foo")} /> }}
         />
       </py.SourceFile>,
     ]);

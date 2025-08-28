@@ -1,4 +1,4 @@
-import { Children, childrenArray, For, memo } from "@alloy-js/core";
+import { Children, For, memo } from "@alloy-js/core";
 
 export interface SingleTypeExpressionProps {
   children: Children;
@@ -25,7 +25,9 @@ export interface UnionTypeExpressionProps {
 
 export function UnionTypeExpression(props: UnionTypeExpressionProps) {
   // Map each SingleTypeExpressionProps to a SingleTypeExpression element (Children)
-  let childrenElements: Children[] = props.children.map((childProps) => <SingleTypeExpression {...childProps} />);
+  let childrenElements: Children[] = props.children.map((childProps) => (
+    <SingleTypeExpression {...childProps} />
+  ));
 
   if (props.optional) {
     childrenElements = [...childrenElements, "None"];
@@ -53,7 +55,9 @@ export function UnionTypeExpression(props: UnionTypeExpressionProps) {
   );
 }
 
-export type TypeExpressionProps = SingleTypeExpressionProps | UnionTypeExpressionProps;
+export type TypeExpressionProps =
+  | SingleTypeExpressionProps
+  | UnionTypeExpressionProps;
 
 export function TypeExpression(props: TypeExpressionProps) {
   if (Array.isArray(props.children)) {

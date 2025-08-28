@@ -11,7 +11,7 @@ export function UnionTypeExpression(props: UnionTypeExpressionProps) {
       preserveFragments: true,
     });
 
-  if (props.optional) {
+    if (props.optional) {
       children.push("None");
     }
     return children;

@@ -1,5 +1,4 @@
 import {
-  Children,
   computed,
   createSymbolSlot,
   For,
@@ -11,7 +10,7 @@ import { createPythonSymbol } from "../symbol-creation.js";
 import { PythonOutputSymbol } from "../symbols/index.js";
 import { Atom } from "./Atom.jsx";
 import { PythonSourceFileContext } from "./SourceFile.jsx";
-import { TypeProps } from "./index.js";
+import { TypeExpression } from "./index.js";
 
 export interface CallSignatureParametersProps {
   readonly parameters?: ParameterDescriptor[] | string[];
@@ -96,7 +95,10 @@ function parameter(param: DeclaredParameterDescriptor) {
     <group>
       {param.symbol.name}
       <Show when={!!param.type}>
-        : <SymbolSlot>{param.type?.children}</SymbolSlot>
+        :{" "}
+        <SymbolSlot>
+          <TypeExpression {...param.type} />
+        </SymbolSlot>
       </Show>
       <Show when={!!param.optional}>
         <Show when={!param.type}>=</Show>

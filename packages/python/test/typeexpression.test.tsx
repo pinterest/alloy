@@ -8,9 +8,7 @@ describe("TypeExpression", () => {
   it("renders a Python type expression", () => {
     const type = code`int`;
     expect(
-      toSourceText([
-        <py.SingleTypeExpression>{type}</py.SingleTypeExpression>,
-      ]),
+      toSourceText([<py.SingleTypeExpression>{type}</py.SingleTypeExpression>]),
     ).toRenderTo("int");
   });
   it("renders a Python type expression with a reference", () => {
@@ -19,9 +17,12 @@ describe("TypeExpression", () => {
     expect(
       toSourceText([
         <py.StatementList>
-          <py.ClassDeclaration name="Bar" refkey={classRefkey}></py.ClassDeclaration>
+          <py.ClassDeclaration
+            name="Bar"
+            refkey={classRefkey}
+          ></py.ClassDeclaration>
           <py.SingleTypeExpression>{classRefkey}</py.SingleTypeExpression>
-        </py.StatementList>
+        </py.StatementList>,
       ]),
     ).toRenderTo(d`
         class Bar:
@@ -34,7 +35,7 @@ describe("TypeExpression", () => {
 
 describe("UnionTypeExpression", () => {
   it("renders a Python union expression - 1 item", () => {
-    const elements = [{children: 'int'}];
+    const elements = [{ children: "int" }];
     expect(
       toSourceText([
         <py.UnionTypeExpression>{elements}</py.UnionTypeExpression>,
@@ -42,7 +43,7 @@ describe("UnionTypeExpression", () => {
     ).toRenderTo("int");
   });
   it("renders a Python union expression - 2 items", () => {
-    const elements = [{children: 'int'}, {children: 'str'}];
+    const elements = [{ children: "int" }, { children: "str" }];
     expect(
       toSourceText([
         <py.UnionTypeExpression>{elements}</py.UnionTypeExpression>,
@@ -51,19 +52,19 @@ describe("UnionTypeExpression", () => {
   });
   it("renders a Python union expression - N items", () => {
     const elements = [
-      {children: 'int'},
-      {children: 'str'},
-      {children: 'float'},
-      {children: 'bool'},
-      {children: 'list'},
-      {children: 'dict'},
-      {children: 'set'},
-      {children: 'tuple'},
-      {children: 'frozenset'},
-      {children: 'bytes'},
-      {children: 'bytearray'},
-      {children: 'memoryview'},
-      {children: 'complex'},
+      { children: "int" },
+      { children: "str" },
+      { children: "float" },
+      { children: "bool" },
+      { children: "list" },
+      { children: "dict" },
+      { children: "set" },
+      { children: "tuple" },
+      { children: "frozenset" },
+      { children: "bytes" },
+      { children: "bytearray" },
+      { children: "memoryview" },
+      { children: "complex" },
     ];
     expect(
       toSourceText([
@@ -87,7 +88,7 @@ describe("UnionTypeExpression", () => {
         )`);
   });
   it("renders a Python union expression - 2 items", () => {
-    const elements = [{children: 'int'}, {children: 'str'}];
+    const elements = [{ children: "int" }, { children: "str" }];
     expect(
       toSourceText([
         <py.UnionTypeExpression>{elements}</py.UnionTypeExpression>,
@@ -95,7 +96,7 @@ describe("UnionTypeExpression", () => {
     ).toRenderTo("int | str");
   });
   it("renders a Python union expression - 2 items with optional", () => {
-    const elements = [{children: 'int'}, {children: 'str'}];
+    const elements = [{ children: "int" }, { children: "str" }];
     expect(
       toSourceText([
         <py.UnionTypeExpression optional>{elements}</py.UnionTypeExpression>,
@@ -106,18 +107,25 @@ describe("UnionTypeExpression", () => {
     const classRefkey = refkey();
     const otherClassRefkey = refkey();
     const elements = [
-      {children: classRefkey},
-      {children: otherClassRefkey}
+      { children: classRefkey },
+      { children: otherClassRefkey },
     ];
 
     expect(
       toSourceText([
         <py.StatementList>
-          <py.ClassDeclaration name="Bar" refkey={classRefkey}></py.ClassDeclaration>
-          <py.ClassDeclaration name="Foo" refkey={otherClassRefkey}></py.ClassDeclaration>
+          <py.ClassDeclaration
+            name="Bar"
+            refkey={classRefkey}
+          ></py.ClassDeclaration>
+          <py.ClassDeclaration
+            name="Foo"
+            refkey={otherClassRefkey}
+          ></py.ClassDeclaration>
           <py.UnionTypeExpression>{elements}</py.UnionTypeExpression>
-        </py.StatementList>
-      ])).toRenderTo(d`
+        </py.StatementList>,
+      ]),
+    ).toRenderTo(d`
         class Bar:
             pass
 

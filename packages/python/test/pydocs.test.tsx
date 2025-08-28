@@ -182,7 +182,11 @@ describe("GoogleStyleDocParam", () => {
   it("name, type, description, and optional", () => {
     const res = toSourceText([
       <py.PyDoc>
-        <py.GoogleStyleDocParam name="somebody" type={{ children: "str" }} optional>
+        <py.GoogleStyleDocParam
+          name="somebody"
+          type={{ children: "str" }}
+          optional
+        >
           Somebody's name.
         </py.GoogleStyleDocParam>
       </py.PyDoc>,
@@ -337,7 +341,10 @@ describe("Full example", () => {
         <py.ClassDeclaration name="A" doc={doc}>
           <py.StatementList>
             <py.VariableDeclaration name="just_name" />
-            <py.VariableDeclaration name="name_and_type" type={{ children: "int" }} />
+            <py.VariableDeclaration
+              name="name_and_type"
+              type={{ children: "int" }}
+            />
             <py.VariableDeclaration
               name="name_type_and_value"
               type={{ children: "int" }}
@@ -423,7 +430,10 @@ describe("Full example", () => {
         <py.FunctionDeclaration name="some_function" doc={doc}>
           <py.StatementList>
             <py.VariableDeclaration name="just_name" />
-            <py.VariableDeclaration name="name_and_type" type={{ children: "number" }} />
+            <py.VariableDeclaration
+              name="name_and_type"
+              type={{ children: "number" }}
+            />
             <py.VariableDeclaration
               name="name_type_and_value"
               type={{ children: "number" }}
