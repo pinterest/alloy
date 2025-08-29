@@ -1,7 +1,7 @@
-import { Children, For, memo } from "@alloy-js/core";
+import { Children, For, memo, Refkey } from "@alloy-js/core";
 
 export interface SingleTypeExpressionProps {
-  children: Children;
+  children: string | Refkey;
 }
 
 export function SingleTypeExpression(props: SingleTypeExpressionProps) {
