@@ -1,4 +1,5 @@
 import {
+  Children,
   computed,
   createSymbolSlot,
   For,
@@ -10,7 +11,8 @@ import { createPythonSymbol } from "../symbol-creation.js";
 import { PythonOutputSymbol } from "../symbols/index.js";
 import { Atom } from "./Atom.jsx";
 import { PythonSourceFileContext } from "./SourceFile.jsx";
-import { TypeExpression } from "./index.js";
+import { SingleTypeExpression, SingleTypeExpressionProps, UnionTypeExpression, UnionTypeExpressionProps } from "./index.js";
+import { resolveTypeExpression } from "../utils.js";
 
 export interface CallSignatureParametersProps {
   readonly parameters?: ParameterDescriptor[] | string[];
@@ -90,14 +92,15 @@ function parameter(param: DeclaredParameterDescriptor) {
   const SymbolSlot = createSymbolSlot();
 
   SymbolSlot.instantiateInto(param.symbol);
+  let type = param.type ? resolveTypeExpression(param.type) : undefined;
 
   return (
     <group>
       {param.symbol.name}
-      <Show when={!!param.type}>
+      <Show when={!!type}>
         :{" "}
         <SymbolSlot>
-          <TypeExpression {...param.type} />
+          {type}
         </SymbolSlot>
       </Show>
       <Show when={!!param.optional}>
@@ -203,7 +206,7 @@ export interface CallSignatureProps {
   /**
    * The return type of the function.
    */
-  returnType?: TypeProps;
+  returnType?: SingleTypeExpressionProps | UnionTypeExpressionProps;
 }
 /**
  * A Python call signature, e.g. the part after the `def` keyword and the name in a
@@ -238,11 +241,12 @@ export function CallSignature(props: CallSignatureProps) {
   );
   const typeParams =
     props.typeParameters ? `[${props.typeParameters.join(", ")}]` : "";
+  let resolvedReturnype = props.returnType ? resolveTypeExpression(props.returnType) : undefined;
   const sReturnType =
-    props.returnType ?
+    resolvedReturnype ?
       <>
         {" -> "}
-        {props.returnType.children}
+        {resolvedReturnype}
       </>
     : undefined;
 

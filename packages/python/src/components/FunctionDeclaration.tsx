@@ -1,4 +1,6 @@
 import {
+  Children,
+  code,
   emitSymbol,
   Name,
   OutputScope,
@@ -69,7 +71,6 @@ export function FunctionDeclaration(props: FunctionDeclarationProps) {
         <Scope name={sym.name} kind="function">
           <CallSignature
             {...callSignatureProps}
-            returnType={props.returnType}
           />
           <PythonBlock opener=":">
             <Show when={Boolean(props.doc)}>{props.doc}</Show>

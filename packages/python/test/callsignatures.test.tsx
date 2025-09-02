@@ -26,8 +26,8 @@ describe("Call Signature Parameters", () => {
     const result = toSourceText([
       <py.CallSignatureParameters
         parameters={[
-          { name: "a", type: { children: "int" } },
-          { name: "b", type: { children: "str" } },
+          { name: "a", type: { children: "int" } as py.SingleTypeExpressionProps},
+          { name: "b", type: { children: "str" } as py.SingleTypeExpressionProps},
         ]}
       />,
     ]);
@@ -39,8 +39,8 @@ describe("Call Signature Parameters", () => {
     const result = toSourceText([
       <py.CallSignatureParameters
         parameters={[
-          { name: "a", type: { children: "int" }, optional: true },
-          { name: "b", type: { children: "str" }, optional: true },
+          { name: "a", type: { children: "int" } as py.SingleTypeExpressionProps, optional: true },
+          { name: "b", type: { children: "str" } as py.SingleTypeExpressionProps, optional: true },
         ]}
       />,
     ]);
@@ -65,10 +65,10 @@ describe("Call Signature Parameters", () => {
     const result = toSourceText([
       <py.CallSignatureParameters
         parameters={[
-          { name: "a", type: { children: "int" }, optional: true, default: 5 },
+          { name: "a", type: { children: "int" } as py.SingleTypeExpressionProps, optional: true, default: 5 },
           {
             name: "b",
-            type: { children: "str" },
+            type: { children: "str" } as py.SingleTypeExpressionProps,
             optional: true,
             default: "hello",
           },
@@ -178,8 +178,8 @@ describe("Call Signature - Parameter Descriptors", () => {
     const result = toSourceText([
       <py.CallSignature
         parameters={[
-          { name: "a", type: { children: "int" } },
-          { name: "b", type: { children: "str" } },
+          { name: "a", type: { children: "int" } as py.SingleTypeExpressionProps },
+          { name: "b", type: { children: "str" } as py.SingleTypeExpressionProps },
         ]}
       />,
     ]);
@@ -191,8 +191,8 @@ describe("Call Signature - Parameter Descriptors", () => {
     const result = toSourceText([
       <py.CallSignature
         parameters={[
-          { name: "a", type: { children: "int" } },
-          { name: "b", type: { children: "str" } },
+          { name: "a", type: { children: "int" } as py.SingleTypeExpressionProps },
+          { name: "b", type: { children: "str" } as py.SingleTypeExpressionProps },
         ]}
         args
         kwargs
@@ -206,10 +206,10 @@ describe("Call Signature - Parameter Descriptors", () => {
     const result = toSourceText([
       <py.CallSignature
         parameters={[
-          { name: "a", type: { children: "int" } },
-          { name: "b", type: { children: "str" } },
+          { name: "a", type: { children: "int" } as py.SingleTypeExpressionProps },
+          { name: "b", type: { children: "str" } as py.SingleTypeExpressionProps },
         ]}
-        returnType={{ children: "int" }}
+        returnType={{ children: "int" } as py.SingleTypeExpressionProps}
       />,
     ]);
     expect(result).toRenderTo(d`
@@ -220,8 +220,8 @@ describe("Call Signature - Parameter Descriptors", () => {
     const result = toSourceText([
       <py.CallSignature
         parameters={[
-          { name: "a", type: { children: "int" } },
-          { name: "b", type: { children: "str" } },
+          { name: "a", type: { children: "int" } as py.SingleTypeExpressionProps },
+          { name: "b", type: { children: "str" } as py.SingleTypeExpressionProps },
         ]}
         classFunction
       />,
@@ -234,8 +234,8 @@ describe("Call Signature - Parameter Descriptors", () => {
     const result = toSourceText([
       <py.CallSignature
         parameters={[
-          { name: "a", type: { children: "int" } },
-          { name: "b", type: { children: "str" } },
+          { name: "a", type: { children: "int" } as py.SingleTypeExpressionProps },
+          { name: "b", type: { children: "str" } as py.SingleTypeExpressionProps },
         ]}
         instanceFunction
       />,
@@ -248,13 +248,13 @@ describe("Call Signature - Parameter Descriptors", () => {
     const result = toSourceText([
       <py.CallSignature
         parameters={[
-          { name: "a", type: { children: "int" } },
-          { name: "b", type: { children: "str" } },
+          { name: "a", type: { children: "int" } as py.SingleTypeExpressionProps },
+          { name: "b", type: { children: "str" } as py.SingleTypeExpressionProps },
         ]}
         instanceFunction
         args
         kwargs
-        returnType={{ children: "int" }}
+        returnType={{ children: "int" } as py.SingleTypeExpressionProps}
       />,
     ]);
     expect(result).toRenderTo(d`
@@ -266,10 +266,10 @@ describe("Call Signature - Parameter Descriptors", () => {
       <py.CallSignature
         typeParameters={["T", "U"]}
         parameters={[
-          { name: "a", type: { children: "int" } },
-          { name: "b", type: { children: "str" }, default: "default_value" },
+          { name: "a", type: { children: "int" } as py.SingleTypeExpressionProps },
+          { name: "b", type: { children: "str" } as py.SingleTypeExpressionProps, default: "default_value" },
         ]}
-        returnType={{ children: "int" }}
+        returnType={{ children: "int" } as py.SingleTypeExpressionProps}
       />,
     ]);
     expect(result).toRenderTo(d`

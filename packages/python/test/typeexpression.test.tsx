@@ -6,10 +6,16 @@ import { toSourceText } from "./utils.jsx";
 
 describe("TypeExpression", () => {
   it("renders a Python type expression", () => {
-    const type = code`int`;
+    const type = 'int';
     expect(
       toSourceText([<py.SingleTypeExpression>{type}</py.SingleTypeExpression>]),
     ).toRenderTo("int");
+  });
+  it("renders a Python type expression with None", () => {
+    const type = 'None';
+    expect(
+      toSourceText([<py.SingleTypeExpression>{type}</py.SingleTypeExpression>]),
+    ).toRenderTo("None");
   });
   it("renders a Python type expression with a reference", () => {
     const classRefkey = refkey();
@@ -95,11 +101,11 @@ describe("UnionTypeExpression", () => {
       ]),
     ).toRenderTo("int | str");
   });
-  it("renders a Python union expression - 2 items with optional", () => {
-    const elements = [{ children: "int" }, { children: "str" }];
+  it("renders a Python union expression - 2 items with None", () => {
+    const elements = [{ children: "int" }, { children: "str" }, { children: "None" }];
     expect(
       toSourceText([
-        <py.UnionTypeExpression optional>{elements}</py.UnionTypeExpression>,
+        <py.UnionTypeExpression>{elements}</py.UnionTypeExpression>,
       ]),
     ).toRenderTo("int | str | None");
   });

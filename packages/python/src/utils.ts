@@ -1,5 +1,5 @@
 import { defaultProps, splitProps } from "@alloy-js/core";
-import { CallSignatureProps } from "./components/index.js";
+import { CallSignatureProps, SingleTypeExpression, SingleTypeExpressionProps, UnionTypeExpression, UnionTypeExpressionProps } from "./components/index.js";
 
 /**
  * Extract only the call signature props from a props object which extends
@@ -24,4 +24,12 @@ export function getCallSignatureProps(
   }
 
   return defaultProps(callSignatureProps, defaults);
+}
+
+export function resolveTypeExpression(type: SingleTypeExpressionProps | UnionTypeExpressionProps) {
+  if (Array.isArray(type.children)) {
+    return UnionTypeExpression(type as UnionTypeExpressionProps);
+  } else {
+    return SingleTypeExpression(type as SingleTypeExpressionProps);
+  }
 }

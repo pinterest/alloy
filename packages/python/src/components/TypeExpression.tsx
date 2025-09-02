@@ -2,6 +2,7 @@ import { Children, For, memo, Refkey } from "@alloy-js/core";
 
 export interface SingleTypeExpressionProps {
   children: string | Refkey;
+  typeArguments?: SingleTypeExpressionProps[];
 }
 
 export function SingleTypeExpression(props: SingleTypeExpressionProps) {
@@ -11,7 +12,7 @@ export function SingleTypeExpression(props: SingleTypeExpressionProps) {
     <group>
       <indent>
         <sbr />
-        {resolvedChildren}
+        {resolvedChildren()}
       </indent>
       <sbr />
     </group>
@@ -20,7 +21,6 @@ export function SingleTypeExpression(props: SingleTypeExpressionProps) {
 
 export interface UnionTypeExpressionProps {
   children: SingleTypeExpressionProps[];
-  optional?: boolean;
 }
 
 export function UnionTypeExpression(props: UnionTypeExpressionProps) {
@@ -28,10 +28,6 @@ export function UnionTypeExpression(props: UnionTypeExpressionProps) {
   let childrenElements: Children[] = props.children.map((childProps) => (
     <SingleTypeExpression {...childProps} />
   ));
-
-  if (props.optional) {
-    childrenElements = [...childrenElements, "None"];
-  }
 
   return (
     <group>
@@ -53,19 +49,4 @@ export function UnionTypeExpression(props: UnionTypeExpressionProps) {
       <ifBreak>)</ifBreak>
     </group>
   );
-}
-
-export type TypeExpressionProps =
-  | SingleTypeExpressionProps
-  | UnionTypeExpressionProps;
-
-export function TypeExpression(props: TypeExpressionProps) {
-  if (Array.isArray(props.children)) {
-    // Ensure children is an array of SingleTypeExpressionProps
-    const childrenPropsArray = props.children as SingleTypeExpressionProps[];
-    return <UnionTypeExpression {...props} children={childrenPropsArray} />;
-  }
-  // Only pass SingleTypeExpressionProps to SingleTypeExpression
-  const singleTypeProps = props as SingleTypeExpressionProps;
-  return <SingleTypeExpression {...singleTypeProps} />;
 }

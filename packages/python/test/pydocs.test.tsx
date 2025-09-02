@@ -409,14 +409,14 @@ describe("Full example", () => {
         parameters={[
           {
             name: "somebody",
-            type: { children: "str" },
+            type: { children: "str" } as py.SingleTypeExpressionProps,
             optional: true,
             default: "John Doe",
             doc: "Somebody's name. This can be any string representing a person, whether it's a first name, full name, nickname, or even a codename (e.g., 'Agent X'). It's used primarily for display purposes, logging, or greeting messages and is not required to be unique or validated unless specified by the caller. Defaults to \"John Doe\".",
           },
           {
             name: "somebody2",
-            type: { children: "str" },
+            type: { children: "str" } as py.SingleTypeExpressionProps,
             doc: "Somebody's name. This can be any string representing a person, whether it's a first name, full name, nickname, or even a codename (e.g., 'Agent X'). It's used primarily for display purposes, logging, or greeting messages and is not required to be unique or validated unless specified by the caller.",
           },
         ]}
@@ -432,11 +432,11 @@ describe("Full example", () => {
             <py.VariableDeclaration name="just_name" />
             <py.VariableDeclaration
               name="name_and_type"
-              type={{ children: "number" }}
+              type={{ children: "number" } as py.SingleTypeExpressionProps}
             />
             <py.VariableDeclaration
               name="name_type_and_value"
-              type={{ children: "number" }}
+              type={{ children: "number" } as py.SingleTypeExpressionProps}
               initializer={12}
             />
           </py.StatementList>

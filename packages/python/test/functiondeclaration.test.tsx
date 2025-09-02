@@ -152,7 +152,7 @@ describe("Function Declaration", () => {
           <py.FunctionDeclaration
             async
             name="foo"
-            returnType={{ children: <py.Reference refkey={refkey("Foo")} /> }}
+            returnType={{ children: refkey("Foo") }}
           />
         </py.StatementList>,
       ]),
