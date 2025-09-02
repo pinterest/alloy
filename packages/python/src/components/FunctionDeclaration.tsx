@@ -1,6 +1,4 @@
 import {
-  Children,
-  code,
   emitSymbol,
   Name,
   OutputScope,
@@ -69,9 +67,7 @@ export function FunctionDeclaration(props: FunctionDeclarationProps) {
       <Declaration {...props} nameKind="function" symbol={sym}>
         {asyncKwd}def <Name />
         <Scope name={sym.name} kind="function">
-          <CallSignature
-            {...callSignatureProps}
-          />
+          <CallSignature {...callSignatureProps} />
           <PythonBlock opener=":">
             <Show when={Boolean(props.doc)}>{props.doc}</Show>
             {props.children ?? "pass"}

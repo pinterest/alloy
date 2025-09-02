@@ -13,10 +13,14 @@ import {
   useScope,
 } from "@alloy-js/core";
 import { createPythonSymbol } from "../symbol-creation.js";
+import { resolveTypeExpression } from "../utils.js";
 import { Atom } from "./Atom.jsx";
 import { BaseDeclarationProps } from "./Declaration.jsx";
-import { SimpleCommentBlock, SingleTypeExpressionProps, UnionTypeExpressionProps } from "./index.js";
-import { resolveTypeExpression } from "../utils.js";
+import {
+  SimpleCommentBlock,
+  SingleTypeExpressionProps,
+  UnionTypeExpressionProps,
+} from "./index.js";
 
 export interface VariableDeclarationProps extends BaseDeclarationProps {
   /**
@@ -108,10 +112,7 @@ export function VariableDeclaration(props: VariableDeclarationProps) {
     if (!props.type || props.callStatementVar) return undefined;
     return (
       <>
-        :{" "}
-        <TypeSymbolSlot>
-          {resolvedType}
-        </TypeSymbolSlot>
+        : <TypeSymbolSlot>{resolvedType}</TypeSymbolSlot>
       </>
     );
   });

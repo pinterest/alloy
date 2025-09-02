@@ -110,7 +110,10 @@ describe("Python Variable", () => {
   it("declares a python variable with an optional type", () => {
     const res = toSourceText([
       <py.StatementList>
-        <py.VariableDeclaration name="my_var" type={{ children: [{ children: "int" }, { children: "None" }] }} />
+        <py.VariableDeclaration
+          name="my_var"
+          type={{ children: [{ children: "int" }, { children: "None" }] }}
+        />
       </py.StatementList>,
     ]);
     expect(res).toBe(d`
@@ -120,7 +123,11 @@ describe("Python Variable", () => {
   it("declares a python variable with an optional type omitting none", () => {
     const res = toSourceText([
       <py.StatementList>
-        <py.VariableDeclaration name="my_var" type={{ children: [{ children: "int" }, { children: "None" }] }} omitNone />
+        <py.VariableDeclaration
+          name="my_var"
+          type={{ children: [{ children: "int" }, { children: "None" }] }}
+          omitNone
+        />
       </py.StatementList>,
     ]);
     expect(res).toBe(d`
@@ -133,7 +140,11 @@ describe("Python Variable", () => {
         <py.ClassDeclaration name="MyClass" />
         <py.VariableDeclaration
           name="my_var"
-          type={{ children: <py.Reference refkey={refkey("MyClass")} /> } as py.SingleTypeExpressionProps}
+          type={
+            {
+              children: <py.Reference refkey={refkey("MyClass")} />,
+            } as py.SingleTypeExpressionProps
+          }
         />
       </py.StatementList>,
     ]);
@@ -152,7 +163,11 @@ describe("Python Variable", () => {
       <py.SourceFile path="usage.py">
         <py.VariableDeclaration
           name="my_var"
-          type={{ children: <py.Reference refkey={refkey("MyClass")} /> } as py.SingleTypeExpressionProps}
+          type={
+            {
+              children: <py.Reference refkey={refkey("MyClass")} />,
+            } as py.SingleTypeExpressionProps
+          }
         />
       </py.SourceFile>,
     ]);

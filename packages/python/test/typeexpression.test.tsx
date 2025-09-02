@@ -1,4 +1,4 @@
-import { code, refkey } from "@alloy-js/core";
+import { refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import * as py from "../src/index.js";
@@ -6,13 +6,13 @@ import { toSourceText } from "./utils.jsx";
 
 describe("TypeExpression", () => {
   it("renders a Python type expression", () => {
-    const type = 'int';
+    const type = "int";
     expect(
       toSourceText([<py.SingleTypeExpression>{type}</py.SingleTypeExpression>]),
     ).toRenderTo("int");
   });
   it("renders a Python type expression with None", () => {
-    const type = 'None';
+    const type = "None";
     expect(
       toSourceText([<py.SingleTypeExpression>{type}</py.SingleTypeExpression>]),
     ).toRenderTo("None");
@@ -47,7 +47,11 @@ describe("TypeExpression", () => {
             name="Bar"
             refkey={classRefkey}
           ></py.ClassDeclaration>
-          <py.SingleTypeExpression typeArguments={[{ children: "T" }, { children: "P" }]}>{classRefkey}</py.SingleTypeExpression>
+          <py.SingleTypeExpression
+            typeArguments={[{ children: "T" }, { children: "P" }]}
+          >
+            {classRefkey}
+          </py.SingleTypeExpression>
         </py.StatementList>,
       ]),
     ).toRenderTo(d`
@@ -122,7 +126,11 @@ describe("UnionTypeExpression", () => {
     ).toRenderTo("int | str");
   });
   it("renders a Python union expression - 2 items with None", () => {
-    const elements = [{ children: "int" }, { children: "str" }, { children: "None" }];
+    const elements = [
+      { children: "int" },
+      { children: "str" },
+      { children: "None" },
+    ];
     expect(
       toSourceText([
         <py.UnionTypeExpression>{elements}</py.UnionTypeExpression>,

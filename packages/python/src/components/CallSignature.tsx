@@ -1,5 +1,4 @@
 import {
-  Children,
   computed,
   createSymbolSlot,
   For,
@@ -9,10 +8,13 @@ import {
 import { ParameterDescriptor } from "../parameter-descriptor.js";
 import { createPythonSymbol } from "../symbol-creation.js";
 import { PythonOutputSymbol } from "../symbols/index.js";
+import { resolveTypeExpression } from "../utils.js";
 import { Atom } from "./Atom.jsx";
 import { PythonSourceFileContext } from "./SourceFile.jsx";
-import { SingleTypeExpression, SingleTypeExpressionProps, UnionTypeExpression, UnionTypeExpressionProps } from "./index.js";
-import { resolveTypeExpression } from "../utils.js";
+import {
+  SingleTypeExpressionProps,
+  UnionTypeExpressionProps,
+} from "./index.js";
 
 export interface CallSignatureParametersProps {
   readonly parameters?: ParameterDescriptor[] | string[];
@@ -98,10 +100,7 @@ function parameter(param: DeclaredParameterDescriptor) {
     <group>
       {param.symbol.name}
       <Show when={!!type}>
-        :{" "}
-        <SymbolSlot>
-          {type}
-        </SymbolSlot>
+        : <SymbolSlot>{type}</SymbolSlot>
       </Show>
       <Show when={!!param.optional}>
         <Show when={!param.type}>=</Show>
@@ -241,7 +240,8 @@ export function CallSignature(props: CallSignatureProps) {
   );
   const typeParams =
     props.typeParameters ? `[${props.typeParameters.join(", ")}]` : "";
-  let resolvedReturnype = props.returnType ? resolveTypeExpression(props.returnType) : undefined;
+  let resolvedReturnype =
+    props.returnType ? resolveTypeExpression(props.returnType) : undefined;
   const sReturnType =
     resolvedReturnype ?
       <>

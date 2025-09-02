@@ -1,7 +1,13 @@
 import { For, Indent, List, Prose, Show, childrenArray } from "@alloy-js/core";
 import { Children } from "@alloy-js/core/jsx-runtime";
 import { ParameterDescriptor } from "../parameter-descriptor.js";
-import { Atom, SingleTypeExpression, SingleTypeExpressionProps, UnionTypeExpression, UnionTypeExpressionProps } from "./index.js";
+import {
+  Atom,
+  SingleTypeExpression,
+  SingleTypeExpressionProps,
+  UnionTypeExpression,
+  UnionTypeExpressionProps,
+} from "./index.js";
 
 interface GoogleStyleDocParamTypeProps {
   type?: SingleTypeExpressionProps | UnionTypeExpressionProps;
@@ -12,9 +18,13 @@ function GoogleStyleDocParamType(props: GoogleStyleDocParamTypeProps) {
   let type;
   if (props.type) {
     if (typeof props.type?.children === "string") {
-      type = <SingleTypeExpression {...props.type as SingleTypeExpressionProps} />;
+      type = (
+        <SingleTypeExpression {...(props.type as SingleTypeExpressionProps)} />
+      );
     } else {
-      type = <UnionTypeExpression {...props.type as UnionTypeExpressionProps} />;
+      type = (
+        <UnionTypeExpression {...(props.type as UnionTypeExpressionProps)} />
+      );
     }
   }
   return (
