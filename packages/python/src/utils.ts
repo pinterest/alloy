@@ -26,10 +26,10 @@ export function getCallSignatureProps(
   return defaultProps(callSignatureProps, defaults);
 }
 
-export function resolveTypeExpression(type: SingleTypeExpressionProps | UnionTypeExpressionProps) {
-  if (Array.isArray(type.children)) {
-    return UnionTypeExpression(type as UnionTypeExpressionProps);
+export function resolveTypeExpression(typeProps: SingleTypeExpressionProps | UnionTypeExpressionProps) {
+  if (Array.isArray(typeProps.children)) {
+    return UnionTypeExpression(typeProps as UnionTypeExpressionProps);
   } else {
-    return SingleTypeExpression(type as SingleTypeExpressionProps);
+    return SingleTypeExpression(typeProps as SingleTypeExpressionProps);
   }
 }

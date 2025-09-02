@@ -37,6 +37,26 @@ describe("TypeExpression", () => {
         Bar
     `);
   });
+  it("renders a Python type expression with a reference and type arguments", () => {
+    const classRefkey = refkey();
+
+    expect(
+      toSourceText([
+        <py.StatementList>
+          <py.ClassDeclaration
+            name="Bar"
+            refkey={classRefkey}
+          ></py.ClassDeclaration>
+          <py.SingleTypeExpression typeArguments={[{ children: "T" }, { children: "P" }]}>{classRefkey}</py.SingleTypeExpression>
+        </py.StatementList>,
+      ]),
+    ).toRenderTo(d`
+        class Bar:
+            pass
+
+        Bar[T, P]
+    `);
+  });
 });
 
 describe("UnionTypeExpression", () => {
