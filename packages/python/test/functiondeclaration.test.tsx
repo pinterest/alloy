@@ -297,16 +297,16 @@ describe("Function Declaration", () => {
           parameters={[
             {
               name: "x",
-              type: { children: <py.Reference refkey={refkey("A")} /> },
+              type: { children: refkey("A") },
             },
             {
               name: "y",
-              type: { children: <py.Reference refkey={refkey("B")} /> },
+              type: { children: refkey("B") },
             },
           ]}
           args={true}
           kwargs={true}
-          returnType={{ children: <py.Reference refkey={refkey("Foo")} /> }}
+          returnType={{ children: refkey("Foo") }}
         />
       </py.SourceFile>,
     ]);
