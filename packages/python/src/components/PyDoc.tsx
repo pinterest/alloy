@@ -1,11 +1,10 @@
 import { For, Indent, List, Prose, Show, childrenArray } from "@alloy-js/core";
 import { Children } from "@alloy-js/core/jsx-runtime";
 import { ParameterDescriptor } from "../parameter-descriptor.js";
+import { resolveTypeExpression } from "../utils.js";
 import {
   Atom,
-  SingleTypeExpression,
   SingleTypeExpressionProps,
-  UnionTypeExpression,
   UnionTypeExpressionProps,
 } from "./index.js";
 
@@ -15,23 +14,12 @@ interface GoogleStyleDocParamTypeProps {
 }
 
 function GoogleStyleDocParamType(props: GoogleStyleDocParamTypeProps) {
-  let type;
-  if (props.type) {
-    if (typeof props.type?.children === "string") {
-      type = (
-        <SingleTypeExpression {...(props.type as SingleTypeExpressionProps)} />
-      );
-    } else {
-      type = (
-        <UnionTypeExpression {...(props.type as UnionTypeExpressionProps)} />
-      );
-    }
-  }
+  let resolvedType = props.type ? resolveTypeExpression(props.type) : undefined;
   return (
     <>
       <Show when={Boolean(props.type)}>
         {" ("}
-        {type}
+        {resolvedType}
         <Show when={props.optional}>{", optional"}</Show>
         {")"}
       </Show>
