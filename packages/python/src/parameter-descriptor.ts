@@ -21,11 +21,6 @@ export interface ParameterDescriptor {
   readonly refkey?: Refkey | Refkey[];
 
   /**
-   * Whether the parameter is optional.
-   */
-  readonly optional?: boolean;
-
-  /**
    * Documentation for the parameter.
    */
   readonly doc?: Children;

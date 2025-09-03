@@ -1,4 +1,4 @@
-import { Children, For, memo, Refkey } from "@alloy-js/core";
+import { Children, For, memo } from "@alloy-js/core";
 import { resolveTypeExpression } from "../utils.js";
 
 export interface SingleTypeExpressionProps {
@@ -67,4 +67,6 @@ export function UnionTypeExpression(props: UnionTypeExpressionProps) {
   );
 }
 
-export type TypeExpressionProps = SingleTypeExpressionProps | UnionTypeExpressionProps;
+export type TypeExpressionProps =
+  | SingleTypeExpressionProps
+  | UnionTypeExpressionProps;

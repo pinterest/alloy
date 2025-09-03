@@ -40,7 +40,7 @@ export function ClientMethod(props: ClientMethodProps) {
 
   // get the return type based on the spec's responseBody.
   let responseReturnType = {
-    children: resolveRestAPIReference(op.responseBody, apiContext)
+    children: resolveRestAPIReference(op.responseBody, apiContext),
   } as py.SingleTypeExpressionProps;
   let responseReturnTypeString: string = `${resolveRestAPIReferenceToString(op.responseBody, apiContext)}: ${op.responseDoc}`;
 

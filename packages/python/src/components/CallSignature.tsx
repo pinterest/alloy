@@ -99,18 +99,9 @@ function parameter(param: DeclaredParameterDescriptor) {
       <Show when={!!type}>
         : <SymbolSlot>{type}</SymbolSlot>
       </Show>
-      <Show when={!!param.optional}>
-        <Show when={!param.type}>=</Show>
-        <Show when={!!param.type}> = </Show>
-        <>
-          {param.default ?
-            <Atom jsValue={param.default} />
-          : "None"}
-        </>
-      </Show>
-      <Show when={!param.optional && param.default !== undefined}>
-        <Show when={!param.type}>=</Show>
-        <Show when={!!param.type}> = </Show>
+      <Show when={param.default !== undefined}>
+        <Show when={!type}>=</Show>
+        <Show when={!!type}> = </Show>
         <>
           <Atom jsValue={param.default} />
         </>

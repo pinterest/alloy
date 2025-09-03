@@ -48,12 +48,12 @@ describe("Call Signature Parameters", () => {
           {
             name: "a",
             type: { children: "int" } as py.SingleTypeExpressionProps,
-            optional: true,
+            default: null,
           },
           {
             name: "b",
             type: { children: "str" } as py.SingleTypeExpressionProps,
-            optional: true,
+            default: null,
           },
         ]}
       />,
@@ -82,13 +82,11 @@ describe("Call Signature Parameters", () => {
           {
             name: "a",
             type: { children: "int" } as py.SingleTypeExpressionProps,
-            optional: true,
             default: 5,
           },
           {
             name: "b",
             type: { children: "str" } as py.SingleTypeExpressionProps,
-            optional: true,
             default: "hello",
           },
         ]}

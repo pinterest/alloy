@@ -1,4 +1,4 @@
-import { Children, code, refkey } from "@alloy-js/core";
+import { code } from "@alloy-js/core";
 import * as py from "@alloy-js/python";
 import { useApi } from "../context/api.js";
 import { RestApiModelProperty } from "../schema.js";
@@ -24,12 +24,18 @@ export function ModelProperty(props: ModelPropertyProps) {
     memberType = castOpenAPITypeToPython(apiType);
   }
 
-  let finalMemberType = { children: memberType } as py.SingleTypeExpressionProps;
+  let finalMemberType = {
+    children: memberType,
+  } as py.SingleTypeExpressionProps;
   if (props.property.array) {
-    finalMemberType = { children: code`list[${memberType}]` } as py.SingleTypeExpressionProps;
+    finalMemberType = {
+      children: code`list[${memberType}]`,
+    } as py.SingleTypeExpressionProps;
   }
   if (props.property.optional) {
-    finalMemberType = { children: `${memberType} | None` } as py.SingleTypeExpressionProps;
+    finalMemberType = {
+      children: `${memberType} | None`,
+    } as py.SingleTypeExpressionProps;
   }
 
   return (

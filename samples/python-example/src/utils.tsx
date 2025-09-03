@@ -1,5 +1,4 @@
 import { Children, code, refkey } from "@alloy-js/core";
-import * as py from "@alloy-js/python";
 import { ApiContext } from "./context/api.js";
 import { RestApiModelReference, RestApiNonModelReference } from "./schema.js";
 

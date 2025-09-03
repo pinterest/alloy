@@ -426,7 +426,7 @@ describe("with refkeys", () => {
     const parameters: ParameterDescriptor[] = [
       {
         name: "foo",
-        optional: true,
+        default: null,
         refkey: fooRef,
         type: { children: modelRef },
       },

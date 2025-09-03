@@ -16,10 +16,7 @@ import { createPythonSymbol } from "../symbol-creation.js";
 import { resolveTypeExpression } from "../utils.js";
 import { Atom } from "./Atom.jsx";
 import { BaseDeclarationProps } from "./Declaration.jsx";
-import {
-  SimpleCommentBlock,
-  type TypeExpressionProps
-} from "./index.js";
+import { SimpleCommentBlock, type TypeExpressionProps } from "./index.js";
 
 export interface VariableDeclarationProps extends BaseDeclarationProps {
   /**

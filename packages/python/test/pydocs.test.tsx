@@ -179,36 +179,13 @@ describe("GoogleStyleDocParam", () => {
           `,
     );
   });
-  it("name, type, description, and optional", () => {
+  it("name, type, description, and default value", () => {
     const res = toSourceText([
       <py.PyDoc>
         <py.GoogleStyleDocParam
           name="somebody"
           type={{ children: "str" }}
-          optional
-        >
-          Somebody's name.
-        </py.GoogleStyleDocParam>
-      </py.PyDoc>,
-    ]);
-    expect(res).toRenderTo(
-      d`
-          """
-          somebody (str, optional): Somebody's name.
-          """
-
-
-          `,
-    );
-  });
-  it("name, type, description, and optional with default value", () => {
-    const res = toSourceText([
-      <py.PyDoc>
-        <py.GoogleStyleDocParam
-          name="somebody"
-          type={{ children: "str" }}
-          optional
-          defaultValue="John Doe"
+          default="John Doe"
         >
           Somebody's name.
         </py.GoogleStyleDocParam>
@@ -231,8 +208,7 @@ describe("GoogleStyleDocParam", () => {
           <py.GoogleStyleDocParam
             name="somebody"
             type={{ children: "str" }}
-            optional
-            defaultValue="John Doe"
+            default="John Doe"
           >
             Somebody's name. This can be any string representing a person,
             whether it's a first name, full name, nickname, or even a codename
@@ -278,8 +254,7 @@ describe("GoogleStyleDocParam", () => {
           <py.GoogleStyleDocParam
             name="somebody"
             type={{ children: "str" }}
-            optional
-            defaultValue="John Doe"
+            default="John Doe"
           >
             Somebody's name. This is one line
             <hbr />
@@ -323,9 +298,8 @@ describe("Full example", () => {
           {
             name: "somebody",
             type: { children: "str" },
-            optional: true,
             default: "John Doe",
-            doc: "Somebody's name. This can be any string representing a person, whether it's a first name, full name, nickname, or even a codename (e.g., 'Agent X'). It's used primarily for display purposes, logging, or greeting messages and is not required to be unique or validated unless specified by the caller. Defaults to \"John Doe\".",
+            doc: "Somebody's name. This can be any string representing a person, whether it's a first name, full name, nickname, or even a codename (e.g., 'Agent X'). It's used primarily for display purposes, logging, or greeting messages and is not required to be unique or validated unless specified by the caller.",
           },
           {
             name: "somebody2",
@@ -410,9 +384,8 @@ describe("Full example", () => {
           {
             name: "somebody",
             type: { children: "str" } as py.SingleTypeExpressionProps,
-            optional: true,
             default: "John Doe",
-            doc: "Somebody's name. This can be any string representing a person, whether it's a first name, full name, nickname, or even a codename (e.g., 'Agent X'). It's used primarily for display purposes, logging, or greeting messages and is not required to be unique or validated unless specified by the caller. Defaults to \"John Doe\".",
+            doc: "Somebody's name. This can be any string representing a person, whether it's a first name, full name, nickname, or even a codename (e.g., 'Agent X'). It's used primarily for display purposes, logging, or greeting messages and is not required to be unique or validated unless specified by the caller.",
           },
           {
             name: "somebody2",
