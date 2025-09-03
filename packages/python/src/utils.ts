@@ -35,9 +35,24 @@ export function getCallSignatureProps(
 export function resolveTypeExpression(
   typeProps: SingleTypeExpressionProps | UnionTypeExpressionProps,
 ) {
+  // The issue: this function was incorrectly treating code template arrays as union types.
+  // UnionTypeExpression expects children: SingleTypeExpressionProps[] 
+  // (array of objects with children property)
+  // SingleTypeExpression with code template has children: Children 
+  // (can be array of mixed types from template literal)
+  
   if (Array.isArray(typeProps.children)) {
-    return UnionTypeExpression(typeProps as UnionTypeExpressionProps);
-  } else {
-    return SingleTypeExpression(typeProps as SingleTypeExpressionProps);
+    // Check if this is a true union type by seeing if first element has children property
+    const firstChild = typeProps.children[0];
+    const isUnionType = firstChild && 
+      typeof firstChild === 'object' && 
+      firstChild !== null && 
+      'children' in firstChild;
+      
+    if (isUnionType) {
+      return UnionTypeExpression(typeProps as UnionTypeExpressionProps);
+    }
   }
+  
+  return SingleTypeExpression(typeProps as SingleTypeExpressionProps);
 }

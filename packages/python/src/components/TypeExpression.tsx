@@ -2,7 +2,7 @@ import { Children, For, memo, Refkey } from "@alloy-js/core";
 import { resolveTypeExpression } from "../utils.js";
 
 export interface SingleTypeExpressionProps {
-  children: string | Refkey;
+  children: Children;
   typeArguments?: SingleTypeExpressionProps[];
 }
 

@@ -1,4 +1,4 @@
-import { refkey } from "@alloy-js/core";
+import { code, refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import * as py from "../src/index.js";
@@ -161,6 +161,28 @@ describe("Function Declaration", () => {
           pass
 
       async def foo() -> Foo:
+          pass
+
+    `);
+  });
+
+  it("can be an async function with returnType element with list of References", () => {
+    expect(
+      toSourceText([
+        <py.StatementList>
+          <py.ClassDeclaration name="Foo" />
+          <py.FunctionDeclaration
+            async
+            name="foo"
+            returnType={{ children: code`list[${refkey("Foo")}]` }}
+          />
+        </py.StatementList>,
+      ]),
+    ).toBe(d`
+      class Foo:
+          pass
+
+      async def foo() -> list[Foo]:
           pass
 
     `);

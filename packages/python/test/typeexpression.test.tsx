@@ -1,4 +1,4 @@
-import { refkey } from "@alloy-js/core";
+import { code, refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import * as py from "../src/index.js";
@@ -136,6 +136,27 @@ describe("UnionTypeExpression", () => {
         <py.UnionTypeExpression>{elements}</py.UnionTypeExpression>,
       ]),
     ).toRenderTo("int | str | None");
+  });
+  it("renders a Python list expression with a reference", () => {
+    const classRefkey = refkey();
+    const type = code`list[${classRefkey}]`;
+
+    expect(
+      toSourceText([
+        <py.StatementList>
+          <py.ClassDeclaration
+            name="Foo"
+            refkey={classRefkey}
+          ></py.ClassDeclaration>
+          <py.SingleTypeExpression>{type}</py.SingleTypeExpression>
+        </py.StatementList>,
+      ]),
+    ).toRenderTo(d`
+        class Foo:
+            pass
+
+        list[Foo]
+    `);
   });
   it("renders a Python type expression with a reference", () => {
     const classRefkey = refkey();
