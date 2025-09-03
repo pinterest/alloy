@@ -37,15 +37,12 @@ describe("Function Declaration", () => {
       <py.StatementList>
         <py.FunctionDeclaration
           name="foo"
-          instanceFunction={true}
           returnType={{ children: "int" }}
           refkey={refkeyFoo}
         />
         <py.FunctionDeclaration
           name="bar"
-          instanceFunction={true}
           returnType={{ children: "int" }}
-          refkey={refkeyFoo}
         >
           <py.VariableDeclaration
             name="result"
@@ -177,7 +174,7 @@ describe("Function Declaration", () => {
     expect(
       toSourceText([
         <py.StatementList>
-          <py.ClassDeclaration name="Foo" />
+          <py.ClassDeclaration name="Foo" refkey={refkey("Foo")} />
           <py.FunctionDeclaration
             async
             name="foo"

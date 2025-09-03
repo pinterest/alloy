@@ -48,7 +48,6 @@ it("uses import from external library in multiple functions", () => {
       name={"getUser"}
       parameters={[{ name: "userId", type: { children: "int" } }]}
       returnType={{ children: py.requestsModule["models"]["Response"] }}
-      instanceFunction={true}
     >
       <py.StatementList>
         <py.VariableDeclaration
@@ -69,7 +68,6 @@ it("uses import from external library in multiple functions", () => {
       name={"createUser"}
       parameters={[{ name: "userName", type: { children: "string" } }]}
       returnType={{ children: py.requestsModule["models"]["Response"] }}
-      instanceFunction={true}
     >
       <py.StatementList>
         <py.VariableDeclaration
@@ -124,8 +122,6 @@ it("uses import from external library in multiple class methods", () => {
           name={"getUser"}
           parameters={[{ name: "userId", type: { children: "int" } }]}
           returnType={{ children: py.requestsModule["models"]["Response"] }}
-          instanceFunction={true}
-          name="getUser"
           instanceFunction
         >
           <py.StatementList>
