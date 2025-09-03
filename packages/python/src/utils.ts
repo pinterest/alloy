@@ -49,9 +49,5 @@ export function isUnionTypeProps(typeProps: SingleTypeExpressionProps | UnionTyp
 export function resolveTypeExpression(
   typeProps: SingleTypeExpressionProps | UnionTypeExpressionProps,
 ) {
-  if (isUnionTypeProps(typeProps)) {
-    return UnionTypeExpression(typeProps as UnionTypeExpressionProps);
-  }
-  
-  return SingleTypeExpression(typeProps as SingleTypeExpressionProps);
+  return isUnionTypeProps(typeProps) ? UnionTypeExpression(typeProps) : SingleTypeExpression(typeProps);
 }
