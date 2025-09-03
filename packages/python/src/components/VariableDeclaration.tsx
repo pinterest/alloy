@@ -105,7 +105,8 @@ export function VariableDeclaration(props: VariableDeclarationProps) {
   );
   emitSymbol(sym);
 
-  let resolvedType = props.type ? resolveTypeExpression(props.type) : undefined;
+  const resolvedType =
+    props.type ? resolveTypeExpression(props.type) : undefined;
 
   // Handle optional type annotation
   const type = memo(() => {

@@ -94,7 +94,7 @@ function parameter(param: DeclaredParameterDescriptor) {
   const SymbolSlot = createSymbolSlot();
 
   SymbolSlot.instantiateInto(param.symbol);
-  let type = param.type ? resolveTypeExpression(param.type) : undefined;
+  const type = param.type ? resolveTypeExpression(param.type) : undefined;
 
   return (
     <group>
@@ -240,13 +240,13 @@ export function CallSignature(props: CallSignatureProps) {
   );
   const typeParams =
     props.typeParameters ? `[${props.typeParameters.join(", ")}]` : "";
-  let resolvedReturnype =
+  const resolvedReturnType =
     props.returnType ? resolveTypeExpression(props.returnType) : undefined;
   const sReturnType =
-    resolvedReturnype ?
+    resolvedReturnType ?
       <>
         {" -> "}
-        {resolvedReturnype}
+        {resolvedReturnType}
       </>
     : undefined;
 

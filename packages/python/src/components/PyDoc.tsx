@@ -14,7 +14,8 @@ interface GoogleStyleDocParamTypeProps {
 }
 
 function GoogleStyleDocParamType(props: GoogleStyleDocParamTypeProps) {
-  let resolvedType = props.type ? resolveTypeExpression(props.type) : undefined;
+  const resolvedType =
+    props.type ? resolveTypeExpression(props.type) : undefined;
   return (
     <>
       <Show when={Boolean(props.type)}>

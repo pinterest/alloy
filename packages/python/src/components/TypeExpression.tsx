@@ -43,7 +43,7 @@ export interface UnionTypeExpressionProps {
 
 export function UnionTypeExpression(props: UnionTypeExpressionProps) {
   // Map each SingleTypeExpressionProps to a SingleTypeExpression element (Children)
-  let childrenElements: Children[] = props.children.map((childProps) => (
+  const childrenElements: Children[] = props.children.map((childProps) => (
     <SingleTypeExpression {...childProps} />
   ));
 
