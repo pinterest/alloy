@@ -1,19 +1,10 @@
-import {
-  emitSymbol,
-  Name,
-  OutputScope,
-  OutputSymbolFlags,
-  Scope,
-  Show,
-  useMemberScope,
-  useScope,
-} from "@alloy-js/core";
+import { emitSymbol, Name, Show } from "@alloy-js/core";
 import { createPythonSymbol } from "../symbol-creation.js";
 import { getCallSignatureProps } from "../utils.js";
 import { CallSignature, CallSignatureProps } from "./CallSignature.jsx";
 import { BaseDeclarationProps, Declaration } from "./Declaration.js";
 import { PythonBlock } from "./PythonBlock.jsx";
-import { NoNamePolicy } from "./index.js";
+import { LexicalScope, NoNamePolicy } from "./index.js";
 
 export interface FunctionDeclarationProps
   extends BaseDeclarationProps,
@@ -42,23 +33,13 @@ export interface FunctionDeclarationProps
 export function FunctionDeclaration(props: FunctionDeclarationProps) {
   const asyncKwd = props.async ? "async " : "";
   const callSignatureProps = getCallSignatureProps(props, {});
-  const memberScope = useMemberScope();
-  let scope: OutputScope | undefined = undefined;
-  if (memberScope !== undefined) {
-    scope = memberScope.instanceMembers!;
-  } else {
-    scope = useScope();
-  }
-
   const sym = createPythonSymbol(
     props.name,
     {
-      scope: scope,
+      instance: props.instanceFunction,
       refkeys: props.refkey,
-      flags: props.flags ?? OutputSymbolFlags.None,
     },
     "function",
-    false,
   );
   emitSymbol(sym);
 
@@ -66,17 +47,23 @@ export function FunctionDeclaration(props: FunctionDeclarationProps) {
     <>
       <Declaration {...props} nameKind="function" symbol={sym}>
         {asyncKwd}def <Name />
-        <Scope name={sym.name} kind="function">
+        <LexicalScope name={sym.name}>
           <CallSignature {...callSignatureProps} />
           <PythonBlock opener=":">
             <Show when={Boolean(props.doc)}>{props.doc}</Show>
             {props.children ?? "pass"}
           </PythonBlock>
-        </Scope>
+        </LexicalScope>
       </Declaration>
     </>
   );
 }
+
+export interface InitFunctionDeclarationProps
+  extends Omit<
+    FunctionDeclarationProps,
+    "name" | "instanceFunction" | "classFunction"
+  > {}
 
 /**
  * A Python `__init__` function declaration.
@@ -99,12 +86,7 @@ export function FunctionDeclaration(props: FunctionDeclarationProps) {
  * an instance function, and forces the name to be `__init__` without applying
  * the name policy.
  */
-export function InitFunctionDeclaration(
-  props: Omit<
-    FunctionDeclarationProps,
-    "name" | "instanceFunction" | "classFunction"
-  >,
-) {
+export function InitFunctionDeclaration(props: InitFunctionDeclarationProps) {
   return (
     <NoNamePolicy>
       <FunctionDeclaration

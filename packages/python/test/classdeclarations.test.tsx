@@ -34,8 +34,8 @@ describe("Python Class", () => {
   it("renders a class with base classes", () => {
     const result = toSourceText([
       <py.StatementList>
-        <py.ClassDeclaration name="Base1" />
-        <py.ClassDeclaration name="Base2" />
+        <py.ClassDeclaration name="Base1" refkey={refkey("Base1")} />
+        <py.ClassDeclaration name="Base2" refkey={refkey("Base2")} />
         <py.ClassDeclaration
           name="Baz"
           bases={[refkey("Base1"), refkey("Base2")]}
@@ -74,10 +74,14 @@ describe("Python Class", () => {
   it("renders classes across modules with inheritance", () => {
     const result = toSourceTextMultiple([
       <py.SourceFile path="mod1.py">
-        <py.ClassDeclaration name="A" />
+        <py.ClassDeclaration name="A" refkey={refkey("A")} />
       </py.SourceFile>,
       <py.SourceFile path="folder/mod2.py">
-        <py.ClassDeclaration name="B" bases={[refkey("A")]} />
+        <py.ClassDeclaration
+          name="B"
+          refkey={refkey("B")}
+          bases={[refkey("A")]}
+        />
       </py.SourceFile>,
       <py.SourceFile path="mod3.py">
         <py.ClassDeclaration name="C" bases={[refkey("B")]} />
@@ -113,7 +117,7 @@ describe("Python Class", () => {
   it("renders a class with class variables like foo: str, and also bar: A where A is another class", () => {
     const result = toSourceText([
       <py.StatementList>
-        <py.ClassDeclaration name="A" />
+        <py.ClassDeclaration name="A" refkey={refkey("A")} />
         <py.ClassDeclaration name="B">
           <py.StatementList>
             <py.VariableDeclaration
@@ -144,6 +148,9 @@ describe("Python Class", () => {
   });
 
   it("renders a class with class variables like foo: str, and another identical class", () => {
+    const fooKey = refkey();
+    const barKey = refkey();
+
     const result = toSourceText([
       <py.StatementList>
         <py.ClassDeclaration name="A">
@@ -151,6 +158,7 @@ describe("Python Class", () => {
             <py.VariableDeclaration
               name="foo"
               type={{ children: "str" }}
+              refkey={fooKey}
               omitNone
             />
           </py.StatementList>
@@ -160,10 +168,13 @@ describe("Python Class", () => {
             <py.VariableDeclaration
               name="foo"
               type={{ children: "str" }}
+              refkey={barKey}
               omitNone
             />
           </py.StatementList>
         </py.ClassDeclaration>
+        {fooKey}
+        {barKey}
       </py.StatementList>,
     ]);
     const expected = d`
@@ -173,7 +184,8 @@ describe("Python Class", () => {
       class B:
           foo: str
 
-
+      A.foo
+      B.foo
     `;
     expect(result).toRenderTo(expected);
   });
@@ -183,20 +195,26 @@ describe("Python Class - VariableDeclaration", () => {
   it("renders a class with class fields", () => {
     const result = toSourceText([
       <py.StatementList>
-        <py.ClassDeclaration name="Base"></py.ClassDeclaration>
-        <py.ClassDeclaration name="A">
+        <py.ClassDeclaration
+          refkey={refkey("Base")}
+          name="Base"
+        ></py.ClassDeclaration>
+        <py.ClassDeclaration refkey={refkey("A")} name="A">
           <py.StatementList>
-            <py.VariableDeclaration name="just_name" />
+            <py.VariableDeclaration instanceVariable name="just_name" />
             <py.VariableDeclaration
               name="name_and_type"
               type={{ children: "number" }}
+              instanceVariable
             />
             <py.VariableDeclaration
+              instanceVariable
               name="name_type_and_value"
               type={{ children: "number" }}
               initializer={12}
             />
             <py.VariableDeclaration
+              instanceVariable
               name="class_based"
               type={{ children: refkey("Base") }}
             />
@@ -232,12 +250,7 @@ describe("Python Class - VariableDeclaration", () => {
             name="one"
             refkey={v1Rk}
             type={{ children: classRk }}
-            initializer={
-              <py.MemberExpression>
-                <py.MemberExpression.Part refkey={classRk} />
-                <py.MemberExpression.Part args />
-              </py.MemberExpression>
-            }
+            initializer={<py.ClassInstantiation target={classRk} />}
           />
           <>{memberRefkey(v1Rk, classMemberRk)}</>
           <>{memberRefkey(v1Rk, classMethodRk)}()</>
@@ -250,11 +263,11 @@ describe("Python Class - VariableDeclaration", () => {
               name="instanceProp"
               refkey={classMemberRk}
               initializer={42}
-              instanceVariable={true}
+              instanceVariable
             />
             <py.FunctionDeclaration
               name="instanceMethod"
-              instanceFunction={true}
+              instanceFunction
               refkey={classMethodRk}
               returnType={{ children: "int" }}
             />
@@ -285,12 +298,16 @@ describe("Python Class - VariableDeclaration", () => {
 
 describe("Python Class - FunctionDeclaration", () => {
   it("renders a class with class fields and method", () => {
+    const methodRefkey = refkey();
+    const classMethodRefkey = refkey();
+    const staticMethodRefkey = refkey();
+
     const result = toSourceText([
-      <>
+      <py.StatementList>
         <py.ClassDeclaration name="MyClass" bases={["BaseClass"]}>
           <py.StatementList>
-            <py.VariableDeclaration name="a" type={{ children: "int" }} />
-            <py.VariableDeclaration name="b" type={{ children: "int" }} />
+            <py.VariableDeclaration name="a" type={{ children: "int" }} instanceVariable />
+            <py.VariableDeclaration name="b" type={{ children: "int" }} instanceVariable />
             <py.FunctionDeclaration
               name="my_method"
               parameters={[
@@ -298,28 +315,31 @@ describe("Python Class - FunctionDeclaration", () => {
                 { name: "b", type: { children: "int" } },
               ]}
               returnType={{ children: "int" }}
-              instanceFunction={true}
+              instanceFunction
+              refkey={methodRefkey}
             >
               return a + b
             </py.FunctionDeclaration>
             <py.FunctionDeclaration
               name="my_class_method"
-              instanceFunction={false}
-              classFunction={true}
+              classFunction
               returnType={{ children: "int" }}
+              refkey={classMethodRefkey}
             >
               pass
             </py.FunctionDeclaration>
             <py.FunctionDeclaration
               name="my_standalone_function"
-              instanceFunction={false}
               returnType={{ children: "int" }}
+              refkey={staticMethodRefkey}
             >
               pass
             </py.FunctionDeclaration>
           </py.StatementList>
         </py.ClassDeclaration>
-      </>,
+        {classMethodRefkey}
+        {staticMethodRefkey}
+      </py.StatementList>,
     ]);
     const expected = d`
       class MyClass(BaseClass):
@@ -334,8 +354,9 @@ describe("Python Class - FunctionDeclaration", () => {
           def my_standalone_function() -> int:
               pass
 
-
-          
+      
+      MyClass.my_class_method
+      MyClass.my_standalone_function
     `;
     expect(result).toRenderTo(expected);
   });

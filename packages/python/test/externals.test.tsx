@@ -96,12 +96,12 @@ it("uses import from external library in multiple functions", () => {
     from requests import post
     from requests.models import Response
 
-    def get_user(self, user_id: int) -> Response:
+    def get_user(user_id: int) -> Response:
         response = get(1)
         return response.json()
 
 
-    def create_user(self, user_name: string) -> Response:
+    def create_user(user_name: string) -> Response:
         response = post(1)
         return response.json()
 
@@ -118,12 +118,15 @@ it("uses import from external library in multiple class methods", () => {
           name="some_var"
           initializer={12}
           instanceVariable
+          refkey={refkey("some_var")}
         />
         <py.FunctionDeclaration
           name={"getUser"}
           parameters={[{ name: "userId", type: { children: "int" } }]}
           returnType={{ children: py.requestsModule["models"]["Response"] }}
           instanceFunction={true}
+          name="getUser"
+          instanceFunction
         >
           <py.StatementList>
             <py.VariableDeclaration
@@ -144,7 +147,7 @@ it("uses import from external library in multiple class methods", () => {
           name={"createUser"}
           parameters={[{ name: "userName", type: { children: "string" } }]}
           returnType={{ children: py.requestsModule["models"]["Response"] }}
-          instanceFunction={true}
+          instanceFunction
         >
           <py.StatementList>
             <py.VariableDeclaration

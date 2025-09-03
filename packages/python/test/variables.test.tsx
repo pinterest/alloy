@@ -135,14 +135,15 @@ describe("Python Variable", () => {
   });
 
   it("declares a python variable with a class type", () => {
+    const classKey = refkey();
     const res = toSourceText([
       <py.StatementList>
-        <py.ClassDeclaration name="MyClass" />
+        <py.ClassDeclaration name="MyClass" refkey={classKey} />
         <py.VariableDeclaration
           name="my_var"
           type={
             {
-              children: <py.Reference refkey={refkey("MyClass")} />,
+              children: <py.Reference refkey={classKey} />,
             } as py.SingleTypeExpressionProps
           }
         />
@@ -156,16 +157,17 @@ describe("Python Variable", () => {
   });
 
   it("declares a python variable with a class type from a different module", () => {
+    const classKey = refkey();
     const res = toSourceTextMultiple([
       <py.SourceFile path="classes.py">
-        <py.ClassDeclaration name="MyClass" />
+        <py.ClassDeclaration name="MyClass" refkey={classKey} />
       </py.SourceFile>,
       <py.SourceFile path="usage.py">
         <py.VariableDeclaration
           name="my_var"
           type={
             {
-              children: <py.Reference refkey={refkey("MyClass")} />,
+              children: <py.Reference refkey={classKey} />,
             } as py.SingleTypeExpressionProps
           }
         />
@@ -186,13 +188,15 @@ describe("Python Variable", () => {
   });
 
   it("declares a python variable receiving other variable as value", () => {
+    const varKey = refkey();
     const res = toSourceText([
       <py.StatementList>
-        <py.VariableDeclaration name="my_var" initializer={42} />
         <py.VariableDeclaration
-          name="my_other_var"
-          initializer={refkey("my_var")}
+          name="my_var"
+          refkey={varKey}
+          initializer={42}
         />
+        <py.VariableDeclaration name="my_other_var" initializer={varKey} />
       </py.StatementList>,
     ]);
     expect(res).toBe(`my_var = 42\nmy_other_var = my_var`);
