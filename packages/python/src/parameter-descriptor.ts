@@ -1,8 +1,5 @@
 import type { Children, Refkey } from "@alloy-js/core";
-import type {
-  SingleTypeExpressionProps,
-  UnionTypeExpressionProps,
-} from "./components/TypeExpression.jsx";
+import type { TypeExpressionProps } from "./components/TypeExpression.jsx";
 
 /**
  * Information for a Python function parameter.
@@ -16,7 +13,7 @@ export interface ParameterDescriptor {
   /**
    * The type of the parameter.
    */
-  readonly type?: SingleTypeExpressionProps | UnionTypeExpressionProps;
+  readonly type?: TypeExpressionProps;
 
   /**
    * The refkey for this parameter.

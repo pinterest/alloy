@@ -66,3 +66,5 @@ export function UnionTypeExpression(props: UnionTypeExpressionProps) {
     </group>
   );
 }
+
+export type TypeExpressionProps = SingleTypeExpressionProps | UnionTypeExpressionProps;

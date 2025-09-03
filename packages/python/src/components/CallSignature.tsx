@@ -11,10 +11,7 @@ import { PythonOutputSymbol } from "../symbols/index.js";
 import { resolveTypeExpression } from "../utils.js";
 import { Atom } from "./Atom.jsx";
 import { PythonSourceFileContext } from "./SourceFile.jsx";
-import {
-  SingleTypeExpressionProps,
-  UnionTypeExpressionProps,
-} from "./index.js";
+import { type TypeExpressionProps } from "./index.js";
 
 export interface CallSignatureParametersProps {
   readonly parameters?: ParameterDescriptor[] | string[];
@@ -205,7 +202,7 @@ export interface CallSignatureProps {
   /**
    * The return type of the function.
    */
-  returnType?: SingleTypeExpressionProps | UnionTypeExpressionProps;
+  returnType?: TypeExpressionProps;
 }
 /**
  * A Python call signature, e.g. the part after the `def` keyword and the name in a

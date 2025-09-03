@@ -2,7 +2,7 @@ import { defaultProps, splitProps } from "@alloy-js/core";
 import {
   CallSignatureProps,
   SingleTypeExpression,
-  SingleTypeExpressionProps,
+  TypeExpressionProps,
   UnionTypeExpression,
   UnionTypeExpressionProps,
 } from "./components/index.js";
@@ -32,7 +32,7 @@ export function getCallSignatureProps(
   return defaultProps(callSignatureProps, defaults);
 }
 
-export function isUnionTypeProps(typeProps: SingleTypeExpressionProps | UnionTypeExpressionProps): typeProps is UnionTypeExpressionProps {
+export function isUnionTypeProps(typeProps: TypeExpressionProps): typeProps is UnionTypeExpressionProps {
   if (Array.isArray(typeProps.children)) {
     // Check if this is a true union type by seeing if first element has children property
     // It could also be a single type expression with a code template array, but we don't want to treat that as a union type.
@@ -46,8 +46,6 @@ export function isUnionTypeProps(typeProps: SingleTypeExpressionProps | UnionTyp
   return false;
 }
 
-export function resolveTypeExpression(
-  typeProps: SingleTypeExpressionProps | UnionTypeExpressionProps,
-) {
+export function resolveTypeExpression(typeProps: TypeExpressionProps) {
   return isUnionTypeProps(typeProps) ? UnionTypeExpression(typeProps) : SingleTypeExpression(typeProps);
 }

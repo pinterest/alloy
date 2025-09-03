@@ -18,8 +18,7 @@ import { Atom } from "./Atom.jsx";
 import { BaseDeclarationProps } from "./Declaration.jsx";
 import {
   SimpleCommentBlock,
-  SingleTypeExpressionProps,
-  UnionTypeExpressionProps,
+  type TypeExpressionProps
 } from "./index.js";
 
 export interface VariableDeclarationProps extends BaseDeclarationProps {
@@ -30,7 +29,7 @@ export interface VariableDeclarationProps extends BaseDeclarationProps {
   /**
    * The type of the variable. Used only for type annotation. Optional.
    */
-  type?: SingleTypeExpressionProps | UnionTypeExpressionProps;
+  type?: TypeExpressionProps;
   /**
    * Indicates if we should omit the None assignment. Optional.
    */

@@ -4,12 +4,11 @@ import { ParameterDescriptor } from "../parameter-descriptor.js";
 import { resolveTypeExpression } from "../utils.js";
 import {
   Atom,
-  SingleTypeExpressionProps,
-  UnionTypeExpressionProps,
+  type TypeExpressionProps,
 } from "./index.js";
 
 interface GoogleStyleDocParamTypeProps {
-  type?: SingleTypeExpressionProps | UnionTypeExpressionProps;
+  type?: TypeExpressionProps;
   optional?: boolean;
 }
 
@@ -60,7 +59,7 @@ function GoogleStyleDocParamDescription(
 
 export interface GoogleStyleDocParamProps {
   name: Children;
-  type?: SingleTypeExpressionProps | UnionTypeExpressionProps;
+  type?: TypeExpressionProps;
   children?: Children;
   optional?: boolean;
   defaultValue?: Children;
