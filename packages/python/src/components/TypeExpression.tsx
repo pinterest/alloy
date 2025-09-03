@@ -8,11 +8,9 @@ export interface SingleTypeExpressionProps {
 
 export function SingleTypeExpression(props: SingleTypeExpressionProps) {
   const resolvedChildren = memo(() => props.children);
-  let resolvedTypeArguments: Children = undefined;
+  let resolvedTypeArguments: Children | undefined = undefined;
   if (props.typeArguments) {
-    const typeArguments = props.typeArguments.map((child) =>
-      resolveTypeExpression(child),
-    );
+    const typeArguments = props.typeArguments.map(resolveTypeExpression);
     resolvedTypeArguments =
       typeArguments && typeArguments.length > 0 ?
         <>
