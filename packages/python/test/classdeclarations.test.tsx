@@ -306,8 +306,16 @@ describe("Python Class - FunctionDeclaration", () => {
       <py.StatementList>
         <py.ClassDeclaration name="MyClass" bases={["BaseClass"]}>
           <py.StatementList>
-            <py.VariableDeclaration name="a" type={{ children: "int" }} instanceVariable />
-            <py.VariableDeclaration name="b" type={{ children: "int" }} instanceVariable />
+            <py.VariableDeclaration
+              name="a"
+              type={{ children: "int" }}
+              instanceVariable
+            />
+            <py.VariableDeclaration
+              name="b"
+              type={{ children: "int" }}
+              instanceVariable
+            />
             <py.FunctionDeclaration
               name="my_method"
               parameters={[

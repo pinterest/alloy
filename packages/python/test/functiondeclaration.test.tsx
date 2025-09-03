@@ -40,10 +40,7 @@ describe("Function Declaration", () => {
           returnType={{ children: "int" }}
           refkey={refkeyFoo}
         />
-        <py.FunctionDeclaration
-          name="bar"
-          returnType={{ children: "int" }}
-        >
+        <py.FunctionDeclaration name="bar" returnType={{ children: "int" }}>
           <py.VariableDeclaration
             name="result"
             type={{ children: "int" }}
