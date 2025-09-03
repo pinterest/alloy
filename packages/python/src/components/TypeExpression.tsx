@@ -11,16 +11,14 @@ export function SingleTypeExpression(props: SingleTypeExpressionProps) {
   let resolvedTypeArguments: Children | undefined = undefined;
   if (props.typeArguments) {
     const typeArguments = props.typeArguments.map(resolveTypeExpression);
-    resolvedTypeArguments =
-      typeArguments && typeArguments.length > 0 ?
-        <>
-          [
-          <For each={typeArguments} joiner=", ">
-            {(arg) => arg}
-          </For>
-          ]
-        </>
-      : undefined;
+    resolvedTypeArguments = 
+      <>
+        [
+        <For each={typeArguments} joiner=", ">
+          {(arg) => arg}
+        </For>
+        ]
+      </>;
   }
 
   return (
