@@ -48,10 +48,7 @@ export function FunctionDeclaration(props: FunctionDeclarationProps) {
       <Declaration {...props} nameKind="function" symbol={sym}>
         {asyncKwd}def <Name />
         <LexicalScope name={sym.name}>
-          <CallSignature
-            {...callSignatureProps}
-            returnType={props.returnType}
-          />
+          <CallSignature {...callSignatureProps} />
           <PythonBlock opener=":">
             <Show when={Boolean(props.doc)}>{props.doc}</Show>
             {props.children ?? "pass"}
