@@ -279,13 +279,18 @@ describe("Function Declaration", () => {
 
     `);
   });
-  it("renders __init__ function with parameters", () => {
+  it("renders dunder methods with parameters", () => {
     const parameters = [{ name: "x", type: { children: "int" } }];
     const decl = (
       <py.ClassDeclaration name="MyClass">
-        <py.DunderMethodDeclaration name="__init__" parameters={parameters}>
-          self.attribute = "value"
-        </py.DunderMethodDeclaration>
+        <py.StatementList>
+          <py.DunderMethodDeclaration name="__init__" parameters={parameters}>
+            self.attribute = "value"
+          </py.DunderMethodDeclaration>
+          <py.DunderMethodDeclaration name="__repr__" parameters={parameters}>
+            return "MyClass"
+          </py.DunderMethodDeclaration>
+        </py.StatementList>
       </py.ClassDeclaration>
     );
 
@@ -293,6 +298,9 @@ describe("Function Declaration", () => {
       class MyClass:
           def __init__(self, x: int):
               self.attribute = "value"
+
+          def __repr__(self, x: int):
+              return "MyClass"
 
 
     `);
