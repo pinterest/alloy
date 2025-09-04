@@ -163,6 +163,17 @@ describe("Call Signature", () => {
       (self, a, b)
     `);
   });
+  it("renders a simple call signature for an instance function", () => {
+    const result = toSourceText([
+      <py.CallSignature
+        parameters={[{ name: "a" }, { name: "b" }]}
+        staticFunction
+      />,
+    ]);
+    expect(result).toRenderTo(d`
+      (a, b)
+    `);
+  });
   it("throws an error for a call signature that's instance and class function at the same time", () => {
     expect(() =>
       toSourceText([
@@ -172,7 +183,7 @@ describe("Call Signature", () => {
           classFunction
         />,
       ]),
-    ).toThrowError(/Cannot be both an instance function and a class function/);
+    ).toThrowError(/A function can only be one of instance, class, or static/);
   });
   it("renders a simple call signature with all properties", () => {
     const result = toSourceText([

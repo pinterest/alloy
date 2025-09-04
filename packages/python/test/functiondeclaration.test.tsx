@@ -65,9 +65,7 @@ describe("Function Declaration", () => {
   it("renders an instance function with a body", () => {
     const result = toSourceText([
       <py.ClassDeclaration name="MyClass">
-        <py.FunctionDeclaration name="bar" instanceFunction={true}>
-          print('hi')
-        </py.FunctionDeclaration>
+        <py.MethodDeclaration name="bar">print('hi')</py.MethodDeclaration>
       </py.ClassDeclaration>,
     ]);
     expect(result).toRenderTo(d`
@@ -108,7 +106,10 @@ describe("Function Declaration", () => {
   it("renders an __init__ function with no body as 'pass'", () => {
     const result = toSourceText([
       <py.ClassDeclaration name="MyClass">
-        <py.InitFunctionDeclaration parameters={[{ name: "x" }]} />
+        <py.DunderMethodDeclaration
+          name="__init__"
+          parameters={[{ name: "x" }]}
+        />
       </py.ClassDeclaration>,
     ]);
     expect(result).toRenderTo(d`
@@ -222,17 +223,13 @@ describe("Function Declaration", () => {
 
     `);
   });
-  it("renders function with parameters", () => {
+  it("renders method with parameters", () => {
     const parameters = [{ name: "x", type: { children: "int" } }];
     const decl = (
       <py.ClassDeclaration name="MyClass">
-        <py.FunctionDeclaration
-          name="foo"
-          instanceFunction
-          parameters={parameters}
-        >
+        <py.MethodDeclaration name="foo" parameters={parameters}>
           self.attribute = "value"
-        </py.FunctionDeclaration>
+        </py.MethodDeclaration>
       </py.ClassDeclaration>
     );
 
@@ -244,13 +241,51 @@ describe("Function Declaration", () => {
 
     `);
   });
+  it("renders class method with parameters", () => {
+    const parameters = [{ name: "x", type: { children: "int" } }];
+    const decl = (
+      <py.ClassDeclaration name="MyClass">
+        <py.ClassMethodDeclaration name="foo" parameters={parameters}>
+          self.attribute = "value"
+        </py.ClassMethodDeclaration>
+      </py.ClassDeclaration>
+    );
+
+    expect(toSourceText([decl])).toBe(d`
+      class MyClass:
+          @classmethod
+          def foo(cls, x: int):
+              self.attribute = "value"
+
+
+    `);
+  });
+  it("renders static method with parameters", () => {
+    const parameters = [{ name: "x", type: { children: "int" } }];
+    const decl = (
+      <py.ClassDeclaration name="MyClass">
+        <py.StaticMethodDeclaration name="foo" parameters={parameters}>
+          attribute = "value"
+        </py.StaticMethodDeclaration>
+      </py.ClassDeclaration>
+    );
+
+    expect(toSourceText([decl])).toBe(d`
+      class MyClass:
+          @staticmethod
+          def foo(x: int):
+              attribute = "value"
+
+
+    `);
+  });
   it("renders __init__ function with parameters", () => {
     const parameters = [{ name: "x", type: { children: "int" } }];
     const decl = (
       <py.ClassDeclaration name="MyClass">
-        <py.InitFunctionDeclaration parameters={parameters}>
+        <py.DunderMethodDeclaration name="__init__" parameters={parameters}>
           self.attribute = "value"
-        </py.InitFunctionDeclaration>
+        </py.DunderMethodDeclaration>
       </py.ClassDeclaration>
     );
 
