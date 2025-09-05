@@ -328,7 +328,7 @@ describe("Python Class - FunctionDeclaration", () => {
             </py.MethodDeclaration>
             <py.FunctionDeclaration
               name="my_class_method"
-              classFunction
+              functionType="class"
               returnType={{ children: "int" }}
               refkey={classMethodRefkey}
             >

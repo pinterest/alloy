@@ -18,9 +18,7 @@ export interface CallSignatureParametersProps {
   readonly parameters?: ParameterDescriptor[] | string[];
   readonly args?: boolean;
   readonly kwargs?: boolean;
-  readonly instanceFunction?: boolean;
-  readonly classFunction?: boolean;
-  readonly staticFunction?: boolean;
+  readonly functionType?: "instance" | "class" | "static";
 }
 
 /**
@@ -37,14 +35,6 @@ export interface CallSignatureParametersProps {
  * ```
  */
 export function CallSignatureParameters(props: CallSignatureParametersProps) {
-  if (
-    [props.instanceFunction, props.classFunction, props.staticFunction].filter(
-      Boolean,
-    ).length > 1
-  ) {
-    throw new Error("A function can only be one of instance, class, or static");
-  }
-
   const sfContext = useContext(PythonSourceFileContext);
   const module = sfContext?.module;
   const parameters = normalizeAndDeclareParameters(props.parameters ?? []);
@@ -53,13 +43,13 @@ export function CallSignatureParameters(props: CallSignatureParametersProps) {
     const params = [];
 
     // Add self/cls parameter if instance or class function
-    if (props.instanceFunction) {
+    if (props.functionType == "instance") {
       params.push(
         parameter({
           symbol: createPythonSymbol("self", { module: module }),
         }),
       );
-    } else if (props.classFunction) {
+    } else if (props.functionType == "class") {
       params.push(
         parameter({
           symbol: createPythonSymbol("cls", { module: module }),
@@ -177,19 +167,9 @@ export interface CallSignatureProps {
   kwargs?: boolean;
 
   /**
-   * Indicates that this is an instance function.
+   * Indicates the type of function.
    */
-  instanceFunction?: boolean; // true if this is an instance function
-
-  /**
-   * Indicates that this is a class function.
-   */
-  classFunction?: boolean; // true if this is a class function
-
-  /**
-   * Indicates that this is a static function.
-   */
-  staticFunction?: boolean; // true if this is a static function
+  functionType?: "instance" | "class" | "static";
 
   /**
    * The return type of the function.
@@ -223,9 +203,7 @@ export function CallSignature(props: CallSignatureProps) {
       parameters={props.parameters}
       args={props.args}
       kwargs={props.kwargs}
-      instanceFunction={props.instanceFunction}
-      classFunction={props.classFunction}
-      staticFunction={props.staticFunction}
+      functionType={props.functionType}
     />
   );
   const typeParams =

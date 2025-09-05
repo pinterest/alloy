@@ -36,8 +36,7 @@ function FunctionDeclarationBase(props: FunctionDeclarationProps) {
   const sym = createPythonSymbol(
     props.name,
     {
-      instance:
-        props.instanceFunction || props.staticFunction || props.classFunction,
+      instance: props.functionType !== undefined,
       refkeys: props.refkey,
     },
     "function",
@@ -65,7 +64,7 @@ export function FunctionDeclaration(props: FunctionDeclarationProps) {
 }
 
 export function MethodDeclaration(props: FunctionDeclarationProps) {
-  return <FunctionDeclarationBase instanceFunction={true} {...props} />;
+  return <FunctionDeclarationBase functionType={"instance"} {...props} />;
 }
 
 export function ClassMethodDeclaration(props: FunctionDeclarationProps) {
@@ -73,7 +72,7 @@ export function ClassMethodDeclaration(props: FunctionDeclarationProps) {
     <>
       {"@classmethod"}
       <hbr />
-      <FunctionDeclarationBase classFunction={true} {...props} />
+      <FunctionDeclarationBase functionType={"class"} {...props} />
     </>
   );
 }
@@ -83,16 +82,13 @@ export function StaticMethodDeclaration(props: FunctionDeclarationProps) {
     <>
       {"@staticmethod"}
       <hbr />
-      <FunctionDeclarationBase staticFunction={true} {...props} />
+      <FunctionDeclarationBase functionType={"static"} {...props} />
     </>
   );
 }
 
 export interface DunderMethodDeclarationProps
-  extends Omit<
-    FunctionDeclarationProps,
-    "instanceFunction" | "classFunction" | "staticFunction"
-  > {}
+  extends Omit<FunctionDeclarationProps, "functionType"> {}
 
 /**
  * A Python dunder method declaration.
