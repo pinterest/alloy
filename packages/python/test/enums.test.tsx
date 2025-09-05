@@ -6,10 +6,10 @@ import * as py from "../src/index.js";
 import { toSourceText } from "./utils.jsx";
 
 describe("Python Enum", () => {
-  it("class enum with explicit values", () => {
+  it("classic enum with explicit values", () => {
     const result = toSourceText(
       [
-        <py.ClassEnumDeclaration
+        <py.EnumDeclaration
           name="Color"
           baseType="IntEnum"
           members={[
@@ -34,10 +34,10 @@ describe("Python Enum", () => {
     expect(result).toRenderTo(expected);
   });
 
-  it("class enum with jsValues", () => {
+  it("classic enum with jsValues", () => {
     const result = toSourceText(
       [
-        <py.ClassEnumDeclaration
+        <py.EnumDeclaration
           name="Color"
           baseType="IntEnum"
           members={[
@@ -62,13 +62,13 @@ describe("Python Enum", () => {
     expect(result).toRenderTo(expected);
   });
 
-  it("class enum with a refkey as jsValue", () => {
+  it("classic enum with a refkey as jsValue", () => {
     const result = toSourceText(
       [
         <py.StatementList>
           <py.ClassDeclaration name="Dog" refkey={refkey("Dog")} />
           <py.ClassDeclaration name="Cat" refkey={refkey("Cat")} />
-          <py.ClassEnumDeclaration
+          <py.EnumDeclaration
             name="Animal"
             baseType="Enum"
             members={[
@@ -98,12 +98,12 @@ describe("Python Enum", () => {
     expect(result).toRenderTo(expected);
   });
 
-  it("class enum with auto() values", () => {
+  it("enum with auto() values", () => {
     const result = toSourceText(
       [
-        <py.ClassEnumDeclaration
+        <py.EnumDeclaration
           name="Animal"
-          auto
+          style="auto"
           members={[{ name: "DOG" }, { name: "CAT" }, { name: "RABBIT" }]}
         />,
       ],
@@ -123,13 +123,13 @@ describe("Python Enum", () => {
     expect(result).toRenderTo(expected);
   });
 
-  it("class enum with mixed manual and auto() values", () => {
+  it("enum with mixed manual and auto() values", () => {
     const result = toSourceText(
       [
-        <py.ClassEnumDeclaration
+        <py.EnumDeclaration
           name="Permission"
           baseType="Flag"
-          auto
+          style="auto"
           members={[
             { name: "READ", value: 1 },
             { name: "WRITE" },
@@ -157,8 +157,9 @@ describe("Python Enum", () => {
   it("functional enum with list", () => {
     const result = toSourceText(
       [
-        <py.FunctionalEnumDeclaration
+        <py.EnumDeclaration
           name="Direction"
+          style="functional"
           members={[
             { name: "NORTH" },
             { name: "SOUTH" },
@@ -180,8 +181,9 @@ describe("Python Enum", () => {
   it("functional enum with mapping", () => {
     const result = toSourceText(
       [
-        <py.FunctionalEnumDeclaration
+        <py.EnumDeclaration
           name="Priority"
+          style="functional"
           members={[
             { name: "HIGH", value: 1 },
             { name: "MEDIUM", value: 2 },
