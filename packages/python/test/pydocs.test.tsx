@@ -482,7 +482,7 @@ describe("Full example", () => {
   it("classic enum with explicit values", () => {
     const result = toSourceText(
       [
-        <py.EnumDeclaration
+        <py.ClassEnumDeclaration
           name="Color"
           baseType="IntEnum"
           members={[
