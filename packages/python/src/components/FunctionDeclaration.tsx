@@ -30,13 +30,14 @@ export interface FunctionDeclarationProps
  *   return a + b
  * ```
  */
-export function FunctionDeclaration(props: FunctionDeclarationProps) {
+function FunctionDeclarationBase(props: FunctionDeclarationProps) {
   const asyncKwd = props.async ? "async " : "";
   const callSignatureProps = getCallSignatureProps(props, {});
   const sym = createPythonSymbol(
     props.name,
     {
-      instance: props.instanceFunction,
+      instance:
+        props.instanceFunction || props.staticFunction || props.classFunction,
       refkeys: props.refkey,
     },
     "function",
@@ -59,20 +60,48 @@ export function FunctionDeclaration(props: FunctionDeclarationProps) {
   );
 }
 
-export interface InitFunctionDeclarationProps
+export function FunctionDeclaration(props: FunctionDeclarationProps) {
+  return <FunctionDeclarationBase {...props} />;
+}
+
+export function MethodDeclaration(props: FunctionDeclarationProps) {
+  return <FunctionDeclarationBase instanceFunction={true} {...props} />;
+}
+
+export function ClassMethodDeclaration(props: FunctionDeclarationProps) {
+  return (
+    <>
+      {"@classmethod"}
+      <hbr />
+      <FunctionDeclarationBase classFunction={true} {...props} />
+    </>
+  );
+}
+
+export function StaticMethodDeclaration(props: FunctionDeclarationProps) {
+  return (
+    <>
+      {"@staticmethod"}
+      <hbr />
+      <FunctionDeclarationBase staticFunction={true} {...props} />
+    </>
+  );
+}
+
+export interface DunderMethodDeclarationProps
   extends Omit<
     FunctionDeclarationProps,
-    "name" | "instanceFunction" | "classFunction"
+    "instanceFunction" | "classFunction" | "staticFunction"
   > {}
 
 /**
- * A Python `__init__` function declaration.
+ * A Python dunder method declaration.
  *
  * @example
  * ```tsx
- * <InitFunctionDeclaration>
+ * <DunderMethodDeclaration name="__init__">
  *   self.attribute = "value"
- * </InitFunctionDeclaration>
+ * </DunderMethodDeclaration>
  * ```
  * This will generate:
  * ```python
@@ -82,19 +111,12 @@ export interface InitFunctionDeclarationProps
  *
  * @remarks
  *
- * This is a convenience component that sets the name to `__init__`, marks it as
- * an instance function, and forces the name to be `__init__` without applying
- * the name policy.
+ * This is a convenience component for dunder methods.
  */
-export function InitFunctionDeclaration(props: InitFunctionDeclarationProps) {
+export function DunderMethodDeclaration(props: DunderMethodDeclarationProps) {
   return (
     <NoNamePolicy>
-      <FunctionDeclaration
-        {...props}
-        name="__init__"
-        instanceFunction={true}
-        classFunction={false}
-      />
+      <MethodDeclaration {...props} />
     </NoNamePolicy>
   );
 }

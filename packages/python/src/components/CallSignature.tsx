@@ -20,6 +20,7 @@ export interface CallSignatureParametersProps {
   readonly kwargs?: boolean;
   readonly instanceFunction?: boolean;
   readonly classFunction?: boolean;
+  readonly staticFunction?: boolean;
 }
 
 /**
@@ -36,9 +37,12 @@ export interface CallSignatureParametersProps {
  * ```
  */
 export function CallSignatureParameters(props: CallSignatureParametersProps) {
-  // Validate that only one of instanceFunction or classFunction is true
-  if (props.instanceFunction && props.classFunction) {
-    throw new Error("Cannot be both an instance function and a class function");
+  if (
+    [props.instanceFunction, props.classFunction, props.staticFunction].filter(
+      Boolean,
+    ).length > 1
+  ) {
+    throw new Error("A function can only be one of instance, class, or static");
   }
 
   const sfContext = useContext(PythonSourceFileContext);
@@ -183,6 +187,11 @@ export interface CallSignatureProps {
   classFunction?: boolean; // true if this is a class function
 
   /**
+   * Indicates that this is a static function.
+   */
+  staticFunction?: boolean; // true if this is a static function
+
+  /**
    * The return type of the function.
    */
   returnType?: TypeExpressionProps;
@@ -216,6 +225,7 @@ export function CallSignature(props: CallSignatureProps) {
       kwargs={props.kwargs}
       instanceFunction={props.instanceFunction}
       classFunction={props.classFunction}
+      staticFunction={props.staticFunction}
     />
   );
   const typeParams =

@@ -265,9 +265,8 @@ describe("Python Class - VariableDeclaration", () => {
               initializer={42}
               instanceVariable
             />
-            <py.FunctionDeclaration
+            <py.MethodDeclaration
               name="instanceMethod"
-              instanceFunction
               refkey={classMethodRk}
               returnType={{ children: "int" }}
             />
@@ -316,18 +315,17 @@ describe("Python Class - FunctionDeclaration", () => {
               type={{ children: "int" }}
               instanceVariable
             />
-            <py.FunctionDeclaration
+            <py.MethodDeclaration
               name="my_method"
               parameters={[
                 { name: "a", type: { children: "int" } },
                 { name: "b", type: { children: "int" } },
               ]}
               returnType={{ children: "int" }}
-              instanceFunction
               refkey={methodRefkey}
             >
               return a + b
-            </py.FunctionDeclaration>
+            </py.MethodDeclaration>
             <py.FunctionDeclaration
               name="my_class_method"
               classFunction
