@@ -495,7 +495,6 @@ describe("Function Declaration", () => {
   });
 
   it("renders dunder methods __new__", () => {
-    const parameters = [{ name: "cls" }];
     const decl = (
       <py.ClassDeclaration name="MyClass">
         <py.StatementList>
