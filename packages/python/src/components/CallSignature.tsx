@@ -194,8 +194,8 @@ export interface CallSignatureProps {
  * @example
  * ```tsx
  * <CallSignature
- *   parameters={[{ name: "a", type: "int" }, { name: "b", type: "str" }]}
- *   returnType="int"
+ *   parameters={[{ name: "a", type: { children: "int" } }, { name: "b", type: { children: "str" } }]}
+ *   returnType={{ children: "int" }}
  * />
  * ```
  * renders to

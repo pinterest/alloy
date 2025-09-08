@@ -45,7 +45,7 @@ export interface VariableDeclarationProps extends BaseDeclarationProps {
  * ```tsx
  * <VariableDeclaration
  *   name="myVar"
- *   type="int"
+ *   type={{ children:"int" }}
  *   initializer={42}  // Initial value
  * />
  * <VariableDeclaration

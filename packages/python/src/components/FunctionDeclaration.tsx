@@ -19,8 +19,8 @@ export interface FunctionDeclarationProps
  * ```tsx
  * <FunctionDeclaration
  *  name="my_function"
- *  returnType="int"
- *  parameters=[{name: "a", type: "int"},{name: "b", type: "str"}]>
+ *  returnType={{ children:"int" }}
+ *  parameters=[{name: "a", type: { children:"int" }},{name: "b", type: { children:"str" }}]>
  *   return a + b
  * </FunctionDeclaration>
  * ```

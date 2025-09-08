@@ -191,3 +191,64 @@ describe("UnionTypeExpression", () => {
     `);
   });
 });
+
+describe("TypeExpression in different scenarios", () => {
+  it("renders an UnionTypeExpression as a function type parameter and return type", () => {
+    const classRefkey = refkey();
+    const elements = [{ children: "int" }, { children: "str" }, { children: classRefkey }];
+    const type = <py.UnionTypeExpression>{elements}</py.UnionTypeExpression>;
+    expect(
+      toSourceText([
+        <py.ClassDeclaration
+        name="Foo"
+        refkey={classRefkey}
+      ></py.ClassDeclaration>,
+        <py.FunctionDeclaration
+          name="fooFunction"
+          parameters={[
+            {
+              name: "x",
+              type: { children: type },
+            },
+          ]}
+          args={true}
+          kwargs={true}
+          returnType={{ children: type }}
+        />,
+      ]),
+    ).toRenderTo(d`
+        class Foo:
+            pass
+
+
+        def foo_function(x: int | str | Foo, *args, **kwargs) -> int | str | Foo:
+            pass
+
+
+    `);
+  });
+  it("renders an UnionTypeExpression as a variable type", () => {
+    const classRefkey = refkey();
+    const elements = [{ children: "int" }, { children: "str" }, { children: classRefkey }];
+    const type = <py.UnionTypeExpression>{elements}</py.UnionTypeExpression>;
+    expect(
+      toSourceText([
+        <py.ClassDeclaration
+        name="Foo"
+        refkey={classRefkey}
+        ></py.ClassDeclaration>,
+        <py.VariableDeclaration
+          name="fooVariable"
+          type={{ children: type }}
+        />,
+      ]),
+    ).toRenderTo(d`
+        class Foo:
+            pass
+
+
+        foo_variable: int | str | Foo = None
+
+    `);
+  });
+});
