@@ -2,7 +2,7 @@ import { code, refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import * as py from "../src/index.js";
-import { abcModule, NoNamePolicy } from "../src/index.js";
+import { abcModule } from "../src/index.js";
 import {
   assertFileContents,
   toSourceText,
@@ -495,9 +495,7 @@ describe("Function Declaration", () => {
   });
 
   it("renders dunder methods __new__", () => {
-    const parameters = [
-      { name: "cls" },
-    ];
+    const parameters = [{ name: "cls" }];
     const decl = (
       <py.ClassDeclaration name="MyClass">
         <py.StatementList>

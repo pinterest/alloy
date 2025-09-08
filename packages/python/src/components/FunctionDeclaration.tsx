@@ -210,7 +210,11 @@ export function DunderMethodDeclaration(props: DunderMethodDeclarationProps) {
 export interface NewDunderClassMethodDeclarationProps
   extends Omit<DunderMethodDeclarationProps, "name"> {}
 
-export function NewDunderClassMethodDeclaration(props: NewDunderClassMethodDeclarationProps) {
+export function NewDunderClassMethodDeclaration(
+  props: NewDunderClassMethodDeclarationProps,
+) {
+  // __new__ is a special method, as, despite having cls as the first parameter,
+  // it isn't decorated with @classmethod.
   return (
     <NoNamePolicy>
       <MethodDeclaration {...props} name="__new__" functionType={"class"} />
