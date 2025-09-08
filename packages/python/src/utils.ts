@@ -20,7 +20,6 @@ export function getCallSignatureProps(
     "typeParameters",
     "args",
     "kwargs",
-    "functionType",
     "returnType",
   ]);
 

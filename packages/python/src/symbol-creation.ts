@@ -62,6 +62,7 @@ export function createPythonSymbol(
     metadata: options.metadata,
     module: sfContext?.module,
     type: options.type,
+    ignoreNameConflict: options.ignoreNameConflict,
   });
 }
 

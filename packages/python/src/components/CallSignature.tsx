@@ -35,28 +35,10 @@ export interface CallSignatureParametersProps {
  * ```
  */
 export function CallSignatureParameters(props: CallSignatureParametersProps) {
-  const sfContext = useContext(PythonSourceFileContext);
-  const module = sfContext?.module;
   const parameters = normalizeAndDeclareParameters(props.parameters ?? []);
 
   const parameterList = computed(() => {
     const params = [];
-
-    // Add self/cls parameter if instance or class function
-    if (props.functionType == "instance") {
-      params.push(
-        parameter({
-          symbol: createPythonSymbol("self", { module: module }),
-        }),
-      );
-    } else if (props.functionType == "class") {
-      params.push(
-        parameter({
-          symbol: createPythonSymbol("cls", { module: module }),
-        }),
-      );
-    }
-
     // Add regular parameters
     parameters.forEach((param) => {
       params.push(parameter(param));
@@ -82,7 +64,7 @@ export function CallSignatureParameters(props: CallSignatureParametersProps) {
   );
 }
 
-function parameter(param: DeclaredParameterDescriptor) {
+export function parameter(param: DeclaredParameterDescriptor) {
   const type = param.type ? resolveTypeExpression(param.type) : undefined;
   const TypeSlot = param.TypeSlot!; // TypeSlot will always be present when param.type is true.
   return (
@@ -167,11 +149,6 @@ export interface CallSignatureProps {
   kwargs?: boolean;
 
   /**
-   * Indicates the type of function.
-   */
-  functionType?: "instance" | "class" | "static";
-
-  /**
    * The return type of the function.
    */
   returnType?: TypeExpressionProps;
@@ -203,7 +180,6 @@ export function CallSignature(props: CallSignatureProps) {
       parameters={props.parameters}
       args={props.args}
       kwargs={props.kwargs}
-      functionType={props.functionType}
     />
   );
   const typeParams =
