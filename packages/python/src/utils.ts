@@ -20,9 +20,6 @@ export function getCallSignatureProps(
     "typeParameters",
     "args",
     "kwargs",
-    "instanceFunction",
-    "classFunction",
-    "staticFunction",
     "returnType",
   ]);
 
@@ -40,12 +37,12 @@ export function isUnionTypeProps(
     // Check if this is a true union type by seeing if first element has children property
     // It could also be a single type expression with a code template array, but we don't want to treat that as a union type.
     const firstChild = typeProps.children[0];
-    const isUnionType =
+    return Boolean(
       firstChild &&
-      typeof firstChild === "object" &&
-      firstChild !== null &&
-      "children" in firstChild;
-    return isUnionType as boolean;
+        typeof firstChild === "object" &&
+        firstChild !== null &&
+        "children" in firstChild,
+    );
   }
   return false;
 }

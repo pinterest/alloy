@@ -4,23 +4,19 @@ import {
   For,
   Show,
   SymbolSlot,
-  useContext,
 } from "@alloy-js/core";
 import { ParameterDescriptor } from "../parameter-descriptor.js";
 import { createPythonSymbol } from "../symbol-creation.js";
 import { PythonOutputSymbol } from "../symbols/index.js";
 import { resolveTypeExpression } from "../utils.js";
 import { Atom } from "./Atom.jsx";
-import { PythonSourceFileContext } from "./SourceFile.jsx";
 import { type TypeExpressionProps } from "./index.js";
 
 export interface CallSignatureParametersProps {
   readonly parameters?: ParameterDescriptor[] | string[];
   readonly args?: boolean;
   readonly kwargs?: boolean;
-  readonly instanceFunction?: boolean;
-  readonly classFunction?: boolean;
-  readonly staticFunction?: boolean;
+  readonly functionType?: "instance" | "class" | "static";
 }
 
 /**
@@ -37,36 +33,10 @@ export interface CallSignatureParametersProps {
  * ```
  */
 export function CallSignatureParameters(props: CallSignatureParametersProps) {
-  if (
-    [props.instanceFunction, props.classFunction, props.staticFunction].filter(
-      Boolean,
-    ).length > 1
-  ) {
-    throw new Error("A function can only be one of instance, class, or static");
-  }
-
-  const sfContext = useContext(PythonSourceFileContext);
-  const module = sfContext?.module;
   const parameters = normalizeAndDeclareParameters(props.parameters ?? []);
 
   const parameterList = computed(() => {
     const params = [];
-
-    // Add self/cls parameter if instance or class function
-    if (props.instanceFunction) {
-      params.push(
-        parameter({
-          symbol: createPythonSymbol("self", { module: module }),
-        }),
-      );
-    } else if (props.classFunction) {
-      params.push(
-        parameter({
-          symbol: createPythonSymbol("cls", { module: module }),
-        }),
-      );
-    }
-
     // Add regular parameters
     parameters.forEach((param) => {
       params.push(parameter(param));
@@ -177,21 +147,6 @@ export interface CallSignatureProps {
   kwargs?: boolean;
 
   /**
-   * Indicates that this is an instance function.
-   */
-  instanceFunction?: boolean; // true if this is an instance function
-
-  /**
-   * Indicates that this is a class function.
-   */
-  classFunction?: boolean; // true if this is a class function
-
-  /**
-   * Indicates that this is a static function.
-   */
-  staticFunction?: boolean; // true if this is a static function
-
-  /**
    * The return type of the function.
    */
   returnType?: TypeExpressionProps;
@@ -203,8 +158,8 @@ export interface CallSignatureProps {
  * @example
  * ```tsx
  * <CallSignature
- *   parameters={[{ name: "a", type: "int" }, { name: "b", type: "str" }]}
- *   returnType="int"
+ *   parameters={[{ name: "a", type: { children: "int" } }, { name: "b", type: { children: "str" } }]}
+ *   returnType={{ children: "int" }}
  * />
  * ```
  * renders to
@@ -223,9 +178,6 @@ export function CallSignature(props: CallSignatureProps) {
       parameters={props.parameters}
       args={props.args}
       kwargs={props.kwargs}
-      instanceFunction={props.instanceFunction}
-      classFunction={props.classFunction}
-      staticFunction={props.staticFunction}
     />
   );
   const typeParams =

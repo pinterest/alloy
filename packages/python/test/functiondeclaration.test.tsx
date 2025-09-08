@@ -2,6 +2,7 @@ import { code, refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import * as py from "../src/index.js";
+import { abcModule } from "../src/index.js";
 import {
   assertFileContents,
   toSourceText,
@@ -279,6 +280,197 @@ describe("Function Declaration", () => {
 
     `);
   });
+  it("renders abstract methods", () => {
+    const parameters = [{ name: "x", type: { children: "int" } }];
+    const decl = (
+      <py.StatementList>
+        <py.ClassDeclaration name="MyClass">
+          <py.StatementList>
+            <py.MethodDeclaration
+              name="methoddef"
+              parameters={parameters}
+              abstract
+            />
+            <py.ClassMethodDeclaration
+              name="classdef"
+              parameters={parameters}
+              abstract
+            />
+            <py.StaticMethodDeclaration
+              name="staticdef"
+              parameters={parameters}
+              abstract
+            />
+          </py.StatementList>
+        </py.ClassDeclaration>
+      </py.StatementList>
+    );
+
+    expect(toSourceText([decl], { externals: [abcModule] })).toBe(d`
+      from abc import abstractmethod
+
+      class MyClass:
+          @abstractmethod
+          def methoddef(self, x: int):
+              pass
+
+          @classmethod
+          @abstractmethod
+          def classdef(cls, x: int):
+              pass
+
+          @staticmethod
+          @abstractmethod
+          def staticdef(x: int):
+              pass
+
+
+    `);
+  });
+  it("renders normal property, getter, setter, deleter", () => {
+    const setterParameters = [{ name: "value" }];
+    const decl = (
+      <py.StatementList>
+        <py.ClassDeclaration name="MyClass">
+          <py.StatementList>
+            <py.MethodDeclaration name="x" property="property" />
+            <py.MethodDeclaration name="x" property="getter" />
+            <py.MethodDeclaration
+              name="x"
+              property="setter"
+              parameters={setterParameters}
+            />
+            <py.MethodDeclaration name="x" property="deleter" />
+            <py.ClassMethodDeclaration name="y" property="property" />
+            <py.ClassMethodDeclaration name="y" property="getter" />
+            <py.ClassMethodDeclaration
+              name="y"
+              property="setter"
+              parameters={setterParameters}
+            />
+            <py.ClassMethodDeclaration name="y" property="deleter" />
+            <py.StaticMethodDeclaration name="z" property="property" />
+            <py.StaticMethodDeclaration name="z" property="getter" />
+            <py.StaticMethodDeclaration
+              name="z"
+              property="setter"
+              parameters={setterParameters}
+            />
+            <py.StaticMethodDeclaration name="z" property="deleter" />
+          </py.StatementList>
+        </py.ClassDeclaration>
+      </py.StatementList>
+    );
+
+    expect(toSourceText([decl], { externals: [abcModule] })).toBe(d`
+      class MyClass:
+          @property
+          def x(self):
+              pass
+
+          @x.getter
+          def x(self):
+              pass
+
+          @x.setter
+          def x(self, value):
+              pass
+
+          @x.deleter
+          def x(self):
+              pass
+
+          @classmethod
+          @property
+          def y(cls):
+              pass
+
+          @classmethod
+          @y.getter
+          def y(cls):
+              pass
+
+          @classmethod
+          @y.setter
+          def y(cls, value):
+              pass
+
+          @classmethod
+          @y.deleter
+          def y(cls):
+              pass
+
+          @staticmethod
+          @property
+          def z():
+              pass
+
+          @staticmethod
+          @z.getter
+          def z():
+              pass
+
+          @staticmethod
+          @z.setter
+          def z(value):
+              pass
+
+          @staticmethod
+          @z.deleter
+          def z():
+              pass
+
+
+    `);
+  });
+  it("renders property and function with the same name, renaming the latter to avoid conflict", () => {
+    const setterParameters = [{ name: "value" }];
+    const decl = (
+      <py.StatementList>
+        <py.ClassDeclaration name="MyClass">
+          <py.StatementList>
+            <py.MethodDeclaration name="x" property="property" />
+            <py.MethodDeclaration name="x" property="getter" />
+            <py.MethodDeclaration
+              name="x"
+              property="setter"
+              parameters={setterParameters}
+            />
+            <py.MethodDeclaration name="x" property="deleter" />
+            <py.MethodDeclaration name="x" />
+          </py.StatementList>
+        </py.ClassDeclaration>
+        <py.FunctionDeclaration name="x" />
+      </py.StatementList>
+    );
+
+    expect(toSourceText([decl], { externals: [abcModule] })).toBe(d`
+      class MyClass:
+          @property
+          def x(self):
+              pass
+
+          @x.getter
+          def x(self):
+              pass
+
+          @x.setter
+          def x(self, value):
+              pass
+
+          @x.deleter
+          def x(self):
+              pass
+
+          def x_2_test(self):
+              pass
+
+
+      def x():
+          pass
+
+    `);
+  });
   it("renders dunder methods with parameters", () => {
     const parameters = [{ name: "x", type: { children: "int" } }];
     const decl = (
@@ -301,6 +493,26 @@ describe("Function Declaration", () => {
 
           def __repr__(self, x: int):
               return "MyClass"
+
+
+    `);
+  });
+
+  it("renders dunder methods __new__", () => {
+    const decl = (
+      <py.ClassDeclaration name="MyClass">
+        <py.StatementList>
+          <py.NewDunderClassMethodDeclaration args kwargs>
+            pass
+          </py.NewDunderClassMethodDeclaration>
+        </py.StatementList>
+      </py.ClassDeclaration>
+    );
+
+    expect(toSourceText([decl])).toBe(d`
+      class MyClass:
+          def __new__(cls, *args, **kwargs):
+              pass
 
 
     `);

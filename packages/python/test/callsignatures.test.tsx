@@ -141,64 +141,6 @@ describe("Call Signature", () => {
       (a, b) -> int
     `);
   });
-  it("renders a simple call signature for a class function", () => {
-    const result = toSourceText([
-      <py.CallSignature
-        parameters={[{ name: "a" }, { name: "b" }]}
-        classFunction
-      />,
-    ]);
-    expect(result).toRenderTo(d`
-      (cls, a, b)
-    `);
-  });
-  it("renders a simple call signature for an instance function", () => {
-    const result = toSourceText([
-      <py.CallSignature
-        parameters={[{ name: "a" }, { name: "b" }]}
-        instanceFunction
-      />,
-    ]);
-    expect(result).toRenderTo(d`
-      (self, a, b)
-    `);
-  });
-  it("renders a simple call signature for an instance function", () => {
-    const result = toSourceText([
-      <py.CallSignature
-        parameters={[{ name: "a" }, { name: "b" }]}
-        staticFunction
-      />,
-    ]);
-    expect(result).toRenderTo(d`
-      (a, b)
-    `);
-  });
-  it("throws an error for a call signature that's instance and class function at the same time", () => {
-    expect(() =>
-      toSourceText([
-        <py.CallSignature
-          parameters={[{ name: "a" }, { name: "b" }]}
-          instanceFunction
-          classFunction
-        />,
-      ]),
-    ).toThrowError(/A function can only be one of instance, class, or static/);
-  });
-  it("renders a simple call signature with all properties", () => {
-    const result = toSourceText([
-      <py.CallSignature
-        parameters={[{ name: "a" }, { name: "b" }]}
-        instanceFunction
-        args
-        kwargs
-        returnType={{ children: "int" }}
-      />,
-    ]);
-    expect(result).toRenderTo(d`
-      (self, a, b, *args, **kwargs) -> int
-    `);
-  });
 });
 
 describe("Call Signature - Parameter Descriptors", () => {
@@ -275,31 +217,10 @@ describe("Call Signature - Parameter Descriptors", () => {
             type: { children: "str" } as py.SingleTypeExpressionProps,
           },
         ]}
-        classFunction
       />,
     ]);
     expect(result).toRenderTo(d`
-      (cls, a: int, b: str)
-    `);
-  });
-  it("renders a call signature with parameter descriptors for an instance function", () => {
-    const result = toSourceText([
-      <py.CallSignature
-        parameters={[
-          {
-            name: "a",
-            type: { children: "int" } as py.SingleTypeExpressionProps,
-          },
-          {
-            name: "b",
-            type: { children: "str" } as py.SingleTypeExpressionProps,
-          },
-        ]}
-        instanceFunction
-      />,
-    ]);
-    expect(result).toRenderTo(d`
-      (self, a: int, b: str)
+      (a: int, b: str)
     `);
   });
   it("renders a call signature with all", () => {
@@ -315,14 +236,13 @@ describe("Call Signature - Parameter Descriptors", () => {
             type: { children: "str" } as py.SingleTypeExpressionProps,
           },
         ]}
-        instanceFunction
         args
         kwargs
         returnType={{ children: "int" } as py.SingleTypeExpressionProps}
       />,
     ]);
     expect(result).toRenderTo(d`
-      (self, a: int, b: str, *args, **kwargs) -> int
+      (a: int, b: str, *args, **kwargs) -> int
     `);
   });
   it("renders a more complex call signature with parameter descriptors", () => {
