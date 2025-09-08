@@ -195,14 +195,18 @@ describe("UnionTypeExpression", () => {
 describe("TypeExpression in different scenarios", () => {
   it("renders an UnionTypeExpression as a function type parameter and return type", () => {
     const classRefkey = refkey();
-    const elements = [{ children: "int" }, { children: "str" }, { children: classRefkey }];
+    const elements = [
+      { children: "int" },
+      { children: "str" },
+      { children: classRefkey },
+    ];
     const type = <py.UnionTypeExpression>{elements}</py.UnionTypeExpression>;
     expect(
       toSourceText([
         <py.ClassDeclaration
-        name="Foo"
-        refkey={classRefkey}
-      ></py.ClassDeclaration>,
+          name="Foo"
+          refkey={classRefkey}
+        ></py.ClassDeclaration>,
         <py.FunctionDeclaration
           name="fooFunction"
           parameters={[
@@ -229,18 +233,19 @@ describe("TypeExpression in different scenarios", () => {
   });
   it("renders an UnionTypeExpression as a variable type", () => {
     const classRefkey = refkey();
-    const elements = [{ children: "int" }, { children: "str" }, { children: classRefkey }];
+    const elements = [
+      { children: "int" },
+      { children: "str" },
+      { children: classRefkey },
+    ];
     const type = <py.UnionTypeExpression>{elements}</py.UnionTypeExpression>;
     expect(
       toSourceText([
         <py.ClassDeclaration
-        name="Foo"
-        refkey={classRefkey}
+          name="Foo"
+          refkey={classRefkey}
         ></py.ClassDeclaration>,
-        <py.VariableDeclaration
-          name="fooVariable"
-          type={{ children: type }}
-        />,
+        <py.VariableDeclaration name="fooVariable" type={{ children: type }} />,
       ]),
     ).toRenderTo(d`
         class Foo:

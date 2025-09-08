@@ -41,9 +41,9 @@ export function isUnionTypeProps(
     const firstChild = typeProps.children[0];
     return Boolean(
       firstChild &&
-      typeof firstChild === "object" &&
-      firstChild !== null &&
-      "children" in firstChild
+        typeof firstChild === "object" &&
+        firstChild !== null &&
+        "children" in firstChild,
     );
   }
   return false;
