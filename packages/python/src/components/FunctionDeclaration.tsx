@@ -47,13 +47,13 @@ export interface FunctionDeclarationPropsBase
 function FunctionDeclarationBase(props: FunctionDeclarationPropsBase) {
   const asyncKwd = props.async ? "async " : "";
   let callSignatureProps = getCallSignatureProps(props, {});
-  let extraParameters: ParameterDescriptor[] = [];
+  const extraParameters: ParameterDescriptor[] = [];
   // Add self/cls parameter if instance or class function
-  if (props.functionType == "instance") {
+  if (props.functionType === "instance") {
     extraParameters.push({
       name: "self",
     });
-  } else if (props.functionType == "class") {
+  } else if (props.functionType === "class") {
     extraParameters.push({
       name: "cls",
     });
@@ -62,7 +62,7 @@ function FunctionDeclarationBase(props: FunctionDeclarationPropsBase) {
     ...callSignatureProps,
     parameters: [...extraParameters, ...(callSignatureProps.parameters || [])],
   };
-  let sym: PythonOutputSymbol = createPythonSymbol(
+  const sym: PythonOutputSymbol = createPythonSymbol(
     props.name,
     {
       instance: props.functionType !== undefined,
@@ -124,7 +124,7 @@ export function MethodDeclarationBase(props: MethodDeclarationProps) {
   let skipSymbolCreation: boolean = false;
   if (propertyMethod) {
     const parametersAmount = props.parameters?.length ?? 0;
-    if (props.property == "setter" && parametersAmount > 1) {
+    if (props.property === "setter" && parametersAmount > 1) {
       throw new Error(
         "Setter property methods must have exactly one parameter",
       );
