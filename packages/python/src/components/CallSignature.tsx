@@ -64,7 +64,7 @@ export function CallSignatureParameters(props: CallSignatureParametersProps) {
   );
 }
 
-export function parameter(param: DeclaredParameterDescriptor) {
+function parameter(param: DeclaredParameterDescriptor) {
   const type = param.type ? resolveTypeExpression(param.type) : undefined;
   const TypeSlot = param.TypeSlot!; // TypeSlot will always be present when param.type is true.
   return (
@@ -160,8 +160,8 @@ export interface CallSignatureProps {
  * @example
  * ```tsx
  * <CallSignature
- *   parameters={[{ name: "a", type: "int" }, { name: "b", type: "str" }]}
- *   returnType="int"
+ *   parameters={[{ name: "a", type: { children: "int" } }, { name: "b", type: { children: "str" } }]}
+ *   returnType={{ children: "int" }}
  * />
  * ```
  * renders to
