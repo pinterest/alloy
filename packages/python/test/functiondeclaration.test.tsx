@@ -2,12 +2,12 @@ import { code, refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import * as py from "../src/index.js";
+import { abcModule } from "../src/index.js";
 import {
   assertFileContents,
   toSourceText,
   toSourceTextMultiple,
 } from "./utils.js";
-import { abcModule } from "../src/index.js";
 
 describe("Function Declaration", () => {
   it("renders a function with no body as 'pass'", () => {
@@ -286,9 +286,21 @@ describe("Function Declaration", () => {
       <py.StatementList>
         <py.ClassDeclaration name="MyClass">
           <py.StatementList>
-            <py.MethodDeclaration name="methoddef" parameters={parameters} abstract />
-            <py.ClassMethodDeclaration name="classdef" parameters={parameters} abstract />
-            <py.StaticMethodDeclaration name="staticdef" parameters={parameters} abstract />
+            <py.MethodDeclaration
+              name="methoddef"
+              parameters={parameters}
+              abstract
+            />
+            <py.ClassMethodDeclaration
+              name="classdef"
+              parameters={parameters}
+              abstract
+            />
+            <py.StaticMethodDeclaration
+              name="staticdef"
+              parameters={parameters}
+              abstract
+            />
           </py.StatementList>
         </py.ClassDeclaration>
       </py.StatementList>
@@ -316,22 +328,34 @@ describe("Function Declaration", () => {
     `);
   });
   it("renders normal property, getter, setter, deleter", () => {
-    const setterParameters = [{ name: "value"}];
+    const setterParameters = [{ name: "value" }];
     const decl = (
       <py.StatementList>
         <py.ClassDeclaration name="MyClass">
           <py.StatementList>
             <py.MethodDeclaration name="x" property="property" />
             <py.MethodDeclaration name="x" property="getter" />
-            <py.MethodDeclaration name="x" property="setter" parameters={setterParameters} />
+            <py.MethodDeclaration
+              name="x"
+              property="setter"
+              parameters={setterParameters}
+            />
             <py.MethodDeclaration name="x" property="deleter" />
             <py.ClassMethodDeclaration name="y" property="property" />
             <py.ClassMethodDeclaration name="y" property="getter" />
-            <py.ClassMethodDeclaration name="y" property="setter" parameters={setterParameters} />
+            <py.ClassMethodDeclaration
+              name="y"
+              property="setter"
+              parameters={setterParameters}
+            />
             <py.ClassMethodDeclaration name="y" property="deleter" />
             <py.StaticMethodDeclaration name="z" property="property" />
             <py.StaticMethodDeclaration name="z" property="getter" />
-            <py.StaticMethodDeclaration name="z" property="setter" parameters={setterParameters} />
+            <py.StaticMethodDeclaration
+              name="z"
+              property="setter"
+              parameters={setterParameters}
+            />
             <py.StaticMethodDeclaration name="z" property="deleter" />
           </py.StatementList>
         </py.ClassDeclaration>
@@ -400,14 +424,18 @@ describe("Function Declaration", () => {
     `);
   });
   it("renders property and function with the same name, renaming the latter to avoid conflict", () => {
-    const setterParameters = [{ name: "value"}];
+    const setterParameters = [{ name: "value" }];
     const decl = (
       <py.StatementList>
         <py.ClassDeclaration name="MyClass">
           <py.StatementList>
             <py.MethodDeclaration name="x" property="property" />
             <py.MethodDeclaration name="x" property="getter" />
-            <py.MethodDeclaration name="x" property="setter" parameters={setterParameters} />
+            <py.MethodDeclaration
+              name="x"
+              property="setter"
+              parameters={setterParameters}
+            />
             <py.MethodDeclaration name="x" property="deleter" />
             <py.MethodDeclaration name="x" />
           </py.StatementList>

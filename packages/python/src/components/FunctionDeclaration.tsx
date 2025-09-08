@@ -1,13 +1,13 @@
-import { code, emitSymbol, Name, Show, useContext } from "@alloy-js/core";
+import { code, emitSymbol, Name, Show } from "@alloy-js/core";
+import { abcModule } from "../builtins/python.js";
+import { PythonOutputSymbol } from "../index.js";
+import { ParameterDescriptor } from "../parameter-descriptor.js";
 import { createPythonSymbol } from "../symbol-creation.js";
 import { getCallSignatureProps } from "../utils.js";
 import { CallSignature, CallSignatureProps } from "./CallSignature.jsx";
 import { BaseDeclarationProps, Declaration } from "./Declaration.js";
 import { PythonBlock } from "./PythonBlock.jsx";
-import { LexicalScope, NoNamePolicy, PythonSourceFileContext } from "./index.js";
-import { ParameterDescriptor } from "../parameter-descriptor.js";
-import { abcModule } from "../builtins/python.js";
-import { PythonOutputSymbol } from "../index.js";
+import { LexicalScope, NoNamePolicy } from "./index.js";
 
 export interface FunctionDeclarationPropsBase
   extends BaseDeclarationProps,
@@ -89,7 +89,8 @@ function FunctionDeclarationBase(props: FunctionDeclarationPropsBase) {
   );
 }
 
-export interface FunctionDeclarationProps extends FunctionDeclarationPropsBase {};
+export interface FunctionDeclarationProps
+  extends FunctionDeclarationPropsBase {}
 
 export function FunctionDeclaration(props: FunctionDeclarationProps) {
   return <FunctionDeclarationBase {...props} />;
@@ -98,16 +99,17 @@ export function FunctionDeclaration(props: FunctionDeclarationProps) {
 export interface MethodDeclarationProps extends FunctionDeclarationProps {
   abstract?: boolean;
   property?: "property" | "getter" | "setter" | "deleter";
-};
+}
 
 export function MethodDeclarationBase(props: MethodDeclarationProps) {
-  const abstractMethod = props.abstract ? code`@${abcModule["."].abstractmethod}` : undefined;
+  const abstractMethod =
+    props.abstract ? code`@${abcModule["."].abstractmethod}` : undefined;
   let propertyMethod;
   switch (props.property) {
     case "property":
       propertyMethod = code`@property`;
       break;
-      case "getter":
+    case "getter":
       propertyMethod = code`@${props.name}.getter`;
       break;
     case "setter":
@@ -123,7 +125,9 @@ export function MethodDeclarationBase(props: MethodDeclarationProps) {
   if (propertyMethod) {
     const parametersAmount = props.parameters?.length ?? 0;
     if (props.property == "setter" && parametersAmount > 1) {
-      throw new Error("Setter property methods must have exactly one parameter");
+      throw new Error(
+        "Setter property methods must have exactly one parameter",
+      );
     }
     if (props.property !== "setter" && parametersAmount > 0) {
       throw new Error("Property methods cannot have parameters");

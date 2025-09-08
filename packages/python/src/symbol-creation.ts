@@ -29,7 +29,7 @@ export function findExistingSymbol(
   if (!targetSpace) {
     return undefined;
   }
-  
+
   const existingSymbol = targetSpace.symbolNames.get(name);
   return existingSymbol as PythonOutputSymbol | undefined;
 }

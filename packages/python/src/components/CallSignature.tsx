@@ -4,14 +4,12 @@ import {
   For,
   Show,
   SymbolSlot,
-  useContext,
 } from "@alloy-js/core";
 import { ParameterDescriptor } from "../parameter-descriptor.js";
 import { createPythonSymbol } from "../symbol-creation.js";
 import { PythonOutputSymbol } from "../symbols/index.js";
 import { resolveTypeExpression } from "../utils.js";
 import { Atom } from "./Atom.jsx";
-import { PythonSourceFileContext } from "./SourceFile.jsx";
 import { type TypeExpressionProps } from "./index.js";
 
 export interface CallSignatureParametersProps {
