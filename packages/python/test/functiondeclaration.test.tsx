@@ -440,6 +440,7 @@ describe("Function Declaration", () => {
             <py.MethodDeclaration name="x" />
           </py.StatementList>
         </py.ClassDeclaration>
+        <py.FunctionDeclaration name="x" />
       </py.StatementList>
     );
 
@@ -464,6 +465,9 @@ describe("Function Declaration", () => {
           def x_2_test(self):
               pass
 
+
+      def x():
+          pass
 
     `);
   });
