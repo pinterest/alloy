@@ -399,6 +399,46 @@ describe("Function Declaration", () => {
 
     `);
   });
+  it("renders property and function with the same name, renaming the latter to avoid conflict", () => {
+    const setterParameters = [{ name: "value"}];
+    const decl = (
+      <py.StatementList>
+        <py.ClassDeclaration name="MyClass">
+          <py.StatementList>
+            <py.MethodDeclaration name="x" property="property" />
+            <py.MethodDeclaration name="x" property="getter" />
+            <py.MethodDeclaration name="x" property="setter" parameters={setterParameters} />
+            <py.MethodDeclaration name="x" property="deleter" />
+            <py.MethodDeclaration name="x" />
+          </py.StatementList>
+        </py.ClassDeclaration>
+      </py.StatementList>
+    );
+
+    expect(toSourceText([decl], { externals: [abcModule] })).toBe(d`
+      class MyClass:
+          @property
+          def x(self):
+              pass
+
+          @x.getter
+          def x(self):
+              pass
+
+          @x.setter
+          def x(self, value):
+              pass
+
+          @x.deleter
+          def x(self):
+              pass
+
+          def x_2_test(self):
+              pass
+
+
+    `);
+  });
   it("renders dunder methods with parameters", () => {
     const parameters = [{ name: "x", type: { children: "int" } }];
     const decl = (

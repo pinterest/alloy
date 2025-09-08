@@ -1,7 +1,7 @@
 import { code, emitSymbol, Name, Show, useContext } from "@alloy-js/core";
 import { createPythonSymbol } from "../symbol-creation.js";
 import { getCallSignatureProps } from "../utils.js";
-import { CallSignature, CallSignatureProps, parameter } from "./CallSignature.jsx";
+import { CallSignature, CallSignatureProps } from "./CallSignature.jsx";
 import { BaseDeclarationProps, Declaration } from "./Declaration.js";
 import { PythonBlock } from "./PythonBlock.jsx";
 import { LexicalScope, NoNamePolicy, PythonSourceFileContext } from "./index.js";
@@ -21,9 +21,9 @@ export interface FunctionDeclarationPropsBase
    */
   functionType?: "instance" | "class" | "static";
   /**
-   * The symbol for the function.
+   * The symbol for the function. Mostly used for property methods.
    */
-  symbol?: PythonOutputSymbol;
+  skipSymbolCreation?: boolean;
 }
 
 /**
@@ -62,19 +62,15 @@ function FunctionDeclarationBase(props: FunctionDeclarationPropsBase) {
     ...callSignatureProps,
     parameters: [...extraParameters, ...(callSignatureProps.parameters || [])],
   };
-  let sym: PythonOutputSymbol;
-  if (props.symbol) {
-    sym = props.symbol;
-  } else {
-    sym = createPythonSymbol(
-      props.name,
-      {
-        instance: props.functionType !== undefined,
-        refkeys: props.refkey,
-      },
-      "function",
-    );
-  }
+  let sym: PythonOutputSymbol = createPythonSymbol(
+    props.name,
+    {
+      instance: props.functionType !== undefined,
+      refkeys: props.refkey,
+      reuseExisting: props.skipSymbolCreation,
+    },
+    "function",
+  );
   emitSymbol(sym);
 
   return (
@@ -123,7 +119,7 @@ export function MethodDeclarationBase(props: MethodDeclarationProps) {
     default:
       break;
   }
-  let sym: PythonOutputSymbol;
+  let skipSymbolCreation: boolean = false;
   if (propertyMethod) {
     const parametersAmount = props.parameters?.length ?? 0;
     if (props.property == "setter" && parametersAmount > 1) {
@@ -132,18 +128,12 @@ export function MethodDeclarationBase(props: MethodDeclarationProps) {
     if (props.property !== "setter" && parametersAmount > 0) {
       throw new Error("Property methods cannot have parameters");
     }
-
-    // In case we are creating a property method, we want to ignore name conflict,
-    // so that we can have multiple property methods (getter, setter, deleter) with the same name
-    sym = createPythonSymbol(
-      props.name,
-      {
-        instance: props.functionType !== undefined,
-        refkeys: props.refkey,
-        ignoreNameConflict: true,
-      },
-      "function",
-    );
+    // In case we are creating a property method other than the @property decorated method,
+    // we want to skip symbol creation.
+    if (props.property !== "property") {
+      skipSymbolCreation = true;
+      console.log("skipSymbolCreation", skipSymbolCreation, props.name);
+    }
   }
   return (
     <>
@@ -151,7 +141,7 @@ export function MethodDeclarationBase(props: MethodDeclarationProps) {
       {propertyMethod && <hbr />}
       {abstractMethod}
       {abstractMethod && <hbr />}
-      <FunctionDeclaration {...props} symbol={sym!} />
+      <FunctionDeclaration {...props} skipSymbolCreation={skipSymbolCreation} />
     </>
   );
 }
