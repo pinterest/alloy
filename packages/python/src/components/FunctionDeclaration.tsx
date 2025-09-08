@@ -136,7 +136,6 @@ export function MethodDeclarationBase(props: MethodDeclarationProps) {
     // we want to skip symbol creation.
     if (props.property !== "property") {
       skipSymbolCreation = true;
-      console.log("skipSymbolCreation", skipSymbolCreation, props.name);
     }
   }
   return (
@@ -204,6 +203,17 @@ export function DunderMethodDeclaration(props: DunderMethodDeclarationProps) {
   return (
     <NoNamePolicy>
       <MethodDeclaration {...props} />
+    </NoNamePolicy>
+  );
+}
+
+export interface NewDunderClassMethodDeclarationProps
+  extends Omit<DunderMethodDeclarationProps, "name"> {}
+
+export function NewDunderClassMethodDeclaration(props: NewDunderClassMethodDeclarationProps) {
+  return (
+    <NoNamePolicy>
+      <MethodDeclaration {...props} name="__new__" functionType={"class"} />
     </NoNamePolicy>
   );
 }

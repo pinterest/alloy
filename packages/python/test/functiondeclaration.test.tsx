@@ -2,7 +2,7 @@ import { code, refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import * as py from "../src/index.js";
-import { abcModule } from "../src/index.js";
+import { abcModule, NoNamePolicy } from "../src/index.js";
 import {
   assertFileContents,
   toSourceText,
@@ -489,6 +489,29 @@ describe("Function Declaration", () => {
 
           def __repr__(self, x: int):
               return "MyClass"
+
+
+    `);
+  });
+
+  it("renders dunder methods __new__", () => {
+    const parameters = [
+      { name: "cls" },
+    ];
+    const decl = (
+      <py.ClassDeclaration name="MyClass">
+        <py.StatementList>
+          <py.NewDunderClassMethodDeclaration args kwargs>
+            pass
+          </py.NewDunderClassMethodDeclaration>
+        </py.StatementList>
+      </py.ClassDeclaration>
+    );
+
+    expect(toSourceText([decl])).toBe(d`
+      class MyClass:
+          def __new__(cls, *args, **kwargs):
+              pass
 
 
     `);
