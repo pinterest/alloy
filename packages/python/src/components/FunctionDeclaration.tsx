@@ -1,13 +1,29 @@
-import { code, emitSymbol, Name, Show } from "@alloy-js/core";
+import {
+  childrenArray,
+  code,
+  DeclarationContext,
+  emitSymbol,
+  findKeyedChild,
+  findUnkeyedChildren,
+  List,
+  Name,
+  Show,
+  taggedComponent,
+  useContext,
+} from "@alloy-js/core";
 import { abcModule } from "../builtins/python.js";
 import { PythonOutputSymbol } from "../index.js";
 import { ParameterDescriptor } from "../parameter-descriptor.js";
 import { createPythonSymbol } from "../symbol-creation.js";
+import { usePythonScope } from "../symbols/scopes.js";
 import { getCallSignatureProps } from "../utils.js";
 import { CallSignature, CallSignatureProps } from "./CallSignature.jsx";
 import { BaseDeclarationProps, Declaration } from "./Declaration.js";
 import { PythonBlock } from "./PythonBlock.jsx";
 import { LexicalScope, NoNamePolicy } from "./index.js";
+
+const setterTag = Symbol();
+const deleterTag = Symbol();
 
 export interface FunctionDeclarationPropsBase
   extends BaseDeclarationProps,
@@ -62,16 +78,19 @@ function FunctionDeclarationBase(props: FunctionDeclarationPropsBase) {
     ...callSignatureProps,
     parameters: [...extraParameters, ...(callSignatureProps.parameters || [])],
   };
+  const currentScope = usePythonScope();
   const sym: PythonOutputSymbol = createPythonSymbol(
     props.name,
     {
-      instance: props.functionType !== undefined,
+      instance: props.functionType !== undefined && currentScope?.isMemberScope,
       refkeys: props.refkey,
       reuseExisting: props.skipSymbolCreation,
     },
     "function",
   );
-  emitSymbol(sym);
+  if (!props.skipSymbolCreation) {
+    emitSymbol(sym);
+  }
 
   return (
     <>
@@ -98,53 +117,16 @@ export function FunctionDeclaration(props: FunctionDeclarationProps) {
 
 export interface MethodDeclarationProps extends FunctionDeclarationProps {
   abstract?: boolean;
-  property?: "property" | "getter" | "setter" | "deleter";
 }
 
 export function MethodDeclarationBase(props: MethodDeclarationProps) {
   const abstractMethod =
     props.abstract ? code`@${abcModule["."].abstractmethod}` : undefined;
-  let propertyMethod;
-  switch (props.property) {
-    case "property":
-      propertyMethod = code`@property`;
-      break;
-    case "getter":
-      propertyMethod = code`@${props.name}.getter`;
-      break;
-    case "setter":
-      propertyMethod = code`@${props.name}.setter`;
-      break;
-    case "deleter":
-      propertyMethod = code`@${props.name}.deleter`;
-      break;
-    default:
-      break;
-  }
-  let skipSymbolCreation: boolean = false;
-  if (propertyMethod) {
-    const parametersAmount = props.parameters?.length ?? 0;
-    if (props.property === "setter" && parametersAmount > 1) {
-      throw new Error(
-        "Setter property methods must have exactly one parameter",
-      );
-    }
-    if (props.property !== "setter" && parametersAmount > 0) {
-      throw new Error("Property methods cannot have parameters");
-    }
-    // In case we are creating a property method other than the @property decorated method,
-    // we want to skip symbol creation.
-    if (props.property !== "property") {
-      skipSymbolCreation = true;
-    }
-  }
   return (
     <>
-      {propertyMethod}
-      {propertyMethod && <hbr />}
       {abstractMethod}
       {abstractMethod && <hbr />}
-      <FunctionDeclaration {...props} skipSymbolCreation={skipSymbolCreation} />
+      <FunctionDeclaration {...props} />
     </>
   );
 }
@@ -156,6 +138,124 @@ export function MethodDeclaration(props: MethodDeclarationProps) {
     </>
   );
 }
+
+export function PropertyDeclaration(props: FunctionDeclarationProps) {
+  const children = childrenArray(() => props.children);
+  const skipSymbolCreation: boolean = true;
+  const setterComponent =
+    findKeyedChild(children, PropertyDeclaration.Setter.tag) ?? undefined;
+  const deleterComponent =
+    findKeyedChild(children, PropertyDeclaration.Deleter.tag) ?? undefined;
+  const setterChildren = setterComponent?.props?.children;
+  const deleterChildren = deleterComponent?.props?.children;
+  const unkeyedChildren = findUnkeyedChildren(children);
+  const currentScope = usePythonScope();
+  const sym: PythonOutputSymbol = createPythonSymbol(
+    props.name,
+    {
+      instance: currentScope?.isMemberScope ?? false,
+      refkeys: props.refkey,
+      reuseExisting: props.skipSymbolCreation,
+    },
+    "function",
+  );
+  emitSymbol(sym);
+  return (
+    <>
+      <DeclarationContext.Provider value={sym}>
+        <List hardline enderPunctuation>
+          <>
+            {code`@property`}
+            <hbr />
+            <PropertyMethodDeclaration
+              functionType={"instance"}
+              children={unkeyedChildren}
+            />
+          </>
+          <>
+            <Show when={Boolean(setterComponent)}>
+              {code`@${props.name}.setter`}
+              <hbr />
+              <PropertyMethodDeclaration
+                parameters={[{ name: "value" }]}
+                skipSymbolCreation={skipSymbolCreation}
+                children={setterChildren}
+              />
+            </Show>
+          </>
+          <>
+            <Show when={Boolean(deleterComponent)}>
+              {code`@${props.name}.deleter`}
+              <hbr />
+              <PropertyMethodDeclaration
+                skipSymbolCreation={skipSymbolCreation}
+                children={deleterChildren}
+              />
+            </Show>
+          </>
+        </List>
+      </DeclarationContext.Provider>
+    </>
+  );
+}
+
+export interface PropertyMethodDeclarationProps
+  extends Omit<FunctionDeclarationProps, "name"> {}
+
+export function PropertyMethodDeclaration(
+  props: PropertyMethodDeclarationProps,
+) {
+  const declarationContext = useContext(
+    DeclarationContext,
+  ) as PythonOutputSymbol;
+  const { children, ...propsWithoutChildren } = props;
+  const callSignatureProps = getCallSignatureProps(propsWithoutChildren, {});
+  const callSignaturePropsWithSelf = {
+    ...callSignatureProps,
+    parameters: [{ name: "self" }, ...(callSignatureProps.parameters || [])],
+  };
+  return (
+    <>
+      <Declaration nameKind="function" symbol={declarationContext}>
+        def <Name />
+        <LexicalScope name={declarationContext.name}>
+          <CallSignature {...callSignaturePropsWithSelf} />
+          <PythonBlock opener=":">
+            <Show when={Boolean(props.doc)}>{props.doc}</Show>
+            {children ? children : "pass"}
+          </PythonBlock>
+        </LexicalScope>
+      </Declaration>
+    </>
+  );
+}
+
+export function createPropertyMethodComponent(tag: symbol) {
+  return taggedComponent(
+    tag,
+    function Parameters(props: PropertyMethodDeclarationProps) {
+      const declarationContext = useContext(
+        DeclarationContext,
+      ) as PythonOutputSymbol;
+      if (props.children) {
+        return props.children;
+      }
+
+      return (
+        <>
+          <FunctionDeclaration
+            functionType={"instance"}
+            {...props}
+            name={declarationContext.name}
+          />
+        </>
+      );
+    },
+  );
+}
+
+PropertyDeclaration.Setter = createPropertyMethodComponent(setterTag);
+PropertyDeclaration.Deleter = createPropertyMethodComponent(deleterTag);
 
 export function ClassMethodDeclaration(props: MethodDeclarationProps) {
   return (

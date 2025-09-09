@@ -333,30 +333,13 @@ describe("Function Declaration", () => {
       <py.StatementList>
         <py.ClassDeclaration name="MyClass">
           <py.StatementList>
-            <py.MethodDeclaration name="x" property="property" />
-            <py.MethodDeclaration name="x" property="getter" />
-            <py.MethodDeclaration
-              name="x"
-              property="setter"
-              parameters={setterParameters}
-            />
-            <py.MethodDeclaration name="x" property="deleter" />
-            <py.ClassMethodDeclaration name="y" property="property" />
-            <py.ClassMethodDeclaration name="y" property="getter" />
-            <py.ClassMethodDeclaration
-              name="y"
-              property="setter"
-              parameters={setterParameters}
-            />
-            <py.ClassMethodDeclaration name="y" property="deleter" />
-            <py.StaticMethodDeclaration name="z" property="property" />
-            <py.StaticMethodDeclaration name="z" property="getter" />
-            <py.StaticMethodDeclaration
-              name="z"
-              property="setter"
-              parameters={setterParameters}
-            />
-            <py.StaticMethodDeclaration name="z" property="deleter" />
+            <py.PropertyDeclaration name="x">
+              something
+              <py.PropertyDeclaration.Setter>
+                something else
+              </py.PropertyDeclaration.Setter>
+              <py.PropertyDeclaration.Deleter />
+            </py.PropertyDeclaration>
           </py.StatementList>
         </py.ClassDeclaration>
       </py.StatementList>
@@ -366,58 +349,14 @@ describe("Function Declaration", () => {
       class MyClass:
           @property
           def x(self):
-              pass
-
-          @x.getter
-          def x(self):
-              pass
+              something
 
           @x.setter
           def x(self, value):
-              pass
+              something else
 
           @x.deleter
           def x(self):
-              pass
-
-          @classmethod
-          @property
-          def y(cls):
-              pass
-
-          @classmethod
-          @y.getter
-          def y(cls):
-              pass
-
-          @classmethod
-          @y.setter
-          def y(cls, value):
-              pass
-
-          @classmethod
-          @y.deleter
-          def y(cls):
-              pass
-
-          @staticmethod
-          @property
-          def z():
-              pass
-
-          @staticmethod
-          @z.getter
-          def z():
-              pass
-
-          @staticmethod
-          @z.setter
-          def z(value):
-              pass
-
-          @staticmethod
-          @z.deleter
-          def z():
               pass
 
 
@@ -429,14 +368,11 @@ describe("Function Declaration", () => {
       <py.StatementList>
         <py.ClassDeclaration name="MyClass">
           <py.StatementList>
-            <py.MethodDeclaration name="x" property="property" />
-            <py.MethodDeclaration name="x" property="getter" />
-            <py.MethodDeclaration
-              name="x"
-              property="setter"
-              parameters={setterParameters}
-            />
-            <py.MethodDeclaration name="x" property="deleter" />
+            <py.PropertyDeclaration name="x">
+              something
+              <py.PropertyDeclaration.Setter />
+              <py.PropertyDeclaration.Deleter />
+            </py.PropertyDeclaration>
             <py.MethodDeclaration name="x" />
           </py.StatementList>
         </py.ClassDeclaration>
@@ -448,11 +384,7 @@ describe("Function Declaration", () => {
       class MyClass:
           @property
           def x(self):
-              pass
-
-          @x.getter
-          def x(self):
-              pass
+              something
 
           @x.setter
           def x(self, value):
