@@ -74,6 +74,8 @@ export interface FunctionDeclarationPropsBase
  * def my_function(a: int, b: str) -> int:
  *   return a + b
  * ```
+ * 
+ * @remarks
  */
 function FunctionDeclarationBase(props: FunctionDeclarationPropsBase) {
   const asyncKwd = props.async ? "async " : "";
@@ -130,11 +132,62 @@ function FunctionDeclarationBase(props: FunctionDeclarationPropsBase) {
 export interface FunctionDeclarationProps
   extends FunctionDeclarationPropsBase {}
 
+/**
+ * A Python function declaration.
+ *
+ * @example
+ * ```tsx
+ * <FunctionDeclaration
+ *   name="my_function"
+ *   returnType={{ children: "int" }}
+ *   parameters={[{ name: "a", type: { children: "int" } }, { name: "b", type: { children: "str" } }]}
+ * >
+ *   return a + b
+ * </FunctionDeclaration>
+ * ```
+ * This will generate:
+ * ```python
+ * def my_function(a: int, b: str) -> int:
+ *     return a + b
+ * ```
+ * 
+ * @remarks
+ * This component creates a Python function declaration with optional type annotations,
+ * parameters, and return types. It supports async functions, different function types
+ * (instance, class, static), and can reuse existing symbols. The function automatically
+ * handles symbol creation and emission unless an existing symbol is provided.
+ */
+
 export function FunctionDeclaration(props: FunctionDeclarationProps) {
   return <FunctionDeclarationBase {...props} />;
 }
 
 export interface MethodDeclarationBaseProps extends FunctionDeclarationProps {}
+
+/**
+ * A Python method declaration base component.
+ *
+ * @example
+ * ```tsx
+ * <MethodDeclarationBase
+ *   name="my_method"
+ *   returnType={{ children: "int" }}
+ *   parameters={[{ name: "value", type: { children: "str" } }]}
+ * >
+ *   return len(value)
+ * </MethodDeclarationBase>
+ * ```
+ * This will generate:
+ * ```python
+ * def my_method(self, value: str) -> int:
+ *   return len(value)
+ * ```
+ * 
+ * @remarks
+ * This is the base component for method declarations that handles validation
+ * and ensures the method is declared within a class (member scope). It automatically
+ * adds the appropriate first parameter (self, cls) based on the functionType.
+ */
 
 export function MethodDeclarationBase(props: MethodDeclarationBaseProps) {
   // Only validate if we don't have an existing symbol (which implies validation already happened)
@@ -152,6 +205,46 @@ export function MethodDeclarationBase(props: MethodDeclarationBaseProps) {
 export interface MethodDeclarationProps extends FunctionDeclarationProps {
   abstract?: boolean;
 }
+
+/**
+ * A Python method declaration component.
+ *
+ * @example
+ * ```tsx
+ * <MethodDeclaration
+ *   name="my_method"
+ *   returnType={{ children: "int" }}
+ *   parameters={[{ name: "value", type: { children: "str" } }]}
+ * >
+ *   return len(value)
+ * </MethodDeclaration>
+ * ```
+ * This will generate:
+ * ```python
+ * def my_method(self, value: str) -> int:
+ *   return len(value)
+ * ```
+ * 
+ * @example Abstract method:
+ * ```tsx
+ * <MethodDeclaration
+ *   name="abstract_method"
+ *   abstract={true}
+ *   returnType={{ children: "str" }}
+ * />
+ * ```
+ * This will generate:
+ * ```python
+ * @abstractmethod
+ * def abstract_method(self) -> str:
+ *   pass
+ * ```
+ * 
+ * @remarks
+ * This component automatically adds the `self` parameter as the first parameter
+ * for instance methods. Set `abstract={true}` to generate an abstract method
+ * with the `@abstractmethod` decorator. The method must be declared within a class.
+ */
 
 export function MethodDeclaration(props: MethodDeclarationProps) {
   const abstractMethod =
@@ -183,6 +276,56 @@ export interface PropertyDeclarationProps {
   refkey?: Refkey;
 }
 
+/**
+ * Declares a Python property with optional getter, setter, and deleter methods.
+ *
+ * @example
+ * ```tsx
+ * <PropertyDeclaration property={{ name: "name", type: "str" }}>
+ *   return self._name
+ * </PropertyDeclaration>
+ * ```
+ * This will generate:
+ * ```python
+ * @property
+ * def name(self) -> str:
+ *   return self._name
+ * ```
+ *
+ * @example
+ * With setter and deleter:
+ * ```tsx
+ * <PropertyDeclaration property={{ name: "value", type: "int" }}>
+ *   return self._value
+ *   <PropertyDeclaration.Setter type="int">
+ *     self._value = value
+ *   </PropertyDeclaration.Setter>
+ *   <PropertyDeclaration.Deleter>
+ *     del self._value
+ *   </PropertyDeclaration.Deleter>
+ * </PropertyDeclaration>
+ * ```
+ * This will generate:
+ * ```python
+ * @property
+ * def value(self) -> int:
+ *   return self._value
+ * 
+ * @value.setter
+ * def value(self, value: int) -> None:
+ *   self._value = value
+ * 
+ * @value.deleter
+ * def value(self) -> None:
+ *   del self._value
+ * ```
+ *
+ * @remarks
+ * The property must be declared within a class. The getter method is automatically
+ * generated with the `@property` decorator. Optional setter and deleter methods
+ * can be added using the `PropertyDeclaration.Setter` and `PropertyDeclaration.Deleter`
+ * child components.
+ */
 export function PropertyDeclaration(props: PropertyDeclarationProps) {
   // Utility function to format the children output
   // If we pass an empty array to a component, it will treat as if valid children
@@ -249,6 +392,19 @@ export interface PropertyMethodDeclarationProps {
   returnType?: TypeExpressionProps;
 }
 
+/**
+ * A Python property method declaration component.
+ *
+ * @example
+ * ```tsx
+ * <PropertyMethodDeclaration
+ *   name="my_property"
+ *   returnType={{ children: "int" }}
+ * >
+ *   return self._my_property
+ * </PropertyMethodDeclaration>
+ * ```
+ */
 export function PropertyMethodDeclaration(
   props: PropertyMethodDeclarationProps,
 ) {
@@ -280,6 +436,29 @@ export interface SetterPropertyMethodDeclarationProps extends PropertyMethodDecl
   type?: TypeExpressionProps;
 }
 
+/**
+ * A Python property setter method declaration.
+ *
+ * @example
+ * ```tsx
+ * <py.SetterPropertyMethodDeclaration type={{ children: "int" }}>
+ *   {py.code`self._value = value`}
+ * </py.SetterPropertyMethodDeclaration>
+ * ```
+ * This will generate:
+ * ```python
+ * @property_name.setter
+ * def property_name(self, value: int) -> None:
+ *     self._value = value
+ * ```
+ * 
+ * @remarks
+ * This component is used within a PropertyDeclaration to define the setter method
+ * for a Python property. It automatically generates the appropriate decorator and
+ * method signature with a 'value' parameter. The setter method should contain the
+ * logic to set the property value.
+ */
+
 export function SetterPropertyMethodDeclaration(
   props: SetterPropertyMethodDeclarationProps,
 ) {
@@ -304,6 +483,28 @@ export function SetterPropertyMethodDeclaration(
 }
 
 export interface DeleterPropertyMethodDeclarationProps extends Omit<PropertyMethodDeclarationProps, "returnType"> {}
+
+/**
+ * A Python property deleter method declaration.
+ *
+ * @example
+ * ```tsx
+ * <py.DeleterPropertyMethodDeclaration>
+ *   {py.code`del self._value`}
+ * </py.DeleterPropertyMethodDeclaration>
+ * ```
+ * This will generate:
+ * ```python
+ * @property_name.deleter
+ * def property_name(self):
+ *     del self._value
+ * ```
+ * 
+ * @remarks
+ * This component is used within a PropertyDeclaration to define the deleter method
+ * for a Python property. It automatically generates the appropriate decorator and
+ * method signature. The deleter method should contain the logic to delete the property.
+ */
 
 export function DeleterPropertyMethodDeclaration(
   props: DeleterPropertyMethodDeclarationProps,
