@@ -320,11 +320,15 @@ export function PropertyDeclaration(props: PropertyDeclarationProps) {
   const deleterComponent =
     findKeyedChild(children, PropertyDeclaration.Deleter.tag) ?? undefined;
 
-  const setterChildren = nonEmptyOrNotImplemented(setterComponent?.props?.children);
+  const setterChildren = nonEmptyOrNotImplemented(
+    setterComponent?.props?.children,
+  );
   const deleterChildren = nonEmptyOrNotImplemented(
     deleterComponent?.props?.children,
   );
-  const unkeyedChildren = nonEmptyOrNotImplemented(findUnkeyedChildren(children));
+  const unkeyedChildren = nonEmptyOrNotImplemented(
+    findUnkeyedChildren(children),
+  );
 
   validateMemberScope(props.property.name, "PropertyDeclaration");
 
