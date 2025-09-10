@@ -36,10 +36,6 @@ export interface FunctionDeclarationPropsBase
    * Indicates the type of function.
    */
   functionType?: "instance" | "class" | "static";
-  /**
-   * The symbol for the function. Mostly used for property methods.
-   */
-  skipSymbolCreation?: boolean;
 }
 
 /**
@@ -84,13 +80,10 @@ function FunctionDeclarationBase(props: FunctionDeclarationPropsBase) {
     {
       instance: props.functionType !== undefined && currentScope?.isMemberScope,
       refkeys: props.refkey,
-      reuseExisting: props.skipSymbolCreation,
     },
     "function",
   );
-  if (!props.skipSymbolCreation) {
-    emitSymbol(sym);
-  }
+  emitSymbol(sym);
 
   return (
     <>
@@ -141,7 +134,6 @@ export function MethodDeclaration(props: MethodDeclarationProps) {
 
 export function PropertyDeclaration(props: FunctionDeclarationProps) {
   const children = childrenArray(() => props.children);
-  const skipSymbolCreation: boolean = true;
   const setterComponent =
     findKeyedChild(children, PropertyDeclaration.Setter.tag) ?? undefined;
   const deleterComponent =
@@ -155,7 +147,6 @@ export function PropertyDeclaration(props: FunctionDeclarationProps) {
     {
       instance: currentScope?.isMemberScope ?? false,
       refkeys: props.refkey,
-      reuseExisting: props.skipSymbolCreation,
     },
     "function",
   );
@@ -178,7 +169,6 @@ export function PropertyDeclaration(props: FunctionDeclarationProps) {
               <hbr />
               <PropertyMethodDeclaration
                 parameters={[{ name: "value" }]}
-                skipSymbolCreation={skipSymbolCreation}
                 children={setterChildren}
               />
             </Show>
@@ -187,10 +177,7 @@ export function PropertyDeclaration(props: FunctionDeclarationProps) {
             <Show when={Boolean(deleterComponent)}>
               {code`@${props.name}.deleter`}
               <hbr />
-              <PropertyMethodDeclaration
-                skipSymbolCreation={skipSymbolCreation}
-                children={deleterChildren}
-              />
+              <PropertyMethodDeclaration children={deleterChildren} />
             </Show>
           </>
         </List>
