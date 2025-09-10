@@ -328,7 +328,6 @@ describe("Function Declaration", () => {
     `);
   });
   it("renders empty property, setter, deleter", () => {
-    const setterParameters = [{ name: "value" }];
     const decl = (
       <py.StatementList>
         <py.ClassDeclaration name="MyClass">
@@ -360,7 +359,6 @@ describe("Function Declaration", () => {
     `);
   });
   it("renders normal property, setter, deleter with children and type", () => {
-    const setterParameters = [{ name: "value" }];
     const decl = (
       <py.StatementList>
         <py.ClassDeclaration name="MyClass">
@@ -399,7 +397,6 @@ describe("Function Declaration", () => {
     `);
   });
   it("renders normal property, setter, deleter with children and type, overriding the setter type", () => {
-    const setterParameters = [{ name: "value" }];
     const decl = (
       <py.StatementList>
         <py.ClassDeclaration name="MyClass">
@@ -446,7 +443,6 @@ describe("Function Declaration", () => {
     `);
   });
   it("renders property and function with the same name, renaming the latter to avoid conflict", () => {
-    const setterParameters = [{ name: "value" }];
     const decl = (
       <py.StatementList>
         <py.ClassDeclaration name="MyClass">

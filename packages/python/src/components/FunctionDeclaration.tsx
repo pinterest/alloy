@@ -675,8 +675,6 @@ export interface ConstructorDeclarationProps
  * def __new__(cls, *args, **kwargs):
  *   pass
  * ```
- * @param props
- * @returns
  */
 export function ConstructorDeclaration(props: ConstructorDeclarationProps) {
   // __new__ is a special method, as, despite having cls as the first parameter,
