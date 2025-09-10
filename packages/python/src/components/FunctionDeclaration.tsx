@@ -306,12 +306,12 @@ export function PropertyDeclaration(props: PropertyDeclarationProps) {
   // Utility function to format the children output
   // If we pass an empty array to a component, it will treat as if valid children
   // were passed, and thus "pass" will not be rendered.
-  const nonEmptyOrUndefined = (
+  const nonEmptyOrNotImplemented = (
     children: Children | undefined,
-  ): Children | undefined => {
-    if (!children) return undefined;
+  ): Children => {
+    if (!children) return [code`raise NotImplementedError`];
     const childArray = childrenArray(() => children);
-    return childArray.length > 0 ? children : undefined;
+    return childArray.length > 0 ? children : [code`raise NotImplementedError`];
   };
 
   const children = childrenArray(() => props.children);
@@ -320,11 +320,11 @@ export function PropertyDeclaration(props: PropertyDeclarationProps) {
   const deleterComponent =
     findKeyedChild(children, PropertyDeclaration.Deleter.tag) ?? undefined;
 
-  const setterChildren = nonEmptyOrUndefined(setterComponent?.props?.children);
-  const deleterChildren = nonEmptyOrUndefined(
+  const setterChildren = nonEmptyOrNotImplemented(setterComponent?.props?.children);
+  const deleterChildren = nonEmptyOrNotImplemented(
     deleterComponent?.props?.children,
   );
-  const unkeyedChildren = nonEmptyOrUndefined(findUnkeyedChildren(children));
+  const unkeyedChildren = nonEmptyOrNotImplemented(findUnkeyedChildren(children));
 
   validateMemberScope(props.property.name, "PropertyDeclaration");
 

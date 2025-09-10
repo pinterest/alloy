@@ -345,15 +345,15 @@ describe("Function Declaration", () => {
       class MyClass:
           @property
           def x(self):
-              pass
+              raise NotImplementedError
 
           @x.setter
           def x(self, value) -> None:
-              pass
+              raise NotImplementedError
 
           @x.deleter
           def x(self) -> None:
-              pass
+              raise NotImplementedError
 
 
     `);
@@ -467,11 +467,11 @@ describe("Function Declaration", () => {
 
           @x.setter
           def x(self, value) -> None:
-              pass
+              raise NotImplementedError
 
           @x.deleter
           def x(self) -> None:
-              pass
+              raise NotImplementedError
 
           def x_2_test(self):
               pass
