@@ -1,4 +1,5 @@
 import {
+  Children,
   childrenArray,
   code,
   DeclarationContext,
@@ -7,6 +8,7 @@ import {
   findUnkeyedChildren,
   List,
   Name,
+  Refkey,
   Show,
   taggedComponent,
   useContext,
@@ -20,7 +22,7 @@ import { getCallSignatureProps } from "../utils.js";
 import { CallSignature, CallSignatureProps } from "./CallSignature.jsx";
 import { BaseDeclarationProps, Declaration } from "./Declaration.js";
 import { PythonBlock } from "./PythonBlock.jsx";
-import { LexicalScope, NoNamePolicy } from "./index.js";
+import { Atom, LexicalScope, NoNamePolicy, TypeExpressionProps } from "./index.js";
 
 const setterTag = Symbol();
 const deleterTag = Symbol();
@@ -164,20 +166,47 @@ export function MethodDeclaration(props: MethodDeclarationProps) {
   );
 }
 
-export function PropertyDeclaration(props: FunctionDeclarationProps) {
+export interface PropertyDeclarationProps {
+  /**
+   * The name of the property.
+   */
+  property: ParameterDescriptor;
+
+  /**
+   * The children of the property.
+   */
+  children?: Children;
+
+  /**
+   * The refkey of the property.
+   */
+  refkey?: Refkey;
+}
+
+export function PropertyDeclaration(props: PropertyDeclarationProps) {
+  // Utility function to format the children output
+  // If we pass an empty array to a component, it will treat as if valid children
+  // were passed, and thus "pass" will not be rendered.
+  const nonEmptyOrUndefined = (children: Children | undefined): Children | undefined => {
+    if (!children) return undefined;
+    const childArray = childrenArray(() => children);
+    return childArray.length > 0 ? children : undefined;
+  };
+
   const children = childrenArray(() => props.children);
   const setterComponent =
     findKeyedChild(children, PropertyDeclaration.Setter.tag) ?? undefined;
   const deleterComponent =
     findKeyedChild(children, PropertyDeclaration.Deleter.tag) ?? undefined;
-  const setterChildren = setterComponent?.props?.children;
-  const deleterChildren = deleterComponent?.props?.children;
-  const unkeyedChildren = findUnkeyedChildren(children);
 
-  validateMemberScope(props.name, "PropertyDeclaration");
+  const setterChildren = nonEmptyOrUndefined(setterComponent?.props?.children);
+  const deleterChildren = nonEmptyOrUndefined(deleterComponent?.props?.children);
+  const unkeyedChildren = nonEmptyOrUndefined(findUnkeyedChildren(children));
+
+  validateMemberScope(props.property.name, "PropertyDeclaration");
 
   const sym: PythonOutputSymbol = createPythonSymbol(
-    props.name,
+    props.property.name,
     {
       instance: true,
       refkeys: props.refkey,
@@ -189,39 +218,36 @@ export function PropertyDeclaration(props: FunctionDeclarationProps) {
     <>
       <DeclarationContext.Provider value={sym}>
         <List hardline enderPunctuation>
-          <>
-            {code`@property`}
-            <hbr />
-            <PropertyMethodDeclaration
-              functionType={"instance"}
-              children={unkeyedChildren}
-            />
-          </>
-          <>
-            <Show when={Boolean(setterComponent)}>
-              {code`@${props.name}.setter`}
-              <hbr />
-              <PropertyMethodDeclaration
-                parameters={[{ name: "value" }]}
-                children={setterChildren}
-              />
-            </Show>
-          </>
-          <>
-            <Show when={Boolean(deleterComponent)}>
-              {code`@${props.name}.deleter`}
-              <hbr />
-              <PropertyMethodDeclaration children={deleterChildren} />
-            </Show>
-          </>
+          <PropertyMethodDeclaration returnType={props.property.type}>
+            {unkeyedChildren}
+          </PropertyMethodDeclaration>
+          <Show when={Boolean(setterComponent)}>
+            <SetterPropertyMethodDeclaration type={setterComponent?.props?.type ?? props.property.type}>
+              {setterChildren}
+            </SetterPropertyMethodDeclaration>
+          </Show>
+          <Show when={Boolean(deleterComponent)}>
+            <DeleterPropertyMethodDeclaration>
+              {deleterChildren}
+            </DeleterPropertyMethodDeclaration>
+          </Show>
         </List>
       </DeclarationContext.Provider>
     </>
   );
 }
 
-export interface PropertyMethodDeclarationProps
-  extends Omit<FunctionDeclarationProps, "name"> {}
+export interface PropertyMethodDeclarationProps {
+  /**
+   * The children of the property.
+   */
+  children?: Children;
+
+  /**
+   * The return type of the property.
+   */
+  returnType?: TypeExpressionProps;
+}
 
 export function PropertyMethodDeclaration(
   props: PropertyMethodDeclarationProps,
@@ -231,19 +257,80 @@ export function PropertyMethodDeclaration(
   ) as PythonOutputSymbol;
 
   return (
-    <MethodDeclarationBase
-      {...props}
-      name={declarationContext.name}
-      functionType="instance"
-      sym={declarationContext}
-    />
+    <>
+      {code`@property`}
+      <hbr />
+      <MethodDeclarationBase
+        {...props}
+        name={declarationContext.name}
+        functionType="instance"
+        returnType={props.returnType}
+        sym={declarationContext}
+      >
+        {props.children}
+      </MethodDeclarationBase>
+    </>
   );
 }
 
-export function createPropertyMethodComponent(tag: symbol) {
+export interface SetterPropertyMethodDeclarationProps extends PropertyMethodDeclarationProps {
+  /**
+   * The type of the property. Overrides the PropertyDeclaration type.
+   */
+  type?: TypeExpressionProps;
+}
+
+export function SetterPropertyMethodDeclaration(
+  props: SetterPropertyMethodDeclarationProps,
+) {
+  const declarationContext = useContext(
+    DeclarationContext,
+  ) as PythonOutputSymbol;
+
+  return (
+    <>
+      {code`@${declarationContext.name}.setter`}
+      <hbr />
+      <MethodDeclarationBase
+        {...props}
+        name={declarationContext.name}
+        functionType="instance"
+        parameters={[{ name: "value", type: props.type }]}
+        returnType={{ children: <Atom jsValue={null} /> }}
+        sym={declarationContext}
+      />
+    </>
+  );
+}
+
+export interface DeleterPropertyMethodDeclarationProps extends Omit<PropertyMethodDeclarationProps, "returnType"> {}
+
+export function DeleterPropertyMethodDeclaration(
+  props: DeleterPropertyMethodDeclarationProps,
+) {
+  const declarationContext = useContext(
+    DeclarationContext,
+  ) as PythonOutputSymbol;
+
+  return (
+    <>
+      {code`@${declarationContext.name}.deleter`}
+      <hbr />
+      <MethodDeclarationBase
+        {...props}
+        name={declarationContext.name}
+        functionType="instance"
+        returnType={{ children: <Atom jsValue={null} /> }}
+        sym={declarationContext}
+      />
+    </>
+  );
+}
+
+export function createPropertyMethodComponent<P extends { children?: any; type?: any }>(tag: symbol) {
   return taggedComponent(
     tag,
-    function Parameters(props: PropertyMethodDeclarationProps) {
+    function Parameters(props: P) {
       const declarationContext = useContext(
         DeclarationContext,
       ) as PythonOutputSymbol;
@@ -251,12 +338,18 @@ export function createPropertyMethodComponent(tag: symbol) {
         return props.children;
       }
 
+      // Special handling for setter which needs a "value" parameter with the specified type
+      const parameters = props.type ? [{ name: "value", type: props.type }] : undefined;
+
       return (
         <>
-          <FunctionDeclaration
-            functionType={"instance"}
+          <MethodDeclarationBase
             {...props}
             name={declarationContext.name}
+            functionType="instance"
+            parameters={parameters}
+            returnType={{ children: <Atom jsValue={null} /> }}
+            sym={declarationContext}
           />
         </>
       );
@@ -264,8 +357,8 @@ export function createPropertyMethodComponent(tag: symbol) {
   );
 }
 
-PropertyDeclaration.Setter = createPropertyMethodComponent(setterTag);
-PropertyDeclaration.Deleter = createPropertyMethodComponent(deleterTag);
+PropertyDeclaration.Setter = createPropertyMethodComponent<SetterPropertyMethodDeclarationProps>(setterTag);
+PropertyDeclaration.Deleter = createPropertyMethodComponent<DeleterPropertyMethodDeclarationProps>(deleterTag);
 
 export function ClassMethodDeclaration(props: MethodDeclarationProps) {
   const abstractMethod =
@@ -327,11 +420,28 @@ export function DunderMethodDeclaration(props: DunderMethodDeclarationProps) {
   );
 }
 
-export interface NewDunderClassMethodDeclarationProps
+export interface ConstructorDeclarationProps
   extends Omit<DunderMethodDeclarationProps, "name"> {}
 
-export function NewDunderClassMethodDeclaration(
-  props: NewDunderClassMethodDeclarationProps,
+/**
+ * A Python constructor declaration (__new__).
+ *
+ * @example
+ * ```tsx
+ * <ConstructorDeclaration args kwargs>
+ *   pass
+ * </ConstructorDeclaration>
+ * ```
+ * This will generate:
+ * ```python
+ * def __new__(cls, *args, **kwargs):
+ *   pass
+ * ```
+ * @param props 
+ * @returns 
+ */
+export function ConstructorDeclaration(
+  props: ConstructorDeclarationProps,
 ) {
   // __new__ is a special method, as, despite having cls as the first parameter,
   // it isn't decorated with @classmethod.

@@ -327,16 +327,14 @@ describe("Function Declaration", () => {
 
     `);
   });
-  it("renders normal property, getter, setter, deleter", () => {
+  it("renders empty property, setter, deleter", () => {
     const setterParameters = [{ name: "value" }];
     const decl = (
       <py.StatementList>
         <py.ClassDeclaration name="MyClass">
           <py.StatementList>
-            <py.PropertyDeclaration name="x">
-              something
+            <py.PropertyDeclaration property={{ name: "x" }}>
               <py.PropertyDeclaration.Setter>
-                something else
               </py.PropertyDeclaration.Setter>
               <py.PropertyDeclaration.Deleter />
             </py.PropertyDeclaration>
@@ -349,15 +347,89 @@ describe("Function Declaration", () => {
       class MyClass:
           @property
           def x(self):
+              pass
+
+          @x.setter
+          def x(self, value) -> None:
+              pass
+
+          @x.deleter
+          def x(self) -> None:
+              pass
+
+
+    `);
+  });
+  it("renders normal property, setter, deleter with children and type", () => {
+    const setterParameters = [{ name: "value" }];
+    const decl = (
+      <py.StatementList>
+        <py.ClassDeclaration name="MyClass">
+          <py.StatementList>
+            <py.PropertyDeclaration property={{ name: "x", type: { children: "int" } }}>
+              something
+              <py.PropertyDeclaration.Setter>
+                something else
+              </py.PropertyDeclaration.Setter>
+              <py.PropertyDeclaration.Deleter>
+                some other thing
+              </py.PropertyDeclaration.Deleter>
+            </py.PropertyDeclaration>
+          </py.StatementList>
+        </py.ClassDeclaration>
+      </py.StatementList>
+    );
+
+    expect(toSourceText([decl], { externals: [abcModule] })).toBe(d`
+      class MyClass:
+          @property
+          def x(self) -> int:
               something
 
           @x.setter
-          def x(self, value):
+          def x(self, value: int) -> None:
               something else
 
           @x.deleter
-          def x(self):
-              pass
+          def x(self) -> None:
+              some other thing
+
+
+    `);
+  });
+  it("renders normal property, setter, deleter with children and type, overriding the setter type", () => {
+    const setterParameters = [{ name: "value" }];
+    const decl = (
+      <py.StatementList>
+        <py.ClassDeclaration name="MyClass">
+          <py.StatementList>
+            <py.PropertyDeclaration property={{ name: "x", type: { children: "int" } }}>
+              something
+              <py.PropertyDeclaration.Setter type={{ children: [{ children: "int"}, { children: "float"}, { children: "str" }] }}>
+                self._string = str(value)
+              </py.PropertyDeclaration.Setter>
+              <py.PropertyDeclaration.Deleter>
+                some other thing
+              </py.PropertyDeclaration.Deleter>
+            </py.PropertyDeclaration>
+          </py.StatementList>
+        </py.ClassDeclaration>
+      </py.StatementList>
+    );
+
+    expect(toSourceText([decl], { externals: [abcModule] })).toBe(d`
+      class MyClass:
+          @property
+          def x(self) -> int:
+              something
+
+          @x.setter
+          def x(self, value: int | float | str) -> None:
+              self._string = str(value)
+
+          @x.deleter
+          def x(self) -> None:
+              some other thing
 
 
     `);
@@ -368,7 +440,7 @@ describe("Function Declaration", () => {
       <py.StatementList>
         <py.ClassDeclaration name="MyClass">
           <py.StatementList>
-            <py.PropertyDeclaration name="x">
+            <py.PropertyDeclaration property={{ name: "x" }}>
               something
               <py.PropertyDeclaration.Setter />
               <py.PropertyDeclaration.Deleter />
@@ -387,11 +459,11 @@ describe("Function Declaration", () => {
               something
 
           @x.setter
-          def x(self, value):
+          def x(self, value) -> None:
               pass
 
           @x.deleter
-          def x(self):
+          def x(self) -> None:
               pass
 
           def x_2_test(self):
@@ -434,9 +506,9 @@ describe("Function Declaration", () => {
     const decl = (
       <py.ClassDeclaration name="MyClass">
         <py.StatementList>
-          <py.NewDunderClassMethodDeclaration args kwargs>
+          <py.ConstructorDeclaration args kwargs>
             pass
-          </py.NewDunderClassMethodDeclaration>
+          </py.ConstructorDeclaration>
         </py.StatementList>
       </py.ClassDeclaration>
     );
@@ -558,7 +630,7 @@ describe("Function Declaration", () => {
 
   it("throws error when PropertyDeclaration is used outside of a class", () => {
     expect(() => {
-      toSourceText([<py.PropertyDeclaration name="x" />]);
+      toSourceText([<py.PropertyDeclaration property={{ name: "x" }} />]);
     }).toThrow(
       'PropertyDeclaration "x" must be declared inside a class (member scope)',
     );
