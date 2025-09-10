@@ -334,8 +334,7 @@ describe("Function Declaration", () => {
         <py.ClassDeclaration name="MyClass">
           <py.StatementList>
             <py.PropertyDeclaration property={{ name: "x" }}>
-              <py.PropertyDeclaration.Setter>
-              </py.PropertyDeclaration.Setter>
+              <py.PropertyDeclaration.Setter></py.PropertyDeclaration.Setter>
               <py.PropertyDeclaration.Deleter />
             </py.PropertyDeclaration>
           </py.StatementList>
@@ -366,7 +365,9 @@ describe("Function Declaration", () => {
       <py.StatementList>
         <py.ClassDeclaration name="MyClass">
           <py.StatementList>
-            <py.PropertyDeclaration property={{ name: "x", type: { children: "int" } }}>
+            <py.PropertyDeclaration
+              property={{ name: "x", type: { children: "int" } }}
+            >
               something
               <py.PropertyDeclaration.Setter>
                 something else
@@ -403,9 +404,19 @@ describe("Function Declaration", () => {
       <py.StatementList>
         <py.ClassDeclaration name="MyClass">
           <py.StatementList>
-            <py.PropertyDeclaration property={{ name: "x", type: { children: "int" } }}>
+            <py.PropertyDeclaration
+              property={{ name: "x", type: { children: "int" } }}
+            >
               something
-              <py.PropertyDeclaration.Setter type={{ children: [{ children: "int"}, { children: "float"}, { children: "str" }] }}>
+              <py.PropertyDeclaration.Setter
+                type={{
+                  children: [
+                    { children: "int" },
+                    { children: "float" },
+                    { children: "str" },
+                  ],
+                }}
+              >
                 self._string = str(value)
               </py.PropertyDeclaration.Setter>
               <py.PropertyDeclaration.Deleter>

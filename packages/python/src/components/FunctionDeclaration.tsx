@@ -22,7 +22,12 @@ import { getCallSignatureProps } from "../utils.js";
 import { CallSignature, CallSignatureProps } from "./CallSignature.jsx";
 import { BaseDeclarationProps, Declaration } from "./Declaration.js";
 import { PythonBlock } from "./PythonBlock.jsx";
-import { Atom, LexicalScope, NoNamePolicy, TypeExpressionProps } from "./index.js";
+import {
+  Atom,
+  LexicalScope,
+  NoNamePolicy,
+  TypeExpressionProps,
+} from "./index.js";
 
 const setterTag = Symbol();
 const deleterTag = Symbol();
@@ -75,7 +80,7 @@ export interface FunctionDeclarationProps
  * def my_function(a: int, b: str) -> int:
  *     return a + b
  * ```
- * 
+ *
  * @remarks
  * This component creates a Python function declaration with optional type annotations,
  * parameters, and return types. It supports async functions, different function types
@@ -155,7 +160,7 @@ export interface MethodDeclarationBaseProps extends FunctionDeclarationProps {}
  * def my_method(self, value: str) -> int:
  *   return len(value)
  * ```
- * 
+ *
  * @remarks
  * This is the base component for method declarations that handles validation
  * and ensures the method is declared within a class (member scope).
@@ -195,7 +200,7 @@ export interface MethodDeclarationProps extends FunctionDeclarationProps {
  * def my_method(self, value: str) -> int:
  *   return len(value)
  * ```
- * 
+ *
  * @example Abstract method:
  * ```tsx
  * <MethodDeclaration
@@ -210,7 +215,7 @@ export interface MethodDeclarationProps extends FunctionDeclarationProps {
  * def abstract_method(self) -> str:
  *   pass
  * ```
- * 
+ *
  * @remarks
  * This component automatically adds the `self` parameter as the first parameter
  * for instance methods. Set `abstract={true}` to generate an abstract method
@@ -281,11 +286,11 @@ export interface PropertyDeclarationProps {
  * @property
  * def value(self) -> int:
  *   return self._value
- * 
+ *
  * @value.setter
  * def value(self, value: int | float | str) -> None:
  *   self._value = int(value)
- * 
+ *
  * @value.deleter
  * def value(self) -> None:
  *   del self._value
@@ -301,7 +306,9 @@ export function PropertyDeclaration(props: PropertyDeclarationProps) {
   // Utility function to format the children output
   // If we pass an empty array to a component, it will treat as if valid children
   // were passed, and thus "pass" will not be rendered.
-  const nonEmptyOrUndefined = (children: Children | undefined): Children | undefined => {
+  const nonEmptyOrUndefined = (
+    children: Children | undefined,
+  ): Children | undefined => {
     if (!children) return undefined;
     const childArray = childrenArray(() => children);
     return childArray.length > 0 ? children : undefined;
@@ -314,7 +321,9 @@ export function PropertyDeclaration(props: PropertyDeclarationProps) {
     findKeyedChild(children, PropertyDeclaration.Deleter.tag) ?? undefined;
 
   const setterChildren = nonEmptyOrUndefined(setterComponent?.props?.children);
-  const deleterChildren = nonEmptyOrUndefined(deleterComponent?.props?.children);
+  const deleterChildren = nonEmptyOrUndefined(
+    deleterComponent?.props?.children,
+  );
   const unkeyedChildren = nonEmptyOrUndefined(findUnkeyedChildren(children));
 
   validateMemberScope(props.property.name, "PropertyDeclaration");
@@ -336,7 +345,9 @@ export function PropertyDeclaration(props: PropertyDeclarationProps) {
             {unkeyedChildren}
           </PropertyMethodDeclaration>
           <Show when={Boolean(setterComponent)}>
-            <SetterPropertyMethodDeclaration type={setterComponent?.props?.type ?? props.property.type}>
+            <SetterPropertyMethodDeclaration
+              type={setterComponent?.props?.type ?? props.property.type}
+            >
               {setterChildren}
             </SetterPropertyMethodDeclaration>
           </Show>
@@ -400,7 +411,8 @@ export function PropertyMethodDeclaration(
   );
 }
 
-export interface SetterPropertyMethodDeclarationProps extends PropertyMethodDeclarationProps {
+export interface SetterPropertyMethodDeclarationProps
+  extends PropertyMethodDeclarationProps {
   /**
    * The type of the property. Overrides the PropertyDeclaration type.
    */
@@ -422,7 +434,7 @@ export interface SetterPropertyMethodDeclarationProps extends PropertyMethodDecl
  * def property_name(self, value: int) -> None:
  *     self._value = value
  * ```
- * 
+ *
  * @remarks
  * This component is used within a PropertyDeclaration to define the setter method
  * for a Python property. It automatically generates the appropriate decorator and
@@ -452,7 +464,8 @@ export function SetterPropertyMethodDeclaration(
   );
 }
 
-export interface DeleterPropertyMethodDeclarationProps extends Omit<PropertyMethodDeclarationProps, "returnType"> {}
+export interface DeleterPropertyMethodDeclarationProps
+  extends Omit<PropertyMethodDeclarationProps, "returnType"> {}
 
 /**
  * A Python property deleter method declaration.
@@ -469,7 +482,7 @@ export interface DeleterPropertyMethodDeclarationProps extends Omit<PropertyMeth
  * def property_name(self):
  *     del self._value
  * ```
- * 
+ *
  * @remarks
  * This component is used within a PropertyDeclaration to define the deleter method
  * for a Python property. It automatically generates the appropriate decorator and
@@ -497,38 +510,44 @@ export function DeleterPropertyMethodDeclaration(
   );
 }
 
-export function createPropertyMethodComponent<P extends { children?: any; type?: any }>(tag: symbol) {
-  return taggedComponent(
-    tag,
-    function Parameters(props: P) {
-      const declarationContext = useContext(
-        DeclarationContext,
-      ) as PythonOutputSymbol;
-      if (props.children) {
-        return props.children;
-      }
+export function createPropertyMethodComponent<
+  P extends { children?: any; type?: any },
+>(tag: symbol) {
+  return taggedComponent(tag, function Parameters(props: P) {
+    const declarationContext = useContext(
+      DeclarationContext,
+    ) as PythonOutputSymbol;
+    if (props.children) {
+      return props.children;
+    }
 
-      // Special handling for setter which needs a "value" parameter with the specified type
-      const parameters = props.type ? [{ name: "value", type: props.type }] : undefined;
+    // Special handling for setter which needs a "value" parameter with the specified type
+    const parameters =
+      props.type ? [{ name: "value", type: props.type }] : undefined;
 
-      return (
-        <>
-          <MethodDeclarationBase
-            {...props}
-            name={declarationContext.name}
-            functionType="instance"
-            parameters={parameters}
-            returnType={{ children: <Atom jsValue={null} /> }}
-            sym={declarationContext}
-          />
-        </>
-      );
-    },
-  );
+    return (
+      <>
+        <MethodDeclarationBase
+          {...props}
+          name={declarationContext.name}
+          functionType="instance"
+          parameters={parameters}
+          returnType={{ children: <Atom jsValue={null} /> }}
+          sym={declarationContext}
+        />
+      </>
+    );
+  });
 }
 
-PropertyDeclaration.Setter = createPropertyMethodComponent<SetterPropertyMethodDeclarationProps>(setterTag);
-PropertyDeclaration.Deleter = createPropertyMethodComponent<DeleterPropertyMethodDeclarationProps>(deleterTag);
+PropertyDeclaration.Setter =
+  createPropertyMethodComponent<SetterPropertyMethodDeclarationProps>(
+    setterTag,
+  );
+PropertyDeclaration.Deleter =
+  createPropertyMethodComponent<DeleterPropertyMethodDeclarationProps>(
+    deleterTag,
+  );
 
 /**
  * A Python class method declaration component.
@@ -549,7 +568,7 @@ PropertyDeclaration.Deleter = createPropertyMethodComponent<DeleterPropertyMetho
  * def create_instance(cls, value: str) -> MyClass:
  *   return cls(value)
  * ```
- * 
+ *
  * @remarks
  * This component automatically adds the `@classmethod` decorator and the `cls`
  * parameter as the first parameter. The method must be declared within a class.
@@ -588,7 +607,7 @@ export function ClassMethodDeclaration(props: MethodDeclarationProps) {
  * def create_instance(value: str) -> str:
  *   return value
  * ```
- * 
+ *
  * @remarks
  * This component automatically adds the `@staticmethod` decorator and the `cls`
  * parameter as the first parameter. The method must be declared within a class. It
@@ -656,12 +675,10 @@ export interface ConstructorDeclarationProps
  * def __new__(cls, *args, **kwargs):
  *   pass
  * ```
- * @param props 
- * @returns 
+ * @param props
+ * @returns
  */
-export function ConstructorDeclaration(
-  props: ConstructorDeclarationProps,
-) {
+export function ConstructorDeclaration(props: ConstructorDeclarationProps) {
   // __new__ is a special method, as, despite having cls as the first parameter,
   // it isn't decorated with @classmethod.
   return (
