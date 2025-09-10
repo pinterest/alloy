@@ -555,4 +555,44 @@ describe("Function Declaration", () => {
             `,
     });
   });
+
+  it("throws error when PropertyDeclaration is used outside of a class", () => {
+    expect(() => {
+      toSourceText([<py.PropertyDeclaration name="x" />]);
+    }).toThrow(
+      'PropertyDeclaration "x" must be declared inside a class (member scope)',
+    );
+  });
+
+  it("throws error when MethodDeclaration is used outside of a class", () => {
+    expect(() => {
+      toSourceText([<py.MethodDeclaration name="my_method" />]);
+    }).toThrow(
+      'Method "my_method" must be declared inside a class (member scope)',
+    );
+  });
+
+  it("throws error when ClassMethodDeclaration is used outside of a class", () => {
+    expect(() => {
+      toSourceText([<py.ClassMethodDeclaration name="my_class_method" />]);
+    }).toThrow(
+      'Method "my_class_method" must be declared inside a class (member scope)',
+    );
+  });
+
+  it("throws error when StaticMethodDeclaration is used outside of a class", () => {
+    expect(() => {
+      toSourceText([<py.StaticMethodDeclaration name="my_static_method" />]);
+    }).toThrow(
+      'Method "my_static_method" must be declared inside a class (member scope)',
+    );
+  });
+
+  it("throws error when DunderMethodDeclaration is used outside of a class", () => {
+    expect(() => {
+      toSourceText([<py.DunderMethodDeclaration name="__init__" />]);
+    }).toThrow(
+      'Method "__init__" must be declared inside a class (member scope)',
+    );
+  });
 });

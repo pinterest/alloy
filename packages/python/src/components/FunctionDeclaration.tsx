@@ -25,6 +25,19 @@ import { LexicalScope, NoNamePolicy } from "./index.js";
 const setterTag = Symbol();
 const deleterTag = Symbol();
 
+/**
+ * Validates that the current scope is a member scope (inside a class).
+ * Throws an error if not in a member scope.
+ */
+function validateMemberScope(name: string, type: string = "Method") {
+  const currentScope = usePythonScope();
+  if (!currentScope?.isMemberScope) {
+    throw new Error(
+      `${type} "${name}" must be declared inside a class (member scope)`,
+    );
+  }
+}
+
 export interface FunctionDeclarationPropsBase
   extends BaseDeclarationProps,
     CallSignatureProps {
@@ -36,6 +49,10 @@ export interface FunctionDeclarationPropsBase
    * Indicates the type of function.
    */
   functionType?: "instance" | "class" | "static";
+  /**
+   * Optional existing symbol to use instead of creating a new one.
+   */
+  sym?: PythonOutputSymbol;
 }
 
 /**
@@ -75,15 +92,22 @@ function FunctionDeclarationBase(props: FunctionDeclarationPropsBase) {
     parameters: [...extraParameters, ...(callSignatureProps.parameters || [])],
   };
   const currentScope = usePythonScope();
-  const sym: PythonOutputSymbol = createPythonSymbol(
-    props.name,
-    {
-      instance: props.functionType !== undefined && currentScope?.isMemberScope,
-      refkeys: props.refkey,
-    },
-    "function",
-  );
-  emitSymbol(sym);
+  const sym: PythonOutputSymbol =
+    props.sym ??
+    createPythonSymbol(
+      props.name,
+      {
+        instance:
+          props.functionType !== undefined && currentScope?.isMemberScope,
+        refkeys: props.refkey,
+      },
+      "function",
+    );
+
+  // Only emit symbol if we created it (not if using existing one)
+  if (!props.sym) {
+    emitSymbol(sym);
+  }
 
   return (
     <>
@@ -108,25 +132,33 @@ export function FunctionDeclaration(props: FunctionDeclarationProps) {
   return <FunctionDeclarationBase {...props} />;
 }
 
-export interface MethodDeclarationProps extends FunctionDeclarationProps {
-  abstract?: boolean;
-}
+export interface MethodDeclarationBaseProps extends FunctionDeclarationProps {}
 
-export function MethodDeclarationBase(props: MethodDeclarationProps) {
-  const abstractMethod =
-    props.abstract ? code`@${abcModule["."].abstractmethod}` : undefined;
+export function MethodDeclarationBase(props: MethodDeclarationBaseProps) {
+  // Only validate if we don't have an existing symbol (which implies validation already happened)
+  if (!props.sym) {
+    validateMemberScope(props.name);
+  }
+
   return (
     <>
-      {abstractMethod}
-      {abstractMethod && <hbr />}
       <FunctionDeclaration {...props} />
     </>
   );
 }
 
+export interface MethodDeclarationProps extends FunctionDeclarationProps {
+  abstract?: boolean;
+}
+
 export function MethodDeclaration(props: MethodDeclarationProps) {
+  const abstractMethod =
+    props.abstract ? code`@${abcModule["."].abstractmethod}` : undefined;
+
   return (
     <>
+      {abstractMethod}
+      {abstractMethod && <hbr />}
       <MethodDeclarationBase functionType={"instance"} {...props} />
     </>
   );
@@ -141,11 +173,13 @@ export function PropertyDeclaration(props: FunctionDeclarationProps) {
   const setterChildren = setterComponent?.props?.children;
   const deleterChildren = deleterComponent?.props?.children;
   const unkeyedChildren = findUnkeyedChildren(children);
-  const currentScope = usePythonScope();
+
+  validateMemberScope(props.name, "PropertyDeclaration");
+
   const sym: PythonOutputSymbol = createPythonSymbol(
     props.name,
     {
-      instance: currentScope?.isMemberScope ?? false,
+      instance: true,
       refkeys: props.refkey,
     },
     "function",
@@ -195,25 +229,14 @@ export function PropertyMethodDeclaration(
   const declarationContext = useContext(
     DeclarationContext,
   ) as PythonOutputSymbol;
-  const { children, ...propsWithoutChildren } = props;
-  const callSignatureProps = getCallSignatureProps(propsWithoutChildren, {});
-  const callSignaturePropsWithSelf = {
-    ...callSignatureProps,
-    parameters: [{ name: "self" }, ...(callSignatureProps.parameters || [])],
-  };
+
   return (
-    <>
-      <Declaration nameKind="function" symbol={declarationContext}>
-        def <Name />
-        <LexicalScope name={declarationContext.name}>
-          <CallSignature {...callSignaturePropsWithSelf} />
-          <PythonBlock opener=":">
-            <Show when={Boolean(props.doc)}>{props.doc}</Show>
-            {children ? children : "pass"}
-          </PythonBlock>
-        </LexicalScope>
-      </Declaration>
-    </>
+    <MethodDeclarationBase
+      {...props}
+      name={declarationContext.name}
+      functionType="instance"
+      sym={declarationContext}
+    />
   );
 }
 
@@ -245,20 +268,30 @@ PropertyDeclaration.Setter = createPropertyMethodComponent(setterTag);
 PropertyDeclaration.Deleter = createPropertyMethodComponent(deleterTag);
 
 export function ClassMethodDeclaration(props: MethodDeclarationProps) {
+  const abstractMethod =
+    props.abstract ? code`@${abcModule["."].abstractmethod}` : undefined;
+
   return (
     <>
       {"@classmethod"}
       <hbr />
+      {abstractMethod}
+      {abstractMethod && <hbr />}
       <MethodDeclarationBase functionType={"class"} {...props} />
     </>
   );
 }
 
 export function StaticMethodDeclaration(props: MethodDeclarationProps) {
+  const abstractMethod =
+    props.abstract ? code`@${abcModule["."].abstractmethod}` : undefined;
+
   return (
     <>
       {"@staticmethod"}
       <hbr />
+      {abstractMethod}
+      {abstractMethod && <hbr />}
       <MethodDeclarationBase functionType={"static"} {...props} />
     </>
   );
