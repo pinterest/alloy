@@ -40,7 +40,7 @@ function validateMemberScope(name: string, type: string = "Method") {
   }
 }
 
-export interface FunctionDeclarationPropsBase
+export interface FunctionDeclarationProps
   extends BaseDeclarationProps,
     CallSignatureProps {
   /**
@@ -63,21 +63,27 @@ export interface FunctionDeclarationPropsBase
  * @example
  * ```tsx
  * <FunctionDeclaration
- *  name="my_function"
- *  returnType={{ children:"int" }}
- *  parameters=[{name: "a", type: { children:"int" }},{name: "b", type: { children:"str" }}]>
+ *   name="my_function"
+ *   returnType={{ children: "int" }}
+ *   parameters={[{ name: "a", type: { children: "int" } }, { name: "b", type: { children: "str" } }]}
+ * >
  *   return a + b
  * </FunctionDeclaration>
  * ```
  * This will generate:
  * ```python
  * def my_function(a: int, b: str) -> int:
- *   return a + b
+ *     return a + b
  * ```
  * 
  * @remarks
+ * This component creates a Python function declaration with optional type annotations,
+ * parameters, and return types. It supports async functions, different function types
+ * (regular, instance, class, static), and can reuse existing symbols. The function automatically
+ * handles symbol creation and emission unless an existing symbol is provided. It also
+ * automatically adds the appropriate first parameter (self, cls) based on the functionType.
  */
-function FunctionDeclarationBase(props: FunctionDeclarationPropsBase) {
+export function FunctionDeclaration(props: FunctionDeclarationProps) {
   const asyncKwd = props.async ? "async " : "";
   let callSignatureProps = getCallSignatureProps(props, {});
   const extraParameters: ParameterDescriptor[] = [];
@@ -129,39 +135,6 @@ function FunctionDeclarationBase(props: FunctionDeclarationPropsBase) {
   );
 }
 
-export interface FunctionDeclarationProps
-  extends FunctionDeclarationPropsBase {}
-
-/**
- * A Python function declaration.
- *
- * @example
- * ```tsx
- * <FunctionDeclaration
- *   name="my_function"
- *   returnType={{ children: "int" }}
- *   parameters={[{ name: "a", type: { children: "int" } }, { name: "b", type: { children: "str" } }]}
- * >
- *   return a + b
- * </FunctionDeclaration>
- * ```
- * This will generate:
- * ```python
- * def my_function(a: int, b: str) -> int:
- *     return a + b
- * ```
- * 
- * @remarks
- * This component creates a Python function declaration with optional type annotations,
- * parameters, and return types. It supports async functions, different function types
- * (instance, class, static), and can reuse existing symbols. The function automatically
- * handles symbol creation and emission unless an existing symbol is provided.
- */
-
-export function FunctionDeclaration(props: FunctionDeclarationProps) {
-  return <FunctionDeclarationBase {...props} />;
-}
-
 export interface MethodDeclarationBaseProps extends FunctionDeclarationProps {}
 
 /**
@@ -185,10 +158,8 @@ export interface MethodDeclarationBaseProps extends FunctionDeclarationProps {}
  * 
  * @remarks
  * This is the base component for method declarations that handles validation
- * and ensures the method is declared within a class (member scope). It automatically
- * adds the appropriate first parameter (self, cls) based on the functionType.
+ * and ensures the method is declared within a class (member scope).
  */
-
 export function MethodDeclarationBase(props: MethodDeclarationBaseProps) {
   // Only validate if we don't have an existing symbol (which implies validation already happened)
   if (!props.sym) {
@@ -297,8 +268,8 @@ export interface PropertyDeclarationProps {
  * ```tsx
  * <PropertyDeclaration property={{ name: "value", type: "int" }}>
  *   return self._value
- *   <PropertyDeclaration.Setter type="int">
- *     self._value = value
+ *   <PropertyDeclaration.Setter type={{ children: [{ children: "int" }, { children: "float" }, { children: "str" }] }}>
+ *     self._value = int(value)
  *   </PropertyDeclaration.Setter>
  *   <PropertyDeclaration.Deleter>
  *     del self._value
@@ -312,8 +283,8 @@ export interface PropertyDeclarationProps {
  *   return self._value
  * 
  * @value.setter
- * def value(self, value: int) -> None:
- *   self._value = value
+ * def value(self, value: int | float | str) -> None:
+ *   self._value = int(value)
  * 
  * @value.deleter
  * def value(self) -> None:
@@ -458,7 +429,6 @@ export interface SetterPropertyMethodDeclarationProps extends PropertyMethodDecl
  * method signature with a 'value' parameter. The setter method should contain the
  * logic to set the property value.
  */
-
 export function SetterPropertyMethodDeclaration(
   props: SetterPropertyMethodDeclarationProps,
 ) {
@@ -505,7 +475,6 @@ export interface DeleterPropertyMethodDeclarationProps extends Omit<PropertyMeth
  * for a Python property. It automatically generates the appropriate decorator and
  * method signature. The deleter method should contain the logic to delete the property.
  */
-
 export function DeleterPropertyMethodDeclaration(
   props: DeleterPropertyMethodDeclarationProps,
 ) {
@@ -561,6 +530,30 @@ export function createPropertyMethodComponent<P extends { children?: any; type?:
 PropertyDeclaration.Setter = createPropertyMethodComponent<SetterPropertyMethodDeclarationProps>(setterTag);
 PropertyDeclaration.Deleter = createPropertyMethodComponent<DeleterPropertyMethodDeclarationProps>(deleterTag);
 
+/**
+ * A Python class method declaration component.
+ *
+ * @example
+ * ```tsx
+ * <ClassMethodDeclaration
+ *   name="create_instance"
+ *   returnType={{ children: "MyClass" }}
+ *   parameters={[{ name: "value", type: { children: "str" } }]}
+ * >
+ *   return cls(value)
+ * </ClassMethodDeclaration>
+ * ```
+ * This will generate:
+ * ```python
+ * @classmethod
+ * def create_instance(cls, value: str) -> MyClass:
+ *   return cls(value)
+ * ```
+ * 
+ * @remarks
+ * This component automatically adds the `@classmethod` decorator and the `cls`
+ * parameter as the first parameter. The method must be declared within a class.
+ */
 export function ClassMethodDeclaration(props: MethodDeclarationProps) {
   const abstractMethod =
     props.abstract ? code`@${abcModule["."].abstractmethod}` : undefined;
@@ -576,6 +569,31 @@ export function ClassMethodDeclaration(props: MethodDeclarationProps) {
   );
 }
 
+/**
+ * A Python static method declaration component.
+ *
+ * @example
+ * ```tsx
+ * <StaticMethodDeclaration
+ *   name="create_instance"
+ *   returnType={{ children: "str" }}
+ *   parameters={[{ name: "value", type: { children: "str" } }]}
+ * >
+ *   return value
+ * </StaticMethodDeclaration>
+ * ```
+ * This will generate:
+ * ```python
+ * @staticmethod
+ * def create_instance(value: str) -> str:
+ *   return value
+ * ```
+ * 
+ * @remarks
+ * This component automatically adds the `@staticmethod` decorator and the `cls`
+ * parameter as the first parameter. The method must be declared within a class. It
+ * does not have a `self` parameter.
+ */
 export function StaticMethodDeclaration(props: MethodDeclarationProps) {
   const abstractMethod =
     props.abstract ? code`@${abcModule["."].abstractmethod}` : undefined;
