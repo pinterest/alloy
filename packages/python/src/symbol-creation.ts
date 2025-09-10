@@ -16,7 +16,6 @@ import { PythonLexicalScope } from "./symbols/python-lexical-scope.js";
 interface CreatePythonSymbolOptions extends PythonOutputSymbolOptions {
   space?: OutputSpace;
   instance?: boolean;
-  reuseExisting?: boolean;
 }
 
 /**
@@ -33,6 +32,7 @@ export function findExistingSymbol(
   const existingSymbol = targetSpace.symbolNames.get(name);
   return existingSymbol as PythonOutputSymbol | undefined;
 }
+
 /**
  * Creates a symbol for a python declaration in the current scope.
  */
@@ -70,14 +70,6 @@ export function createPythonSymbol(
   }
 
   const binder = options.binder ?? currentScope?.binder ?? useBinder();
-
-  // Check for existing symbol if reuseExisting is true
-  if (options.reuseExisting && targetSpace) {
-    const existingSymbol = findExistingSymbol(processedName, targetSpace);
-    if (existingSymbol) {
-      return existingSymbol;
-    }
-  }
 
   return new PythonOutputSymbol(processedName, targetSpace, {
     binder: binder,
