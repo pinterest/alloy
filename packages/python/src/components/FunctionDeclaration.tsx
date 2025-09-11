@@ -431,7 +431,6 @@ export function PropertyMethodDeclaration(
         {...props}
         name={declarationContext.name}
         functionType="instance"
-        returnType={props.returnType}
         sym={declarationContext}
       >
         {props.children}
