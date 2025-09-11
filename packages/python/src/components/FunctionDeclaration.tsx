@@ -45,7 +45,8 @@ function validateMemberScope(name: string, type: string = "Method") {
   }
 }
 
-export interface FunctionDeclarationProps
+// Internal interface with all properties - not exported to keep implementation details private
+interface BaseFunctionDeclarationProps
   extends BaseDeclarationProps,
     CallSignatureProps {
   /**
@@ -60,6 +61,14 @@ export interface FunctionDeclarationProps
    * Optional existing symbol to use instead of creating a new one.
    */
   sym?: PythonOutputSymbol;
+}
+
+export interface FunctionDeclarationProps
+  extends Omit<BaseFunctionDeclarationProps, "functionType" | "sym"> {
+  /**
+   * Indicates that the function is async.
+   */
+  async?: boolean;
 }
 
 /**
@@ -88,24 +97,20 @@ export interface FunctionDeclarationProps
  * handles symbol creation and emission unless an existing symbol is provided. It also
  * automatically adds the appropriate first parameter (self, cls) based on the functionType.
  */
-export function FunctionDeclaration(props: FunctionDeclarationProps) {
+export function FunctionDeclaration(props: BaseFunctionDeclarationProps) {
   const asyncKwd = props.async ? "async " : "";
-  let callSignatureProps = getCallSignatureProps(props, {});
-  const extraParameters: ParameterDescriptor[] = [];
   // Add self/cls parameter if instance or class function
-  if (props.functionType === "instance") {
-    extraParameters.push({
-      name: "self",
-    });
-  } else if (props.functionType === "class") {
-    extraParameters.push({
-      name: "cls",
-    });
+  let parameters;
+  switch (props.functionType) {
+    case "instance":
+      parameters = [{ name: "self" }, ...(props.parameters || [])];
+      break;
+    case "class":
+      parameters = [{ name: "cls" }, ...(props.parameters || [])];
+      break;
+    default:
+      parameters = props.parameters;
   }
-  callSignatureProps = {
-    ...callSignatureProps,
-    parameters: [...extraParameters, ...(callSignatureProps.parameters || [])],
-  };
   const currentScope = usePythonScope();
   const sym: PythonOutputSymbol =
     props.sym ??
@@ -129,7 +134,10 @@ export function FunctionDeclaration(props: FunctionDeclarationProps) {
       <Declaration {...props} nameKind="function" symbol={sym}>
         {asyncKwd}def <Name />
         <LexicalScope name={sym.name}>
-          <CallSignature {...callSignatureProps} />
+          <CallSignature
+            {...getCallSignatureProps(props, {})}
+            parameters={parameters}
+          />
           <PythonBlock opener=":">
             <Show when={Boolean(props.doc)}>{props.doc}</Show>
             {props.children ?? "pass"}
@@ -139,8 +147,6 @@ export function FunctionDeclaration(props: FunctionDeclarationProps) {
     </>
   );
 }
-
-export interface MethodDeclarationBaseProps extends FunctionDeclarationProps {}
 
 /**
  * A Python method declaration base component.
@@ -165,7 +171,7 @@ export interface MethodDeclarationBaseProps extends FunctionDeclarationProps {}
  * This is the base component for method declarations that handles validation
  * and ensures the method is declared within a class (member scope).
  */
-export function MethodDeclarationBase(props: MethodDeclarationBaseProps) {
+export function MethodDeclarationBase(props: BaseFunctionDeclarationProps) {
   // Only validate if we don't have an existing symbol (which implies validation already happened)
   if (!props.sym) {
     validateMemberScope(props.name);
@@ -250,6 +256,11 @@ export interface PropertyDeclarationProps {
    * The refkey of the property.
    */
   refkey?: Refkey;
+
+  /**
+   * Indicates that the property is abstract.
+   */
+  abstract?: boolean;
 }
 
 /**
@@ -345,18 +356,22 @@ export function PropertyDeclaration(props: PropertyDeclarationProps) {
     <>
       <DeclarationContext.Provider value={sym}>
         <List hardline enderPunctuation>
-          <PropertyMethodDeclaration returnType={props.property.type}>
+          <PropertyMethodDeclaration
+            returnType={props.property.type}
+            abstract={props.abstract}
+          >
             {unkeyedChildren}
           </PropertyMethodDeclaration>
           <Show when={Boolean(setterComponent)}>
             <SetterPropertyMethodDeclaration
               type={setterComponent?.props?.type ?? props.property.type}
+              abstract={props.abstract}
             >
               {setterChildren}
             </SetterPropertyMethodDeclaration>
           </Show>
           <Show when={Boolean(deleterComponent)}>
-            <DeleterPropertyMethodDeclaration>
+            <DeleterPropertyMethodDeclaration abstract={props.abstract}>
               {deleterChildren}
             </DeleterPropertyMethodDeclaration>
           </Show>
@@ -376,6 +391,11 @@ export interface PropertyMethodDeclarationProps {
    * The return type of the property.
    */
   returnType?: TypeExpressionProps;
+
+  /**
+   * Indicates that the property is abstract.
+   */
+  abstract?: boolean;
 }
 
 /**
@@ -398,10 +418,15 @@ export function PropertyMethodDeclaration(
     DeclarationContext,
   ) as PythonOutputSymbol;
 
+  const abstractMethod =
+    props.abstract ? code`@${abcModule["."].abstractmethod}` : undefined;
+
   return (
     <>
       {code`@property`}
       <hbr />
+      {abstractMethod}
+      {abstractMethod && <hbr />}
       <MethodDeclarationBase
         {...props}
         name={declarationContext.name}
@@ -452,10 +477,15 @@ export function SetterPropertyMethodDeclaration(
     DeclarationContext,
   ) as PythonOutputSymbol;
 
+  const abstractMethod =
+    props.abstract ? code`@${abcModule["."].abstractmethod}` : undefined;
+
   return (
     <>
       {code`@${declarationContext.name}.setter`}
       <hbr />
+      {abstractMethod}
+      {abstractMethod && <hbr />}
       <MethodDeclarationBase
         {...props}
         name={declarationContext.name}
@@ -499,10 +529,15 @@ export function DeleterPropertyMethodDeclaration(
     DeclarationContext,
   ) as PythonOutputSymbol;
 
+  const abstractMethod =
+    props.abstract ? code`@${abcModule["."].abstractmethod}` : undefined;
+
   return (
     <>
       {code`@${declarationContext.name}.deleter`}
       <hbr />
+      {abstractMethod}
+      {abstractMethod && <hbr />}
       <MethodDeclarationBase
         {...props}
         name={declarationContext.name}
@@ -685,7 +720,7 @@ export function ConstructorDeclaration(props: ConstructorDeclarationProps) {
   // it isn't decorated with @classmethod.
   return (
     <NoNamePolicy>
-      <MethodDeclaration {...props} name="__new__" functionType={"class"} />
+      <MethodDeclarationBase {...props} name="__new__" functionType={"class"} />
     </NoNamePolicy>
   );
 }

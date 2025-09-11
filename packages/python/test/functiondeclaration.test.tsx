@@ -482,6 +482,50 @@ describe("Function Declaration", () => {
 
     `);
   });
+  it("renders abstract property with getter, setter, deleter", () => {
+    const decl = (
+      <py.StatementList>
+        <py.ClassDeclaration name="MyClass">
+          <py.StatementList>
+            <py.PropertyDeclaration
+              property={{ name: "value", type: { children: "int" } }}
+              abstract
+            >
+              return self._value
+              <py.PropertyDeclaration.Setter type={{ children: "int" }}>
+                self._value = value
+              </py.PropertyDeclaration.Setter>
+              <py.PropertyDeclaration.Deleter>
+                del self._value
+              </py.PropertyDeclaration.Deleter>
+            </py.PropertyDeclaration>
+          </py.StatementList>
+        </py.ClassDeclaration>
+      </py.StatementList>
+    );
+
+    expect(toSourceText([decl], { externals: [abcModule] })).toBe(d`
+      from abc import abstractmethod
+
+      class MyClass:
+          @property
+          @abstractmethod
+          def value(self) -> int:
+              return self._value
+
+          @value.setter
+          @abstractmethod
+          def value(self, value: int) -> None:
+              self._value = value
+
+          @value.deleter
+          @abstractmethod
+          def value(self) -> None:
+              del self._value
+
+
+    `);
+  });
   it("renders dunder methods with parameters", () => {
     const parameters = [{ name: "x", type: { children: "int" } }];
     const decl = (

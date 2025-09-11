@@ -326,14 +326,13 @@ describe("Python Class - FunctionDeclaration", () => {
             >
               return a + b
             </py.MethodDeclaration>
-            <py.FunctionDeclaration
+            <py.ClassMethodDeclaration
               name="my_class_method"
-              functionType="class"
               returnType={{ children: "int" }}
               refkey={classMethodRefkey}
             >
               pass
-            </py.FunctionDeclaration>
+            </py.ClassMethodDeclaration>
             <py.FunctionDeclaration
               name="my_standalone_function"
               returnType={{ children: "int" }}
@@ -354,6 +353,7 @@ describe("Python Class - FunctionDeclaration", () => {
           def my_method(self, a: int, b: int) -> int:
               return a + b
 
+          @classmethod
           def my_class_method(cls) -> int:
               pass
 
