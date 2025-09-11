@@ -63,14 +63,6 @@ interface BaseFunctionDeclarationProps
   sym?: PythonOutputSymbol;
 }
 
-export interface FunctionDeclarationProps
-  extends Omit<BaseFunctionDeclarationProps, "functionType" | "sym"> {
-  /**
-   * Indicates that the function is async.
-   */
-  async?: boolean;
-}
-
 /**
  * Internal base function declaration component that handles functionType logic.
  * This component is not exported to keep implementation details private.
@@ -124,6 +116,14 @@ function BaseFunctionDeclaration(props: BaseFunctionDeclarationProps) {
       </Declaration>
     </>
   );
+}
+
+export interface FunctionDeclarationProps
+  extends Omit<BaseFunctionDeclarationProps, "functionType" | "sym"> {
+  /**
+   * Indicates that the function is async.
+   */
+  async?: boolean;
 }
 
 /**
