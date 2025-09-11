@@ -118,8 +118,10 @@ function BaseFunctionDeclaration(props: BaseFunctionDeclarationProps) {
   );
 }
 
+// Not inheriting from BaseFunctionDeclarationProps to keep implementation details private
 export interface FunctionDeclarationProps
-  extends Omit<BaseFunctionDeclarationProps, "functionType" | "sym"> {
+  extends BaseDeclarationProps,
+    CallSignatureProps {
   /**
    * Indicates that the function is async.
    */
@@ -155,29 +157,11 @@ export function FunctionDeclaration(props: FunctionDeclarationProps) {
 }
 
 /**
- * A Python method declaration base component.
- *
- * @example
- * ```tsx
- * <MethodDeclarationBase
- *   name="my_method"
- *   returnType={{ children: "int" }}
- *   parameters={[{ name: "value", type: { children: "str" } }]}
- * >
- *   return len(value)
- * </MethodDeclarationBase>
- * ```
- * This will generate:
- * ```python
- * def my_method(self, value: str) -> int:
- *   return len(value)
- * ```
- *
- * @remarks
- * This is the base component for method declarations that handles validation
+ * Internal method declaration base component that handles validation
  * and ensures the method is declared within a class (member scope).
+ * This component is not exported to keep implementation details private.
  */
-export function MethodDeclarationBase(props: BaseFunctionDeclarationProps) {
+function MethodDeclarationBase(props: BaseFunctionDeclarationProps) {
   // Only validate if we don't have an existing symbol (which implies validation already happened)
   if (!props.sym) {
     validateMemberScope(props.name);
@@ -379,13 +363,17 @@ export function PropertyDeclaration(props: PropertyDeclarationProps) {
               type={setterComponent?.props?.type ?? props.property.type}
               abstract={props.abstract}
             >
-              <Show when={Boolean(setterComponent?.props.doc)}>{setterComponent?.props.doc}</Show>
+              <Show when={Boolean(setterComponent?.props.doc)}>
+                {setterComponent?.props.doc}
+              </Show>
               {setterChildren}
             </SetterPropertyMethodDeclaration>
           </Show>
           <Show when={Boolean(deleterComponent)}>
             <DeleterPropertyMethodDeclaration abstract={props.abstract}>
-              <Show when={Boolean(deleterComponent?.props.doc)}>{deleterComponent?.props.doc}</Show>
+              <Show when={Boolean(deleterComponent?.props.doc)}>
+                {deleterComponent?.props.doc}
+              </Show>
               {deleterChildren}
             </DeleterPropertyMethodDeclaration>
           </Show>
@@ -420,12 +408,14 @@ export interface PropertyMethodDeclarationProps {
 /**
  * A Python property method declaration component.
  *
+ * @remarks
+ * This component is used within a PropertyDeclaration to define the getter method.
+ * The property name is automatically obtained from the parent PropertyDeclaration context.
+ * It automatically generates the `@property` decorator.
+ *
  * @example
  * ```tsx
- * <PropertyMethodDeclaration
- *   name="my_property"
- *   returnType={{ children: "int" }}
- * >
+ * <PropertyMethodDeclaration returnType={{ children: "int" }}>
  *   return self._my_property
  * </PropertyMethodDeclaration>
  * ```
@@ -686,7 +676,7 @@ export function StaticMethodDeclaration(props: MethodDeclarationProps) {
 }
 
 export interface DunderMethodDeclarationProps
-  extends Omit<FunctionDeclarationProps, "functionType"> {}
+  extends FunctionDeclarationProps {}
 
 /**
  * A Python dunder method declaration.

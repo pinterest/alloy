@@ -399,31 +399,21 @@ describe("Function Declaration", () => {
   it("renders normal property, setter, deleter with children and type, overriding the setter type", () => {
     const propertyDoc = (
       <py.FunctionDoc
-        description={[
-          <Prose>
-            Property documentation.
-          </Prose>,
-        ]}
+        description={[<Prose>Property documentation.</Prose>]}
         style="google"
       />
     );
     const setterDoc = (
       <py.FunctionDoc
         description={[
-          <Prose>
-            We can receive a string, a float, or a str.
-          </Prose>,
+          <Prose>We can receive a string, a float, or a str.</Prose>,
         ]}
         style="google"
       />
     );
     const deleterDoc = (
       <py.FunctionDoc
-        description={[
-          <Prose>
-            Deleter documentation.
-          </Prose>,
-        ]}
+        description={[<Prose>Deleter documentation.</Prose>]}
         style="google"
       />
     );
@@ -448,9 +438,7 @@ describe("Function Declaration", () => {
               >
                 self._string = str(value)
               </py.PropertyDeclaration.Setter>
-              <py.PropertyDeclaration.Deleter
-                doc={deleterDoc}
-              >
+              <py.PropertyDeclaration.Deleter doc={deleterDoc}>
                 some other thing
               </py.PropertyDeclaration.Deleter>
             </py.PropertyDeclaration>
