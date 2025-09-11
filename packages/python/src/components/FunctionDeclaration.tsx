@@ -72,32 +72,10 @@ export interface FunctionDeclarationProps
 }
 
 /**
- * A Python function declaration.
- *
- * @example
- * ```tsx
- * <FunctionDeclaration
- *   name="my_function"
- *   returnType={{ children: "int" }}
- *   parameters={[{ name: "a", type: { children: "int" } }, { name: "b", type: { children: "str" } }]}
- * >
- *   return a + b
- * </FunctionDeclaration>
- * ```
- * This will generate:
- * ```python
- * def my_function(a: int, b: str) -> int:
- *     return a + b
- * ```
- *
- * @remarks
- * This component creates a Python function declaration with optional type annotations,
- * parameters, and return types. It supports async functions, different function types
- * (regular, instance, class, static), and can reuse existing symbols. The function automatically
- * handles symbol creation and emission unless an existing symbol is provided. It also
- * automatically adds the appropriate first parameter (self, cls) based on the functionType.
+ * Internal base function declaration component that handles functionType logic.
+ * This component is not exported to keep implementation details private.
  */
-export function FunctionDeclaration(props: BaseFunctionDeclarationProps) {
+function BaseFunctionDeclaration(props: BaseFunctionDeclarationProps) {
   const asyncKwd = props.async ? "async " : "";
   // Add self/cls parameter if instance or class function
   let parameters;
@@ -149,6 +127,34 @@ export function FunctionDeclaration(props: BaseFunctionDeclarationProps) {
 }
 
 /**
+ * A Python function declaration.
+ *
+ * @example
+ * ```tsx
+ * <FunctionDeclaration
+ *   name="my_function"
+ *   returnType={{ children: "int" }}
+ *   parameters={[{ name: "a", type: { children: "int" } }, { name: "b", type: { children: "str" } }]}
+ * >
+ *   return a + b
+ * </FunctionDeclaration>
+ * ```
+ * This will generate:
+ * ```python
+ * def my_function(a: int, b: str) -> int:
+ *     return a + b
+ * ```
+ *
+ * @remarks
+ * This component creates a Python function declaration with optional type annotations,
+ * parameters, and return types. It supports async functions and automatically
+ * handles symbol creation and emission.
+ */
+export function FunctionDeclaration(props: FunctionDeclarationProps) {
+  return <BaseFunctionDeclaration {...props} />;
+}
+
+/**
  * A Python method declaration base component.
  *
  * @example
@@ -179,7 +185,7 @@ export function MethodDeclarationBase(props: BaseFunctionDeclarationProps) {
 
   return (
     <>
-      <FunctionDeclaration {...props} />
+      <BaseFunctionDeclaration {...props} />
     </>
   );
 }
