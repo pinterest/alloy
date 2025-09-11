@@ -1,4 +1,4 @@
-import { code, refkey } from "@alloy-js/core";
+import { code, Prose, refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import * as py from "../src/index.js";
@@ -397,12 +397,43 @@ describe("Function Declaration", () => {
     `);
   });
   it("renders normal property, setter, deleter with children and type, overriding the setter type", () => {
+    const propertyDoc = (
+      <py.FunctionDoc
+        description={[
+          <Prose>
+            Property documentation.
+          </Prose>,
+        ]}
+        style="google"
+      />
+    );
+    const setterDoc = (
+      <py.FunctionDoc
+        description={[
+          <Prose>
+            We can receive a string, a float, or a str.
+          </Prose>,
+        ]}
+        style="google"
+      />
+    );
+    const deleterDoc = (
+      <py.FunctionDoc
+        description={[
+          <Prose>
+            Deleter documentation.
+          </Prose>,
+        ]}
+        style="google"
+      />
+    );
     const decl = (
       <py.StatementList>
         <py.ClassDeclaration name="MyClass">
           <py.StatementList>
             <py.PropertyDeclaration
               property={{ name: "x", type: { children: "int" } }}
+              doc={propertyDoc}
             >
               something
               <py.PropertyDeclaration.Setter
@@ -413,10 +444,13 @@ describe("Function Declaration", () => {
                     { children: "str" },
                   ],
                 }}
+                doc={setterDoc}
               >
                 self._string = str(value)
               </py.PropertyDeclaration.Setter>
-              <py.PropertyDeclaration.Deleter>
+              <py.PropertyDeclaration.Deleter
+                doc={deleterDoc}
+              >
                 some other thing
               </py.PropertyDeclaration.Deleter>
             </py.PropertyDeclaration>
@@ -429,14 +463,23 @@ describe("Function Declaration", () => {
       class MyClass:
           @property
           def x(self) -> int:
+              """
+              Property documentation.
+              """
               something
 
           @x.setter
           def x(self, value: int | float | str) -> None:
+              """
+              We can receive a string, a float, or a str.
+              """
               self._string = str(value)
 
           @x.deleter
           def x(self) -> None:
+              """
+              Deleter documentation.
+              """
               some other thing
 
 

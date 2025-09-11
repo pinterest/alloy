@@ -267,6 +267,11 @@ export interface PropertyDeclarationProps {
    * Indicates that the property is abstract.
    */
   abstract?: boolean;
+
+  /**
+   * Documentation for this declaration
+   */
+  doc?: Children;
 }
 
 /**
@@ -366,6 +371,7 @@ export function PropertyDeclaration(props: PropertyDeclarationProps) {
             returnType={props.property.type}
             abstract={props.abstract}
           >
+            <Show when={Boolean(props.doc)}>{props.doc}</Show>
             {unkeyedChildren}
           </PropertyMethodDeclaration>
           <Show when={Boolean(setterComponent)}>
@@ -373,11 +379,13 @@ export function PropertyDeclaration(props: PropertyDeclarationProps) {
               type={setterComponent?.props?.type ?? props.property.type}
               abstract={props.abstract}
             >
+              <Show when={Boolean(setterComponent?.props.doc)}>{setterComponent?.props.doc}</Show>
               {setterChildren}
             </SetterPropertyMethodDeclaration>
           </Show>
           <Show when={Boolean(deleterComponent)}>
             <DeleterPropertyMethodDeclaration abstract={props.abstract}>
+              <Show when={Boolean(deleterComponent?.props.doc)}>{deleterComponent?.props.doc}</Show>
               {deleterChildren}
             </DeleterPropertyMethodDeclaration>
           </Show>
@@ -402,6 +410,11 @@ export interface PropertyMethodDeclarationProps {
    * Indicates that the property is abstract.
    */
   abstract?: boolean;
+
+  /**
+   * Documentation for this declaration
+   */
+  doc?: Children;
 }
 
 /**
