@@ -359,23 +359,21 @@ export function PropertyDeclaration(props: PropertyDeclarationProps) {
             {unkeyedChildren}
           </PropertyMethodDeclaration>
           <Show when={Boolean(setterComponent)}>
-            <SetterPropertyMethodDeclaration
+            <PropertyDeclaration.Setter
               type={setterComponent?.props?.type ?? props.property.type}
               abstract={props.abstract}
+              doc={setterComponent?.props.doc}
             >
-              <Show when={Boolean(setterComponent?.props.doc)}>
-                {setterComponent?.props.doc}
-              </Show>
               {setterChildren}
-            </SetterPropertyMethodDeclaration>
+            </PropertyDeclaration.Setter>
           </Show>
           <Show when={Boolean(deleterComponent)}>
-            <DeleterPropertyMethodDeclaration abstract={props.abstract}>
-              <Show when={Boolean(deleterComponent?.props.doc)}>
-                {deleterComponent?.props.doc}
-              </Show>
+            <PropertyDeclaration.Deleter 
+              abstract={props.abstract}
+              doc={deleterComponent?.props.doc}
+            >
               {deleterChildren}
-            </DeleterPropertyMethodDeclaration>
+            </PropertyDeclaration.Deleter>
           </Show>
         </List>
       </DeclarationContext.Provider>
@@ -448,132 +446,42 @@ export function PropertyMethodDeclaration(
   );
 }
 
-export interface SetterPropertyMethodDeclarationProps
-  extends PropertyMethodDeclarationProps {
-  /**
-   * The type of the property. Overrides the PropertyDeclaration type.
-   */
-  type?: TypeExpressionProps;
-}
 
-/**
- * A Python property setter method declaration.
- *
- * @example
- * ```tsx
- * <py.SetterPropertyMethodDeclaration type={{ children: "int" }}>
- *   {py.code`self._value = value`}
- * </py.SetterPropertyMethodDeclaration>
- * ```
- * This will generate:
- * ```python
- * @property_name.setter
- * def property_name(self, value: int) -> None:
- *     self._value = value
- * ```
- *
- * @remarks
- * This component is used within a PropertyDeclaration to define the setter method
- * for a Python property. It automatically generates the appropriate decorator and
- * method signature with a 'value' parameter. The setter method should contain the
- * logic to set the property value.
- */
-export function SetterPropertyMethodDeclaration(
-  props: SetterPropertyMethodDeclarationProps,
-) {
-  const declarationContext = useContext(
-    DeclarationContext,
-  ) as PythonOutputSymbol;
-
-  const abstractMethod =
-    props.abstract ? code`@${abcModule["."].abstractmethod}` : undefined;
-
-  return (
-    <>
-      {code`@${declarationContext.name}.setter`}
-      <hbr />
-      {abstractMethod}
-      {abstractMethod && <hbr />}
-      <MethodDeclarationBase
-        {...props}
-        name={declarationContext.name}
-        functionType="instance"
-        parameters={[{ name: "value", type: props.type }]}
-        returnType={{ children: <Atom jsValue={null} /> }}
-        sym={declarationContext}
-      />
-    </>
-  );
-}
-
-export interface DeleterPropertyMethodDeclarationProps
-  extends Omit<PropertyMethodDeclarationProps, "returnType"> {}
-
-/**
- * A Python property deleter method declaration.
- *
- * @example
- * ```tsx
- * <py.DeleterPropertyMethodDeclaration>
- *   {py.code`del self._value`}
- * </py.DeleterPropertyMethodDeclaration>
- * ```
- * This will generate:
- * ```python
- * @property_name.deleter
- * def property_name(self):
- *     del self._value
- * ```
- *
- * @remarks
- * This component is used within a PropertyDeclaration to define the deleter method
- * for a Python property. It automatically generates the appropriate decorator and
- * method signature. The deleter method should contain the logic to delete the property.
- */
-export function DeleterPropertyMethodDeclaration(
-  props: DeleterPropertyMethodDeclarationProps,
-) {
-  const declarationContext = useContext(
-    DeclarationContext,
-  ) as PythonOutputSymbol;
-
-  const abstractMethod =
-    props.abstract ? code`@${abcModule["."].abstractmethod}` : undefined;
-
-  return (
-    <>
-      {code`@${declarationContext.name}.deleter`}
-      <hbr />
-      {abstractMethod}
-      {abstractMethod && <hbr />}
-      <MethodDeclarationBase
-        {...props}
-        name={declarationContext.name}
-        functionType="instance"
-        returnType={{ children: <Atom jsValue={null} /> }}
-        sym={declarationContext}
-      />
-    </>
-  );
-}
 
 export function createPropertyMethodComponent<
-  P extends { children?: any; type?: any },
+  P extends { children?: any; type?: any; abstract?: boolean; doc?: Children },
 >(tag: symbol) {
   return taggedComponent(tag, function Parameters(props: P) {
     const declarationContext = useContext(
       DeclarationContext,
     ) as PythonOutputSymbol;
-    if (props.children) {
-      return props.children;
-    }
-
-    // Special handling for setter which needs a "value" parameter with the specified type
-    const parameters =
-      props.type ? [{ name: "value", type: props.type }] : undefined;
+    
+    // Determine if this is a setter or deleter based on the tag
+    const isSetter = tag === setterTag;
+    const isDeleter = tag === deleterTag;
+    
+    // Special handling for setter which always needs a "value" parameter
+    const parameters = isSetter ? [{ name: "value", type: props.type }] : undefined;
+    
+    const abstractMethod =
+      props.abstract ? code`@${abcModule["."].abstractmethod}` : undefined;
 
     return (
       <>
+        {isSetter && (
+          <>
+            {code`@${declarationContext.name}.setter`}
+            <hbr />
+          </>
+        )}
+        {isDeleter && (
+          <>
+            {code`@${declarationContext.name}.deleter`}
+            <hbr />
+          </>
+        )}
+        {abstractMethod}
+        {abstractMethod && <hbr />}
         <MethodDeclarationBase
           {...props}
           name={declarationContext.name}
@@ -581,18 +489,20 @@ export function createPropertyMethodComponent<
           parameters={parameters}
           returnType={{ children: <Atom jsValue={null} /> }}
           sym={declarationContext}
-        />
+        >
+          {props.children}
+        </MethodDeclarationBase>
       </>
     );
   });
 }
 
 PropertyDeclaration.Setter =
-  createPropertyMethodComponent<SetterPropertyMethodDeclarationProps>(
+  createPropertyMethodComponent<PropertyMethodDeclarationProps & { type?: TypeExpressionProps }>(
     setterTag,
   );
 PropertyDeclaration.Deleter =
-  createPropertyMethodComponent<DeleterPropertyMethodDeclarationProps>(
+  createPropertyMethodComponent<Omit<PropertyMethodDeclarationProps, "returnType">>(
     deleterTag,
   );
 
