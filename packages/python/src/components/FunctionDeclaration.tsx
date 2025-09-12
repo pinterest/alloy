@@ -51,14 +51,21 @@ function validateMemberScope(name: string, type: string = "Method") {
   }
 }
 
-// Internal interface with all properties - not exported to keep implementation details private
-interface BaseFunctionDeclarationProps
+/**
+ * Shared base interface for common function properties.
+ * Useful for creating custom function-like components.
+ */
+export interface CommonFunctionProps
   extends BaseDeclarationProps,
     CallSignatureProps {
   /**
    * Indicates that the function is async.
    */
   async?: boolean;
+}
+
+// Internal interface with all properties - not exported to keep implementation details private
+interface BaseFunctionDeclarationProps extends CommonFunctionProps {
   /**
    * Indicates the type of function.
    */
@@ -124,15 +131,8 @@ function BaseFunctionDeclaration(props: BaseFunctionDeclarationProps) {
   );
 }
 
-// Not inheriting from BaseFunctionDeclarationProps to keep implementation details private
-export interface FunctionDeclarationProps
-  extends BaseDeclarationProps,
-    CallSignatureProps {
-  /**
-   * Indicates that the function is async.
-   */
-  async?: boolean;
-}
+// Clean public interface extending common properties
+export interface FunctionDeclarationProps extends CommonFunctionProps {}
 
 /**
  * Base props interface for all method declarations.

@@ -196,7 +196,11 @@ describe("Function Declaration", () => {
       <py.StatementList>
         <py.ClassDeclaration name="MyClass">
           <py.StatementList>
-            <py.MethodDeclaration async name="my_method" returnType={{ children: "str" }}>
+            <py.MethodDeclaration
+              async
+              name="my_method"
+              returnType={{ children: "str" }}
+            >
               return "async result"
             </py.MethodDeclaration>
           </py.StatementList>
@@ -218,7 +222,11 @@ describe("Function Declaration", () => {
       <py.StatementList>
         <py.ClassDeclaration name="MyClass">
           <py.StatementList>
-            <py.ClassMethodDeclaration async name="create_async" returnType={{ children: "MyClass" }}>
+            <py.ClassMethodDeclaration
+              async
+              name="create_async"
+              returnType={{ children: "MyClass" }}
+            >
               return cls()
             </py.ClassMethodDeclaration>
           </py.StatementList>
@@ -241,7 +249,11 @@ describe("Function Declaration", () => {
       <py.StatementList>
         <py.ClassDeclaration name="MyClass">
           <py.StatementList>
-            <py.StaticMethodDeclaration async name="utility" returnType={{ children: "str" }}>
+            <py.StaticMethodDeclaration
+              async
+              name="utility"
+              returnType={{ children: "str" }}
+            >
               return "utility result"
             </py.StaticMethodDeclaration>
           </py.StatementList>
@@ -264,7 +276,11 @@ describe("Function Declaration", () => {
       <py.StatementList>
         <py.ClassDeclaration name="MyClass">
           <py.StatementList>
-            <py.DunderMethodDeclaration async name="__aenter__" returnType={{ children: "MyClass" }}>
+            <py.DunderMethodDeclaration
+              async
+              name="__aenter__"
+              returnType={{ children: "MyClass" }}
+            >
               return self
             </py.DunderMethodDeclaration>
           </py.StatementList>
@@ -286,7 +302,10 @@ describe("Function Declaration", () => {
       <py.StatementList>
         <py.ClassDeclaration name="MyClass">
           <py.StatementList>
-            <py.ConstructorDeclaration async returnType={{ children: "MyClass" }}>
+            <py.ConstructorDeclaration
+              async
+              returnType={{ children: "MyClass" }}
+            >
               return super().__new__(cls)
             </py.ConstructorDeclaration>
           </py.StatementList>
