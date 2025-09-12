@@ -16,6 +16,7 @@ import {
 } from "@alloy-js/core";
 import { abcModule } from "../builtins/python.js";
 import { PythonOutputSymbol } from "../index.js";
+import { ParameterDescriptor } from "../parameter-descriptor.js";
 import { createPythonSymbol } from "../symbol-creation.js";
 import { usePythonScope } from "../symbols/scopes.js";
 import { getCallSignatureProps } from "../utils.js";
@@ -450,58 +451,60 @@ export function PropertyMethodDeclaration(
   );
 }
 
-export function createPropertyMethodComponent<
-  P extends { children?: any; type?: any },
->(tag: symbol) {
-  return taggedComponent(tag, function Parameters(props: P) {
-    const declarationContext = useContext(
-      DeclarationContext,
-    ) as PythonOutputSymbol;
+/**
+ * Shared base component for property setter and deleter methods.
+ */
+function PropertyMethodBase(props: {
+  decoratorType: "setter" | "deleter";
+  parameters?: ParameterDescriptor[];
+  children?: Children;
+  [key: string]: any;
+}) {
+  const declarationContext = useContext(DeclarationContext) as PythonOutputSymbol;
+  const { decoratorType, parameters, children, ...restProps } = props;
 
-    // Determine if this is a setter or deleter based on the tag
-    const isSetter = tag === setterTag;
-    const isDeleter = tag === deleterTag;
-
-    // Special handling for setter which always needs a "value" parameter
-    const parameters =
-      isSetter ? [{ name: "value", type: props.type }] : undefined;
-
-    return (
-      <>
-        {isSetter && (
-          <>
-            {code`@${declarationContext.name}.setter`}
-            <hbr />
-          </>
-        )}
-        {isDeleter && (
-          <>
-            {code`@${declarationContext.name}.deleter`}
-            <hbr />
-          </>
-        )}
-        <MethodDeclarationBase
-          {...props}
-          name={declarationContext.name}
-          functionType="instance"
-          parameters={parameters}
-          returnType={{ children: <Atom jsValue={null} /> }}
-          sym={declarationContext}
-        >
-          {props.children}
-        </MethodDeclarationBase>
-      </>
-    );
-  });
+  return (
+    <>
+      {code`@${declarationContext.name}.${decoratorType}`}
+      <hbr />
+      <MethodDeclarationBase
+        {...restProps}
+        name={declarationContext.name}
+        functionType="instance"
+        parameters={parameters}
+        returnType={{ children: <Atom jsValue={null} /> }}
+        sym={declarationContext}
+      >
+        {children}
+      </MethodDeclarationBase>
+    </>
+  );
 }
 
-PropertyDeclaration.Setter = createPropertyMethodComponent<
-  PropertyMethodDeclarationProps & { type?: TypeExpressionProps }
->(setterTag);
-PropertyDeclaration.Deleter =
-  createPropertyMethodComponent<
-    Omit<PropertyMethodDeclarationProps, "returnType">
-  >(deleterTag);
+PropertyDeclaration.Setter = taggedComponent(
+  setterTag,
+  function PropertySetter(props: PropertyMethodDeclarationProps & { type?: TypeExpressionProps }) {
+    return (
+      <PropertyMethodBase
+        decoratorType="setter"
+        parameters={[{ name: "value", type: props.type }]}
+        {...props}
+      />
+    );
+  }
+);
+
+PropertyDeclaration.Deleter = taggedComponent(
+  deleterTag,
+  function PropertyDeleter(props: Omit<PropertyMethodDeclarationProps, "returnType">) {
+    return (
+      <PropertyMethodBase
+        decoratorType="deleter"
+        {...props}
+      />
+    );
+  }
+);
 
 /**
  * A Python class method declaration component.
