@@ -363,10 +363,7 @@ describe("Function Declaration", () => {
       <py.StatementList>
         <py.ClassDeclaration name="MyClass">
           <py.StatementList>
-            <py.PropertyDeclaration
-              name="x"
-              type={{ children: "int" }}
-            >
+            <py.PropertyDeclaration name="x" type={{ children: "int" }}>
               something
               <py.PropertyDeclaration.Setter>
                 something else

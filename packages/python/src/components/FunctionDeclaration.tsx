@@ -177,21 +177,24 @@ export function FunctionDeclaration(props: FunctionDeclarationProps) {
  * and ensures the method is declared within a class (member scope).
  * This component is not exported to keep implementation details private.
  */
-function MethodDeclarationBase(props: MethodDeclarationBaseProps & {
-  functionType?: "instance" | "class" | "static";
-  sym?: PythonOutputSymbol;
-}) {
+function MethodDeclarationBase(
+  props: MethodDeclarationBaseProps & {
+    functionType?: "instance" | "class" | "static";
+    sym?: PythonOutputSymbol;
+  },
+) {
   // Only validate if we don't have an existing symbol (which implies validation already happened)
   if (!props.sym) {
     validateMemberScope(props.name);
   }
 
-  const abstractMethod = props.abstract ? (
-    <>
-      {code`@${abcModule["."].abstractmethod}`}
-      <hbr />
-    </>
-  ) : undefined;
+  const abstractMethod =
+    props.abstract ?
+      <>
+        {code`@${abcModule["."].abstractmethod}`}
+        <hbr />
+      </>
+    : undefined;
 
   return (
     <>
@@ -200,7 +203,6 @@ function MethodDeclarationBase(props: MethodDeclarationBaseProps & {
     </>
   );
 }
-
 
 /**
  * A Python method declaration component.
@@ -378,7 +380,10 @@ export function PropertyDeclaration(props: PropertyDeclarationProps) {
       <DeclarationContext.Provider value={sym}>
         <PropertyContext.Provider value={props.type}>
           <List hardline enderPunctuation>
-            <PropertyMethodDeclaration abstract={props.abstract} doc={props.doc}>
+            <PropertyMethodDeclaration
+              abstract={props.abstract}
+              doc={props.doc}
+            >
               {unkeyedChildren}
             </PropertyMethodDeclaration>
             <Show when={Boolean(setterComponent)}>
@@ -409,7 +414,8 @@ export function PropertyDeclaration(props: PropertyDeclarationProps) {
  * Props for property method declarations (getter, setter, deleter).
  * Excludes 'name' since property methods derive their name from the PropertyDeclaration context.
  */
-export interface PropertyMethodDeclarationProps extends Omit<MethodDeclarationBaseProps, "name"> {}
+export interface PropertyMethodDeclarationProps
+  extends Omit<MethodDeclarationBaseProps, "name"> {}
 
 /**
  * A Python property method declaration component.
@@ -460,7 +466,9 @@ function PropertyMethodBase(props: {
   children?: Children;
   [key: string]: any;
 }) {
-  const declarationContext = useContext(DeclarationContext) as PythonOutputSymbol;
+  const declarationContext = useContext(
+    DeclarationContext,
+  ) as PythonOutputSymbol;
   const { decoratorType, parameters, children, ...restProps } = props;
 
   return (
@@ -483,7 +491,9 @@ function PropertyMethodBase(props: {
 
 PropertyDeclaration.Setter = taggedComponent(
   setterTag,
-  function PropertySetter(props: PropertyMethodDeclarationProps & { type?: TypeExpressionProps }) {
+  function PropertySetter(
+    props: PropertyMethodDeclarationProps & { type?: TypeExpressionProps },
+  ) {
     return (
       <PropertyMethodBase
         decoratorType="setter"
@@ -491,19 +501,16 @@ PropertyDeclaration.Setter = taggedComponent(
         {...props}
       />
     );
-  }
+  },
 );
 
 PropertyDeclaration.Deleter = taggedComponent(
   deleterTag,
-  function PropertyDeleter(props: Omit<PropertyMethodDeclarationProps, "returnType">) {
-    return (
-      <PropertyMethodBase
-        decoratorType="deleter"
-        {...props}
-      />
-    );
-  }
+  function PropertyDeleter(
+    props: Omit<PropertyMethodDeclarationProps, "returnType">,
+  ) {
+    return <PropertyMethodBase decoratorType="deleter" {...props} />;
+  },
 );
 
 /**
@@ -593,7 +600,7 @@ export interface DunderMethodDeclarationProps
  * ```
  *
  * @remarks
- * This is a convenience component for dunder methods. The method must be declared 
+ * This is a convenience component for dunder methods. The method must be declared
  * within a class.
  */
 export function DunderMethodDeclaration(props: DunderMethodDeclarationProps) {
