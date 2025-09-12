@@ -421,7 +421,7 @@ export interface PropertyMethodDeclarationProps
  * A Python property method declaration component.
  *
  * @remarks
- * This component is used within a PropertyDeclaration to define the getter method.
+ * This component is used only within a PropertyDeclaration to define the getter method.
  * The property name and return type are automatically obtained from the parent PropertyDeclaration context.
  * It automatically generates the `@property` decorator.
  *
@@ -432,9 +432,7 @@ export interface PropertyMethodDeclarationProps
  * </PropertyMethodDeclaration>
  * ```
  */
-export function PropertyMethodDeclaration(
-  props: PropertyMethodDeclarationProps,
-) {
+function PropertyMethodDeclaration(props: PropertyMethodDeclarationProps) {
   const declarationContext = useContext(
     DeclarationContext,
   ) as PythonOutputSymbol;
