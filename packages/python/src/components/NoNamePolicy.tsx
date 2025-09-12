@@ -14,9 +14,9 @@ export interface NoNamePolicyProps {
  * @example
  * ```tsx
  * <NoNamePolicy>
- *   <FunctionDeclaration name="__init__">
+ *   <MethodDeclaration name="__init__">
  *     // Function content
- *   </FunctionDeclaration>
+ *   </MethodDeclaration>
  * </NoNamePolicy>
  * ```
  *

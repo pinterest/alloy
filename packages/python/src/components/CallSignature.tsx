@@ -16,7 +16,6 @@ export interface CallSignatureParametersProps {
   readonly parameters?: ParameterDescriptor[] | string[];
   readonly args?: boolean;
   readonly kwargs?: boolean;
-  readonly functionType?: "instance" | "class" | "static";
 }
 
 /**

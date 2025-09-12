@@ -1,4 +1,4 @@
-import { code, refkey } from "@alloy-js/core";
+import { code, Prose, refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import * as py from "../src/index.js";
@@ -191,6 +191,137 @@ describe("Function Declaration", () => {
     `);
   });
 
+  it("can be an async method", () => {
+    const decl = (
+      <py.StatementList>
+        <py.ClassDeclaration name="MyClass">
+          <py.StatementList>
+            <py.MethodDeclaration
+              async
+              name="my_method"
+              returnType={{ children: "str" }}
+            >
+              return "async result"
+            </py.MethodDeclaration>
+          </py.StatementList>
+        </py.ClassDeclaration>
+      </py.StatementList>
+    );
+
+    expect(toSourceText([decl])).toBe(d`
+      class MyClass:
+          async def my_method(self) -> str:
+              return "async result"
+
+
+    `);
+  });
+
+  it("can be an async class method", () => {
+    const decl = (
+      <py.StatementList>
+        <py.ClassDeclaration name="MyClass">
+          <py.StatementList>
+            <py.ClassMethodDeclaration
+              async
+              name="create_async"
+              returnType={{ children: "MyClass" }}
+            >
+              return cls()
+            </py.ClassMethodDeclaration>
+          </py.StatementList>
+        </py.ClassDeclaration>
+      </py.StatementList>
+    );
+
+    expect(toSourceText([decl])).toBe(d`
+      class MyClass:
+          @classmethod
+          async def create_async(cls) -> MyClass:
+              return cls()
+
+
+    `);
+  });
+
+  it("can be an async static method", () => {
+    const decl = (
+      <py.StatementList>
+        <py.ClassDeclaration name="MyClass">
+          <py.StatementList>
+            <py.StaticMethodDeclaration
+              async
+              name="utility"
+              returnType={{ children: "str" }}
+            >
+              return "utility result"
+            </py.StaticMethodDeclaration>
+          </py.StatementList>
+        </py.ClassDeclaration>
+      </py.StatementList>
+    );
+
+    expect(toSourceText([decl])).toBe(d`
+      class MyClass:
+          @staticmethod
+          async def utility() -> str:
+              return "utility result"
+
+
+    `);
+  });
+
+  it("can be an async dunder method", () => {
+    const decl = (
+      <py.StatementList>
+        <py.ClassDeclaration name="MyClass">
+          <py.StatementList>
+            <py.DunderMethodDeclaration
+              async
+              name="__aenter__"
+              returnType={{ children: "MyClass" }}
+            >
+              return self
+            </py.DunderMethodDeclaration>
+          </py.StatementList>
+        </py.ClassDeclaration>
+      </py.StatementList>
+    );
+
+    expect(toSourceText([decl])).toBe(d`
+      class MyClass:
+          async def __aenter__(self) -> MyClass:
+              return self
+
+
+    `);
+  });
+
+  it("can be an async constructor", () => {
+    const decl = (
+      <py.StatementList>
+        <py.ClassDeclaration name="MyClass">
+          <py.StatementList>
+            <py.ConstructorDeclaration
+              async
+              returnType={{ children: "MyClass" }}
+            >
+              return super().__new__(cls)
+            </py.ConstructorDeclaration>
+          </py.StatementList>
+        </py.ClassDeclaration>
+      </py.StatementList>
+    );
+
+    expect(toSourceText([decl])).toBe(d`
+      class MyClass:
+          async def __new__(cls) -> MyClass:
+              return super().__new__(cls)
+
+
+    `);
+  });
+
   it("supports parameters", () => {
     const decl = (
       <py.FunctionDeclaration
@@ -327,36 +458,15 @@ describe("Function Declaration", () => {
 
     `);
   });
-  it("renders normal property, getter, setter, deleter", () => {
-    const setterParameters = [{ name: "value" }];
+  it("renders empty property, setter, deleter", () => {
     const decl = (
       <py.StatementList>
         <py.ClassDeclaration name="MyClass">
           <py.StatementList>
-            <py.MethodDeclaration name="x" property="property" />
-            <py.MethodDeclaration name="x" property="getter" />
-            <py.MethodDeclaration
-              name="x"
-              property="setter"
-              parameters={setterParameters}
-            />
-            <py.MethodDeclaration name="x" property="deleter" />
-            <py.ClassMethodDeclaration name="y" property="property" />
-            <py.ClassMethodDeclaration name="y" property="getter" />
-            <py.ClassMethodDeclaration
-              name="y"
-              property="setter"
-              parameters={setterParameters}
-            />
-            <py.ClassMethodDeclaration name="y" property="deleter" />
-            <py.StaticMethodDeclaration name="z" property="property" />
-            <py.StaticMethodDeclaration name="z" property="getter" />
-            <py.StaticMethodDeclaration
-              name="z"
-              property="setter"
-              parameters={setterParameters}
-            />
-            <py.StaticMethodDeclaration name="z" property="deleter" />
+            <py.PropertyDeclaration name="x">
+              <py.PropertyDeclaration.Setter />
+              <py.PropertyDeclaration.Deleter />
+            </py.PropertyDeclaration>
           </py.StatementList>
         </py.ClassDeclaration>
       </py.StatementList>
@@ -366,77 +476,143 @@ describe("Function Declaration", () => {
       class MyClass:
           @property
           def x(self):
-              pass
-
-          @x.getter
-          def x(self):
-              pass
+              raise NotImplementedError
 
           @x.setter
-          def x(self, value):
-              pass
+          def x(self, value) -> None:
+              raise NotImplementedError
 
           @x.deleter
-          def x(self):
-              pass
+          def x(self) -> None:
+              raise NotImplementedError
 
-          @classmethod
+
+    `);
+  });
+  it("renders normal property, setter, deleter with children and type", () => {
+    const decl = (
+      <py.StatementList>
+        <py.ClassDeclaration name="MyClass">
+          <py.StatementList>
+            <py.PropertyDeclaration name="x" type={{ children: "int" }}>
+              something
+              <py.PropertyDeclaration.Setter>
+                something else
+              </py.PropertyDeclaration.Setter>
+              <py.PropertyDeclaration.Deleter>
+                some other thing
+              </py.PropertyDeclaration.Deleter>
+            </py.PropertyDeclaration>
+          </py.StatementList>
+        </py.ClassDeclaration>
+      </py.StatementList>
+    );
+
+    expect(toSourceText([decl], { externals: [abcModule] })).toBe(d`
+      class MyClass:
           @property
-          def y(cls):
-              pass
+          def x(self) -> int:
+              something
 
-          @classmethod
-          @y.getter
-          def y(cls):
-              pass
+          @x.setter
+          def x(self, value: int) -> None:
+              something else
 
-          @classmethod
-          @y.setter
-          def y(cls, value):
-              pass
+          @x.deleter
+          def x(self) -> None:
+              some other thing
 
-          @classmethod
-          @y.deleter
-          def y(cls):
-              pass
 
-          @staticmethod
+    `);
+  });
+  it("renders normal property, setter, deleter with children and type, overriding the setter type", () => {
+    const propertyDoc = (
+      <py.FunctionDoc
+        description={[<Prose>Property documentation.</Prose>]}
+        style="google"
+      />
+    );
+    const setterDoc = (
+      <py.FunctionDoc
+        description={[
+          <Prose>We can receive a string, a float, or a str.</Prose>,
+        ]}
+        style="google"
+      />
+    );
+    const deleterDoc = (
+      <py.FunctionDoc
+        description={[<Prose>Deleter documentation.</Prose>]}
+        style="google"
+      />
+    );
+    const decl = (
+      <py.StatementList>
+        <py.ClassDeclaration name="MyClass">
+          <py.StatementList>
+            <py.PropertyDeclaration
+              name="x"
+              type={{ children: "int" }}
+              doc={propertyDoc}
+            >
+              something
+              <py.PropertyDeclaration.Setter
+                type={{
+                  children: [
+                    { children: "int" },
+                    { children: "float" },
+                    { children: "str" },
+                  ],
+                }}
+                doc={setterDoc}
+              >
+                self._string = str(value)
+              </py.PropertyDeclaration.Setter>
+              <py.PropertyDeclaration.Deleter doc={deleterDoc}>
+                some other thing
+              </py.PropertyDeclaration.Deleter>
+            </py.PropertyDeclaration>
+          </py.StatementList>
+        </py.ClassDeclaration>
+      </py.StatementList>
+    );
+
+    expect(toSourceText([decl], { externals: [abcModule] })).toBe(d`
+      class MyClass:
           @property
-          def z():
-              pass
+          def x(self) -> int:
+              """
+              Property documentation.
+              """
+              something
 
-          @staticmethod
-          @z.getter
-          def z():
-              pass
+          @x.setter
+          def x(self, value: int | float | str) -> None:
+              """
+              We can receive a string, a float, or a str.
+              """
+              self._string = str(value)
 
-          @staticmethod
-          @z.setter
-          def z(value):
-              pass
-
-          @staticmethod
-          @z.deleter
-          def z():
-              pass
+          @x.deleter
+          def x(self) -> None:
+              """
+              Deleter documentation.
+              """
+              some other thing
 
 
     `);
   });
   it("renders property and function with the same name, renaming the latter to avoid conflict", () => {
-    const setterParameters = [{ name: "value" }];
     const decl = (
       <py.StatementList>
         <py.ClassDeclaration name="MyClass">
           <py.StatementList>
-            <py.MethodDeclaration name="x" property="property" />
-            <py.MethodDeclaration name="x" property="getter" />
-            <py.MethodDeclaration
-              name="x"
-              property="setter"
-              parameters={setterParameters}
-            />
-            <py.MethodDeclaration name="x" property="deleter" />
+            <py.PropertyDeclaration name="x">
+              something
+              <py.PropertyDeclaration.Setter />
+              <py.PropertyDeclaration.Deleter />
+            </py.PropertyDeclaration>
             <py.MethodDeclaration name="x" />
           </py.StatementList>
         </py.ClassDeclaration>
@@ -448,19 +624,15 @@ describe("Function Declaration", () => {
       class MyClass:
           @property
           def x(self):
-              pass
-
-          @x.getter
-          def x(self):
-              pass
+              something
 
           @x.setter
-          def x(self, value):
-              pass
+          def x(self, value) -> None:
+              raise NotImplementedError
 
           @x.deleter
-          def x(self):
-              pass
+          def x(self) -> None:
+              raise NotImplementedError
 
           def x_2_test(self):
               pass
@@ -468,6 +640,51 @@ describe("Function Declaration", () => {
 
       def x():
           pass
+
+    `);
+  });
+  it("renders abstract property with getter, setter, deleter", () => {
+    const decl = (
+      <py.StatementList>
+        <py.ClassDeclaration name="MyClass">
+          <py.StatementList>
+            <py.PropertyDeclaration
+              name="value"
+              type={{ children: "int" }}
+              abstract
+            >
+              return self._value
+              <py.PropertyDeclaration.Setter type={{ children: "int" }}>
+                self._value = value
+              </py.PropertyDeclaration.Setter>
+              <py.PropertyDeclaration.Deleter>
+                del self._value
+              </py.PropertyDeclaration.Deleter>
+            </py.PropertyDeclaration>
+          </py.StatementList>
+        </py.ClassDeclaration>
+      </py.StatementList>
+    );
+
+    expect(toSourceText([decl], { externals: [abcModule] })).toBe(d`
+      from abc import abstractmethod
+
+      class MyClass:
+          @property
+          @abstractmethod
+          def value(self) -> int:
+              return self._value
+
+          @value.setter
+          @abstractmethod
+          def value(self, value: int) -> None:
+              self._value = value
+
+          @value.deleter
+          @abstractmethod
+          def value(self) -> None:
+              del self._value
+
 
     `);
   });
@@ -502,9 +719,9 @@ describe("Function Declaration", () => {
     const decl = (
       <py.ClassDeclaration name="MyClass">
         <py.StatementList>
-          <py.NewDunderClassMethodDeclaration args kwargs>
+          <py.ConstructorDeclaration args kwargs>
             pass
-          </py.NewDunderClassMethodDeclaration>
+          </py.ConstructorDeclaration>
         </py.StatementList>
       </py.ClassDeclaration>
     );
@@ -622,5 +839,45 @@ describe("Function Declaration", () => {
 
             `,
     });
+  });
+
+  it("throws error when PropertyDeclaration is used outside of a class", () => {
+    expect(() => {
+      toSourceText([<py.PropertyDeclaration name="x" />]);
+    }).toThrow(
+      'PropertyDeclaration "x" must be declared inside a class (member scope)',
+    );
+  });
+
+  it("throws error when MethodDeclaration is used outside of a class", () => {
+    expect(() => {
+      toSourceText([<py.MethodDeclaration name="my_method" />]);
+    }).toThrow(
+      'Method "my_method" must be declared inside a class (member scope)',
+    );
+  });
+
+  it("throws error when ClassMethodDeclaration is used outside of a class", () => {
+    expect(() => {
+      toSourceText([<py.ClassMethodDeclaration name="my_class_method" />]);
+    }).toThrow(
+      'Method "my_class_method" must be declared inside a class (member scope)',
+    );
+  });
+
+  it("throws error when StaticMethodDeclaration is used outside of a class", () => {
+    expect(() => {
+      toSourceText([<py.StaticMethodDeclaration name="my_static_method" />]);
+    }).toThrow(
+      'Method "my_static_method" must be declared inside a class (member scope)',
+    );
+  });
+
+  it("throws error when DunderMethodDeclaration is used outside of a class", () => {
+    expect(() => {
+      toSourceText([<py.DunderMethodDeclaration name="__init__" />]);
+    }).toThrow(
+      'Method "__init__" must be declared inside a class (member scope)',
+    );
   });
 });

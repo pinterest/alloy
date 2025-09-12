@@ -33,6 +33,22 @@ export function findExistingSymbol(
   const existingSymbol = targetSpace.symbolNames.get(name);
   return existingSymbol as PythonOutputSymbol | undefined;
 }
+
+/**
+ * Attempts to find an existing symbol by name in the target space.
+ */
+export function findExistingSymbol(
+  name: string,
+  targetSpace?: OutputSpace,
+): PythonOutputSymbol | undefined {
+  if (!targetSpace) {
+    return undefined;
+  }
+
+  const existingSymbol = targetSpace.symbolNames.get(name);
+  return existingSymbol as PythonOutputSymbol | undefined;
+}
+
 /**
  * Creates a symbol for a python declaration in the current scope.
  */
