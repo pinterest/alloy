@@ -2,6 +2,7 @@ import {
   Children,
   childrenArray,
   code,
+  createContext,
   DeclarationContext,
   emitSymbol,
   findKeyedChild,
@@ -31,6 +32,11 @@ import {
 
 const setterTag = Symbol();
 const deleterTag = Symbol();
+
+/**
+ * Context to provide property type information within a PropertyDeclaration
+ */
+const PropertyContext = createContext<TypeExpressionProps | undefined>();
 
 /**
  * Validates that the current scope is a member scope (inside a class).
@@ -350,32 +356,33 @@ export function PropertyDeclaration(props: PropertyDeclarationProps) {
   return (
     <>
       <DeclarationContext.Provider value={sym}>
-        <List hardline enderPunctuation>
-          <PropertyMethodDeclaration
-            returnType={props.property.type}
-            abstract={props.abstract}
-          >
-            <Show when={Boolean(props.doc)}>{props.doc}</Show>
-            {unkeyedChildren}
-          </PropertyMethodDeclaration>
-          <Show when={Boolean(setterComponent)}>
-            <PropertyDeclaration.Setter
-              type={setterComponent?.props?.type ?? props.property.type}
+        <PropertyContext.Provider value={props.property.type}>
+          <List hardline enderPunctuation>
+            <PropertyMethodDeclaration
               abstract={props.abstract}
-              doc={setterComponent?.props.doc}
             >
-              {setterChildren}
-            </PropertyDeclaration.Setter>
-          </Show>
-          <Show when={Boolean(deleterComponent)}>
-            <PropertyDeclaration.Deleter 
-              abstract={props.abstract}
-              doc={deleterComponent?.props.doc}
-            >
-              {deleterChildren}
-            </PropertyDeclaration.Deleter>
-          </Show>
-        </List>
+              <Show when={Boolean(props.doc)}>{props.doc}</Show>
+              {unkeyedChildren}
+            </PropertyMethodDeclaration>
+            <Show when={Boolean(setterComponent)}>
+              <PropertyDeclaration.Setter
+                type={setterComponent?.props?.type ?? props.property.type}
+                abstract={props.abstract}
+                doc={setterComponent?.props.doc}
+              >
+                {setterChildren}
+              </PropertyDeclaration.Setter>
+            </Show>
+            <Show when={Boolean(deleterComponent)}>
+              <PropertyDeclaration.Deleter 
+                abstract={props.abstract}
+                doc={deleterComponent?.props.doc}
+              >
+                {deleterChildren}
+              </PropertyDeclaration.Deleter>
+            </Show>
+          </List>
+        </PropertyContext.Provider>
       </DeclarationContext.Provider>
     </>
   );
@@ -386,11 +393,6 @@ export interface PropertyMethodDeclarationProps {
    * The children of the property.
    */
   children?: Children;
-
-  /**
-   * The return type of the property.
-   */
-  returnType?: TypeExpressionProps;
 
   /**
    * Indicates that the property is abstract.
@@ -413,7 +415,7 @@ export interface PropertyMethodDeclarationProps {
  *
  * @example
  * ```tsx
- * <PropertyMethodDeclaration returnType={{ children: "int" }}>
+ * <PropertyMethodDeclaration>
  *   return self._my_property
  * </PropertyMethodDeclaration>
  * ```
@@ -424,6 +426,7 @@ export function PropertyMethodDeclaration(
   const declarationContext = useContext(
     DeclarationContext,
   ) as PythonOutputSymbol;
+  const propertyType = useContext(PropertyContext);
 
   const abstractMethod =
     props.abstract ? code`@${abcModule["."].abstractmethod}` : undefined;
@@ -438,6 +441,7 @@ export function PropertyMethodDeclaration(
         {...props}
         name={declarationContext.name}
         functionType="instance"
+        returnType={propertyType}
         sym={declarationContext}
       >
         {props.children}
