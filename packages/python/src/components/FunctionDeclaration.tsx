@@ -269,7 +269,7 @@ export interface PropertyDeclarationProps {
  *
  * @example
  * ```tsx
- * <PropertyDeclaration property={{ name: "name", type: "str" }}>
+ * <PropertyDeclaration property={{ name: "name", type: { children: "str" } }}>
  *   return self._name
  * </PropertyDeclaration>
  * ```
@@ -283,7 +283,7 @@ export interface PropertyDeclarationProps {
  * @example
  * With setter and deleter:
  * ```tsx
- * <PropertyDeclaration property={{ name: "value", type: "int" }}>
+ * <PropertyDeclaration property={{ name: "value", type: { children: "int" } }}>
  *   return self._value
  *   <PropertyDeclaration.Setter type={{ children: [{ children: "int" }, { children: "float" }, { children: "str" }] }}>
  *     self._value = int(value)
@@ -321,9 +321,11 @@ export function PropertyDeclaration(props: PropertyDeclarationProps) {
   const nonEmptyOrNotImplemented = (
     children: Children | undefined,
   ): Children => {
-    if (!children) return [code`raise NotImplementedError`];
-    const childArray = childrenArray(() => children);
-    return childArray.length > 0 ? children : [code`raise NotImplementedError`];
+    if (children && childrenArray(() => children).length > 0) {
+      return children;
+    } else {
+      return [code`raise NotImplementedError`];
+    }
   };
 
   const children = childrenArray(() => props.children);
@@ -358,25 +360,23 @@ export function PropertyDeclaration(props: PropertyDeclarationProps) {
       <DeclarationContext.Provider value={sym}>
         <PropertyContext.Provider value={props.property.type}>
           <List hardline enderPunctuation>
-            <PropertyMethodDeclaration
-              abstract={props.abstract}
-            >
+            <PropertyMethodDeclaration abstract={props.abstract}>
               <Show when={Boolean(props.doc)}>{props.doc}</Show>
               {unkeyedChildren}
             </PropertyMethodDeclaration>
             <Show when={Boolean(setterComponent)}>
               <PropertyDeclaration.Setter
+                {...setterComponent?.props}
                 type={setterComponent?.props?.type ?? props.property.type}
-                abstract={props.abstract}
-                doc={setterComponent?.props.doc}
+                abstract={setterComponent?.props?.abstract ?? props.abstract}
               >
                 {setterChildren}
               </PropertyDeclaration.Setter>
             </Show>
             <Show when={Boolean(deleterComponent)}>
-              <PropertyDeclaration.Deleter 
-                abstract={props.abstract}
-                doc={deleterComponent?.props.doc}
+              <PropertyDeclaration.Deleter
+                {...deleterComponent?.props}
+                abstract={deleterComponent?.props?.abstract ?? props.abstract}
               >
                 {deleterChildren}
               </PropertyDeclaration.Deleter>
@@ -410,7 +410,7 @@ export interface PropertyMethodDeclarationProps {
  *
  * @remarks
  * This component is used within a PropertyDeclaration to define the getter method.
- * The property name is automatically obtained from the parent PropertyDeclaration context.
+ * The property name and return type are automatically obtained from the parent PropertyDeclaration context.
  * It automatically generates the `@property` decorator.
  *
  * @example
@@ -450,8 +450,6 @@ export function PropertyMethodDeclaration(
   );
 }
 
-
-
 export function createPropertyMethodComponent<
   P extends { children?: any; type?: any; abstract?: boolean; doc?: Children },
 >(tag: symbol) {
@@ -459,14 +457,15 @@ export function createPropertyMethodComponent<
     const declarationContext = useContext(
       DeclarationContext,
     ) as PythonOutputSymbol;
-    
+
     // Determine if this is a setter or deleter based on the tag
     const isSetter = tag === setterTag;
     const isDeleter = tag === deleterTag;
-    
+
     // Special handling for setter which always needs a "value" parameter
-    const parameters = isSetter ? [{ name: "value", type: props.type }] : undefined;
-    
+    const parameters =
+      isSetter ? [{ name: "value", type: props.type }] : undefined;
+
     const abstractMethod =
       props.abstract ? code`@${abcModule["."].abstractmethod}` : undefined;
 
@@ -501,14 +500,13 @@ export function createPropertyMethodComponent<
   });
 }
 
-PropertyDeclaration.Setter =
-  createPropertyMethodComponent<PropertyMethodDeclarationProps & { type?: TypeExpressionProps }>(
-    setterTag,
-  );
+PropertyDeclaration.Setter = createPropertyMethodComponent<
+  PropertyMethodDeclarationProps & { type?: TypeExpressionProps }
+>(setterTag);
 PropertyDeclaration.Deleter =
-  createPropertyMethodComponent<Omit<PropertyMethodDeclarationProps, "returnType">>(
-    deleterTag,
-  );
+  createPropertyMethodComponent<
+    Omit<PropertyMethodDeclarationProps, "returnType">
+  >(deleterTag);
 
 /**
  * A Python class method declaration component.
