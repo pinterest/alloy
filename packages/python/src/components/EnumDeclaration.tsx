@@ -12,7 +12,7 @@ import { SimpleCommentBlock } from "./index.js";
 import { MemberScope } from "./MemberScope.jsx";
 import { PythonBlock } from "./PythonBlock.jsx";
 
-interface EnumPropsBase extends BaseDeclarationProps {
+export interface EnumPropsBase extends BaseDeclarationProps {
   /**
    * The base type of the enum. One of: 'Enum', 'IntEnum', 'StrEnum', 'Flag', 'IntFlag'.
    * Defaults to 'Enum'.
