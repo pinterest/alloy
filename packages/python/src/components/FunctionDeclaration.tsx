@@ -458,14 +458,18 @@ export function PropertyMethodDeclaration(
 }
 
 /**
- * Shared base component for property setter and deleter methods.
+ * Props for the PropertyMethodBase component.
  */
-function PropertyMethodBase(props: {
+interface PropertyMethodBaseProps
+  extends Omit<PropertyMethodDeclarationProps, "name"> {
   decoratorType: "setter" | "deleter";
   parameters?: ParameterDescriptor[];
-  children?: Children;
-  [key: string]: any;
-}) {
+}
+
+/**
+ * Shared base component for property setter and deleter methods.
+ */
+function PropertyMethodBase(props: PropertyMethodBaseProps) {
   const declarationContext = useContext(
     DeclarationContext,
   ) as PythonOutputSymbol;
