@@ -191,6 +191,118 @@ describe("Function Declaration", () => {
     `);
   });
 
+  it("can be an async method", () => {
+    const decl = (
+      <py.StatementList>
+        <py.ClassDeclaration name="MyClass">
+          <py.StatementList>
+            <py.MethodDeclaration async name="my_method" returnType={{ children: "str" }}>
+              return "async result"
+            </py.MethodDeclaration>
+          </py.StatementList>
+        </py.ClassDeclaration>
+      </py.StatementList>
+    );
+
+    expect(toSourceText([decl])).toBe(d`
+      class MyClass:
+          async def my_method(self) -> str:
+              return "async result"
+
+
+    `);
+  });
+
+  it("can be an async class method", () => {
+    const decl = (
+      <py.StatementList>
+        <py.ClassDeclaration name="MyClass">
+          <py.StatementList>
+            <py.ClassMethodDeclaration async name="create_async" returnType={{ children: "MyClass" }}>
+              return cls()
+            </py.ClassMethodDeclaration>
+          </py.StatementList>
+        </py.ClassDeclaration>
+      </py.StatementList>
+    );
+
+    expect(toSourceText([decl])).toBe(d`
+      class MyClass:
+          @classmethod
+          async def create_async(cls) -> MyClass:
+              return cls()
+
+
+    `);
+  });
+
+  it("can be an async static method", () => {
+    const decl = (
+      <py.StatementList>
+        <py.ClassDeclaration name="MyClass">
+          <py.StatementList>
+            <py.StaticMethodDeclaration async name="utility" returnType={{ children: "str" }}>
+              return "utility result"
+            </py.StaticMethodDeclaration>
+          </py.StatementList>
+        </py.ClassDeclaration>
+      </py.StatementList>
+    );
+
+    expect(toSourceText([decl])).toBe(d`
+      class MyClass:
+          @staticmethod
+          async def utility() -> str:
+              return "utility result"
+
+
+    `);
+  });
+
+  it("can be an async dunder method", () => {
+    const decl = (
+      <py.StatementList>
+        <py.ClassDeclaration name="MyClass">
+          <py.StatementList>
+            <py.DunderMethodDeclaration async name="__aenter__" returnType={{ children: "MyClass" }}>
+              return self
+            </py.DunderMethodDeclaration>
+          </py.StatementList>
+        </py.ClassDeclaration>
+      </py.StatementList>
+    );
+
+    expect(toSourceText([decl])).toBe(d`
+      class MyClass:
+          async def __aenter__(self) -> MyClass:
+              return self
+
+
+    `);
+  });
+
+  it("can be an async constructor", () => {
+    const decl = (
+      <py.StatementList>
+        <py.ClassDeclaration name="MyClass">
+          <py.StatementList>
+            <py.ConstructorDeclaration async returnType={{ children: "MyClass" }}>
+              return super().__new__(cls)
+            </py.ConstructorDeclaration>
+          </py.StatementList>
+        </py.ClassDeclaration>
+      </py.StatementList>
+    );
+
+    expect(toSourceText([decl])).toBe(d`
+      class MyClass:
+          async def __new__(cls) -> MyClass:
+              return super().__new__(cls)
+
+
+    `);
+  });
+
   it("supports parameters", () => {
     const decl = (
       <py.FunctionDeclaration
