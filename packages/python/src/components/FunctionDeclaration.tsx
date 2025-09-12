@@ -16,7 +16,6 @@ import {
 } from "@alloy-js/core";
 import { abcModule } from "../builtins/python.js";
 import { PythonOutputSymbol } from "../index.js";
-import { ParameterDescriptor } from "../parameter-descriptor.js";
 import { createPythonSymbol } from "../symbol-creation.js";
 import { usePythonScope } from "../symbols/scopes.js";
 import { getCallSignatureProps } from "../utils.js";
@@ -135,6 +134,16 @@ export interface FunctionDeclarationProps
 }
 
 /**
+ * Base props interface for all method declarations.
+ */
+export interface MethodDeclarationBaseProps extends FunctionDeclarationProps {
+  /**
+   * Indicates that the method is abstract.
+   */
+  abstract?: boolean;
+}
+
+/**
  * A Python function declaration.
  *
  * @example
@@ -167,22 +176,30 @@ export function FunctionDeclaration(props: FunctionDeclarationProps) {
  * and ensures the method is declared within a class (member scope).
  * This component is not exported to keep implementation details private.
  */
-function MethodDeclarationBase(props: BaseFunctionDeclarationProps) {
+function MethodDeclarationBase(props: MethodDeclarationBaseProps & {
+  functionType?: "instance" | "class" | "static";
+  sym?: PythonOutputSymbol;
+}) {
   // Only validate if we don't have an existing symbol (which implies validation already happened)
   if (!props.sym) {
     validateMemberScope(props.name);
   }
 
+  const abstractMethod = props.abstract ? (
+    <>
+      {code`@${abcModule["."].abstractmethod}`}
+      <hbr />
+    </>
+  ) : undefined;
+
   return (
     <>
+      {abstractMethod}
       <BaseFunctionDeclaration {...props} />
     </>
   );
 }
 
-export interface MethodDeclarationProps extends FunctionDeclarationProps {
-  abstract?: boolean;
-}
 
 /**
  * A Python method declaration component.
@@ -224,14 +241,9 @@ export interface MethodDeclarationProps extends FunctionDeclarationProps {
  * with the `@abstractmethod` decorator. The method must be declared within a class.
  */
 
-export function MethodDeclaration(props: MethodDeclarationProps) {
-  const abstractMethod =
-    props.abstract ? code`@${abcModule["."].abstractmethod}` : undefined;
-
+export function MethodDeclaration(props: MethodDeclarationBaseProps) {
   return (
     <>
-      {abstractMethod}
-      {abstractMethod && <hbr />}
       <MethodDeclarationBase functionType={"instance"} {...props} />
     </>
   );
@@ -241,7 +253,12 @@ export interface PropertyDeclarationProps {
   /**
    * The name of the property.
    */
-  property: ParameterDescriptor;
+  name: string;
+
+  /**
+   * The type of the property.
+   */
+  type?: TypeExpressionProps;
 
   /**
    * The children of the property.
@@ -269,7 +286,7 @@ export interface PropertyDeclarationProps {
  *
  * @example
  * ```tsx
- * <PropertyDeclaration property={{ name: "name", type: { children: "str" } }}>
+ * <PropertyDeclaration name="name" type={{ children: "str" }}>
  *   return self._name
  * </PropertyDeclaration>
  * ```
@@ -283,7 +300,7 @@ export interface PropertyDeclarationProps {
  * @example
  * With setter and deleter:
  * ```tsx
- * <PropertyDeclaration property={{ name: "value", type: { children: "int" } }}>
+ * <PropertyDeclaration name="value" type={{ children: "int" }}>
  *   return self._value
  *   <PropertyDeclaration.Setter type={{ children: [{ children: "int" }, { children: "float" }, { children: "str" }] }}>
  *     self._value = int(value)
@@ -344,10 +361,10 @@ export function PropertyDeclaration(props: PropertyDeclarationProps) {
     findUnkeyedChildren(children),
   );
 
-  validateMemberScope(props.property.name, "PropertyDeclaration");
+  validateMemberScope(props.name, "PropertyDeclaration");
 
   const sym: PythonOutputSymbol = createPythonSymbol(
-    props.property.name,
+    props.name,
     {
       instance: true,
       refkeys: props.refkey,
@@ -358,16 +375,15 @@ export function PropertyDeclaration(props: PropertyDeclarationProps) {
   return (
     <>
       <DeclarationContext.Provider value={sym}>
-        <PropertyContext.Provider value={props.property.type}>
+        <PropertyContext.Provider value={props.type}>
           <List hardline enderPunctuation>
-            <PropertyMethodDeclaration abstract={props.abstract}>
-              <Show when={Boolean(props.doc)}>{props.doc}</Show>
+            <PropertyMethodDeclaration abstract={props.abstract} doc={props.doc}>
               {unkeyedChildren}
             </PropertyMethodDeclaration>
             <Show when={Boolean(setterComponent)}>
               <PropertyDeclaration.Setter
                 {...setterComponent?.props}
-                type={setterComponent?.props?.type ?? props.property.type}
+                type={setterComponent?.props?.type ?? props.type}
                 abstract={setterComponent?.props?.abstract ?? props.abstract}
               >
                 {setterChildren}
@@ -388,22 +404,11 @@ export function PropertyDeclaration(props: PropertyDeclarationProps) {
   );
 }
 
-export interface PropertyMethodDeclarationProps {
-  /**
-   * The children of the property.
-   */
-  children?: Children;
-
-  /**
-   * Indicates that the property is abstract.
-   */
-  abstract?: boolean;
-
-  /**
-   * Documentation for this declaration
-   */
-  doc?: Children;
-}
+/**
+ * Props for property method declarations (getter, setter, deleter).
+ * Excludes 'name' since property methods derive their name from the PropertyDeclaration context.
+ */
+export interface PropertyMethodDeclarationProps extends Omit<MethodDeclarationBaseProps, "name"> {}
 
 /**
  * A Python property method declaration component.
@@ -428,15 +433,10 @@ export function PropertyMethodDeclaration(
   ) as PythonOutputSymbol;
   const propertyType = useContext(PropertyContext);
 
-  const abstractMethod =
-    props.abstract ? code`@${abcModule["."].abstractmethod}` : undefined;
-
   return (
     <>
       {code`@property`}
       <hbr />
-      {abstractMethod}
-      {abstractMethod && <hbr />}
       <MethodDeclarationBase
         {...props}
         name={declarationContext.name}
@@ -451,7 +451,7 @@ export function PropertyMethodDeclaration(
 }
 
 export function createPropertyMethodComponent<
-  P extends { children?: any; type?: any; abstract?: boolean; doc?: Children },
+  P extends { children?: any; type?: any },
 >(tag: symbol) {
   return taggedComponent(tag, function Parameters(props: P) {
     const declarationContext = useContext(
@@ -465,9 +465,6 @@ export function createPropertyMethodComponent<
     // Special handling for setter which always needs a "value" parameter
     const parameters =
       isSetter ? [{ name: "value", type: props.type }] : undefined;
-
-    const abstractMethod =
-      props.abstract ? code`@${abcModule["."].abstractmethod}` : undefined;
 
     return (
       <>
@@ -483,8 +480,6 @@ export function createPropertyMethodComponent<
             <hbr />
           </>
         )}
-        {abstractMethod}
-        {abstractMethod && <hbr />}
         <MethodDeclarationBase
           {...props}
           name={declarationContext.name}
@@ -532,16 +527,11 @@ PropertyDeclaration.Deleter =
  * This component automatically adds the `@classmethod` decorator and the `cls`
  * parameter as the first parameter. The method must be declared within a class.
  */
-export function ClassMethodDeclaration(props: MethodDeclarationProps) {
-  const abstractMethod =
-    props.abstract ? code`@${abcModule["."].abstractmethod}` : undefined;
-
+export function ClassMethodDeclaration(props: MethodDeclarationBaseProps) {
   return (
     <>
       {"@classmethod"}
       <hbr />
-      {abstractMethod}
-      {abstractMethod && <hbr />}
       <MethodDeclarationBase functionType={"class"} {...props} />
     </>
   );
@@ -568,27 +558,21 @@ export function ClassMethodDeclaration(props: MethodDeclarationProps) {
  * ```
  *
  * @remarks
- * This component automatically adds the `@staticmethod` decorator and the `cls`
- * parameter as the first parameter. The method must be declared within a class. It
- * does not have a `self` parameter.
+ * This component automatically adds the `@staticmethod` decorator. The method must be
+ * declared within a class.
  */
-export function StaticMethodDeclaration(props: MethodDeclarationProps) {
-  const abstractMethod =
-    props.abstract ? code`@${abcModule["."].abstractmethod}` : undefined;
-
+export function StaticMethodDeclaration(props: MethodDeclarationBaseProps) {
   return (
     <>
       {"@staticmethod"}
       <hbr />
-      {abstractMethod}
-      {abstractMethod && <hbr />}
       <MethodDeclarationBase functionType={"static"} {...props} />
     </>
   );
 }
 
 export interface DunderMethodDeclarationProps
-  extends FunctionDeclarationProps {}
+  extends MethodDeclarationBaseProps {}
 
 /**
  * A Python dunder method declaration.
@@ -601,13 +585,13 @@ export interface DunderMethodDeclarationProps
  * ```
  * This will generate:
  * ```python
- * def __init__(self: MyClass) -> None:
+ * def __init__(self) -> None:
  *     self.attribute = "value"
  * ```
  *
  * @remarks
- *
- * This is a convenience component for dunder methods.
+ * This is a convenience component for dunder methods. The method must be declared 
+ * within a class.
  */
 export function DunderMethodDeclaration(props: DunderMethodDeclarationProps) {
   return (
@@ -625,7 +609,12 @@ export interface ConstructorDeclarationProps
  *
  * @example
  * ```tsx
- * <ConstructorDeclaration args kwargs>
+ * <ConstructorDeclaration
+ *   parameters={[
+ *     { name: "args", spread: "args" },
+ *     { name: "kwargs", spread: "kwargs" }
+ *   ]}
+ * >
  *   pass
  * </ConstructorDeclaration>
  * ```
@@ -634,6 +623,11 @@ export interface ConstructorDeclarationProps
  * def __new__(cls, *args, **kwargs):
  *   pass
  * ```
+ *
+ * @remarks
+ * The `__new__` method is a special method that acts as a constructor. It automatically
+ * receives `cls` as the first parameter but is not decorated with `@classmethod`.
+ * The method must be declared within a class.
  */
 export function ConstructorDeclaration(props: ConstructorDeclarationProps) {
   // __new__ is a special method, as, despite having cls as the first parameter,

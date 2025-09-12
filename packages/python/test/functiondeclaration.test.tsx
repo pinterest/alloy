@@ -332,8 +332,8 @@ describe("Function Declaration", () => {
       <py.StatementList>
         <py.ClassDeclaration name="MyClass">
           <py.StatementList>
-            <py.PropertyDeclaration property={{ name: "x" }}>
-              <py.PropertyDeclaration.Setter></py.PropertyDeclaration.Setter>
+            <py.PropertyDeclaration name="x">
+              <py.PropertyDeclaration.Setter />
               <py.PropertyDeclaration.Deleter />
             </py.PropertyDeclaration>
           </py.StatementList>
@@ -364,7 +364,8 @@ describe("Function Declaration", () => {
         <py.ClassDeclaration name="MyClass">
           <py.StatementList>
             <py.PropertyDeclaration
-              property={{ name: "x", type: { children: "int" } }}
+              name="x"
+              type={{ children: "int" }}
             >
               something
               <py.PropertyDeclaration.Setter>
@@ -422,7 +423,8 @@ describe("Function Declaration", () => {
         <py.ClassDeclaration name="MyClass">
           <py.StatementList>
             <py.PropertyDeclaration
-              property={{ name: "x", type: { children: "int" } }}
+              name="x"
+              type={{ children: "int" }}
               doc={propertyDoc}
             >
               something
@@ -478,7 +480,7 @@ describe("Function Declaration", () => {
       <py.StatementList>
         <py.ClassDeclaration name="MyClass">
           <py.StatementList>
-            <py.PropertyDeclaration property={{ name: "x" }}>
+            <py.PropertyDeclaration name="x">
               something
               <py.PropertyDeclaration.Setter />
               <py.PropertyDeclaration.Deleter />
@@ -519,7 +521,8 @@ describe("Function Declaration", () => {
         <py.ClassDeclaration name="MyClass">
           <py.StatementList>
             <py.PropertyDeclaration
-              property={{ name: "value", type: { children: "int" } }}
+              name="value"
+              type={{ children: "int" }}
               abstract
             >
               return self._value
@@ -712,7 +715,7 @@ describe("Function Declaration", () => {
 
   it("throws error when PropertyDeclaration is used outside of a class", () => {
     expect(() => {
-      toSourceText([<py.PropertyDeclaration property={{ name: "x" }} />]);
+      toSourceText([<py.PropertyDeclaration name="x" />]);
     }).toThrow(
       'PropertyDeclaration "x" must be declared inside a class (member scope)',
     );
