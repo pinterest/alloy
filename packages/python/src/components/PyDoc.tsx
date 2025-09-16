@@ -22,13 +22,13 @@ export interface FunctionDocProps {
  * A component that creates a FunctionDoc block for functions.
  */
 export function FunctionDoc(props: FunctionDocProps) {
-  const style = props.style ?? "google";
-  const { style: _style, ...rest } = props;
+  const {
+    style = "google",
+    ...rest
+  }: { style?: "google" } & GoogleStyleFunctionDocProps = props;
   switch (style) {
     case "google":
-      return (
-        <GoogleStyleFunctionDoc {...(rest as GoogleStyleFunctionDocProps)} />
-      );
+      return <GoogleStyleFunctionDoc {...rest} />;
     default:
       return undefined;
   }
@@ -50,11 +50,13 @@ export interface ClassDocProps {
  * A component that creates a ClassDoc block for classes.
  */
 export function ClassDoc(props: ClassDocProps) {
-  const style = props.style ?? "google";
-  const { style: _style, ...rest } = props;
+  const {
+    style = "google",
+    ...rest
+  }: { style?: "google" } & GoogleStyleClassDocProps = props;
   switch (style) {
     case "google":
-      return <GoogleStyleClassDoc {...(rest as GoogleStyleClassDocProps)} />;
+      return <GoogleStyleClassDoc {...rest} />;
     default:
       return undefined;
   }
@@ -75,11 +77,13 @@ export interface ModuleDocProps {
  * A component that creates a ModuleDoc block for module-level documentation.
  */
 export function ModuleDoc(props: ModuleDocProps) {
-  const style = props.style ?? "google";
-  const { style: _style, ...rest } = props;
+  const {
+    style = "google",
+    ...rest
+  }: { style?: "google" } & GoogleStyleModuleDocProps = props;
   switch (style) {
     case "google":
-      return <GoogleStyleModuleDoc {...(rest as GoogleStyleModuleDocProps)} />;
+      return <GoogleStyleModuleDoc {...rest} />;
     default:
       return undefined;
   }
@@ -100,13 +104,13 @@ export interface PropertyDocProps {
  * A component that creates a PropertyDoc block for `@property` decorated methods.
  */
 export function PropertyDoc(props: PropertyDocProps) {
-  const style = props.style ?? "google";
-  const { style: _style, ...rest } = props;
+  const {
+    style = "google",
+    ...rest
+  }: { style?: "google" } & GoogleStylePropertyDocProps = props;
   switch (style) {
     case "google":
-      return (
-        <GoogleStylePropertyDoc {...(rest as GoogleStylePropertyDocProps)} />
-      );
+      return <GoogleStylePropertyDoc {...rest} />;
     default:
       return undefined;
   }
@@ -129,13 +133,13 @@ export interface GeneratorDocProps {
  * A component that creates a GeneratorDoc block for generator functions.
  */
 export function GeneratorDoc(props: GeneratorDocProps) {
-  const style = props.style ?? "google";
-  const { style: _style, ...rest } = props;
+  const {
+    style = "google",
+    ...rest
+  }: { style?: "google" } & GoogleStyleGeneratorDocProps = props;
   switch (style) {
     case "google":
-      return (
-        <GoogleStyleGeneratorDoc {...(rest as GoogleStyleGeneratorDocProps)} />
-      );
+      return <GoogleStyleGeneratorDoc {...rest} />;
     default:
       return undefined;
   }
@@ -157,13 +161,13 @@ export interface ExceptionDocProps {
  * A component that creates an ExceptionDoc block for custom exception classes.
  */
 export function ExceptionDoc(props: ExceptionDocProps) {
-  const style = props.style ?? "google";
-  const { style: _style, ...rest } = props;
+  const {
+    style = "google",
+    ...rest
+  }: { style?: "google" } & GoogleStyleExceptionDocProps = props;
   switch (style) {
     case "google":
-      return (
-        <GoogleStyleExceptionDoc {...(rest as GoogleStyleExceptionDocProps)} />
-      );
+      return <GoogleStyleExceptionDoc {...rest} />;
     default:
       return undefined;
   }
@@ -181,13 +185,13 @@ export interface AttributeDocProps {
  * This can be used for both inline and block attribute documentation.
  */
 export function AttributeDoc(props: AttributeDocProps) {
-  const style = props.style ?? "google";
-  const { style: _style, ...rest } = props;
+  const {
+    style = "google",
+    ...rest
+  }: { style?: "google" } & GoogleStyleAttributeDocProps = props;
   switch (style) {
     case "google":
-      return (
-        <GoogleStyleAttributeDoc {...(rest as GoogleStyleAttributeDocProps)} />
-      );
+      return <GoogleStyleAttributeDoc {...rest} />;
     default:
       return undefined;
   }
@@ -212,11 +216,13 @@ export interface MethodDocProps {
  * Automatically adds a note about not including 'self' parameter if no custom note is provided.
  */
 export function MethodDoc(props: MethodDocProps) {
-  const style = props.style ?? "google";
+  const {
+    style = "google",
+    ...rest
+  }: { style?: "google" } & GoogleStyleMethodDocProps = props;
   switch (style) {
     case "google": {
-      const { style: _style, ...rest } = props;
-      return <GoogleStyleMethodDoc {...(rest as GoogleStyleMethodDocProps)} />;
+      return <GoogleStyleMethodDoc {...rest} />;
     }
     default:
       return undefined;
@@ -333,9 +339,7 @@ function GoogleStyleFunctionDoc(props: GoogleStyleFunctionDocProps) {
   // <List> would render spaces between the elements even if <Show> evaluates to false.
   const children = [];
   if (props.description !== undefined) {
-    children.push(
-      <List doubleHardline>{props.description.map((param) => param)}</List>,
-    );
+    children.push(<List doubleHardline>{props.description}</List>);
   }
   if (props.parameters?.length) {
     children.push(<GoogleStyleDocParams parameters={props.parameters} />);
@@ -379,9 +383,7 @@ function GoogleStyleClassDoc(props: GoogleStyleClassDocProps) {
   // <List> would render spaces between the elements even if <Show> evaluates to false.
   const children = [];
   if (props.description !== undefined) {
-    children.push(
-      <List doubleHardline>{props.description.map((param) => param)}</List>,
-    );
+    children.push(<List doubleHardline>{props.description}</List>);
   }
   if (props.attributes?.length) {
     children.push(<GoogleStyleDocAttributes attributes={props.attributes} />);
@@ -415,9 +417,7 @@ interface GoogleStyleModuleDocProps extends Omit<ModuleDocProps, "style"> {}
 function GoogleStyleModuleDoc(props: GoogleStyleModuleDocProps) {
   const children = [];
   if (props.description !== undefined) {
-    children.push(
-      <List doubleHardline>{props.description.map((param) => param)}</List>,
-    );
+    children.push(<List doubleHardline>{props.description}</List>);
   }
   if (props.attributes?.length) {
     children.push(<GoogleStyleDocAttributes attributes={props.attributes} />);
@@ -448,9 +448,7 @@ interface GoogleStylePropertyDocProps extends Omit<PropertyDocProps, "style"> {}
 function GoogleStylePropertyDoc(props: GoogleStylePropertyDocProps) {
   const children = [];
   if (props.description !== undefined) {
-    children.push(
-      <List doubleHardline>{props.description.map((param) => param)}</List>,
-    );
+    children.push(<List doubleHardline>{props.description}</List>);
   }
   if (props.returns) {
     children.push(<GoogleStyleDocReturn message={props.returns} />);
@@ -482,9 +480,7 @@ interface GoogleStyleGeneratorDocProps
 function GoogleStyleGeneratorDoc(props: GoogleStyleGeneratorDocProps) {
   const children = [];
   if (props.description !== undefined) {
-    children.push(
-      <List doubleHardline>{props.description.map((param) => param)}</List>,
-    );
+    children.push(<List doubleHardline>{props.description}</List>);
   }
   if (props.parameters?.length) {
     children.push(<GoogleStyleDocParams parameters={props.parameters} />);
@@ -524,9 +520,7 @@ interface GoogleStyleExceptionDocProps
 function GoogleStyleExceptionDoc(props: GoogleStyleExceptionDocProps) {
   const children = [];
   if (props.description !== undefined) {
-    children.push(
-      <List doubleHardline>{props.description.map((param) => param)}</List>,
-    );
+    children.push(<List doubleHardline>{props.description}</List>);
   }
   if (props.parameters?.length) {
     children.push(<GoogleStyleDocParams parameters={props.parameters} />);
@@ -574,9 +568,7 @@ interface GoogleStyleMethodDocProps extends Omit<MethodDocProps, "style"> {}
 function GoogleStyleMethodDoc(props: GoogleStyleMethodDocProps) {
   const children = [];
   if (props.description !== undefined) {
-    children.push(
-      <List doubleHardline>{props.description.map((param) => param)}</List>,
-    );
+    children.push(<List doubleHardline>{props.description}</List>);
   }
   if (props.parameters?.length) {
     children.push(<GoogleStyleDocParams parameters={props.parameters} />);
