@@ -10,6 +10,10 @@ export interface FunctionDocProps {
   returns?: string;
   yields?: string;
   raises?: string[];
+  examples?: Children[];
+  seeAlso?: string[];
+  warning?: string;
+  deprecated?: string;
   note?: string;
   style?: "google";
 }
@@ -19,17 +23,14 @@ export interface FunctionDocProps {
  */
 export function FunctionDoc(props: FunctionDocProps) {
   const style = props.style ?? "google";
-  if (style === "google") {
-    return (
-      <GoogleStyleFunctionDoc
-        description={props.description}
-        parameters={props.parameters}
-        returns={props.returns}
-        yields={props.yields}
-        raises={props.raises}
-        note={props.note}
-      />
-    );
+  const { style: _style, ...rest } = props;
+  switch (style) {
+    case "google":
+      return (
+        <GoogleStyleFunctionDoc {...(rest as GoogleStyleFunctionDocProps)} />
+      );
+    default:
+      return undefined;
   }
 }
 
@@ -37,6 +38,10 @@ export interface ClassDocProps {
   description: Children[];
   parameters?: ParameterDescriptor[];
   attributes?: GoogleStyleDocAttributeProps[];
+  examples?: Children[];
+  seeAlso?: string[];
+  warning?: string;
+  deprecated?: string;
   note?: string;
   style?: "google";
 }
@@ -46,21 +51,22 @@ export interface ClassDocProps {
  */
 export function ClassDoc(props: ClassDocProps) {
   const style = props.style ?? "google";
-  if (style === "google") {
-    return (
-      <GoogleStyleClassDoc
-        description={props.description}
-        parameters={props.parameters}
-        attributes={props.attributes}
-        note={props.note}
-      />
-    );
+  const { style: _style, ...rest } = props;
+  switch (style) {
+    case "google":
+      return <GoogleStyleClassDoc {...(rest as GoogleStyleClassDocProps)} />;
+    default:
+      return undefined;
   }
 }
 
 export interface ModuleDocProps {
   description: Children[];
   attributes?: GoogleStyleDocAttributeProps[];
+  examples?: Children[];
+  seeAlso?: string[];
+  warning?: string;
+  deprecated?: string;
   todo?: string[];
   style?: "google";
 }
@@ -70,20 +76,22 @@ export interface ModuleDocProps {
  */
 export function ModuleDoc(props: ModuleDocProps) {
   const style = props.style ?? "google";
-  if (style === "google") {
-    return (
-      <GoogleStyleModuleDoc
-        description={props.description}
-        attributes={props.attributes}
-        todo={props.todo}
-      />
-    );
+  const { style: _style, ...rest } = props;
+  switch (style) {
+    case "google":
+      return <GoogleStyleModuleDoc {...(rest as GoogleStyleModuleDocProps)} />;
+    default:
+      return undefined;
   }
 }
 
 export interface PropertyDocProps {
   description: Children[];
   returns?: string;
+  examples?: Children[];
+  seeAlso?: string[];
+  warning?: string;
+  deprecated?: string;
   note?: string;
   style?: "google";
 }
@@ -93,14 +101,14 @@ export interface PropertyDocProps {
  */
 export function PropertyDoc(props: PropertyDocProps) {
   const style = props.style ?? "google";
-  if (style === "google") {
-    return (
-      <GoogleStylePropertyDoc
-        description={props.description}
-        returns={props.returns}
-        note={props.note}
-      />
-    );
+  const { style: _style, ...rest } = props;
+  switch (style) {
+    case "google":
+      return (
+        <GoogleStylePropertyDoc {...(rest as GoogleStylePropertyDocProps)} />
+      );
+    default:
+      return undefined;
   }
 }
 
@@ -109,6 +117,10 @@ export interface GeneratorDocProps {
   parameters?: ParameterDescriptor[];
   yields?: string;
   raises?: string[];
+  examples?: Children[];
+  seeAlso?: string[];
+  warning?: string;
+  deprecated?: string;
   note?: string;
   style?: "google";
 }
@@ -118,16 +130,14 @@ export interface GeneratorDocProps {
  */
 export function GeneratorDoc(props: GeneratorDocProps) {
   const style = props.style ?? "google";
-  if (style === "google") {
-    return (
-      <GoogleStyleGeneratorDoc
-        description={props.description}
-        parameters={props.parameters}
-        yields={props.yields}
-        raises={props.raises}
-        note={props.note}
-      />
-    );
+  const { style: _style, ...rest } = props;
+  switch (style) {
+    case "google":
+      return (
+        <GoogleStyleGeneratorDoc {...(rest as GoogleStyleGeneratorDocProps)} />
+      );
+    default:
+      return undefined;
   }
 }
 
@@ -135,6 +145,10 @@ export interface ExceptionDocProps {
   description: Children[];
   parameters?: ParameterDescriptor[];
   attributes?: GoogleStyleDocAttributeProps[];
+  examples?: Children[];
+  seeAlso?: string[];
+  warning?: string;
+  deprecated?: string;
   note?: string;
   style?: "google";
 }
@@ -144,15 +158,14 @@ export interface ExceptionDocProps {
  */
 export function ExceptionDoc(props: ExceptionDocProps) {
   const style = props.style ?? "google";
-  if (style === "google") {
-    return (
-      <GoogleStyleExceptionDoc
-        description={props.description}
-        parameters={props.parameters}
-        attributes={props.attributes}
-        note={props.note}
-      />
-    );
+  const { style: _style, ...rest } = props;
+  switch (style) {
+    case "google":
+      return (
+        <GoogleStyleExceptionDoc {...(rest as GoogleStyleExceptionDocProps)} />
+      );
+    default:
+      return undefined;
   }
 }
 
@@ -169,12 +182,14 @@ export interface AttributeDocProps {
  */
 export function AttributeDoc(props: AttributeDocProps) {
   const style = props.style ?? "google";
-  if (style === "google") {
-    return (
-      <GoogleStyleAttributeDoc name={props.name} type={props.type}>
-        {props.children}
-      </GoogleStyleAttributeDoc>
-    );
+  const { style: _style, ...rest } = props;
+  switch (style) {
+    case "google":
+      return (
+        <GoogleStyleAttributeDoc {...(rest as GoogleStyleAttributeDocProps)} />
+      );
+    default:
+      return undefined;
   }
 }
 
@@ -183,7 +198,12 @@ export interface MethodDocProps {
   parameters?: ParameterDescriptor[];
   returns?: string;
   raises?: string[];
+  examples?: Children[];
+  seeAlso?: string[];
+  warning?: string;
+  deprecated?: string;
   note?: string;
+  overrides?: string;
   style?: "google";
 }
 
@@ -193,18 +213,20 @@ export interface MethodDocProps {
  */
 export function MethodDoc(props: MethodDocProps) {
   const style = props.style ?? "google";
-  if (style === "google") {
-    const defaultNote =
-      "Do not include the 'self' parameter in the Args section.";
-    return (
-      <GoogleStyleMethodDoc
-        description={props.description}
-        parameters={props.parameters}
-        returns={props.returns}
-        raises={props.raises}
-        note={props.note ?? defaultNote}
-      />
-    );
+  switch (style) {
+    case "google": {
+      const defaultNote =
+        "Do not include the 'self' parameter in the Args section.";
+      const { style: _style, note, ...rest } = props;
+      return (
+        <GoogleStyleMethodDoc
+          {...(rest as GoogleStyleMethodDocProps)}
+          note={note ?? defaultNote}
+        />
+      );
+    }
+    default:
+      return undefined;
   }
 }
 
@@ -322,21 +344,33 @@ function GoogleStyleFunctionDoc(props: GoogleStyleFunctionDocProps) {
       <List doubleHardline>{props.description.map((param) => param)}</List>,
     );
   }
-  if (props.parameters !== undefined && props.parameters.length > 0) {
+  if (props.parameters?.length) {
     children.push(<GoogleStyleDocParams parameters={props.parameters} />);
   }
-  if (props.returns !== undefined) {
+  if (props.returns) {
     children.push(<GoogleStyleDocReturn message={props.returns} />);
   }
-  if (props.yields !== undefined) {
+  if (props.yields) {
     children.push(<GoogleStyleDocYields message={props.yields} />);
   }
-  if (props.raises !== undefined && props.raises.length > 0) {
+  if (props.raises?.length) {
     children.push(
       props.raises!.map((param) => <GoogleStyleDocRaises message={param} />),
     );
   }
-  if (props.note !== undefined) {
+  if (props.examples?.length) {
+    children.push(<GoogleStyleDocExamples items={props.examples} />);
+  }
+  if (props.seeAlso?.length) {
+    children.push(<GoogleStyleDocSeeAlso items={props.seeAlso} />);
+  }
+  if (props.warning) {
+    children.push(<GoogleStyleDocWarning message={props.warning} />);
+  }
+  if (props.deprecated) {
+    children.push(<GoogleStyleDocDeprecated message={props.deprecated} />);
+  }
+  if (props.note) {
     children.push(<GoogleStyleDocNote message={props.note} />);
   }
   return <PyDoc>{children}</PyDoc>;
@@ -356,13 +390,25 @@ function GoogleStyleClassDoc(props: GoogleStyleClassDocProps) {
       <List doubleHardline>{props.description.map((param) => param)}</List>,
     );
   }
-  if (props.attributes !== undefined && props.attributes.length > 0) {
+  if (props.attributes?.length) {
     children.push(<GoogleStyleDocAttributes attributes={props.attributes} />);
   }
-  if (props.parameters !== undefined && props.parameters.length > 0) {
+  if (props.parameters?.length) {
     children.push(<GoogleStyleDocParams parameters={props.parameters} />);
   }
-  if (props.note !== undefined) {
+  if (props.examples?.length) {
+    children.push(<GoogleStyleDocExamples items={props.examples} />);
+  }
+  if (props.seeAlso?.length) {
+    children.push(<GoogleStyleDocSeeAlso items={props.seeAlso} />);
+  }
+  if (props.warning) {
+    children.push(<GoogleStyleDocWarning message={props.warning} />);
+  }
+  if (props.deprecated) {
+    children.push(<GoogleStyleDocDeprecated message={props.deprecated} />);
+  }
+  if (props.note) {
     children.push(<GoogleStyleDocNote message={props.note} />);
   }
   return <PyDoc>{children}</PyDoc>;
@@ -380,10 +426,22 @@ function GoogleStyleModuleDoc(props: GoogleStyleModuleDocProps) {
       <List doubleHardline>{props.description.map((param) => param)}</List>,
     );
   }
-  if (props.attributes !== undefined && props.attributes.length > 0) {
+  if (props.attributes?.length) {
     children.push(<GoogleStyleDocAttributes attributes={props.attributes} />);
   }
-  if (props.todo !== undefined && props.todo.length > 0) {
+  if (props.examples?.length) {
+    children.push(<GoogleStyleDocExamples items={props.examples} />);
+  }
+  if (props.seeAlso?.length) {
+    children.push(<GoogleStyleDocSeeAlso items={props.seeAlso} />);
+  }
+  if (props.warning) {
+    children.push(<GoogleStyleDocWarning message={props.warning} />);
+  }
+  if (props.deprecated) {
+    children.push(<GoogleStyleDocDeprecated message={props.deprecated} />);
+  }
+  if (props.todo?.length) {
     children.push(<GoogleStyleDocTodo items={props.todo} />);
   }
   return <PyDoc>{children}</PyDoc>;
@@ -401,10 +459,22 @@ function GoogleStylePropertyDoc(props: GoogleStylePropertyDocProps) {
       <List doubleHardline>{props.description.map((param) => param)}</List>,
     );
   }
-  if (props.returns !== undefined) {
+  if (props.returns) {
     children.push(<GoogleStyleDocReturn message={props.returns} />);
   }
-  if (props.note !== undefined) {
+  if (props.examples?.length) {
+    children.push(<GoogleStyleDocExamples items={props.examples} />);
+  }
+  if (props.seeAlso?.length) {
+    children.push(<GoogleStyleDocSeeAlso items={props.seeAlso} />);
+  }
+  if (props.warning) {
+    children.push(<GoogleStyleDocWarning message={props.warning} />);
+  }
+  if (props.deprecated) {
+    children.push(<GoogleStyleDocDeprecated message={props.deprecated} />);
+  }
+  if (props.note) {
     children.push(<GoogleStyleDocNote message={props.note} />);
   }
   return <PyDoc>{children}</PyDoc>;
@@ -423,18 +493,30 @@ function GoogleStyleGeneratorDoc(props: GoogleStyleGeneratorDocProps) {
       <List doubleHardline>{props.description.map((param) => param)}</List>,
     );
   }
-  if (props.parameters !== undefined && props.parameters.length > 0) {
+  if (props.parameters?.length) {
     children.push(<GoogleStyleDocParams parameters={props.parameters} />);
   }
-  if (props.yields !== undefined) {
+  if (props.yields) {
     children.push(<GoogleStyleDocYields message={props.yields} />);
   }
-  if (props.raises !== undefined && props.raises.length > 0) {
+  if (props.raises?.length) {
     children.push(
       props.raises!.map((param) => <GoogleStyleDocRaises message={param} />),
     );
   }
-  if (props.note !== undefined) {
+  if (props.examples?.length) {
+    children.push(<GoogleStyleDocExamples items={props.examples} />);
+  }
+  if (props.seeAlso?.length) {
+    children.push(<GoogleStyleDocSeeAlso items={props.seeAlso} />);
+  }
+  if (props.warning) {
+    children.push(<GoogleStyleDocWarning message={props.warning} />);
+  }
+  if (props.deprecated) {
+    children.push(<GoogleStyleDocDeprecated message={props.deprecated} />);
+  }
+  if (props.note) {
     children.push(<GoogleStyleDocNote message={props.note} />);
   }
   return <PyDoc>{children}</PyDoc>;
@@ -453,13 +535,25 @@ function GoogleStyleExceptionDoc(props: GoogleStyleExceptionDocProps) {
       <List doubleHardline>{props.description.map((param) => param)}</List>,
     );
   }
-  if (props.parameters !== undefined && props.parameters.length > 0) {
+  if (props.parameters?.length) {
     children.push(<GoogleStyleDocParams parameters={props.parameters} />);
   }
-  if (props.attributes !== undefined && props.attributes.length > 0) {
+  if (props.attributes?.length) {
     children.push(<GoogleStyleDocAttributes attributes={props.attributes} />);
   }
-  if (props.note !== undefined) {
+  if (props.examples?.length) {
+    children.push(<GoogleStyleDocExamples items={props.examples} />);
+  }
+  if (props.seeAlso?.length) {
+    children.push(<GoogleStyleDocSeeAlso items={props.seeAlso} />);
+  }
+  if (props.warning) {
+    children.push(<GoogleStyleDocWarning message={props.warning} />);
+  }
+  if (props.deprecated) {
+    children.push(<GoogleStyleDocDeprecated message={props.deprecated} />);
+  }
+  if (props.note) {
     children.push(<GoogleStyleDocNote message={props.note} />);
   }
   return <PyDoc>{children}</PyDoc>;
@@ -491,18 +585,33 @@ function GoogleStyleMethodDoc(props: GoogleStyleMethodDocProps) {
       <List doubleHardline>{props.description.map((param) => param)}</List>,
     );
   }
-  if (props.parameters !== undefined && props.parameters.length > 0) {
+  if (props.parameters?.length) {
     children.push(<GoogleStyleDocParams parameters={props.parameters} />);
   }
-  if (props.returns !== undefined) {
+  if (props.returns) {
     children.push(<GoogleStyleDocReturn message={props.returns} />);
   }
-  if (props.raises !== undefined && props.raises.length > 0) {
+  if (props.raises?.length) {
     children.push(
       props.raises!.map((param) => <GoogleStyleDocRaises message={param} />),
     );
   }
-  if (props.note !== undefined) {
+  if (props.examples?.length) {
+    children.push(<GoogleStyleDocExamples items={props.examples} />);
+  }
+  if (props.seeAlso?.length) {
+    children.push(<GoogleStyleDocSeeAlso items={props.seeAlso} />);
+  }
+  if (props.warning) {
+    children.push(<GoogleStyleDocWarning message={props.warning} />);
+  }
+  if (props.deprecated) {
+    children.push(<GoogleStyleDocDeprecated message={props.deprecated} />);
+  }
+  if (props.overrides) {
+    children.push(<GoogleStyleDocOverrides parentClass={props.overrides} />);
+  }
+  if (props.note) {
     children.push(<GoogleStyleDocNote message={props.note} />);
   }
   return <PyDoc>{children}</PyDoc>;
@@ -694,6 +803,95 @@ function GoogleStyleDocTodo(props: GoogleStyleDocTodoProps) {
           ))}
         </List>
       </Indent>
+    </>
+  );
+}
+
+interface GoogleStyleDocExamplesProps {
+  items: Children[];
+}
+
+/**
+ * A component that creates a GoogleStyleDoc block for examples.
+ */
+function GoogleStyleDocExamples(props: GoogleStyleDocExamplesProps) {
+  return (
+    <>
+      {"Examples:"}
+      <Indent>
+        <List doubleHardline>{props.items.map((item) => item)}</List>
+      </Indent>
+    </>
+  );
+}
+
+interface GoogleStyleDocSeeAlsoProps {
+  items: string[];
+}
+
+/**
+ * A component that creates a GoogleStyleDoc block for see also references.
+ */
+function GoogleStyleDocSeeAlso(props: GoogleStyleDocSeeAlsoProps) {
+  return (
+    <>
+      {"See Also:"}
+      <Indent>
+        <List hardline>
+          {props.items.map((item) => (
+            <>{item}</>
+          ))}
+        </List>
+      </Indent>
+    </>
+  );
+}
+
+interface GoogleStyleDocWarningProps {
+  message: string;
+}
+
+/**
+ * A component that creates a GoogleStyleDoc block for warnings.
+ */
+function GoogleStyleDocWarning(props: GoogleStyleDocWarningProps) {
+  return (
+    <>
+      {"Warning:"}
+      <Indent>{props.message}</Indent>
+    </>
+  );
+}
+
+interface GoogleStyleDocDeprecatedProps {
+  message: string;
+}
+
+/**
+ * A component that creates a GoogleStyleDoc block for deprecation notices.
+ */
+function GoogleStyleDocDeprecated(props: GoogleStyleDocDeprecatedProps) {
+  return (
+    <>
+      {"Deprecated:"}
+      <Indent>{props.message}</Indent>
+    </>
+  );
+}
+
+interface GoogleStyleDocOverridesProps {
+  parentClass: string;
+}
+
+/**
+ * A component that creates a GoogleStyleDoc block for overridden methods.
+ * This indicates that the method overrides a parent class method.
+ */
+function GoogleStyleDocOverrides(props: GoogleStyleDocOverridesProps) {
+  return (
+    <>
+      {"Overrides:"}
+      <Indent>{props.parentClass}</Indent>
     </>
   );
 }

@@ -249,6 +249,10 @@ describe("New Documentation Components", () => {
             children: "Module level variables may be documented.",
           },
         ]}
+        examples={[<py.PyDocExample>print("mod")</py.PyDocExample>]}
+        seeAlso={["another_module.func", "RelatedClass"]}
+        warning="Internal API."
+        deprecated="Use new_module instead."
         todo={[
           "For module TODOs",
           "You have to also use sphinx.ext.todo extension",
@@ -264,6 +268,19 @@ describe("New Documentation Components", () => {
 
         Attributes:
             module_level_variable1 (int): Module level variables may be documented.
+
+        Examples:
+            >> print("mod")
+
+        See Also:
+            another_module.func
+            RelatedClass
+
+        Warning:
+            Internal API.
+
+        Deprecated:
+            Use new_module instead.
 
         Todo:
             * For module TODOs
@@ -284,6 +301,10 @@ describe("New Documentation Components", () => {
           </Prose>,
         ]}
         returns="str: The readonly property value."
+        examples={[<py.PyDocExample>print(obj.name)</py.PyDocExample>]}
+        seeAlso={["other_property"]}
+        warning="Access may be slow."
+        deprecated="Use full_name instead."
         note="If the setter method contains notable behavior, it should be mentioned here."
       />,
     ]);
@@ -295,6 +316,18 @@ describe("New Documentation Components", () => {
 
         Returns:
             str: The readonly property value.
+
+        Examples:
+            >> print(obj.name)
+
+        See Also:
+            other_property
+
+        Warning:
+            Access may be slow.
+
+        Deprecated:
+            Use full_name instead.
 
         Note:
             If the setter method contains notable behavior, it should be mentioned here.
@@ -321,6 +354,10 @@ describe("New Documentation Components", () => {
           },
         ]}
         yields="int: The next number in the range of 0 to n - 1."
+        examples={[<py.PyDocExample>print(next(gen))</py.PyDocExample>]}
+        seeAlso={["make_generator"]}
+        warning="Do not consume in tight loops without sleep."
+        deprecated="Use new_generator instead."
         note="Examples should be written in doctest format."
       />,
     ]);
@@ -335,6 +372,18 @@ describe("New Documentation Components", () => {
 
         Yields:
             int: The next number in the range of 0 to n - 1.
+
+        Examples:
+            >> print(next(gen))
+
+        See Also:
+            make_generator
+
+        Warning:
+            Do not consume in tight loops without sleep.
+
+        Deprecated:
+            Use new_generator instead.
 
         Note:
             Examples should be written in doctest format.
@@ -376,6 +425,8 @@ describe("New Documentation Components", () => {
             children: "Exception error code.",
           },
         ]}
+        seeAlso={["BaseException"]}
+        deprecated="Use NewException instead."
         note="Do not include the 'self' parameter in the Args section."
       />,
     ]);
@@ -394,6 +445,12 @@ describe("New Documentation Components", () => {
             msg (str): Human readable string describing the exception.
 
             code (int): Exception error code.
+
+        See Also:
+            BaseException
+
+        Deprecated:
+            Use NewException instead.
 
         Note:
             Do not include the 'self' parameter in the Args section.
@@ -421,6 +478,7 @@ describe("New Documentation Components", () => {
           },
         ]}
         returns="True if successful, False otherwise."
+        overrides="Base.method"
       />,
     ]);
 
@@ -436,6 +494,9 @@ describe("New Documentation Components", () => {
 
         Returns:
             True if successful, False otherwise.
+
+        Overrides:
+            Base.method
 
         Note:
             Do not include the 'self' parameter in the Args section.
@@ -892,6 +953,10 @@ describe("Full example", () => {
             children: "Description of attr2.",
           },
         ]}
+        examples={[<py.PyDocExample>print("class-doc")</py.PyDocExample>]}
+        seeAlso={["RelatedClass", "helper_function"]}
+        warning="This class is experimental."
+        deprecated="Use NewClass instead."
         parameters={[
           {
             name: "somebody",
@@ -958,6 +1023,19 @@ describe("Full example", () => {
                       codename (e.g., 'Agent X'). It's used primarily for display
                       purposes, logging, or greeting messages and is not required to be
                       unique or validated unless specified by the caller.
+
+              Examples:
+                  >> print("class-doc")
+
+              See Also:
+                  RelatedClass
+                  helper_function
+
+              Warning:
+                  This class is experimental.
+
+              Deprecated:
+                  Use NewClass instead.
 
               Note:
                   Do not include the 'self' parameter in the Args section.
