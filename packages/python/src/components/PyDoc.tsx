@@ -215,15 +215,8 @@ export function MethodDoc(props: MethodDocProps) {
   const style = props.style ?? "google";
   switch (style) {
     case "google": {
-      const defaultNote =
-        "Do not include the 'self' parameter in the Args section.";
-      const { style: _style, note, ...rest } = props;
-      return (
-        <GoogleStyleMethodDoc
-          {...(rest as GoogleStyleMethodDocProps)}
-          note={note ?? defaultNote}
-        />
-      );
+      const { style: _style, ...rest } = props;
+      return <GoogleStyleMethodDoc {...(rest as GoogleStyleMethodDocProps)} />;
     }
     default:
       return undefined;

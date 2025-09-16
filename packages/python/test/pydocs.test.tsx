@@ -461,7 +461,7 @@ describe("New Documentation Components", () => {
     );
   });
 
-  it("MethodDoc renders correctly with default note", () => {
+  it("MethodDoc renders correctly without default note", () => {
     const res = toSourceText([
       <py.MethodDoc
         description={[
@@ -497,9 +497,6 @@ describe("New Documentation Components", () => {
 
         Overrides:
             Base.method
-
-        Note:
-            Do not include the 'self' parameter in the Args section.
         """
 
 
@@ -816,9 +813,6 @@ describe("New Documentation Components", () => {
 
         Raises:
             IOError: If processing fails due to I/O issues.
-
-        Note:
-            Do not include the 'self' parameter in the Args section.
         """
 
 
