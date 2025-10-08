@@ -2,6 +2,7 @@ import { For, Indent, memo } from "@alloy-js/core";
 
 export interface AtomProps {
   jsValue?: unknown;
+  asFloat?: boolean;
 }
 
 /**
@@ -25,20 +26,13 @@ export function Atom(props: AtomProps): any {
     if (typeof jsValue === "undefined") {
       return "None";
     } else if (typeof jsValue === "number") {
+      if (props.asFloat && Number.isInteger(jsValue)) {
+        return `${jsValue}.0`;
+      }
       return String(jsValue);
     } else if (typeof jsValue === "boolean") {
       return jsValue ? "True" : "False";
     } else if (typeof jsValue === "string") {
-      const str = jsValue.trim();
-      // Detect float-like numeric strings (with decimal point or exponent)
-      // We need this to avoid rendering 123.0 as "123"
-      const floatLike = /^(?:[+-]?(?:\d+\.\d*|\.\d+)(?:[eE][+-]?\d+)?)$/.test(
-        str,
-      );
-      const exponentOnly = /^(?:[+-]?\d+(?:[eE][+-]?\d+))$/.test(str);
-      if (floatLike || exponentOnly) {
-        return str;
-      }
       return `"${jsValue.replace(/"/g, '\\"')}"`;
     } else if (typeof jsValue === "function") {
       // functions are inserted as-is.
