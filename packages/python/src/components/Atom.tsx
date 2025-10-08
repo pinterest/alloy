@@ -27,7 +27,7 @@ export function Atom(props: AtomProps): any {
       return "None";
     } else if (typeof jsValue === "number") {
       if (props.asFloat && Number.isInteger(jsValue)) {
-        return `${jsValue}.0`;
+        return jsValue.toFixed(1);
       }
       return String(jsValue);
     } else if (typeof jsValue === "boolean") {
