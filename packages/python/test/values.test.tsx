@@ -15,6 +15,26 @@ describe("Atom", () => {
     expect(toSourceText([<py.Atom jsValue={123} />])).toRenderTo("123");
   });
 
+  it("renders floating point number", () => {
+    expect(toSourceText([<py.Atom jsValue={123.456} />])).toRenderTo("123.456");
+  });
+
+  it("renders floating point number with decimal point zero", () => {
+    expect(toSourceText([<py.Atom jsValue={"123.0"} />])).toRenderTo("123.0");
+  });
+
+  it("renders scientific notation number (lowercase e)", () => {
+    expect(toSourceText([<py.Atom jsValue={"1e3"} />])).toRenderTo("1e3");
+  });
+
+  it("renders scientific notation number with uppercase E and negative exponent", () => {
+    expect(toSourceText([<py.Atom jsValue={"-2E5"} />])).toRenderTo("-2E5");
+  });
+
+  it("renders scientific notation number with unary plus and negative exponent", () => {
+    expect(toSourceText([<py.Atom jsValue={"+7e-2"} />])).toRenderTo("+7e-2");
+  });
+
   it("renders boolean - True", () => {
     expect(toSourceText([<py.Atom jsValue={true} />])).toRenderTo("True");
   });

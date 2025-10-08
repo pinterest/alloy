@@ -29,6 +29,16 @@ export function Atom(props: AtomProps): any {
     } else if (typeof jsValue === "boolean") {
       return jsValue ? "True" : "False";
     } else if (typeof jsValue === "string") {
+      const str = jsValue.trim();
+      // Detect float-like numeric strings (with decimal point or exponent)
+      // We need this to avoid rendering 123.0 as "123"
+      const floatLike = /^(?:[+-]?(?:\d+\.\d*|\.\d+)(?:[eE][+-]?\d+)?)$/.test(
+        str,
+      );
+      const exponentOnly = /^(?:[+-]?\d+(?:[eE][+-]?\d+))$/.test(str);
+      if (floatLike || exponentOnly) {
+        return str;
+      }
       return `"${jsValue.replace(/"/g, '\\"')}"`;
     } else if (typeof jsValue === "function") {
       // functions are inserted as-is.
