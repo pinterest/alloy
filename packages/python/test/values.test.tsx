@@ -20,7 +20,9 @@ describe("Atom", () => {
   });
 
   it("renders floating point number when hinted", () => {
-    expect(toSourceText([<py.Atom jsValue={123.456} asFloat />])).toRenderTo("123.456");
+    expect(toSourceText([<py.Atom jsValue={123.456} asFloat />])).toRenderTo(
+      "123.456",
+    );
   });
 
   it("renders floating point number with decimal point zero when hinted", () => {
