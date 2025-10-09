@@ -1,10 +1,9 @@
-import { Children, List, Show, code, childrenArray } from "@alloy-js/core";
+import { List, Show, childrenArray } from "@alloy-js/core";
 import { dataclassesModule } from "../builtins/python.js";
 import { Atom } from "./Atom.jsx";
-import { ClassDeclaration } from "./ClassDeclaration.js";
 import type { ClassDeclarationProps } from "./ClassDeclaration.js";
+import { ClassDeclaration } from "./ClassDeclaration.js";
 import { StatementList } from "./StatementList.js";
-import { VariableDeclaration } from "./VariableDeclaration.js";
 
 export interface DataclassDeclarationProps extends ClassDeclarationProps {
   /** Keyword arguments to pass to `@dataclass(...)`, e.g., `{ frozen: true, slots: true, kw_only: true }`. */
@@ -29,7 +28,8 @@ export interface DataclassDeclarationProps extends ClassDeclarationProps {
  * ```
  */
 export function DataclassDeclaration(props: DataclassDeclarationProps) {
-  const hasDecoratorArgs = Boolean(props.decoratorKwargs) &&
+  const hasDecoratorArgs =
+    Boolean(props.decoratorKwargs) &&
     Object.keys(props.decoratorKwargs as Record<string, unknown>).length > 0;
   const hasBodyChildren =
     childrenArray(() => props.children).filter((c) => Boolean(c)).length > 0;
@@ -51,7 +51,9 @@ export function DataclassDeclaration(props: DataclassDeclarationProps) {
       </Show>
       <hbr />
       <ClassDeclaration name={props.name} bases={props.bases} doc={props.doc}>
-        {hasBodyChildren ? <StatementList>{props.children}</StatementList> : undefined}
+        {hasBodyChildren ?
+          <StatementList>{props.children}</StatementList>
+        : undefined}
       </ClassDeclaration>
     </>
   );
@@ -67,5 +69,3 @@ export function DataclassKWOnly() {
     </>
   );
 }
-
-
