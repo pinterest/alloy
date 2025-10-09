@@ -2,6 +2,7 @@ import {
   For,
   Show,
   childrenArray,
+  computed,
   findKeyedChild,
   taggedComponent,
 } from "@alloy-js/core";
@@ -89,12 +90,13 @@ export function DataclassDeclaration(props: DataclassDeclarationProps) {
       );
     }
   }
+  const childrenComputed = computed(() => childrenArray(() => props.children));
   const hasBodyChildren =
-    childrenArray(() => props.children).filter((c) => Boolean(c)).length > 0;
+    childrenComputed.value.filter((c) => Boolean(c)).length > 0;
 
   // Validate at most one KW_ONLY sentinel in children
   if (hasBodyChildren) {
-    const children = childrenArray(() => props.children);
+    const children = childrenComputed.value;
     let kwOnlyCount = 0;
     for (const child of children) {
       if (findKeyedChild([child], DataclassKWOnly.tag)) {

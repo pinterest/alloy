@@ -1,4 +1,12 @@
-import { For, Indent, List, Prose, Show, childrenArray } from "@alloy-js/core";
+import {
+  For,
+  Indent,
+  List,
+  Prose,
+  Show,
+  childrenArray,
+  computed,
+} from "@alloy-js/core";
 import { Children } from "@alloy-js/core/jsx-runtime";
 import { ParameterDescriptor } from "../parameter-descriptor.js";
 import { Atom } from "./Atom.jsx";
@@ -237,12 +245,12 @@ export interface PyDocProps {
  * linebreaks. This is useful for creating PyDoc comments with multiple paragraphs.
  */
 export function PyDoc(props: PyDocProps) {
-  const children = childrenArray(() => props.children);
+  const children = computed(() => childrenArray(() => props.children));
   return (
     <>
       {'"""'}
       <hbr />
-      <List doubleHardline>{children}</List>
+      <List doubleHardline>{children.value}</List>
       <hbr />
       {'"""'}
       <hbr />
@@ -258,18 +266,18 @@ export interface PyDocExampleProps {
  * Create a PyDoc example, which is prepended by \>\>.
  */
 export function PyDocExample(props: PyDocExampleProps) {
-  const children = childrenArray(() => props.children);
+  const children = computed(() => childrenArray(() => props.children));
   let lines: string[] = [];
 
-  if (children.length === 1 && typeof children[0] === "string") {
+  if (children.value.length === 1 && typeof children.value[0] === "string") {
     // Split, trim each line, and filter out empty lines
-    lines = children[0]
+    lines = children.value[0]
       .split(/\r?\n/)
       .map((line) => line.trim())
       .filter((line) => line.length > 0);
   } else {
     // For non-string children, filter out empty/whitespace-only strings
-    lines = children
+    lines = children.value
       .map((child) => (typeof child === "string" ? child : ""))
       .map((line) => line.trim())
       .filter((line) => line.length > 0);
