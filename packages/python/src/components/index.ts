@@ -6,6 +6,7 @@ export * from "./ClassMethodDeclaration.js";
 export * from "./ConstructorDeclaration.js";
 export * from "./Declaration.js";
 export * from "./DunderMethodDeclaration.js";
+export * from "./DataclassDeclaration.js";
 export * from "./EnumDeclaration.js";
 export * from "./EnumMember.js";
 export type { CommonFunctionProps } from "./FunctionBase.js";
