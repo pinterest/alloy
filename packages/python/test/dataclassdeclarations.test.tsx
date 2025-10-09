@@ -109,6 +109,77 @@ describe("DataclassDeclaration", () => {
     );
   });
 
+  it("Creates a dataclass with all keyword arguments", () => {
+    const res = toSourceText(
+      [
+        <py.SourceFile path="user.py">
+          <py.DataclassDeclaration
+            name="User"
+            decoratorKwargs={{
+              init: true,
+              repr: false,
+              eq: true,
+              order: false,
+              unsafe_hash: true,
+              frozen: true,
+              match_args: false,
+              kw_only: true,
+              slots: true,
+              weakref_slot: false,
+            }}
+          />
+        </py.SourceFile>,
+      ],
+      { externals: [dataclassesModule] },
+    );
+
+    expect(res).toRenderTo(
+      d`
+        from dataclasses import dataclass
+
+        @dataclass(init=True, repr=False, eq=True, order=False, unsafe_hash=True, frozen=True, match_args=False, kw_only=True, slots=True, weakref_slot=False)
+        class User:
+            pass
+
+
+      `,
+    );
+  });
+
+  it("Throws on invalid decorator parameter at runtime", () => {
+    expect(() =>
+      toSourceText(
+        [
+          <py.SourceFile path="user.py">
+            <py.DataclassDeclaration
+              name="User"
+              decoratorKwargs={{ foo: true } as unknown as any}
+            />
+          </py.SourceFile>,
+        ],
+        { externals: [dataclassesModule] },
+      ),
+    ).toThrowError(/Unsupported dataclass parameter: foo/);
+  });
+
+  it("Throws when weakref_slot=True without slots=True", () => {
+    expect(() =>
+      toSourceText(
+        [
+          <py.SourceFile path="user.py">
+            <py.DataclassDeclaration
+              name="User"
+              decoratorKwargs={{ weakref_slot: true }}
+            />
+          </py.SourceFile>,
+        ],
+        { externals: [dataclassesModule] },
+      ),
+    ).toThrowError(
+      /weakref_slot=True requires slots=True in @dataclass decorator/,
+    );
+  });
+
   it("Creates a dataclass with kw_only=True on decorator (sentinel not used)", () => {
     const res = toSourceText(
       [
@@ -162,5 +233,21 @@ describe("DataclassDeclaration", () => {
 
       `,
     );
+  });
+
+  it("Throws when more than one KW_ONLY sentinel is present", () => {
+    expect(() =>
+      toSourceText(
+        [
+          <py.SourceFile path="user.py">
+            <py.DataclassDeclaration name="User">
+              <py.DataclassKWOnly />
+              <py.DataclassKWOnly />
+            </py.DataclassDeclaration>
+          </py.SourceFile>,
+        ],
+        { externals: [dataclassesModule] },
+      ),
+    ).toThrowError(/Only one KW_ONLY sentinel is allowed per dataclass body/);
   });
 });
