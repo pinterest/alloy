@@ -146,23 +146,7 @@ describe("DataclassDeclaration", () => {
     );
   });
 
-  it("Throws on invalid decorator parameter at runtime", () => {
-    expect(() =>
-      toSourceText(
-        [
-          <py.SourceFile path="user.py">
-            <py.DataclassDeclaration
-              name="User"
-              decoratorKwargs={{ foo: true } as unknown as any}
-            />
-          </py.SourceFile>,
-        ],
-        { externals: [dataclassesModule] },
-      ),
-    ).toThrowError(/Unsupported dataclass parameter: foo/);
-  });
-
-  it("Throws when weakref_slot=True without slots=True", () => {
+  it("Throws error when weakref_slot=True without slots=True", () => {
     expect(() =>
       toSourceText(
         [
@@ -177,6 +161,232 @@ describe("DataclassDeclaration", () => {
       ),
     ).toThrowError(
       /weakref_slot=True requires slots=True in @dataclass decorator/,
+    );
+  });
+
+  it("Allows weakref_slot=True when slots=True", () => {
+    const res = toSourceText(
+      [
+        <py.SourceFile path="user.py">
+          <py.DataclassDeclaration
+            name="User"
+            decoratorKwargs={{ slots: true, weakref_slot: true }}
+          />
+        </py.SourceFile>,
+      ],
+      { externals: [dataclassesModule] },
+    );
+    expect(res).toRenderTo(
+      d`
+        from dataclasses import dataclass
+
+        @dataclass(slots=True, weakref_slot=True)
+        class User:
+            pass
+
+
+      `,
+    );
+  });
+
+  it("Throws error when order=True and eq=False", () => {
+    expect(() =>
+      toSourceText(
+        [
+          <py.SourceFile path="user.py">
+            <py.DataclassDeclaration
+              name="User"
+              decoratorKwargs={{ order: true, eq: false }}
+            />
+          </py.SourceFile>,
+        ],
+        { externals: [dataclassesModule] },
+      ),
+    ).toThrowError(/order=True requires eq=True/);
+  });
+
+  it("Creates a dataclass with order=True and no conflicting methods", () => {
+    const res = toSourceText(
+      [
+        <py.SourceFile path="user.py">
+          <py.DataclassDeclaration
+            name="User"
+            decoratorKwargs={{ order: true }}
+          />
+        </py.SourceFile>,
+      ],
+      { externals: [dataclassesModule] },
+    );
+    expect(res).toRenderTo(
+      d`
+        from dataclasses import dataclass
+
+        @dataclass(order=True)
+        class User:
+            pass
+
+
+      `,
+    );
+  });
+
+  it("Throws error when order=True and class defines __lt__", () => {
+    expect(() =>
+      toSourceText(
+        [
+          <py.SourceFile path="user.py">
+            <py.DataclassDeclaration
+              name="User"
+              decoratorKwargs={{ order: true }}
+            >
+              <py.DunderMethodDeclaration name="__lt__" />
+            </py.DataclassDeclaration>
+          </py.SourceFile>,
+        ],
+        { externals: [dataclassesModule] },
+      ),
+    ).toThrowError(
+      /Cannot specify order=True when the class already defines __lt__\(\)/,
+    );
+  });
+
+  it("Throws error when order=True and class defines __le__", () => {
+    expect(() =>
+      toSourceText(
+        [
+          <py.SourceFile path="user.py">
+            <py.DataclassDeclaration
+              name="User"
+              decoratorKwargs={{ order: true }}
+            >
+              <py.DunderMethodDeclaration name="__le__" />
+            </py.DataclassDeclaration>
+          </py.SourceFile>,
+        ],
+        { externals: [dataclassesModule] },
+      ),
+    ).toThrowError(
+      /Cannot specify order=True when the class already defines __le__\(\)/,
+    );
+  });
+
+  it("Throws error when order=True and class defines __gt__", () => {
+    expect(() =>
+      toSourceText(
+        [
+          <py.SourceFile path="user.py">
+            <py.DataclassDeclaration
+              name="User"
+              decoratorKwargs={{ order: true }}
+            >
+              <py.DunderMethodDeclaration name="__gt__" />
+            </py.DataclassDeclaration>
+          </py.SourceFile>,
+        ],
+        { externals: [dataclassesModule] },
+      ),
+    ).toThrowError(
+      /Cannot specify order=True when the class already defines __gt__\(\)/,
+    );
+  });
+
+  it("Throws error when order=True and class defines __ge__", () => {
+    expect(() =>
+      toSourceText(
+        [
+          <py.SourceFile path="user.py">
+            <py.DataclassDeclaration
+              name="User"
+              decoratorKwargs={{ order: true }}
+            >
+              <py.DunderMethodDeclaration name="__ge__" />
+            </py.DataclassDeclaration>
+          </py.SourceFile>,
+        ],
+        { externals: [dataclassesModule] },
+      ),
+    ).toThrowError(
+      /Cannot specify order=True when the class already defines __ge__\(\)/,
+    );
+  });
+
+  it("Throws error when unsafe_hash=True and class defines __hash__", () => {
+    expect(() =>
+      toSourceText(
+        [
+          <py.SourceFile path="user.py">
+            <py.DataclassDeclaration
+              name="User"
+              decoratorKwargs={{ unsafe_hash: true }}
+            >
+              <py.DunderMethodDeclaration name="__hash__" />
+            </py.DataclassDeclaration>
+          </py.SourceFile>,
+        ],
+        { externals: [dataclassesModule] },
+      ),
+    ).toThrowError(
+      /Cannot specify unsafe_hash=True when the class already defines __hash__\(\)/,
+    );
+  });
+
+  it("Throws error when frozen=True and class defines __setattr__", () => {
+    expect(() =>
+      toSourceText(
+        [
+          <py.SourceFile path="user.py">
+            <py.DataclassDeclaration
+              name="User"
+              decoratorKwargs={{ frozen: true }}
+            >
+              <py.DunderMethodDeclaration name="__setattr__" />
+            </py.DataclassDeclaration>
+          </py.SourceFile>,
+        ],
+        { externals: [dataclassesModule] },
+      ),
+    ).toThrowError(
+      /Cannot specify frozen=True when the class already defines __setattr__\(\)/,
+    );
+  });
+
+  it("Throws errorwhen frozen=True and class defines __delattr__", () => {
+    expect(() =>
+      toSourceText(
+        [
+          <py.SourceFile path="user.py">
+            <py.DataclassDeclaration
+              name="User"
+              decoratorKwargs={{ frozen: true }}
+            >
+              <py.DunderMethodDeclaration name="__delattr__" />
+            </py.DataclassDeclaration>
+          </py.SourceFile>,
+        ],
+        { externals: [dataclassesModule] },
+      ),
+    ).toThrowError(
+      /Cannot specify frozen=True when the class already defines __delattr__\(\)/,
+    );
+  });
+
+  it("Throws error when slots=True and class defines __slots__", () => {
+    expect(() =>
+      toSourceText(
+        [
+          <py.SourceFile path="user.py">
+            <py.DataclassDeclaration
+              name="User"
+              decoratorKwargs={{ slots: true }}
+            >
+              <py.DunderMethodDeclaration name="__slots__" />
+            </py.DataclassDeclaration>
+          </py.SourceFile>,
+        ],
+        { externals: [dataclassesModule] },
+      ),
+    ).toThrowError(
+      /Cannot specify slots=True when the class already defines __slots__\(\)/,
     );
   });
 
@@ -235,7 +445,7 @@ describe("DataclassDeclaration", () => {
     );
   });
 
-  it("Throws when more than one KW_ONLY sentinel is present", () => {
+  it("Throws error when more than one KW_ONLY sentinel is present", () => {
     expect(() =>
       toSourceText(
         [

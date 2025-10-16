@@ -4,6 +4,8 @@ import {
   childrenArray,
   computed,
   findKeyedChild,
+  isComponentCreator,
+  isNamekey,
   taggedComponent,
 } from "@alloy-js/core";
 import { dataclassesModule } from "../builtins/python.js";
@@ -13,25 +15,118 @@ import { ClassDeclaration } from "./ClassDeclaration.js";
 import { StatementList } from "./StatementList.js";
 
 /**
+ * Locate the first user-defined dunder method among the component children that
+ * would conflict with dataclass-generated behavior for a given decorator flag.
+ */
+import { ClassMethodDeclaration } from "./ClassMethodDeclaration.js";
+import { DunderMethodDeclaration } from "./DunderMethodDeclaration.js";
+import { FunctionDeclaration } from "./FunctionDeclaration.js";
+import { MethodDeclaration } from "./MethodDeclaration.js";
+import { StaticMethodDeclaration } from "./StaticMethodDeclaration.js";
+
+function findConflictingDunderMethod(
+  children: any[],
+  methodNames: string[],
+): string | undefined {
+  for (const child of children) {
+    if (isComponentCreator(child)) {
+      const comp = (child as any).component;
+      if (
+        comp === MethodDeclaration ||
+        comp === FunctionDeclaration ||
+        comp === ClassMethodDeclaration ||
+        comp === StaticMethodDeclaration ||
+        comp === DunderMethodDeclaration
+      ) {
+        const rawName = (child as any).props?.name as unknown;
+        const candidateName =
+          isNamekey(rawName) ? rawName.name : (rawName as any);
+        if (
+          typeof candidateName === "string" &&
+          methodNames.includes(candidateName)
+        ) {
+          return candidateName;
+        }
+      }
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Validate the keyword arguments for the Python `@dataclass(...)` decorator.
+ */
+function validateDataclassDecoratorKwargs(
+  children: any[],
+  kwargs: DataclassDecoratorKwargs,
+) {
+  if (kwargs.weakref_slot === true && kwargs.slots !== true) {
+    throw new Error(
+      "weakref_slot=True requires slots=True in @dataclass decorator",
+    );
+  }
+
+  if (kwargs.order === true && kwargs.eq === false) {
+    throw new Error("order=True requires eq=True in @dataclass decorator");
+  }
+
+  if (kwargs.order === true) {
+    const orderingMethods = ["__lt__", "__le__", "__gt__", "__ge__"];
+    const conflict = findConflictingDunderMethod(children, orderingMethods);
+    if (conflict) {
+      throw new TypeError(
+        `Cannot specify order=True when the class already defines ${conflict}()`,
+      );
+    }
+  }
+
+  if (kwargs.unsafe_hash === true) {
+    const conflict = findConflictingDunderMethod(children, ["__hash__"]);
+    if (conflict) {
+      throw new TypeError(
+        `Cannot specify unsafe_hash=True when the class already defines ${conflict}()`,
+      );
+    }
+  }
+
+  if (kwargs.frozen === true) {
+    const conflict = findConflictingDunderMethod(children, [
+      "__setattr__",
+      "__delattr__",
+    ]);
+    if (conflict) {
+      throw new TypeError(
+        `Cannot specify frozen=True when the class already defines ${conflict}()`,
+      );
+    }
+  }
+
+  if (kwargs.slots === true) {
+    const conflict = findConflictingDunderMethod(children, ["__slots__"]);
+    if (conflict) {
+      throw new TypeError(
+        `Cannot specify slots=True when the class already defines ${conflict}()`,
+      );
+    }
+  }
+}
+
+/**
  * Allowed keyword arguments for the Python `@dataclass(...)` decorator.
  * Showcases arguments valid for Python 3.11+.
  */
-export const DATACLASS_KWARG_KEYS = [
-  "init",
-  "repr",
-  "eq",
-  "order",
-  "unsafe_hash",
-  "frozen",
-  "match_args",
-  "kw_only",
-  "slots",
-  "weakref_slot",
-] as const;
-
-export type DataclassDecoratorKwargs = Partial<
-  Record<(typeof DATACLASS_KWARG_KEYS)[number], boolean>
->;
+export interface DataclassDecoratorKwargs {
+  init?: boolean;
+  repr?: boolean;
+  eq?: boolean;
+  order?: boolean;
+  unsafe_hash?: boolean;
+  frozen?: boolean;
+  match_args?: boolean;
+  kw_only?: boolean;
+  slots?: boolean;
+  weakref_slot?: boolean;
+}
 
 export interface DataclassDeclarationProps extends ClassDeclarationProps {
   /** Keyword arguments to pass to `@dataclass(...)` (only valid dataclass params). */
@@ -67,36 +162,20 @@ export interface DataclassDeclarationProps extends ClassDeclarationProps {
  * ```
  */
 export function DataclassDeclaration(props: DataclassDeclarationProps) {
-  const kwargs = props.decoratorKwargs;
+  const kwargs = props.decoratorKwargs as DataclassDecoratorKwargs | undefined;
   const hasDecoratorArgs =
     kwargs !== undefined && Object.keys(kwargs).length > 0;
-
-  // Ensure only supported dataclass parameters are provided
-  if (props.decoratorKwargs) {
-    const allowed = new Set<string>(DATACLASS_KWARG_KEYS as readonly string[]);
-    for (const key of Object.keys(props.decoratorKwargs)) {
-      if (!allowed.has(key)) {
-        throw new Error(`Unsupported dataclass parameter: ${key}`);
-      }
-    }
-
-    // Validates that, if weakref_slot=True, it requires slots=True
-    if (
-      props.decoratorKwargs.weakref_slot === true &&
-      props.decoratorKwargs.slots !== true
-    ) {
-      throw new Error(
-        "weakref_slot=True requires slots=True in @dataclass decorator",
-      );
-    }
-  }
   const childrenComputed = computed(() => childrenArray(() => props.children));
   const hasBodyChildren =
     childrenComputed.value.filter((c) => Boolean(c)).length > 0;
+  const children = childrenComputed.value;
+
+  if (props.decoratorKwargs) {
+    validateDataclassDecoratorKwargs(children, props.decoratorKwargs);
+  }
 
   // Validate at most one KW_ONLY sentinel in children
   if (hasBodyChildren) {
-    const children = childrenComputed.value;
     let kwOnlyCount = 0;
     for (const child of children) {
       if (findKeyedChild([child], DataclassKWOnly.tag)) {
@@ -116,7 +195,11 @@ export function DataclassDeclaration(props: DataclassDeclarationProps) {
       {dataclassesModule["."].dataclass}
       <Show when={hasDecoratorArgs}>
         {"("}
-        <For each={Object.entries(kwargs ?? {})} comma space>
+        <For
+          each={Object.keys(kwargs ?? {}).map((k) => [k, (kwargs as any)[k]])}
+          comma
+          space
+        >
           {([k, v]) => (
             <>
               {k}=<Atom jsValue={v} />
