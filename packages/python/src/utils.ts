@@ -1,5 +1,15 @@
-import { defaultProps, splitProps } from "@alloy-js/core";
+import {
+  defaultProps,
+  isComponentCreator,
+  isNamekey,
+  splitProps,
+} from "@alloy-js/core";
+import { ClassMethodDeclaration } from "./components/ClassMethodDeclaration.js";
+import { DunderMethodDeclaration } from "./components/DunderMethodDeclaration.js";
+import { FunctionDeclaration } from "./components/FunctionDeclaration.js";
 import { CallSignatureProps } from "./components/index.js";
+import { MethodDeclaration } from "./components/MethodDeclaration.js";
+import { StaticMethodDeclaration } from "./components/StaticMethodDeclaration.js";
 
 /**
  * Extract only the call signature props from a props object which extends
@@ -22,4 +32,35 @@ export function getCallSignatureProps(
   }
 
   return defaultProps(callSignatureProps, defaults);
+}
+
+/**
+ * Find the first function-like child declaration whose name matches one of the
+ * provided method names. Returns the method name when found.
+ */
+export function findMethodDeclaration(
+  children: any[],
+  methodNames: string[],
+): string | undefined {
+  const creators = [
+    MethodDeclaration,
+    FunctionDeclaration,
+    ClassMethodDeclaration,
+    StaticMethodDeclaration,
+    DunderMethodDeclaration,
+  ];
+  for (const child of children) {
+    if (creators.some((creator) => isComponentCreator(child, creator))) {
+      const rawName = (child as any).props?.name as unknown;
+      const candidateName =
+        isNamekey(rawName) ? rawName.name : (rawName as any);
+      if (
+        typeof candidateName === "string" &&
+        methodNames.includes(candidateName)
+      ) {
+        return candidateName;
+      }
+    }
+  }
+  return undefined;
 }

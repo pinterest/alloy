@@ -61,8 +61,7 @@ export function ClassDeclaration(props: ClassDeclarationProps) {
   );
 
   const childrenComputed = computed(() => childrenArray(() => props.children));
-  const hasChildren =
-    childrenComputed.value.filter((c) => Boolean(c)).length > 0;
+  const hasChildren = childrenComputed.value.some(Boolean);
 
   return (
     <Declaration symbol={sym}>

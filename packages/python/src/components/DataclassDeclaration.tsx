@@ -3,55 +3,15 @@ import {
   Show,
   childrenArray,
   computed,
-  findKeyedChild,
-  isComponentCreator,
-  isNamekey,
+  findKeyedChildren,
   taggedComponent,
 } from "@alloy-js/core";
 import { dataclassesModule } from "../builtins/python.js";
+import { findMethodDeclaration } from "../utils.js";
 import { Atom } from "./Atom.jsx";
 import type { ClassDeclarationProps } from "./ClassDeclaration.js";
 import { ClassDeclaration } from "./ClassDeclaration.js";
 import { StatementList } from "./StatementList.js";
-
-/**
- * Locate the first user-defined dunder method among the component children that
- * would conflict with dataclass-generated behavior for a given decorator flag.
- */
-import { ClassMethodDeclaration } from "./ClassMethodDeclaration.js";
-import { DunderMethodDeclaration } from "./DunderMethodDeclaration.js";
-import { FunctionDeclaration } from "./FunctionDeclaration.js";
-import { MethodDeclaration } from "./MethodDeclaration.js";
-import { StaticMethodDeclaration } from "./StaticMethodDeclaration.js";
-
-function findConflictingDunderMethod(
-  children: any[],
-  methodNames: string[],
-): string | undefined {
-  for (const child of children) {
-    if (isComponentCreator(child)) {
-      const comp = (child as any).component;
-      if (
-        comp === MethodDeclaration ||
-        comp === FunctionDeclaration ||
-        comp === ClassMethodDeclaration ||
-        comp === StaticMethodDeclaration ||
-        comp === DunderMethodDeclaration
-      ) {
-        const rawName = (child as any).props?.name as unknown;
-        const candidateName =
-          isNamekey(rawName) ? rawName.name : (rawName as any);
-        if (
-          typeof candidateName === "string" &&
-          methodNames.includes(candidateName)
-        ) {
-          return candidateName;
-        }
-      }
-    }
-  }
-  return undefined;
-}
 
 /**
  * Validate the keyword arguments for the Python `@dataclass(...)` decorator.
@@ -72,7 +32,7 @@ function validateDataclassDecoratorKwargs(
 
   if (kwargs.order === true) {
     const orderingMethods = ["__lt__", "__le__", "__gt__", "__ge__"];
-    const conflict = findConflictingDunderMethod(children, orderingMethods);
+    const conflict = findMethodDeclaration(children, orderingMethods);
     if (conflict) {
       throw new TypeError(
         `Cannot specify order=True when the class already defines ${conflict}()`,
@@ -81,7 +41,7 @@ function validateDataclassDecoratorKwargs(
   }
 
   if (kwargs.unsafe_hash === true) {
-    const conflict = findConflictingDunderMethod(children, ["__hash__"]);
+    const conflict = findMethodDeclaration(children, ["__hash__"]);
     if (conflict) {
       throw new TypeError(
         `Cannot specify unsafe_hash=True when the class already defines ${conflict}()`,
@@ -90,7 +50,7 @@ function validateDataclassDecoratorKwargs(
   }
 
   if (kwargs.frozen === true) {
-    const conflict = findConflictingDunderMethod(children, [
+    const conflict = findMethodDeclaration(children, [
       "__setattr__",
       "__delattr__",
     ]);
@@ -102,7 +62,7 @@ function validateDataclassDecoratorKwargs(
   }
 
   if (kwargs.slots === true) {
-    const conflict = findConflictingDunderMethod(children, ["__slots__"]);
+    const conflict = findMethodDeclaration(children, ["__slots__"]);
     if (conflict) {
       throw new TypeError(
         `Cannot specify slots=True when the class already defines ${conflict}()`,
@@ -166,8 +126,7 @@ export function DataclassDeclaration(props: DataclassDeclarationProps) {
   const hasDecoratorArgs =
     kwargs !== undefined && Object.keys(kwargs).length > 0;
   const childrenComputed = computed(() => childrenArray(() => props.children));
-  const hasBodyChildren =
-    childrenComputed.value.filter((c) => Boolean(c)).length > 0;
+  const hasBodyChildren = childrenComputed.value.some(Boolean);
   const children = childrenComputed.value;
 
   if (props.decoratorKwargs) {
@@ -176,13 +135,7 @@ export function DataclassDeclaration(props: DataclassDeclarationProps) {
 
   // Validate at most one KW_ONLY sentinel in children
   if (hasBodyChildren) {
-    let kwOnlyCount = 0;
-    for (const child of children) {
-      if (findKeyedChild([child], DataclassKWOnly.tag)) {
-        kwOnlyCount++;
-      }
-    }
-    if (kwOnlyCount > 1) {
+    if (findKeyedChildren(children, DataclassKWOnly.tag).length > 1) {
       throw new Error(
         "Only one KW_ONLY sentinel is allowed per dataclass body",
       );
