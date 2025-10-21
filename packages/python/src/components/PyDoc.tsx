@@ -268,11 +268,13 @@ export function PyDocExample(props: PyDocExampleProps) {
   const getLines = () => {
     const childrenList = childrenArray(() => props.children);
     if (childrenList.length === 1 && typeof childrenList[0] === "string") {
+      // Split, trim each line, and filter out empty lines
       return childrenList[0]
         .split(/\r?\n/)
         .map((s) => s.trim())
         .filter((s) => s.length > 0);
     }
+    // For non-string children, filter out empty/whitespace-only strings
     return childrenList
       .map((c) => (typeof c === "string" ? c : ""))
       .map((s) => s.trim())
