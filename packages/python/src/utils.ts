@@ -1,13 +1,17 @@
 import {
+  Children,
+  ComponentCreator,
   defaultProps,
   isComponentCreator,
-  isNamekey,
   splitProps,
 } from "@alloy-js/core";
 import { ClassMethodDeclaration } from "./components/ClassMethodDeclaration.js";
 import { DunderMethodDeclaration } from "./components/DunderMethodDeclaration.js";
 import { FunctionDeclaration } from "./components/FunctionDeclaration.js";
-import { CallSignatureProps } from "./components/index.js";
+import {
+  BaseDeclarationProps,
+  CallSignatureProps,
+} from "./components/index.js";
 import { MethodDeclaration } from "./components/MethodDeclaration.js";
 import { StaticMethodDeclaration } from "./components/StaticMethodDeclaration.js";
 
@@ -39,7 +43,7 @@ export function getCallSignatureProps(
  * provided method names. Returns the method name when found.
  */
 export function findMethodDeclaration(
-  children: any[],
+  children: Children[],
   methodNames: string[],
 ): string | undefined {
   const creators = [
@@ -51,9 +55,10 @@ export function findMethodDeclaration(
   ];
   for (const child of children) {
     if (creators.some((creator) => isComponentCreator(child, creator))) {
-      const rawName = (child as any).props?.name as unknown;
+      const rawName = (child as ComponentCreator<BaseDeclarationProps>).props
+        ?.name;
       const candidateName =
-        isNamekey(rawName) ? rawName.name : (rawName as any);
+        typeof rawName === "string" ? rawName : rawName?.name;
       if (
         typeof candidateName === "string" &&
         methodNames.includes(candidateName)
