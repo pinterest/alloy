@@ -4,8 +4,8 @@ import {
   List,
   Prose,
   Show,
+  children,
   childrenArray,
-  computed,
 } from "@alloy-js/core";
 import { Children } from "@alloy-js/core/jsx-runtime";
 import { ParameterDescriptor } from "../parameter-descriptor.js";
@@ -245,12 +245,11 @@ export interface PyDocProps {
  * linebreaks. This is useful for creating PyDoc comments with multiple paragraphs.
  */
 export function PyDoc(props: PyDocProps) {
-  const children = computed(() => childrenArray(() => props.children));
   return (
     <>
       {'"""'}
       <hbr />
-      <List doubleHardline>{children.value}</List>
+      <List doubleHardline>{children(() => props.children)}</List>
       <hbr />
       {'"""'}
       <hbr />
@@ -266,26 +265,23 @@ export interface PyDocExampleProps {
  * Create a PyDoc example, which is prepended by \>\>.
  */
 export function PyDocExample(props: PyDocExampleProps) {
-  const children = computed(() => childrenArray(() => props.children));
-  let lines: string[] = [];
-
-  if (children.value.length === 1 && typeof children.value[0] === "string") {
-    // Split, trim each line, and filter out empty lines
-    lines = children.value[0]
-      .split(/\r?\n/)
-      .map((line) => line.trim())
-      .filter((line) => line.length > 0);
-  } else {
-    // For non-string children, filter out empty/whitespace-only strings
-    lines = children.value
-      .map((child) => (typeof child === "string" ? child : ""))
-      .map((line) => line.trim())
-      .filter((line) => line.length > 0);
-  }
+  const getLines = () => {
+    const childrenList = childrenArray(() => props.children);
+    if (childrenList.length === 1 && typeof childrenList[0] === "string") {
+      return childrenList[0]
+        .split(/\r?\n/)
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+    }
+    return childrenList
+      .map((c) => (typeof c === "string" ? c : ""))
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
+  };
 
   return (
     <>
-      <For each={lines}>
+      <For each={getLines}>
         {(line) => (
           <>
             {">> "}
