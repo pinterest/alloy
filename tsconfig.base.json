@@ -20,6 +20,7 @@
     { "path": "packages/typescript" },
     { "path": "packages/java" },
     { "path": "packages/json" },
+    { "path": "packages/graphql" },
     { "path": "samples/client-emitter" },
     { "path": "samples/basic-project" }
   ]
