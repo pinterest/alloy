@@ -1,0 +1,359 @@
+/** @jsxImportSource @alloy-js/core */
+import { code, refkey } from "@alloy-js/core";
+import { d } from "@alloy-js/core/testing";
+import { describe, expect, it } from "vitest";
+import { builtInDirectives } from "../src/builtins/directives.js";
+import * as gql from "../src/index.js";
+import { assertFileContents, toGraphQLText, toGraphQLTextMultiple } from "./utils.jsx";
+
+describe("EnumDeclaration", () => {
+  it("renders a simple enum with values", () => {
+    const result = toGraphQLText(
+      <gql.EnumDeclaration name="Status">
+        <gql.EnumValue name="ACTIVE" />
+        <gql.EnumValue name="INACTIVE" />
+        <gql.EnumValue name="PENDING" />
+      </gql.EnumDeclaration>,
+    );
+    expect(result).toRenderTo(d`
+      enum Status {
+        ACTIVE
+        INACTIVE
+        PENDING
+      }
+    `);
+  });
+
+  it("renders an enum with a description", () => {
+    const result = toGraphQLText(
+      <gql.EnumDeclaration
+        name="Status"
+        description={`"""\nUser status in the system\n"""`}
+      >
+        <gql.EnumValue name="ACTIVE" />
+        <gql.EnumValue name="INACTIVE" />
+      </gql.EnumDeclaration>,
+    );
+    expect(result).toRenderTo(d`
+      """
+      User status in the system
+      """
+      enum Status {
+        ACTIVE
+        INACTIVE
+      }
+    `);
+  });
+
+  it("renders an enum with multi-line description", () => {
+    const result = toGraphQLText(
+      <gql.EnumDeclaration
+        name="Status"
+        description={`"""\nUser status in the system.\nCan be used to filter users.\n"""`}
+      >
+        <gql.EnumValue name="ACTIVE" />
+      </gql.EnumDeclaration>,
+    );
+    expect(result).toRenderTo(d`
+      """
+      User status in the system.
+      Can be used to filter users.
+      """
+      enum Status {
+        ACTIVE
+      }
+    `);
+  });
+
+  it("renders an enum with value descriptions", () => {
+    const result = toGraphQLText(
+      <gql.EnumDeclaration name="Status">
+        <gql.EnumValue
+          name="ACTIVE"
+          description={`"""\nUser is currently active\n"""`}
+        />
+        <gql.EnumValue
+          name="INACTIVE"
+          description={`"""\nUser is temporarily inactive\n"""`}
+        />
+        <gql.EnumValue
+          name="BANNED"
+          description={`"""\nUser has been banned\n"""`}
+        />
+      </gql.EnumDeclaration>,
+    );
+    expect(result).toRenderTo(d`
+      enum Status {
+        """
+        User is currently active
+        """
+        ACTIVE
+        """
+        User is temporarily inactive
+        """
+        INACTIVE
+        """
+        User has been banned
+        """
+        BANNED
+      }
+    `);
+  });
+
+  it("renders an empty enum", () => {
+    const result = toGraphQLText(
+      <gql.EnumDeclaration name="EmptyEnum" />,
+    );
+    expect(result).toRenderTo(d`
+      enum EmptyEnum {
+
+      }
+    `);
+  });
+
+  it("renders an enum with a directive", () => {
+    const result = toGraphQLText(
+      <gql.EnumDeclaration
+        name="Status"
+        directives={
+          <gql.Directive
+            name={builtInDirectives.deprecated}
+            args={{ reason: "Use StatusV2 instead" }}
+          />
+        }
+      >
+        <gql.EnumValue name="ACTIVE" />
+        <gql.EnumValue name="INACTIVE" />
+      </gql.EnumDeclaration>,
+    );
+    expect(result).toRenderTo(d`
+      enum Status @deprecated(reason: "Use StatusV2 instead") {
+        ACTIVE
+        INACTIVE
+      }
+    `);
+  });
+
+  it("renders an enum with multiple directives", () => {
+    const result = toGraphQLText(
+      <gql.EnumDeclaration
+        name="Status"
+        directives={
+          <>
+            <gql.Directive name="auth" args={{ requires: "ADMIN" }} />
+            <gql.Directive name={builtInDirectives.deprecated} />
+          </>
+        }
+      >
+        <gql.EnumValue name="ACTIVE" />
+      </gql.EnumDeclaration>,
+    );
+    expect(result).toRenderTo(d`
+      enum Status @auth(requires: "ADMIN") @deprecated {
+        ACTIVE
+      }
+    `);
+  });
+
+  it("renders an enum value with a directive", () => {
+    const result = toGraphQLText(
+      <gql.EnumDeclaration name="Status">
+        <gql.EnumValue name="ACTIVE" />
+        <gql.EnumValue
+          name="DEPRECATED_STATUS"
+          directives={
+            <gql.Directive
+              name={builtInDirectives.deprecated}
+              args={{ reason: "Use INACTIVE instead" }}
+            />
+          }
+        />
+        <gql.EnumValue name="INACTIVE" />
+      </gql.EnumDeclaration>,
+    );
+    expect(result).toRenderTo(d`
+      enum Status {
+        ACTIVE
+        DEPRECATED_STATUS @deprecated(reason: "Use INACTIVE instead")
+        INACTIVE
+      }
+    `);
+  });
+
+  it("supports enum references in field types", () => {
+    const statusRef = refkey();
+
+    const result = toGraphQLText(
+      <>
+        <gql.EnumDeclaration name="Status" refkey={statusRef}>
+          <gql.EnumValue name="ACTIVE" />
+          <gql.EnumValue name="INACTIVE" />
+        </gql.EnumDeclaration>
+        <gql.ObjectTypeDefinition name="User">
+          <gql.FieldDefinition name="status" type={code`${statusRef}!`} />
+        </gql.ObjectTypeDefinition>
+      </>,
+    );
+
+    expect(result).toRenderTo(d`
+      enum Status {
+        ACTIVE
+        INACTIVE
+      }
+      
+      type User {
+        status: Status!
+      }
+    `);
+  });
+
+  it("supports cross-file enum references", () => {
+    const statusRef = refkey();
+
+    const res = toGraphQLTextMultiple([
+      <gql.SourceFile path="enums.graphql">
+        <gql.EnumDeclaration name="Status" refkey={statusRef}>
+          <gql.EnumValue name="ACTIVE" />
+          <gql.EnumValue name="INACTIVE" />
+          <gql.EnumValue name="PENDING" />
+        </gql.EnumDeclaration>
+      </gql.SourceFile>,
+      <gql.SourceFile path="types.graphql">
+        <gql.ObjectTypeDefinition name="User">
+          <gql.FieldDefinition name="status" type={code`${statusRef}!`} />
+        </gql.ObjectTypeDefinition>
+      </gql.SourceFile>,
+    ]);
+
+    assertFileContents(res, {
+      "enums.graphql": `
+        enum Status {
+          ACTIVE
+          INACTIVE
+          PENDING
+        }
+      `,
+      "types.graphql": `
+        type User {
+          status: Status!
+        }
+      `,
+    });
+  });
+
+  it("renders multiple enums in a schema", () => {
+    const result = toGraphQLText(
+      <>
+        <gql.EnumDeclaration name="Status">
+          <gql.EnumValue name="ACTIVE" />
+          <gql.EnumValue name="INACTIVE" />
+        </gql.EnumDeclaration>
+        <gql.EnumDeclaration name="Role">
+          <gql.EnumValue name="ADMIN" />
+          <gql.EnumValue name="USER" />
+          <gql.EnumValue name="GUEST" />
+        </gql.EnumDeclaration>
+      </>,
+    );
+    expect(result).toRenderTo(d`
+      enum Status {
+        ACTIVE
+        INACTIVE
+      }
+      
+      enum Role {
+        ADMIN
+        USER
+        GUEST
+      }
+    `);
+  });
+
+  it("renders an enum used as argument default value", () => {
+    const statusRef = refkey();
+
+    const result = toGraphQLText(
+      <>
+        <gql.EnumDeclaration name="Status" refkey={statusRef}>
+          <gql.EnumValue name="ACTIVE" />
+          <gql.EnumValue name="INACTIVE" />
+        </gql.EnumDeclaration>
+        <gql.ObjectTypeDefinition name="Query">
+          <gql.FieldDefinition
+            name="users"
+            type="[User!]!"
+            args={
+              <gql.InputValueDefinition
+                name="status"
+                type={code`${statusRef}`}
+                defaultValue="ACTIVE"
+                enumDefault
+              />
+            }
+          />
+        </gql.ObjectTypeDefinition>
+      </>,
+    );
+
+    expect(result).toRenderTo(d`
+      enum Status {
+        ACTIVE
+        INACTIVE
+      }
+      
+      type Query {
+        users(status: Status = ACTIVE): [User!]!
+      }
+    `);
+  });
+
+  it("renders an enum with mixed documentation and directives", () => {
+    const result = toGraphQLText(
+      <gql.EnumDeclaration
+        name="Status"
+        description={`"""\nUser status options\n"""`}
+        directives={<gql.Directive name="auth" args={{ requires: "ADMIN" }} />}
+      >
+        <gql.EnumValue
+          name="ACTIVE"
+          description={`"""\nActive user\n"""`}
+        />
+        <gql.EnumValue
+          name="INACTIVE"
+          description={`"""\nInactive user\n"""`}
+        />
+        <gql.EnumValue
+          name="DEPRECATED_PENDING"
+          description={`"""\nOld pending status\n"""`}
+          directives={
+            <gql.Directive
+              name={builtInDirectives.deprecated}
+              args={{ reason: "Use ACTIVE instead" }}
+            />
+          }
+        />
+      </gql.EnumDeclaration>,
+    );
+
+    expect(result).toRenderTo(d`
+      """
+      User status options
+      """
+      enum Status @auth(requires: "ADMIN") {
+        """
+        Active user
+        """
+        ACTIVE
+        """
+        Inactive user
+        """
+        INACTIVE
+        """
+        Old pending status
+        """
+        DEPRECATED_PENDING @deprecated(reason: "Use ACTIVE instead")
+      }
+    `);
+  });
+});
+
