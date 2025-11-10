@@ -88,7 +88,7 @@ export interface DirectiveDefinitionProps {
  * """
  * Authorization directive for fields and types
  * """
- * directive @auth(
+ * directive \@auth(
  *   requires: Role! = USER
  *   scopes: [String!]
  * ) repeatable on FIELD_DEFINITION | OBJECT
