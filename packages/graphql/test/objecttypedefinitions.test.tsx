@@ -352,4 +352,52 @@ describe("ObjectTypeDefinition", () => {
       }
     `);
   });
+
+  it("renders an object type with union field types", () => {
+    const searchResultRef = refkey();
+
+    const result = toGraphQLText(
+      <>
+        <gql.UnionDeclaration
+          name="SearchResult"
+          members={["User", "Post", "Comment"]}
+          refkey={searchResultRef}
+        />
+        <gql.ObjectTypeDefinition name="Query">
+          <gql.FieldDefinition name="search" type={code`[${searchResultRef}!]!`} />
+        </gql.ObjectTypeDefinition>
+      </>,
+    );
+
+    expect(result).toRenderTo(d`
+      union SearchResult = User | Post | Comment
+      
+      type Query {
+        search: [SearchResult!]!
+      }
+    `);
+  });
+
+  it("renders an object type with custom scalar field types", () => {
+    const dateTimeRef = refkey();
+
+    const result = toGraphQLText(
+      <>
+        <gql.ScalarDeclaration name="DateTime" refkey={dateTimeRef} />
+        <gql.ObjectTypeDefinition name="Event">
+          <gql.FieldDefinition name="startTime" type={code`${dateTimeRef}!`} />
+          <gql.FieldDefinition name="endTime" type={dateTimeRef} />
+        </gql.ObjectTypeDefinition>
+      </>,
+    );
+
+    expect(result).toRenderTo(d`
+      scalar DateTime
+      
+      type Event {
+        startTime: DateTime!
+        endTime: DateTime
+      }
+    `);
+  });
 });
