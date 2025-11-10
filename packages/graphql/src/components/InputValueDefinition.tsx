@@ -43,6 +43,10 @@ export interface InputValueDefinitionProps {
    * Reference key for this argument symbol
    */
   refkey?: Refkey;
+  /**
+   * Whether the default value is an enum value (renders without quotes)
+   */
+  enumDefault?: boolean;
 }
 
 /**
@@ -106,7 +110,12 @@ export function InputValueDefinition(props: InputValueDefinitionProps) {
         <Name />: {inputType}
         <Show when={hasDefaultValue}>
           {" = "}
-          <ValueExpression jsValue={props.defaultValue} />
+          <Show
+            when={props.enumDefault}
+            fallback={<ValueExpression jsValue={props.defaultValue} />}
+          >
+            {props.defaultValue}
+          </Show>
         </Show>
         <Show when={Boolean(props.directives)}>
           <Directives location="ARGUMENT_DEFINITION">
