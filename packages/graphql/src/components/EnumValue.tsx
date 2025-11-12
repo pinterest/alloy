@@ -59,4 +59,3 @@ export function EnumValue(props: EnumValueProps) {
     </>
   );
 }
-

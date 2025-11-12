@@ -62,4 +62,3 @@ export function ScalarDeclaration(props: ScalarDeclarationProps) {
     </>
   );
 }
-
