@@ -21,4 +21,3 @@ export interface BaseDeclarationProps {
    */
   refkey?: Refkey;
 }
-

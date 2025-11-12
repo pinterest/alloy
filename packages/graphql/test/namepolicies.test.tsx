@@ -484,7 +484,10 @@ it("correct formatting of union names (PascalCase)", () => {
     <>
       <gql.UnionDeclaration name="search-result" members={["User", "Post"]} />
       <gql.UnionDeclaration name="media_item" members={["Image", "Video"]} />
-      <gql.UnionDeclaration name="notification-type" members={["Email", "SMS"]} />
+      <gql.UnionDeclaration
+        name="notification-type"
+        members={["Email", "SMS"]}
+      />
     </>,
   );
   expect(result).toRenderTo(d`

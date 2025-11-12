@@ -99,4 +99,3 @@ export function EnumDeclaration(props: EnumDeclarationProps) {
     </>
   );
 }
-
