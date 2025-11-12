@@ -115,11 +115,28 @@ describe("FieldDeclaration", () => {
     `);
   });
 
-  it("can use string type directly", () => {
+  it("can reference custom type using refkey", () => {
+    const customTypeRef = refkey();
+
     const result = toGraphQLText(
-      <gql.FieldDeclaration name="custom" type="CustomType" />,
+      <>
+        <gql.ObjectTypeDeclaration name="CustomType" refkey={customTypeRef}>
+          <gql.FieldDeclaration name="id" type={builtInScalars.ID} />
+        </gql.ObjectTypeDeclaration>
+        <gql.ObjectTypeDeclaration name="Query">
+          <gql.FieldDeclaration name="custom" type={customTypeRef} />
+        </gql.ObjectTypeDeclaration>
+      </>,
     );
-    expect(result).toBe("custom: CustomType");
+    expect(result).toRenderTo(d`
+      type CustomType {
+        id: ID
+      }
+      
+      type Query {
+        custom: CustomType
+      }
+    `);
   });
 
   it("renders field with string type and non-null", () => {
@@ -223,7 +240,7 @@ describe("FieldDeclaration", () => {
     const result = toGraphQLText(
       <gql.FieldDeclaration
         name="user"
-        type="User"
+        type={builtInScalars.String}
         args={
           <gql.ArgumentDeclaration
             name="id"
@@ -232,7 +249,7 @@ describe("FieldDeclaration", () => {
         }
       />,
     );
-    expect(result).toBe("user(id: ID!): User");
+    expect(result).toBe("user(id: ID!): String");
   });
 
   it("renders a field with multiple arguments", () => {

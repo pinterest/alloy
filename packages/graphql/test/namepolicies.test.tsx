@@ -39,31 +39,46 @@ it("correct formatting of field names", () => {
 });
 
 it("correct formatting of argument names", () => {
+  const userRef = refkey();
+
   const result = toGraphQLText(
-    <gql.FieldDeclaration
-      name="user"
-      type="User"
-      args={
-        <>
-          <gql.ArgumentDeclaration
-            name="user-ID"
-            type={code`${builtInScalars.ID}!`}
-          />
-          <gql.ArgumentDeclaration
-            name="FirstName"
-            type={builtInScalars.String}
-          />
-          <gql.ArgumentDeclaration
-            name="include_deleted"
-            type={builtInScalars.Boolean}
-          />
-        </>
-      }
-    />,
+    <>
+      <gql.ObjectTypeDeclaration name="User" refkey={userRef}>
+        <gql.FieldDeclaration name="id" type={builtInScalars.ID} />
+      </gql.ObjectTypeDeclaration>
+      <gql.ObjectTypeDeclaration name="Query">
+        <gql.FieldDeclaration
+          name="user"
+          type={userRef}
+          args={
+            <>
+              <gql.ArgumentDeclaration
+                name="user-ID"
+                type={code`${builtInScalars.ID}!`}
+              />
+              <gql.ArgumentDeclaration
+                name="FirstName"
+                type={builtInScalars.String}
+              />
+              <gql.ArgumentDeclaration
+                name="include_deleted"
+                type={builtInScalars.Boolean}
+              />
+            </>
+          }
+        />
+      </gql.ObjectTypeDeclaration>
+    </>,
   );
-  expect(result).toBe(
-    "user(userId: ID!, firstName: String, includeDeleted: Boolean): User",
-  );
+  expect(result).toRenderTo(d`
+    type User {
+      id: ID
+    }
+    
+    type Query {
+      user(userId: ID!, firstName: String, includeDeleted: Boolean): User
+    }
+  `);
 });
 
 it("correct formatting of directive names", () => {
@@ -158,25 +173,42 @@ it("appends _ to reserved words in field names", () => {
 });
 
 it("appends _ to reserved words in argument names", () => {
+  const userRef = refkey();
+
   const result = toGraphQLText(
-    <gql.FieldDeclaration
-      name="user"
-      type="User"
-      args={
-        <>
-          <gql.ArgumentDeclaration
-            name="fragment"
-            type={builtInScalars.String}
-          />
-          <gql.ArgumentDeclaration
-            name="mutation"
-            type={builtInScalars.Boolean}
-          />
-        </>
-      }
-    />,
+    <>
+      <gql.ObjectTypeDeclaration name="User" refkey={userRef}>
+        <gql.FieldDeclaration name="id" type={builtInScalars.ID} />
+      </gql.ObjectTypeDeclaration>
+      <gql.ObjectTypeDeclaration name="Query">
+        <gql.FieldDeclaration
+          name="user"
+          type={userRef}
+          args={
+            <>
+              <gql.ArgumentDeclaration
+                name="fragment"
+                type={builtInScalars.String}
+              />
+              <gql.ArgumentDeclaration
+                name="mutation"
+                type={builtInScalars.Boolean}
+              />
+            </>
+          }
+        />
+      </gql.ObjectTypeDeclaration>
+    </>,
   );
-  expect(result).toBe("user(fragment_: String, mutation_: Boolean): User");
+  expect(result).toRenderTo(d`
+    type User {
+      id: ID
+    }
+    
+    type Query {
+      user(fragment_: String, mutation_: Boolean): User
+    }
+  `);
 });
 
 it("appends _ to all built-in scalar names (Int, Float, String, Boolean), except ID", () => {

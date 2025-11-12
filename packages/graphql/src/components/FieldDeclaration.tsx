@@ -93,7 +93,7 @@ export interface FieldDeclarationProps {
  * name: String
  * tags: [String!]!
  * user(id: ID!, includeDeleted: Boolean = false): User!
- * legacyField: String @deprecated(reason: "Use newField instead")
+ * legacyField: String \@deprecated(reason: "Use newField instead")
  * ```
  */
 export function FieldDeclaration(props: FieldDeclarationProps) {

@@ -177,13 +177,32 @@ describe("ObjectTypeDeclaration", () => {
   });
 
   it("renders object types with custom type references", () => {
+    const userRef = refkey();
+    const postRef = refkey();
+
     const result = toGraphQLText(
-      <gql.ObjectTypeDeclaration name="Query">
-        <gql.FieldDeclaration name="user" type="User" />
-        <gql.FieldDeclaration name="post" type="Post" />
-      </gql.ObjectTypeDeclaration>,
+      <>
+        <gql.ObjectTypeDeclaration name="User" refkey={userRef}>
+          <gql.FieldDeclaration name="id" type={builtInScalars.ID} />
+        </gql.ObjectTypeDeclaration>
+        <gql.ObjectTypeDeclaration name="Post" refkey={postRef}>
+          <gql.FieldDeclaration name="id" type={builtInScalars.ID} />
+        </gql.ObjectTypeDeclaration>
+        <gql.ObjectTypeDeclaration name="Query">
+          <gql.FieldDeclaration name="user" type={userRef} />
+          <gql.FieldDeclaration name="post" type={postRef} />
+        </gql.ObjectTypeDeclaration>
+      </>,
     );
     expect(result).toRenderTo(d`
+      type User {
+        id: ID
+      }
+      
+      type Post {
+        id: ID
+      }
+      
       type Query {
         user: User
         post: Post

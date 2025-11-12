@@ -84,7 +84,7 @@ export interface ArgumentDeclarationProps {
  * """Reason for the action"""
  * reason: String = "Not specified"
  * status: Status! = ACTIVE
- * priority: Int @deprecated
+ * priority: Int \@deprecated
  * ```
  */
 export function ArgumentDeclaration(props: ArgumentDeclarationProps) {
