@@ -12,7 +12,10 @@ export type GraphQLElements =
   | "enum" // Enum type names
   | "enumValue" // Enum value names
   | "directive" // Directive names
-  | "scalar"; // Scalar type names
+  | "scalar" // Scalar type names
+  | "operation" // Operation names (queries, mutations, subscriptions)
+  | "fragment" // Fragment names
+  | "variable"; // Variable names
 
 // Keywords that are reserved at the top level (type definitions) in GraphQL SDL
 const GRAPHQL_TOP_LEVEL_KEYWORDS = new Set([
@@ -158,6 +161,9 @@ function handleLeadingUnderscore(name: string, transformed: string): string {
  * - Arguments: camelCase
  * - Directives: camelCase
  * - Enum values: UPPER_SNAKE_CASE
+ * - Operations: PascalCase
+ * - Fragments: PascalCase
+ * - Variables: camelCase
  *
  * Note: Single leading underscores are preserved per GraphQL spec.
  * Double underscores (__) are reserved for introspection.
@@ -173,6 +179,8 @@ export function createGraphQLNamePolicy(): NamePolicy<GraphQLElements> {
       case "input":
       case "enum":
       case "scalar":
+      case "operation":
+      case "fragment":
         transformedName = pascalCase(name);
         break;
       case "enumValue":
@@ -181,6 +189,7 @@ export function createGraphQLNamePolicy(): NamePolicy<GraphQLElements> {
       case "field":
       case "argument":
       case "directive":
+      case "variable":
         transformedName = camelCase(name);
         break;
       default:
