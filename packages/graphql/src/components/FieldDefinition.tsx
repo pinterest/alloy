@@ -24,6 +24,7 @@ export interface FieldDefinitionProps extends TypedBaseDeclarationProps {
 
 /**
  * A field definition for GraphQL object types and interfaces.
+ * For input object fields, use InputFieldDeclaration instead.
  *
  * @remarks
  * Directives used on fields are automatically validated to ensure they can be used
@@ -36,30 +37,77 @@ export interface FieldDefinitionProps extends TypedBaseDeclarationProps {
  *
  * const userRef = refkey();
  *
- * <FieldDefinition
- *   name="user"
- *   type={code`${userRef}!`}
- *   description="The user who created this post"
- *   args={
- *     <>
- *       <InputValueDefinition name="id" type={code`${builtInScalars.ID}!`} />
- *       <InputValueDefinition name="includeDeleted" type={builtInScalars.Boolean} defaultValue={false} />
- *     </>
- *   }
- *   directives={
- *     <Directive
- *       name={builtInDirectives.deprecated}
- *       args={{ reason: "Use author instead" }}
+ * <>
+ *   <FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+ *   <FieldDefinition
+ *     name="name"
+ *     type={builtInScalars.String}
+ *     description='"""User full name"""'
+ *   />
+ *   <FieldDefinition name="tags" type={code`[${builtInScalars.String}!]!`} />
+ *   <FieldDefinition
+ *     name="user"
+ *     type={code`${userRef}!`}
+ *     args={
+ *       <>
+ *         <InputValueDefinition name="id" type={code`${builtInScalars.ID}!`} />
+ *         <InputValueDefinition name="includeDeleted" type={builtInScalars.Boolean} defaultValue={false} />
+ *       </>
+ *     }
+ *   />
+ *   <FieldDefinition
+ *     name="legacyField"
+ *     type={builtInScalars.String}
+ *     directives={
+ *       <Directive
+ *         name={builtInDirectives.deprecated}
+ *         args={{ reason: "Use newField instead" }}
+ *       />
+ *     }
+ *   />
+ * </>
+ *
+ * // Field with enum default value in arguments
+ * const statusRef = refkey();
+ * const activeRef = refkey();
+ *
+ * <>
+ *   <EnumTypeDefinition name="Status" refkey={statusRef}>
+ *     <EnumValue name="ACTIVE" refkey={activeRef} />
+ *     <EnumValue name="INACTIVE" />
+ *   </EnumTypeDefinition>
+ *   <ObjectTypeDefinition name="Query">
+ *     <FieldDefinition
+ *       name="users"
+ *       type="[User!]!"
+ *       args={
+ *         <InputValueDefinition
+ *           name="status"
+ *           type={code`${statusRef}`}
+ *           defaultValue={code`${activeRef}`}
+ *         />
+ *       }
  *     />
- *   }
- * />
+ *   </ObjectTypeDefinition>
+ * </>
  * ```
  * renders to
  * ```graphql
- * """
- * The user who created this post
- * """
- * user(id: ID!, includeDeleted: Boolean = false): User! @deprecated(reason: "Use author instead")
+ * id: ID!
+ * """User full name"""
+ * name: String
+ * tags: [String!]!
+ * user(id: ID!, includeDeleted: Boolean = false): User!
+ * legacyField: String \@deprecated(reason: "Use newField instead")
+ *
+ * enum Status {
+ *   ACTIVE
+ *   INACTIVE
+ * }
+ *
+ * type Query {
+ *   users(status: Status = ACTIVE): [User!]!
+ * }
  * ```
  */
 export function FieldDefinition(props: FieldDefinitionProps) {

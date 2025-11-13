@@ -7,15 +7,16 @@ export interface ValueExpressionProps {
 /**
  * A component that renders a JavaScript value as a GraphQL value.
  * It handles various types of values including numbers, booleans, strings,
- * arrays (lists), and objects (input objects), converting them to GraphQL syntax.
+ * arrays (lists), objects (input objects), and refkeys (e.g., for enum values).
  *
  * @example
  * ```tsx
- * <ValueExpression jsValue={42} /> // renders "42"
- * <ValueExpression jsValue={true} /> // renders "true"
- * <ValueExpression jsValue="Hello" /> // renders '"Hello"'
- * <ValueExpression jsValue={[1, 2, 3]} /> // renders "[1, 2, 3]"
- * <ValueExpression jsValue={{ key: "value" }} /> // renders '{key: "value"}'
+ * <ValueExpression jsValue={42} /> // renders: 42
+ * <ValueExpression jsValue={true} /> // renders: true
+ * <ValueExpression jsValue="Hello" /> // renders: "Hello"
+ * <ValueExpression jsValue={[1, 2, 3]} /> // renders: [1, 2, 3]
+ * <ValueExpression jsValue={{ key: "value" }} /> // renders: {key: "value"}
+ * <ValueExpression jsValue={code`${enumValueRef}`} /> // renders: ENUM_VALUE (via refkey)
  * ```
  */
 export function ValueExpression(props: ValueExpressionProps): any {
@@ -39,6 +40,18 @@ export function ValueExpression(props: ValueExpressionProps): any {
       return jsValue;
     } else if (typeof jsValue === "object") {
       if (Array.isArray(jsValue)) {
+        // Check if array contains non-primitives (code templates with refkeys)
+        // Code templates contain objects with 'key' property (refkeys) or functions
+        const hasNonPrimitive = jsValue.some(
+          (v) =>
+            typeof v === "function" ||
+            (typeof v === "object" && v !== null && "key" in v),
+        );
+        if (hasNonPrimitive) {
+          // This is a code template or contains refkeys, render as-is
+          return jsValue;
+        }
+        // Regular array of primitives - render as GraphQL list
         return (
           <group>
             {"["}
@@ -51,6 +64,18 @@ export function ValueExpression(props: ValueExpressionProps): any {
           </group>
         );
       } else {
+        // Check if object contains non-primitives
+        // Code templates contain objects with 'key' property (refkeys) or functions
+        const hasNonPrimitive = Object.values(jsValue).some(
+          (v) =>
+            typeof v === "function" ||
+            (typeof v === "object" && v !== null && "key" in v),
+        );
+        if (hasNonPrimitive) {
+          // This object contains refkeys or code templates, render as-is
+          return jsValue;
+        }
+        // Regular object - render as GraphQL input object
         const entries = Object.entries(jsValue);
         if (entries.length === 0) {
           return "{}";
