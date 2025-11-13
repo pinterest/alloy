@@ -52,9 +52,9 @@ export interface DirectiveDefinitionProps {
    */
   args?: Children;
   /**
-   * Documentation for the directive
+   * Description for the directive
    */
-  doc?: Children;
+  description?: Children;
   /**
    * Whether the directive can be applied multiple times to the same location
    */
@@ -72,12 +72,12 @@ export interface DirectiveDefinitionProps {
  * ```tsx
  * <DirectiveDefinition
  *   name="auth"
- *   doc='"""Authorization directive for fields and types"""'
+ *   description='"""Authorization directive for fields and types"""'
  *   repeatable
  *   locations={["FIELD_DEFINITION", "OBJECT"]}
  *   args={
  *     <>
- *       <InputValueDefinition name="requires" type="Role!" default="USER" enumDefault />
+ *       <InputValueDefinition name="requires" type="Role!" defaultValue="USER" enumDefault />
  *       <InputValueDefinition name="scopes" type={code`[${builtInScalars.String}!]`} />
  *     </>
  *   }
@@ -114,8 +114,8 @@ export function DirectiveDefinition(props: DirectiveDefinitionProps) {
 
   return (
     <>
-      <Show when={Boolean(props.doc)}>
-        {props.doc}
+      <Show when={Boolean(props.description)}>
+        {props.description}
         <hbr />
       </Show>
       <CoreDeclaration symbol={sym}>

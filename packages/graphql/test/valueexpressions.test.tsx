@@ -61,7 +61,6 @@ describe("ValueExpression Component", () => {
     expect(result).toBe('"hello\\nworld"');
   });
 
-
   it("renders empty arrays", () => {
     const result = toGraphQLText([<gql.ValueExpression jsValue={[]} />]);
     expect(result).toBe("[]");
@@ -208,5 +207,4 @@ describe("ValueExpression Component", () => {
     ]);
     expect(result).toBe('@deprecated(reason: "Use newField instead")');
   });
-
 });

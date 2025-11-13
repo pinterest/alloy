@@ -43,9 +43,9 @@ export interface SourceFileProps {
    */
   headerComment?: string;
   /**
-   * Documentation for this schema file, which will be rendered as a schema-level description.
+   * Description for this schema file, which will be rendered as a schema-level description.
    */
-  doc?: Children;
+  description?: Children;
 }
 
 /**
@@ -60,7 +60,7 @@ export interface SourceFileProps {
  * <SourceFile
  *   path="schema.graphql"
  *   headerComment="This file is auto-generated. Do not edit manually."
- *   doc='"""Main schema file for the API"""'
+ *   description='"""Main schema file for the API"""'
  * >
  *   <ObjectType name="User">
  *     <Field name="id" type={code`${builtInScalars.ID}!`} />
@@ -103,9 +103,9 @@ export function SourceFile(props: SourceFileProps) {
           </>
         )}
         {props.header}
-        {props.doc && (
+        {props.description && (
           <>
-            {props.doc}
+            {props.description}
             <hbr />
           </>
         )}

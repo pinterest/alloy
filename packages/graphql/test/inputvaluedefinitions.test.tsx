@@ -37,7 +37,7 @@ describe("InputValueDefinition", () => {
       <gql.InputValueDefinition
         name="limit"
         type={builtInScalars.Int}
-        default={10}
+        defaultValue={10}
       />,
     );
     expect(result).toBe("limit: Int = 10");
@@ -48,7 +48,7 @@ describe("InputValueDefinition", () => {
       <gql.InputValueDefinition
         name="includeDeleted"
         type={builtInScalars.Boolean}
-        default={false}
+        defaultValue={false}
       />,
     );
     expect(result).toBe("includeDeleted: Boolean = false");
@@ -59,7 +59,7 @@ describe("InputValueDefinition", () => {
       <gql.InputValueDefinition
         name="orderBy"
         type={builtInScalars.String}
-        default="createdAt"
+        defaultValue="createdAt"
       />,
     );
     expect(result).toBe('orderBy: String = "createdAt"');
@@ -70,7 +70,7 @@ describe("InputValueDefinition", () => {
       <gql.InputValueDefinition
         name="filter"
         type={builtInScalars.String}
-        default={null}
+        defaultValue={null}
       />,
     );
     expect(result).toBe("filter: String = null");
@@ -81,7 +81,7 @@ describe("InputValueDefinition", () => {
       <gql.InputValueDefinition
         name="reason"
         type={builtInScalars.String}
-        doc={`"""\nReason for deprecation\n"""`}
+        description={`"""\nReason for deprecation\n"""`}
       />,
     );
     expect(result).toRenderTo(d`
@@ -159,17 +159,17 @@ describe("InputValueDefinition", () => {
               <gql.InputValueDefinition
                 name="limit"
                 type={builtInScalars.Int}
-                default={10}
+                defaultValue={10}
               />
               <gql.InputValueDefinition
                 name="offset"
                 type={builtInScalars.Int}
-                default={0}
+                defaultValue={0}
               />
               <gql.InputValueDefinition
                 name="includeDeleted"
                 type={builtInScalars.Boolean}
-                default={false}
+                defaultValue={false}
               />
             </>
           }
@@ -194,7 +194,7 @@ describe("InputValueDefinition", () => {
               <gql.InputValueDefinition
                 name="limit"
                 type={builtInScalars.Int}
-                default={10}
+                defaultValue={10}
               />
               <gql.InputValueDefinition
                 name="filter"
@@ -211,7 +211,7 @@ describe("InputValueDefinition", () => {
               <gql.InputValueDefinition
                 name="limit"
                 type={builtInScalars.Int}
-                default={20}
+                defaultValue={20}
               />
               <gql.InputValueDefinition
                 name="filter"

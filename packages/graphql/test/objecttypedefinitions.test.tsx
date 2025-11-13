@@ -36,7 +36,7 @@ describe("ObjectTypeDefinition", () => {
     const result = toGraphQLText(
       <gql.ObjectTypeDefinition
         name="User"
-        doc={`"""\nA user in the system\n"""`}
+        description={`"""\nA user in the system\n"""`}
       >
         <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
       </gql.ObjectTypeDefinition>,
@@ -55,7 +55,7 @@ describe("ObjectTypeDefinition", () => {
     const result = toGraphQLText(
       <gql.ObjectTypeDefinition
         name="User"
-        doc={`"""\nA user in the system.\nCan have multiple lines of documentation.\n"""`}
+        description={`"""\nA user in the system.\nCan have multiple lines of documentation.\n"""`}
       >
         <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
       </gql.ObjectTypeDefinition>,
@@ -77,12 +77,12 @@ describe("ObjectTypeDefinition", () => {
         <gql.FieldDefinition
           name="id"
           type={code`${builtInScalars.ID}!`}
-          doc={`"""\nUnique identifier\n"""`}
+          description={`"""\nUnique identifier\n"""`}
         />
         <gql.FieldDefinition
           name="email"
           type={builtInScalars.String}
-          doc={`"""\nUser's email address\n"""`}
+          description={`"""\nUser's email address\n"""`}
         />
       </gql.ObjectTypeDefinition>,
     );

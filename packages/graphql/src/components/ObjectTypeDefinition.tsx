@@ -22,9 +22,9 @@ export interface ObjectTypeDefinitionProps {
    */
   children?: Children;
   /**
-   * Documentation for the type
+   * Description for the type
    */
-  doc?: Children;
+  description?: Children;
   /**
    * Interfaces this type implements
    */
@@ -53,7 +53,7 @@ export interface ObjectTypeDefinitionProps {
  * <ObjectTypeDefinition
  *   name="User"
  *   refkey={userRef}
- *   doc='"""A user in the system"""'
+ *   description='"""A user in the system"""'
  *   implements={[nodeRef, timestampedRef]}
  *   directives={<Directive name="auth" args={{ requires: "ADMIN" }} />}
  * >
@@ -101,8 +101,8 @@ export function ObjectTypeDefinition(props: ObjectTypeDefinitionProps) {
 
   return (
     <>
-      <Show when={Boolean(props.doc)}>
-        {props.doc}
+      <Show when={Boolean(props.description)}>
+        {props.description}
         <hbr />
       </Show>
       <CoreDeclaration symbol={sym}>

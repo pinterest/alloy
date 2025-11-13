@@ -38,7 +38,7 @@ describe("DirectiveDefinition", () => {
           <gql.InputValueDefinition
             name="reason"
             type={builtInScalars.String}
-            default="No longer supported"
+            defaultValue="No longer supported"
           />
         }
       />,
@@ -58,7 +58,7 @@ describe("DirectiveDefinition", () => {
             <gql.InputValueDefinition
               name="requires"
               type="Role!"
-              default={1}
+              defaultValue={1}
             />
             <gql.InputValueDefinition
               name="scopes"
@@ -96,7 +96,7 @@ describe("DirectiveDefinition", () => {
     const result = toGraphQLText(
       <gql.DirectiveDefinition
         name="validate"
-        doc={`"""\nValidates field values against a pattern\n"""`}
+        description={`"""\nValidates field values against a pattern\n"""`}
         locations={["FIELD_DEFINITION"]}
         args={
           <gql.InputValueDefinition
@@ -130,12 +130,12 @@ describe("DirectiveDefinition", () => {
               <gql.InputValueDefinition
                 name="limit"
                 type={builtInScalars.Int}
-                default={100}
+                defaultValue={100}
               />
               <gql.InputValueDefinition
                 name="window"
                 type={builtInScalars.Int}
-                default={60}
+                defaultValue={60}
               />
             </>
           }
@@ -162,7 +162,7 @@ describe("DirectiveDefinition", () => {
               <gql.InputValueDefinition
                 name="level"
                 type={builtInScalars.Int}
-                default={1}
+                defaultValue={1}
               />
             </>
           }
@@ -176,7 +176,7 @@ describe("DirectiveDefinition", () => {
               <gql.InputValueDefinition
                 name="level"
                 type={builtInScalars.Int}
-                default={5}
+                defaultValue={5}
               />
             </>
           }
@@ -249,12 +249,12 @@ describe("DirectiveDefinition", () => {
               <gql.InputValueDefinition
                 name="requires"
                 type="Role!"
-                default={1}
+                defaultValue={1}
               />
               <gql.InputValueDefinition
                 name="level"
                 type={builtInScalars.Int}
-                default={1}
+                defaultValue={1}
               />
             </>
           }

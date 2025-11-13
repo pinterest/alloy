@@ -28,11 +28,11 @@ export interface InputValueDefinitionProps {
   /**
    * Default value for the argument
    */
-  default?: Children;
+  defaultValue?: Children;
   /**
-   * Documentation for the argument
+   * Description for the argument
    */
-  doc?: Children;
+  description?: Children;
   /**
    * Directives to apply to the argument
    */
@@ -50,12 +50,12 @@ export interface InputValueDefinitionProps {
  * ```tsx
  * <>
  *   <InputValueDefinition name="id" type={code`${builtInScalars.ID}!`} />
- *   <InputValueDefinition name="limit" type={builtInScalars.Int} default={10} />
+ *   <InputValueDefinition name="limit" type={builtInScalars.Int} defaultValue={10} />
  *   <InputValueDefinition
  *     name="reason"
  *     type={builtInScalars.String}
- *     default="Not specified"
- *     doc='"""Reason for the action"""'
+ *     defaultValue="Not specified"
+ *     description='"""Reason for the action"""'
  *   />
  *   <InputValueDefinition
  *     name="priority"
@@ -88,19 +88,19 @@ export function InputValueDefinition(props: InputValueDefinitionProps) {
     <TypeSymbolSlot>{props.type}</TypeSymbolSlot>
   ));
 
-  const hasDefaultValue = props.default !== undefined;
+  const hasDefaultValue = props.defaultValue !== undefined;
 
   return (
     <>
-      <Show when={Boolean(props.doc)}>
-        {props.doc}
+      <Show when={Boolean(props.description)}>
+        {props.description}
         <hbr />
       </Show>
       <CoreDeclaration symbol={sym}>
         <Name />: {typeAnnotation}
         <Show when={hasDefaultValue}>
           {" = "}
-          <ValueExpression jsValue={props.default} />
+          <ValueExpression jsValue={props.defaultValue} />
         </Show>
         <Show when={Boolean(props.directives)}>{props.directives}</Show>
       </CoreDeclaration>

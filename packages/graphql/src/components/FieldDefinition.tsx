@@ -23,9 +23,9 @@ export interface FieldDefinitionProps {
    */
   refkey?: Refkey;
   /**
-   * Documentation for the field
+   * Description for the field
    */
-  doc?: Children;
+  description?: Children;
   /**
    * The type of the field. Type modifiers like non-null (!) and list ([])
    * should be included in the type string itself.
@@ -61,7 +61,7 @@ export interface FieldDefinitionProps {
  *   <FieldDefinition
  *     name="name"
  *     type={builtInScalars.String}
- *     doc='"""User full name"""'
+ *     description='"""User full name"""'
  *   />
  *   <FieldDefinition name="tags" type={code`[${builtInScalars.String}!]!`} />
  *   <FieldDefinition
@@ -70,7 +70,7 @@ export interface FieldDefinitionProps {
  *     args={
  *       <>
  *         <InputValueDefinition name="id" type={code`${builtInScalars.ID}!`} />
- *         <InputValueDefinition name="includeDeleted" type={builtInScalars.Boolean} default={false} />
+ *         <InputValueDefinition name="includeDeleted" type={builtInScalars.Boolean} defaultValue={false} />
  *       </>
  *     }
  *   />
@@ -121,8 +121,8 @@ export function FieldDefinition(props: FieldDefinitionProps) {
 
   return (
     <>
-      <Show when={Boolean(props.doc)}>
-        {props.doc}
+      <Show when={Boolean(props.description)}>
+        {props.description}
         <hbr />
       </Show>
       <CoreDeclaration symbol={sym}>
