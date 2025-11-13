@@ -15,10 +15,6 @@ export interface InputValueDefinitionProps extends TypedBaseDeclarationProps {
    * Default value for the argument
    */
   defaultValue?: Children;
-  /**
-   * Whether the default value is an enum value (renders without quotes)
-   */
-  enumDefault?: boolean;
 }
 
 /**
@@ -41,6 +37,22 @@ export interface InputValueDefinitionProps extends TypedBaseDeclarationProps {
  *     directives={<Directive name={builtInDirectives.deprecated} />}
  *   />
  * </>
+ *
+ * // Enum default values (use refkeys in code templates)
+ * const statusRef = refkey();
+ * const activeRef = refkey();
+ *
+ * <>
+ *   <EnumTypeDefinition name="Status" refkey={statusRef}>
+ *     <EnumValue name="ACTIVE" refkey={activeRef} />
+ *     <EnumValue name="INACTIVE" />
+ *   </EnumTypeDefinition>
+ *   <InputValueDefinition
+ *     name="status"
+ *     type={code`${statusRef}`}
+ *     defaultValue={code`${activeRef}`}
+ *   />
+ * </>
  * ```
  * renders to
  * ```graphql
@@ -49,6 +61,12 @@ export interface InputValueDefinitionProps extends TypedBaseDeclarationProps {
  * """Reason for the action"""
  * reason: String = "Not specified"
  * priority: Int \@deprecated
+ *
+ * enum Status {
+ *   ACTIVE
+ *   INACTIVE
+ * }
+ * status: Status = ACTIVE
  * ```
  */
 export function InputValueDefinition(props: InputValueDefinitionProps) {
@@ -76,12 +94,7 @@ export function InputValueDefinition(props: InputValueDefinitionProps) {
         <Name />: {inputType}
         <Show when={hasDefaultValue}>
           {" = "}
-          <Show
-            when={props.enumDefault}
-            fallback={<ValueExpression jsValue={props.defaultValue} />}
-          >
-            {props.defaultValue}
-          </Show>
+          <ValueExpression jsValue={props.defaultValue} />
         </Show>
         <Show when={Boolean(props.directives)}>{props.directives}</Show>
       </CoreDeclaration>
