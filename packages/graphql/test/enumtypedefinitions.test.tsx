@@ -273,11 +273,12 @@ describe("EnumTypeDefinition", () => {
 
   it("renders an enum used as argument default value", () => {
     const statusRef = refkey();
+    const activeRef = refkey();
 
     const result = toGraphQLText(
       <>
         <gql.EnumTypeDefinition name="Status" refkey={statusRef}>
-          <gql.EnumValue name="ACTIVE" />
+          <gql.EnumValue name="ACTIVE" refkey={activeRef} />
           <gql.EnumValue name="INACTIVE" />
         </gql.EnumTypeDefinition>
         <gql.ObjectTypeDefinition name="Query">
@@ -288,8 +289,7 @@ describe("EnumTypeDefinition", () => {
               <gql.InputValueDefinition
                 name="status"
                 type={code`${statusRef}`}
-                defaultValue="ACTIVE"
-                enumDefault
+                defaultValue={code`${activeRef}`}
               />
             }
           />

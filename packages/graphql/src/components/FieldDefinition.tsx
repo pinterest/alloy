@@ -22,6 +22,7 @@ export interface FieldDefinitionProps extends TypedBaseDeclarationProps {
 
 /**
  * A field definition for GraphQL object types and interfaces.
+ * For input object fields, use InputFieldDeclaration instead.
  *
  * @example
  * ```tsx
@@ -58,6 +59,30 @@ export interface FieldDefinitionProps extends TypedBaseDeclarationProps {
  *     }
  *   />
  * </>
+ *
+ * // Field with enum default value in arguments
+ * const statusRef = refkey();
+ * const activeRef = refkey();
+ *
+ * <>
+ *   <EnumTypeDefinition name="Status" refkey={statusRef}>
+ *     <EnumValue name="ACTIVE" refkey={activeRef} />
+ *     <EnumValue name="INACTIVE" />
+ *   </EnumTypeDefinition>
+ *   <ObjectTypeDefinition name="Query">
+ *     <FieldDefinition
+ *       name="users"
+ *       type="[User!]!"
+ *       args={
+ *         <InputValueDefinition
+ *           name="status"
+ *           type={code`${statusRef}`}
+ *           defaultValue={code`${activeRef}`}
+ *         />
+ *       }
+ *     />
+ *   </ObjectTypeDefinition>
+ * </>
  * ```
  * renders to
  * ```graphql
@@ -67,6 +92,15 @@ export interface FieldDefinitionProps extends TypedBaseDeclarationProps {
  * tags: [String!]!
  * user(id: ID!, includeDeleted: Boolean = false): User!
  * legacyField: String \@deprecated(reason: "Use newField instead")
+ *
+ * enum Status {
+ *   ACTIVE
+ *   INACTIVE
+ * }
+ *
+ * type Query {
+ *   users(status: Status = ACTIVE): [User!]!
+ * }
  * ```
  */
 export function FieldDefinition(props: FieldDefinitionProps) {

@@ -1,0 +1,119 @@
+import {
+  Children,
+  Declaration as CoreDeclaration,
+  Indent,
+  List,
+  MemberScope,
+  Name,
+  Show,
+  createContentSlot,
+} from "@alloy-js/core";
+import { createGraphQLSymbol } from "../symbol-creation.js";
+import { GraphQLMemberScope, useGraphQLScope } from "../symbols/index.js";
+import { BaseDeclarationProps } from "./common-props.js";
+import { ImplementsInterfaces } from "./ImplementsInterfaces.js";
+
+export interface InterfaceTypeDefinitionProps extends BaseDeclarationProps {
+  /**
+   * Fields of the interface (FieldDefinition components)
+   */
+  children?: Children;
+  /**
+   * Interfaces this interface implements
+   */
+  implements?: Children[];
+}
+
+/**
+ * An interface type definition for GraphQL schemas.
+ * Interfaces define a set of fields that object types can implement.
+ *
+ * @example
+ * ```tsx
+ * import { code, refkey } from "@alloy-js/core";
+ *
+ * const nodeRef = refkey();
+ * const timestampedRef = refkey();
+ *
+ * <InterfaceTypeDefinition
+ *   name="Node"
+ *   refkey={nodeRef}
+ *   description='"""An object with a unique identifier"""'
+ * >
+ *   <FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+ * </InterfaceTypeDefinition>
+ *
+ * <InterfaceTypeDefinition
+ *   name="Timestamped"
+ *   refkey={timestampedRef}
+ *   implements={[nodeRef]}
+ *   description='"""An object with creation and update timestamps"""'
+ * >
+ *   <FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+ *   <FieldDefinition name="createdAt" type={code`${builtInScalars.String}!`} />
+ *   <FieldDefinition name="updatedAt" type={code`${builtInScalars.String}!`} />
+ * </InterfaceTypeDefinition>
+ * ```
+ * renders to
+ * ```graphql
+ * """
+ * An object with a unique identifier
+ * """
+ * interface Node {
+ *   id: ID!
+ * }
+ *
+ * """
+ * An object with creation and update timestamps
+ * """
+ * interface Timestamped implements Node {
+ *   id: ID!
+ *   createdAt: String!
+ *   updatedAt: String!
+ * }
+ * ```
+ */
+export function InterfaceTypeDefinition(props: InterfaceTypeDefinitionProps) {
+  const parentScope = useGraphQLScope();
+
+  const sym = createGraphQLSymbol(
+    props.name,
+    {
+      refkeys: props.refkey,
+    },
+    "type",
+  );
+
+  // Create a member scope for this interface to hold its fields
+  const memberScope = new GraphQLMemberScope(props.name, parentScope, {
+    ownerSymbol: sym,
+  });
+
+  const ContentSlot = createContentSlot();
+
+  return (
+    <>
+      <Show when={Boolean(props.description)}>
+        {props.description}
+        <hbr />
+      </Show>
+      <CoreDeclaration symbol={sym}>
+        interface <Name />
+        <Show when={props.implements && props.implements.length > 0}>
+          <ImplementsInterfaces interfaces={props.implements!} />
+        </Show>
+        <Show when={Boolean(props.directives)}>{props.directives}</Show>
+        {" {"}
+        <MemberScope value={memberScope}>
+          <Indent hardline>
+            <ContentSlot>
+              <List hardline>{props.children}</List>
+            </ContentSlot>
+          </Indent>
+        </MemberScope>
+        <hardline />
+        {"}"}
+      </CoreDeclaration>
+    </>
+  );
+}
