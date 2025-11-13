@@ -4,16 +4,20 @@ import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import { builtInDirectives } from "../src/builtins/directives.js";
 import * as gql from "../src/index.js";
-import { assertFileContents, toGraphQLText, toGraphQLTextMultiple } from "./utils.jsx";
+import {
+  assertFileContents,
+  toGraphQLText,
+  toGraphQLTextMultiple,
+} from "./utils.jsx";
 
-describe("EnumDeclaration", () => {
+describe("EnumTypeDefinition", () => {
   it("renders a simple enum with values", () => {
     const result = toGraphQLText(
-      <gql.EnumDeclaration name="Status">
+      <gql.EnumTypeDefinition name="Status">
         <gql.EnumValue name="ACTIVE" />
         <gql.EnumValue name="INACTIVE" />
         <gql.EnumValue name="PENDING" />
-      </gql.EnumDeclaration>,
+      </gql.EnumTypeDefinition>,
     );
     expect(result).toRenderTo(d`
       enum Status {
@@ -26,13 +30,13 @@ describe("EnumDeclaration", () => {
 
   it("renders an enum with a description", () => {
     const result = toGraphQLText(
-      <gql.EnumDeclaration
+      <gql.EnumTypeDefinition
         name="Status"
         description={`"""\nUser status in the system\n"""`}
       >
         <gql.EnumValue name="ACTIVE" />
         <gql.EnumValue name="INACTIVE" />
-      </gql.EnumDeclaration>,
+      </gql.EnumTypeDefinition>,
     );
     expect(result).toRenderTo(d`
       """
@@ -47,12 +51,12 @@ describe("EnumDeclaration", () => {
 
   it("renders an enum with multi-line description", () => {
     const result = toGraphQLText(
-      <gql.EnumDeclaration
+      <gql.EnumTypeDefinition
         name="Status"
         description={`"""\nUser status in the system.\nCan be used to filter users.\n"""`}
       >
         <gql.EnumValue name="ACTIVE" />
-      </gql.EnumDeclaration>,
+      </gql.EnumTypeDefinition>,
     );
     expect(result).toRenderTo(d`
       """
@@ -67,7 +71,7 @@ describe("EnumDeclaration", () => {
 
   it("renders an enum with value descriptions", () => {
     const result = toGraphQLText(
-      <gql.EnumDeclaration name="Status">
+      <gql.EnumTypeDefinition name="Status">
         <gql.EnumValue
           name="ACTIVE"
           description={`"""\nUser is currently active\n"""`}
@@ -80,7 +84,7 @@ describe("EnumDeclaration", () => {
           name="BANNED"
           description={`"""\nUser has been banned\n"""`}
         />
-      </gql.EnumDeclaration>,
+      </gql.EnumTypeDefinition>,
     );
     expect(result).toRenderTo(d`
       enum Status {
@@ -101,9 +105,7 @@ describe("EnumDeclaration", () => {
   });
 
   it("renders an empty enum", () => {
-    const result = toGraphQLText(
-      <gql.EnumDeclaration name="EmptyEnum" />,
-    );
+    const result = toGraphQLText(<gql.EnumTypeDefinition name="EmptyEnum" />);
     expect(result).toRenderTo(d`
       enum EmptyEnum {
 
@@ -113,7 +115,7 @@ describe("EnumDeclaration", () => {
 
   it("renders an enum with a directive", () => {
     const result = toGraphQLText(
-      <gql.EnumDeclaration
+      <gql.EnumTypeDefinition
         name="Status"
         directives={
           <gql.Directive
@@ -124,7 +126,7 @@ describe("EnumDeclaration", () => {
       >
         <gql.EnumValue name="ACTIVE" />
         <gql.EnumValue name="INACTIVE" />
-      </gql.EnumDeclaration>,
+      </gql.EnumTypeDefinition>,
     );
     expect(result).toRenderTo(d`
       enum Status @deprecated(reason: "Use StatusV2 instead") {
@@ -136,7 +138,7 @@ describe("EnumDeclaration", () => {
 
   it("renders an enum with multiple directives", () => {
     const result = toGraphQLText(
-      <gql.EnumDeclaration
+      <gql.EnumTypeDefinition
         name="Status"
         directives={
           <>
@@ -146,7 +148,7 @@ describe("EnumDeclaration", () => {
         }
       >
         <gql.EnumValue name="ACTIVE" />
-      </gql.EnumDeclaration>,
+      </gql.EnumTypeDefinition>,
     );
     expect(result).toRenderTo(d`
       enum Status @auth(requires: "ADMIN") @deprecated {
@@ -157,7 +159,7 @@ describe("EnumDeclaration", () => {
 
   it("renders an enum value with a directive", () => {
     const result = toGraphQLText(
-      <gql.EnumDeclaration name="Status">
+      <gql.EnumTypeDefinition name="Status">
         <gql.EnumValue name="ACTIVE" />
         <gql.EnumValue
           name="DEPRECATED_STATUS"
@@ -169,7 +171,7 @@ describe("EnumDeclaration", () => {
           }
         />
         <gql.EnumValue name="INACTIVE" />
-      </gql.EnumDeclaration>,
+      </gql.EnumTypeDefinition>,
     );
     expect(result).toRenderTo(d`
       enum Status {
@@ -185,10 +187,10 @@ describe("EnumDeclaration", () => {
 
     const result = toGraphQLText(
       <>
-        <gql.EnumDeclaration name="Status" refkey={statusRef}>
+        <gql.EnumTypeDefinition name="Status" refkey={statusRef}>
           <gql.EnumValue name="ACTIVE" />
           <gql.EnumValue name="INACTIVE" />
-        </gql.EnumDeclaration>
+        </gql.EnumTypeDefinition>
         <gql.ObjectTypeDefinition name="User">
           <gql.FieldDefinition name="status" type={code`${statusRef}!`} />
         </gql.ObjectTypeDefinition>
@@ -212,11 +214,11 @@ describe("EnumDeclaration", () => {
 
     const res = toGraphQLTextMultiple([
       <gql.SourceFile path="enums.graphql">
-        <gql.EnumDeclaration name="Status" refkey={statusRef}>
+        <gql.EnumTypeDefinition name="Status" refkey={statusRef}>
           <gql.EnumValue name="ACTIVE" />
           <gql.EnumValue name="INACTIVE" />
           <gql.EnumValue name="PENDING" />
-        </gql.EnumDeclaration>
+        </gql.EnumTypeDefinition>
       </gql.SourceFile>,
       <gql.SourceFile path="types.graphql">
         <gql.ObjectTypeDefinition name="User">
@@ -244,15 +246,15 @@ describe("EnumDeclaration", () => {
   it("renders multiple enums in a schema", () => {
     const result = toGraphQLText(
       <>
-        <gql.EnumDeclaration name="Status">
+        <gql.EnumTypeDefinition name="Status">
           <gql.EnumValue name="ACTIVE" />
           <gql.EnumValue name="INACTIVE" />
-        </gql.EnumDeclaration>
-        <gql.EnumDeclaration name="Role">
+        </gql.EnumTypeDefinition>
+        <gql.EnumTypeDefinition name="Role">
           <gql.EnumValue name="ADMIN" />
           <gql.EnumValue name="USER" />
           <gql.EnumValue name="GUEST" />
-        </gql.EnumDeclaration>
+        </gql.EnumTypeDefinition>
       </>,
     );
     expect(result).toRenderTo(d`
@@ -274,10 +276,10 @@ describe("EnumDeclaration", () => {
 
     const result = toGraphQLText(
       <>
-        <gql.EnumDeclaration name="Status" refkey={statusRef}>
+        <gql.EnumTypeDefinition name="Status" refkey={statusRef}>
           <gql.EnumValue name="ACTIVE" />
           <gql.EnumValue name="INACTIVE" />
-        </gql.EnumDeclaration>
+        </gql.EnumTypeDefinition>
         <gql.ObjectTypeDefinition name="Query">
           <gql.FieldDefinition
             name="users"
@@ -309,15 +311,12 @@ describe("EnumDeclaration", () => {
 
   it("renders an enum with mixed documentation and directives", () => {
     const result = toGraphQLText(
-      <gql.EnumDeclaration
+      <gql.EnumTypeDefinition
         name="Status"
         description={`"""\nUser status options\n"""`}
         directives={<gql.Directive name="auth" args={{ requires: "ADMIN" }} />}
       >
-        <gql.EnumValue
-          name="ACTIVE"
-          description={`"""\nActive user\n"""`}
-        />
+        <gql.EnumValue name="ACTIVE" description={`"""\nActive user\n"""`} />
         <gql.EnumValue
           name="INACTIVE"
           description={`"""\nInactive user\n"""`}
@@ -332,7 +331,7 @@ describe("EnumDeclaration", () => {
             />
           }
         />
-      </gql.EnumDeclaration>,
+      </gql.EnumTypeDefinition>,
     );
 
     expect(result).toRenderTo(d`
@@ -356,4 +355,3 @@ describe("EnumDeclaration", () => {
     `);
   });
 });
-

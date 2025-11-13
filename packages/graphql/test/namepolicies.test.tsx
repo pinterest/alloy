@@ -428,10 +428,10 @@ describe("Name format validation", () => {
 
 it("correct formatting of enum names (PascalCase)", () => {
   const result = toGraphQLText(
-    <gql.EnumDeclaration name="user-status-type">
+    <gql.EnumTypeDefinition name="user-status-type">
       <gql.EnumValue name="active" />
       <gql.EnumValue name="inactive" />
-    </gql.EnumDeclaration>,
+    </gql.EnumTypeDefinition>,
   );
   const expected = d`
     enum UserStatusType {
@@ -444,12 +444,12 @@ it("correct formatting of enum names (PascalCase)", () => {
 
 it("correct formatting of enum values (UPPER_SNAKE_CASE)", () => {
   const result = toGraphQLText(
-    <gql.EnumDeclaration name="Status">
+    <gql.EnumTypeDefinition name="Status">
       <gql.EnumValue name="activeUser" />
       <gql.EnumValue name="InactiveUser" />
       <gql.EnumValue name="pending-approval" />
       <gql.EnumValue name="waitingForReview" />
-    </gql.EnumDeclaration>,
+    </gql.EnumTypeDefinition>,
   );
   const expected = d`
     enum Status {
@@ -465,9 +465,9 @@ it("correct formatting of enum values (UPPER_SNAKE_CASE)", () => {
 it("correct formatting of scalar names (PascalCase)", () => {
   const result = toGraphQLText(
     <>
-      <gql.ScalarDeclaration name="date-time-scalar" />
-      <gql.ScalarDeclaration name="json_value" />
-      <gql.ScalarDeclaration name="url_string" />
+      <gql.ScalarTypeDefinition name="date-time-scalar" />
+      <gql.ScalarTypeDefinition name="json_value" />
+      <gql.ScalarTypeDefinition name="url_string" />
     </>,
   );
   expect(result).toRenderTo(d`
@@ -482,9 +482,12 @@ it("correct formatting of scalar names (PascalCase)", () => {
 it("correct formatting of union names (PascalCase)", () => {
   const result = toGraphQLText(
     <>
-      <gql.UnionDeclaration name="search-result" members={["User", "Post"]} />
-      <gql.UnionDeclaration name="media_item" members={["Image", "Video"]} />
-      <gql.UnionDeclaration
+      <gql.UnionTypeDefinition
+        name="search-result"
+        members={["User", "Post"]}
+      />
+      <gql.UnionTypeDefinition name="media_item" members={["Image", "Video"]} />
+      <gql.UnionTypeDefinition
         name="notification-type"
         members={["Email", "SMS"]}
       />
@@ -502,15 +505,15 @@ it("correct formatting of union names (PascalCase)", () => {
 it("appends _ to enum names that conflict with reserved words", () => {
   const result = toGraphQLText(
     <>
-      <gql.EnumDeclaration name="enum">
+      <gql.EnumTypeDefinition name="enum">
         <gql.EnumValue name="VALUE1" />
-      </gql.EnumDeclaration>
-      <gql.EnumDeclaration name="type">
+      </gql.EnumTypeDefinition>
+      <gql.EnumTypeDefinition name="type">
         <gql.EnumValue name="VALUE2" />
-      </gql.EnumDeclaration>
-      <gql.EnumDeclaration name="input">
+      </gql.EnumTypeDefinition>
+      <gql.EnumTypeDefinition name="input">
         <gql.EnumValue name="VALUE3" />
-      </gql.EnumDeclaration>
+      </gql.EnumTypeDefinition>
     </>,
   );
   const expected = d`

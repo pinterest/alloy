@@ -4,12 +4,19 @@ import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import { builtInScalars } from "../src/builtins/scalars.js";
 import * as gql from "../src/index.js";
-import { assertFileContents, toGraphQLText, toGraphQLTextMultiple } from "./utils.jsx";
+import {
+  assertFileContents,
+  toGraphQLText,
+  toGraphQLTextMultiple,
+} from "./utils.jsx";
 
-describe("UnionDeclaration", () => {
+describe("UnionTypeDefinition", () => {
   it("renders a simple union with string type names", () => {
     const result = toGraphQLText(
-      <gql.UnionDeclaration name="SearchResult" members={["User", "Post", "Comment"]} />,
+      <gql.UnionTypeDefinition
+        name="SearchResult"
+        members={["User", "Post", "Comment"]}
+      />,
     );
     expect(result).toRenderTo(d`
       union SearchResult = User | Post | Comment
@@ -18,7 +25,7 @@ describe("UnionDeclaration", () => {
 
   it("renders a union with documentation", () => {
     const result = toGraphQLText(
-      <gql.UnionDeclaration
+      <gql.UnionTypeDefinition
         name="SearchResult"
         members={["User", "Post"]}
         description={`"""\nTypes that can be returned from search\n"""`}
@@ -34,7 +41,7 @@ describe("UnionDeclaration", () => {
 
   it("renders a union with multi-line documentation", () => {
     const result = toGraphQLText(
-      <gql.UnionDeclaration
+      <gql.UnionTypeDefinition
         name="Node"
         members={["User", "Post"]}
         description={`"""\nTypes implementing the Node interface.\nUsed for pagination and caching.\n"""`}
@@ -65,7 +72,7 @@ describe("UnionDeclaration", () => {
         <gql.ObjectTypeDefinition name="Comment" refkey={commentRef}>
           <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
         </gql.ObjectTypeDefinition>
-        <gql.UnionDeclaration
+        <gql.UnionTypeDefinition
           name="SearchResult"
           members={[userRef, postRef, commentRef]}
         />
@@ -91,7 +98,7 @@ describe("UnionDeclaration", () => {
 
   it("renders a union with two members", () => {
     const result = toGraphQLText(
-      <gql.UnionDeclaration name="Result" members={["Success", "Error"]} />,
+      <gql.UnionTypeDefinition name="Result" members={["Success", "Error"]} />,
     );
     expect(result).toRenderTo(d`
       union Result = Success | Error
@@ -100,12 +107,10 @@ describe("UnionDeclaration", () => {
 
   it("renders a union with a directive", () => {
     const result = toGraphQLText(
-      <gql.UnionDeclaration
+      <gql.UnionTypeDefinition
         name="SearchResult"
         members={["User", "Post"]}
-        directives={
-          <gql.Directive name="auth" args={{ requires: "VIEWER" }} />
-        }
+        directives={<gql.Directive name="auth" args={{ requires: "VIEWER" }} />}
       />,
     );
     expect(result).toRenderTo(d`
@@ -118,7 +123,7 @@ describe("UnionDeclaration", () => {
 
     const res = toGraphQLTextMultiple([
       <gql.SourceFile path="unions.graphql">
-        <gql.UnionDeclaration
+        <gql.UnionTypeDefinition
           name="SearchResult"
           members={["User", "Post", "Comment"]}
           refkey={searchResultRef}
@@ -155,9 +160,18 @@ describe("UnionDeclaration", () => {
   it("renders multiple unions", () => {
     const result = toGraphQLText(
       <>
-        <gql.UnionDeclaration name="SearchResult" members={["User", "Post"]} />
-        <gql.UnionDeclaration name="MediaItem" members={["Image", "Video", "Audio"]} />
-        <gql.UnionDeclaration name="Notification" members={["Message", "Alert"]} />
+        <gql.UnionTypeDefinition
+          name="SearchResult"
+          members={["User", "Post"]}
+        />
+        <gql.UnionTypeDefinition
+          name="MediaItem"
+          members={["Image", "Video", "Audio"]}
+        />
+        <gql.UnionTypeDefinition
+          name="Notification"
+          members={["Message", "Alert"]}
+        />
       </>,
     );
     expect(result).toRenderTo(d`
@@ -171,13 +185,11 @@ describe("UnionDeclaration", () => {
 
   it("renders a union with documentation and directive", () => {
     const result = toGraphQLText(
-      <gql.UnionDeclaration
+      <gql.UnionTypeDefinition
         name="SearchResult"
         members={["User", "Post"]}
         description={`"""\nSearch result types\n"""`}
-        directives={
-          <gql.Directive name="auth" args={{ requires: "VIEWER" }} />
-        }
+        directives={<gql.Directive name="auth" args={{ requires: "VIEWER" }} />}
       />,
     );
 
@@ -198,13 +210,19 @@ describe("UnionDeclaration", () => {
       <>
         <gql.ObjectTypeDefinition name="User" refkey={userRef}>
           <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
-          <gql.FieldDefinition name="name" type={code`${builtInScalars.String}!`} />
+          <gql.FieldDefinition
+            name="name"
+            type={code`${builtInScalars.String}!`}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Post" refkey={postRef}>
           <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
-          <gql.FieldDefinition name="title" type={code`${builtInScalars.String}!`} />
+          <gql.FieldDefinition
+            name="title"
+            type={code`${builtInScalars.String}!`}
+          />
         </gql.ObjectTypeDefinition>
-        <gql.UnionDeclaration
+        <gql.UnionTypeDefinition
           name="SearchResult"
           members={[userRef, postRef]}
           refkey={searchResultRef}
@@ -243,4 +261,3 @@ describe("UnionDeclaration", () => {
     `);
   });
 });
-

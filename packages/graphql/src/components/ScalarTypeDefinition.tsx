@@ -2,24 +2,24 @@ import { Declaration as CoreDeclaration, Name, Show } from "@alloy-js/core";
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { BaseDeclarationProps } from "./common-props.js";
 
-export interface ScalarDeclarationProps extends BaseDeclarationProps {
+export interface ScalarTypeDefinitionProps extends BaseDeclarationProps {
   // All properties inherited from BaseDeclarationProps
 }
 
 /**
- * A scalar type declaration for GraphQL schemas.
+ * A scalar type definition for GraphQL schemas.
  *
  * @example
  * ```tsx
  * import { builtInDirectives } from "@alloy-js/graphql";
  *
  * <>
- *   <ScalarDeclaration
+ *   <ScalarTypeDefinition
  *     name="DateTime"
  *     description='"""ISO-8601 date-time string"""'
  *   />
- *   <ScalarDeclaration name="JSON" />
- *   <ScalarDeclaration
+ *   <ScalarTypeDefinition name="JSON" />
+ *   <ScalarTypeDefinition
  *     name="URL"
  *     directives={
  *       <Directive
@@ -40,7 +40,7 @@ export interface ScalarDeclarationProps extends BaseDeclarationProps {
  * scalar URL @specifiedBy(url: "https://tools.ietf.org/html/rfc3986")
  * ```
  */
-export function ScalarDeclaration(props: ScalarDeclarationProps) {
+export function ScalarTypeDefinition(props: ScalarTypeDefinitionProps) {
   const sym = createGraphQLSymbol(
     props.name,
     {
