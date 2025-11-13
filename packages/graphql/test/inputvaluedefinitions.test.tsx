@@ -7,17 +7,17 @@ import { builtInScalars } from "../src/builtins/scalars.js";
 import * as gql from "../src/index.js";
 import { toGraphQLText } from "./utils.jsx";
 
-describe("ArgumentDeclaration", () => {
+describe("InputValueDefinition", () => {
   it("renders a simple argument with scalar type", () => {
     const result = toGraphQLText(
-      <gql.ArgumentDeclaration name="id" type={builtInScalars.ID} />,
+      <gql.InputValueDefinition name="id" type={builtInScalars.ID} />,
     );
     expect(result).toBe("id: ID");
   });
 
   it("renders a non-null argument", () => {
     const result = toGraphQLText(
-      <gql.ArgumentDeclaration
+      <gql.InputValueDefinition
         name="email"
         type={code`${builtInScalars.String}!`}
       />,
@@ -27,14 +27,14 @@ describe("ArgumentDeclaration", () => {
 
   it("renders an argument with string type", () => {
     const result = toGraphQLText(
-      <gql.ArgumentDeclaration name="status" type="Status!" />,
+      <gql.InputValueDefinition name="status" type="Status!" />,
     );
     expect(result).toBe("status: Status!");
   });
 
   it("renders an argument with default value (number)", () => {
     const result = toGraphQLText(
-      <gql.ArgumentDeclaration
+      <gql.InputValueDefinition
         name="limit"
         type={builtInScalars.Int}
         default={10}
@@ -45,7 +45,7 @@ describe("ArgumentDeclaration", () => {
 
   it("renders an argument with default value (boolean)", () => {
     const result = toGraphQLText(
-      <gql.ArgumentDeclaration
+      <gql.InputValueDefinition
         name="includeDeleted"
         type={builtInScalars.Boolean}
         default={false}
@@ -56,7 +56,7 @@ describe("ArgumentDeclaration", () => {
 
   it("renders an argument with default value (string)", () => {
     const result = toGraphQLText(
-      <gql.ArgumentDeclaration
+      <gql.InputValueDefinition
         name="orderBy"
         type={builtInScalars.String}
         default="createdAt"
@@ -67,7 +67,7 @@ describe("ArgumentDeclaration", () => {
 
   it("renders an argument with default value (null)", () => {
     const result = toGraphQLText(
-      <gql.ArgumentDeclaration
+      <gql.InputValueDefinition
         name="filter"
         type={builtInScalars.String}
         default={null}
@@ -78,7 +78,7 @@ describe("ArgumentDeclaration", () => {
 
   it("renders an argument with documentation", () => {
     const result = toGraphQLText(
-      <gql.ArgumentDeclaration
+      <gql.InputValueDefinition
         name="reason"
         type={builtInScalars.String}
         doc={`"""\nReason for deprecation\n"""`}
@@ -94,12 +94,10 @@ describe("ArgumentDeclaration", () => {
 
   it("renders an argument with a directive", () => {
     const result = toGraphQLText(
-      <gql.ArgumentDeclaration
+      <gql.InputValueDefinition
         name="legacyArg"
         type={builtInScalars.String}
-        directives={
-          <gql.DirectiveApplication name={builtInDirectives.deprecated} />
-        }
+        directives={<gql.Directive name={builtInDirectives.deprecated} />}
       />,
     );
     expect(result).toBe("legacyArg: String @deprecated");
@@ -109,24 +107,24 @@ describe("ArgumentDeclaration", () => {
     const inputTypeRef = refkey();
     const result = toGraphQLText(
       <>
-        <gql.ObjectTypeDeclaration name="UserInput" refkey={inputTypeRef}>
-          <gql.FieldDeclaration
+        <gql.ObjectTypeDefinition name="UserInput" refkey={inputTypeRef}>
+          <gql.FieldDefinition
             name="name"
             type={code`${builtInScalars.String}!`}
           />
-        </gql.ObjectTypeDeclaration>
-        <gql.ObjectTypeDeclaration name="Query">
-          <gql.FieldDeclaration
+        </gql.ObjectTypeDefinition>
+        <gql.ObjectTypeDefinition name="Query">
+          <gql.FieldDefinition
             name="createUser"
             type={builtInScalars.Boolean}
             args={
-              <gql.ArgumentDeclaration
+              <gql.InputValueDefinition
                 name="userInput"
                 type={code`${inputTypeRef}!`}
               />
             }
           />
-        </gql.ObjectTypeDeclaration>
+        </gql.ObjectTypeDefinition>
       </>,
     );
     expect(result).toRenderTo(d`
@@ -142,7 +140,7 @@ describe("ArgumentDeclaration", () => {
 
   it("renders a list argument", () => {
     const result = toGraphQLText(
-      <gql.ArgumentDeclaration
+      <gql.InputValueDefinition
         name="ids"
         type={code`[${builtInScalars.ID}!]!`}
       />,
@@ -152,23 +150,23 @@ describe("ArgumentDeclaration", () => {
 
   it("renders multiple arguments in a field", () => {
     const result = toGraphQLText(
-      <gql.ObjectTypeDeclaration name="Query">
-        <gql.FieldDeclaration
+      <gql.ObjectTypeDefinition name="Query">
+        <gql.FieldDefinition
           name="users"
           type={code`[User]`}
           args={
             <>
-              <gql.ArgumentDeclaration
+              <gql.InputValueDefinition
                 name="limit"
                 type={builtInScalars.Int}
                 default={10}
               />
-              <gql.ArgumentDeclaration
+              <gql.InputValueDefinition
                 name="offset"
                 type={builtInScalars.Int}
                 default={0}
               />
-              <gql.ArgumentDeclaration
+              <gql.InputValueDefinition
                 name="includeDeleted"
                 type={builtInScalars.Boolean}
                 default={false}
@@ -176,7 +174,7 @@ describe("ArgumentDeclaration", () => {
             </>
           }
         />
-      </gql.ObjectTypeDeclaration>,
+      </gql.ObjectTypeDefinition>,
     );
     expect(result).toRenderTo(d`
       type Query {
@@ -187,42 +185,42 @@ describe("ArgumentDeclaration", () => {
 
   it("allows same argument names in different fields (checks correct scoping)", () => {
     const result = toGraphQLText(
-      <gql.ObjectTypeDeclaration name="Query">
-        <gql.FieldDeclaration
+      <gql.ObjectTypeDefinition name="Query">
+        <gql.FieldDefinition
           name="users"
           type={code`[User]`}
           args={
             <>
-              <gql.ArgumentDeclaration
+              <gql.InputValueDefinition
                 name="limit"
                 type={builtInScalars.Int}
                 default={10}
               />
-              <gql.ArgumentDeclaration
+              <gql.InputValueDefinition
                 name="filter"
                 type={builtInScalars.String}
               />
             </>
           }
         />
-        <gql.FieldDeclaration
+        <gql.FieldDefinition
           name="posts"
           type={code`[Post]`}
           args={
             <>
-              <gql.ArgumentDeclaration
+              <gql.InputValueDefinition
                 name="limit"
                 type={builtInScalars.Int}
                 default={20}
               />
-              <gql.ArgumentDeclaration
+              <gql.InputValueDefinition
                 name="filter"
                 type={builtInScalars.String}
               />
             </>
           }
         />
-      </gql.ObjectTypeDeclaration>,
+      </gql.ObjectTypeDefinition>,
     );
     expect(result).toRenderTo(d`
       type Query {

@@ -10,7 +10,7 @@ import {
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { ValueExpression } from "./ValueExpression.js";
 
-export interface ArgumentDeclarationProps {
+export interface InputValueDefinitionProps {
   /**
    * The name of the argument
    */
@@ -51,29 +51,29 @@ export interface ArgumentDeclarationProps {
 }
 
 /**
- * An argument declaration for GraphQL fields and directives.
+ * An input value definition for GraphQL field arguments and directive arguments.
  *
  * @example
  * ```tsx
  * <>
- *   <ArgumentDeclaration name="id" type={code`${builtInScalars.ID}!`} />
- *   <ArgumentDeclaration name="limit" type={builtInScalars.Int} default={10} />
- *   <ArgumentDeclaration
+ *   <InputValueDefinition name="id" type={code`${builtInScalars.ID}!`} />
+ *   <InputValueDefinition name="limit" type={builtInScalars.Int} default={10} />
+ *   <InputValueDefinition
  *     name="reason"
  *     type={builtInScalars.String}
  *     default="Not specified"
  *     doc='"""Reason for the action"""'
  *   />
- *   <ArgumentDeclaration
+ *   <InputValueDefinition
  *     name="status"
  *     type="Status!"
  *     default="ACTIVE"
  *     enumDefault
  *   />
- *   <ArgumentDeclaration
+ *   <InputValueDefinition
  *     name="priority"
  *     type={builtInScalars.Int}
- *     directives={<DirectiveApplication name={builtInDirectives.deprecated} />}
+ *     directives={<Directive name={builtInDirectives.deprecated} />}
  *   />
  * </>
  * ```
@@ -87,7 +87,7 @@ export interface ArgumentDeclarationProps {
  * priority: Int \@deprecated
  * ```
  */
-export function ArgumentDeclaration(props: ArgumentDeclarationProps) {
+export function InputValueDefinition(props: InputValueDefinitionProps) {
   const TypeSymbolSlot = createSymbolSlot();
 
   const sym = createGraphQLSymbol(

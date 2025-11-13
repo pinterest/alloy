@@ -6,10 +6,10 @@ import { builtInScalars } from "../src/builtins/scalars.js";
 import * as gql from "../src/index.js";
 import { toGraphQLText } from "./utils.jsx";
 
-describe("DirectiveDeclaration", () => {
+describe("DirectiveDefinition", () => {
   it("renders a simple directive declaration without arguments", () => {
     const result = toGraphQLText(
-      <gql.DirectiveDeclaration
+      <gql.DirectiveDefinition
         name="custom"
         locations={["FIELD_DEFINITION"]}
       />,
@@ -19,7 +19,7 @@ describe("DirectiveDeclaration", () => {
 
   it("renders a directive declaration with multiple locations", () => {
     const result = toGraphQLText(
-      <gql.DirectiveDeclaration
+      <gql.DirectiveDefinition
         name="auth"
         locations={["FIELD_DEFINITION", "OBJECT", "INTERFACE"]}
       />,
@@ -31,11 +31,11 @@ describe("DirectiveDeclaration", () => {
 
   it("renders a directive declaration with a single argument", () => {
     const result = toGraphQLText(
-      <gql.DirectiveDeclaration
+      <gql.DirectiveDefinition
         name="deprecated"
         locations={["FIELD_DEFINITION"]}
         args={
-          <gql.ArgumentDeclaration
+          <gql.InputValueDefinition
             name="reason"
             type={builtInScalars.String}
             default="No longer supported"
@@ -50,18 +50,18 @@ describe("DirectiveDeclaration", () => {
 
   it("renders a directive declaration with multiple arguments", () => {
     const result = toGraphQLText(
-      <gql.DirectiveDeclaration
+      <gql.DirectiveDefinition
         name="auth"
         locations={["FIELD_DEFINITION", "OBJECT"]}
         args={
           <>
-            <gql.ArgumentDeclaration
+            <gql.InputValueDefinition
               name="requires"
               type="Role!"
               default="USER"
               enumDefault
             />
-            <gql.ArgumentDeclaration
+            <gql.InputValueDefinition
               name="scopes"
               type={code`[${builtInScalars.String}!]`}
             />
@@ -76,12 +76,12 @@ describe("DirectiveDeclaration", () => {
 
   it("renders a repeatable directive declaration", () => {
     const result = toGraphQLText(
-      <gql.DirectiveDeclaration
+      <gql.DirectiveDefinition
         name="tag"
         repeatable
         locations={["FIELD_DEFINITION", "OBJECT"]}
         args={
-          <gql.ArgumentDeclaration
+          <gql.InputValueDefinition
             name="name"
             type={code`${builtInScalars.String}!`}
           />
@@ -95,12 +95,12 @@ describe("DirectiveDeclaration", () => {
 
   it("renders a directive declaration with documentation", () => {
     const result = toGraphQLText(
-      <gql.DirectiveDeclaration
+      <gql.DirectiveDefinition
         name="validate"
         doc={`"""\nValidates field values against a pattern\n"""`}
         locations={["FIELD_DEFINITION"]}
         args={
-          <gql.ArgumentDeclaration
+          <gql.InputValueDefinition
             name="pattern"
             type={code`${builtInScalars.String}!`}
           />
@@ -118,22 +118,22 @@ describe("DirectiveDeclaration", () => {
   it("renders multiple directive declarations in a schema", () => {
     const result = toGraphQLText(
       <>
-        <gql.DirectiveDeclaration
+        <gql.DirectiveDefinition
           name="auth"
           locations={["FIELD_DEFINITION", "OBJECT"]}
-          args={<gql.ArgumentDeclaration name="requires" type="Role!" />}
+          args={<gql.InputValueDefinition name="requires" type="Role!" />}
         />
-        <gql.DirectiveDeclaration
+        <gql.DirectiveDefinition
           name="rateLimit"
           locations={["FIELD_DEFINITION"]}
           args={
             <>
-              <gql.ArgumentDeclaration
+              <gql.InputValueDefinition
                 name="limit"
                 type={builtInScalars.Int}
                 default={100}
               />
-              <gql.ArgumentDeclaration
+              <gql.InputValueDefinition
                 name="window"
                 type={builtInScalars.Int}
                 default={60}
@@ -154,13 +154,13 @@ describe("DirectiveDeclaration", () => {
     // Each directive should have its own argument scope
     const result = toGraphQLText(
       <>
-        <gql.DirectiveDeclaration
+        <gql.DirectiveDefinition
           name="auth"
           locations={["FIELD_DEFINITION"]}
           args={
             <>
-              <gql.ArgumentDeclaration name="requires" type="Role!" />
-              <gql.ArgumentDeclaration
+              <gql.InputValueDefinition name="requires" type="Role!" />
+              <gql.InputValueDefinition
                 name="level"
                 type={builtInScalars.Int}
                 default={1}
@@ -168,13 +168,13 @@ describe("DirectiveDeclaration", () => {
             </>
           }
         />
-        <gql.DirectiveDeclaration
+        <gql.DirectiveDefinition
           name="permission"
           locations={["OBJECT"]}
           args={
             <>
-              <gql.ArgumentDeclaration name="requires" type="Permission!" />
-              <gql.ArgumentDeclaration
+              <gql.InputValueDefinition name="requires" type="Permission!" />
+              <gql.InputValueDefinition
                 name="level"
                 type={builtInScalars.Int}
                 default={5}
@@ -193,7 +193,7 @@ describe("DirectiveDeclaration", () => {
 
   it("renders directive declaration with all executable directive locations", () => {
     const result = toGraphQLText(
-      <gql.DirectiveDeclaration
+      <gql.DirectiveDefinition
         name="trace"
         locations={[
           "QUERY",
@@ -214,7 +214,7 @@ describe("DirectiveDeclaration", () => {
 
   it("renders directive declaration with all type system directive locations", () => {
     const result = toGraphQLText(
-      <gql.DirectiveDeclaration
+      <gql.DirectiveDefinition
         name="metadata"
         locations={[
           "SCHEMA",
@@ -241,19 +241,19 @@ describe("DirectiveDeclaration", () => {
 
     const result = toGraphQLText(
       <>
-        <gql.DirectiveDeclaration
+        <gql.DirectiveDefinition
           name="auth"
           refkey={authDirectiveRef}
           locations={["FIELD_DEFINITION", "OBJECT"]}
           args={
             <>
-              <gql.ArgumentDeclaration
+              <gql.InputValueDefinition
                 name="requires"
                 type="Role!"
                 default="USER"
                 enumDefault
               />
-              <gql.ArgumentDeclaration
+              <gql.InputValueDefinition
                 name="level"
                 type={builtInScalars.Int}
                 default={1}
@@ -261,27 +261,27 @@ describe("DirectiveDeclaration", () => {
             </>
           }
         />
-        <gql.ObjectTypeDeclaration
+        <gql.ObjectTypeDefinition
           name="User"
           directives={
-            <gql.DirectiveApplication
+            <gql.Directive
               name={authDirectiveRef}
               args={{ requires: "ADMIN", level: 5 }}
             />
           }
         >
-          <gql.FieldDeclaration name="id" type={code`${builtInScalars.ID}!`} />
-          <gql.FieldDeclaration
+          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
             name="sensitiveData"
             type={builtInScalars.String}
             directives={
-              <gql.DirectiveApplication
+              <gql.Directive
                 name={authDirectiveRef}
                 args={{ requires: "SUPER_ADMIN", level: 10 }}
               />
             }
           />
-        </gql.ObjectTypeDeclaration>
+        </gql.ObjectTypeDefinition>
       </>,
     );
 

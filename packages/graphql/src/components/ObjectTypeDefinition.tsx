@@ -12,13 +12,13 @@ import {
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { GraphQLMemberScope, useGraphQLScope } from "../symbols/index.js";
 
-export interface ObjectTypeDeclarationProps {
+export interface ObjectTypeDefinitionProps {
   /**
    * The name of the object type
    */
   name: string;
   /**
-   * Fields of the object type (FieldDeclaration components)
+   * Fields of the object type (FieldDefinition components)
    */
   children?: Children;
   /**
@@ -40,7 +40,7 @@ export interface ObjectTypeDeclarationProps {
 }
 
 /**
- * An object type declaration for GraphQL schemas.
+ * An object type definition for GraphQL schemas.
  *
  * @example
  * ```tsx
@@ -50,17 +50,17 @@ export interface ObjectTypeDeclarationProps {
  * const timestampedRef = refkey();
  * const userRef = refkey();
  *
- * <ObjectTypeDeclaration
+ * <ObjectTypeDefinition
  *   name="User"
  *   refkey={userRef}
  *   doc='"""A user in the system"""'
  *   implements={[nodeRef, timestampedRef]}
- *   directives={<DirectiveApplication name="auth" args={{ requires: "ADMIN" }} />}
+ *   directives={<Directive name="auth" args={{ requires: "ADMIN" }} />}
  * >
- *   <FieldDeclaration name="id" type={code`${builtInScalars.ID}!`} />
- *   <FieldDeclaration name="name" type={code`${builtInScalars.String}!`} />
- *   <FieldDeclaration name="email" type={builtInScalars.String} />
- * </ObjectTypeDeclaration>
+ *   <FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+ *   <FieldDefinition name="name" type={code`${builtInScalars.String}!`} />
+ *   <FieldDefinition name="email" type={builtInScalars.String} />
+ * </ObjectTypeDefinition>
  * ```
  * renders to
  * ```graphql
@@ -74,7 +74,7 @@ export interface ObjectTypeDeclarationProps {
  * }
  * ```
  */
-export function ObjectTypeDeclaration(props: ObjectTypeDeclarationProps) {
+export function ObjectTypeDefinition(props: ObjectTypeDefinitionProps) {
   const parentScope = useGraphQLScope();
 
   const sym = createGraphQLSymbol(

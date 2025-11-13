@@ -1,7 +1,7 @@
 import { Children, For, Show, createSymbolSlot, memo } from "@alloy-js/core";
 import { ValueExpression } from "./ValueExpression.js";
 
-export interface DirectiveApplicationProps {
+export interface DirectiveProps {
   /**
    * The directive name. Can be a string or refkey for built-in directives.
    */
@@ -13,20 +13,20 @@ export interface DirectiveApplicationProps {
 }
 
 /**
- * A GraphQL directive application that can be applied to fields, types, arguments, etc.
+ * A GraphQL directive that can be applied to fields, types, arguments, etc.
  *
  * @example
  * ```tsx
  * import { builtInDirectives } from "@alloy-js/graphql";
  *
  * <>
- *   <DirectiveApplication name={builtInDirectives.deprecated} />
- *   <DirectiveApplication
+ *   <Directive name={builtInDirectives.deprecated} />
+ *   <Directive
  *     name={builtInDirectives.deprecated}
  *     args={{ reason: "Use newField instead" }}
  *   />
- *   <DirectiveApplication name="auth" args={{ requires: "ADMIN" }} />
- *   <DirectiveApplication
+ *   <Directive name="auth" args={{ requires: "ADMIN" }} />
+ *   <Directive
  *     name="rateLimit"
  *     args={{
  *       max: 100,
@@ -34,7 +34,7 @@ export interface DirectiveApplicationProps {
  *       scopes: ["api", "admin"]
  *     }}
  *   />
- *   <DirectiveApplication name={customDirectiveRef} args={{ enabled: true }} />
+ *   <Directive name={customDirectiveRef} args={{ enabled: true }} />
  * </>
  * ```
  * renders to:
@@ -46,7 +46,7 @@ export interface DirectiveApplicationProps {
  * @customDirective(enabled: true)
  * ```
  */
-export function DirectiveApplication(props: DirectiveApplicationProps) {
+export function Directive(props: DirectiveProps) {
   const NameSlot = createSymbolSlot();
 
   const hasArgs = props.args && Object.keys(props.args).length > 0;

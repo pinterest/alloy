@@ -38,7 +38,7 @@ export type DirectiveLocation =
   | "INPUT_OBJECT"
   | "INPUT_FIELD_DEFINITION";
 
-export interface DirectiveDeclarationProps {
+export interface DirectiveDefinitionProps {
   /**
    * The name of the directive (without the \@ symbol)
    */
@@ -48,7 +48,7 @@ export interface DirectiveDeclarationProps {
    */
   locations: DirectiveLocation[];
   /**
-   * Arguments for the directive (ArgumentDeclaration components)
+   * Arguments for the directive (InputValueDefinition components)
    */
   args?: Children;
   /**
@@ -66,19 +66,19 @@ export interface DirectiveDeclarationProps {
 }
 
 /**
- * Declares a custom GraphQL directive in the schema.
+ * Defines a custom GraphQL directive in the schema.
  *
  * @example
  * ```tsx
- * <DirectiveDeclaration
+ * <DirectiveDefinition
  *   name="auth"
  *   doc='"""Authorization directive for fields and types"""'
  *   repeatable
  *   locations={["FIELD_DEFINITION", "OBJECT"]}
  *   args={
  *     <>
- *       <Argument name="requires" type="Role!" default="USER" enumDefault />
- *       <Argument name="scopes" type={code`[${builtInScalars.String}!]`} />
+ *       <InputValueDefinition name="requires" type="Role!" default="USER" enumDefault />
+ *       <InputValueDefinition name="scopes" type={code`[${builtInScalars.String}!]`} />
  *     </>
  *   }
  * />
@@ -94,7 +94,7 @@ export interface DirectiveDeclarationProps {
  * ) repeatable on FIELD_DEFINITION | OBJECT
  * ```
  */
-export function DirectiveDeclaration(props: DirectiveDeclarationProps) {
+export function DirectiveDefinition(props: DirectiveDefinitionProps) {
   const scope = useGraphQLScope();
 
   const sym = createGraphQLSymbol(

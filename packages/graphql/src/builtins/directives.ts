@@ -19,7 +19,7 @@ export type BuiltInDirectiveName = (typeof builtInDirectiveNames)[number];
  * @example
  * ```tsx
  * <Field name="oldField" type={builtInScalars.String}>
- *   <DirectiveApplication name={builtInDirectives.deprecated} args={{ reason: "Use newField instead" }} />
+ *   <Directive name={builtInDirectives.deprecated} args={{ reason: "Use newField instead" }} />
  * </Field>
  * ```
  * renders to

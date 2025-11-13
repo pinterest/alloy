@@ -11,17 +11,17 @@ import {
   toGraphQLTextMultiple,
 } from "./utils.jsx";
 
-describe("ObjectTypeDeclaration", () => {
+describe("ObjectTypeDefinition", () => {
   it("renders a simple object type with fields", () => {
     const result = toGraphQLText(
-      <gql.ObjectTypeDeclaration name="User">
-        <gql.FieldDeclaration name="id" type={code`${builtInScalars.ID}!`} />
-        <gql.FieldDeclaration
+      <gql.ObjectTypeDefinition name="User">
+        <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+        <gql.FieldDefinition
           name="name"
           type={code`${builtInScalars.String}!`}
         />
-        <gql.FieldDeclaration name="email" type={builtInScalars.String} />
-      </gql.ObjectTypeDeclaration>,
+        <gql.FieldDefinition name="email" type={builtInScalars.String} />
+      </gql.ObjectTypeDefinition>,
     );
     expect(result).toRenderTo(d`
       type User {
@@ -34,12 +34,12 @@ describe("ObjectTypeDeclaration", () => {
 
   it("renders an object type with a description", () => {
     const result = toGraphQLText(
-      <gql.ObjectTypeDeclaration
+      <gql.ObjectTypeDefinition
         name="User"
         doc={`"""\nA user in the system\n"""`}
       >
-        <gql.FieldDeclaration name="id" type={code`${builtInScalars.ID}!`} />
-      </gql.ObjectTypeDeclaration>,
+        <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+      </gql.ObjectTypeDefinition>,
     );
     expect(result).toRenderTo(d`
       """
@@ -53,12 +53,12 @@ describe("ObjectTypeDeclaration", () => {
 
   it("renders an object type with multi-line description", () => {
     const result = toGraphQLText(
-      <gql.ObjectTypeDeclaration
+      <gql.ObjectTypeDefinition
         name="User"
         doc={`"""\nA user in the system.\nCan have multiple lines of documentation.\n"""`}
       >
-        <gql.FieldDeclaration name="id" type={code`${builtInScalars.ID}!`} />
-      </gql.ObjectTypeDeclaration>,
+        <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+      </gql.ObjectTypeDefinition>,
     );
     expect(result).toRenderTo(d`
       """
@@ -73,18 +73,18 @@ describe("ObjectTypeDeclaration", () => {
 
   it("renders an object type with field descriptions", () => {
     const result = toGraphQLText(
-      <gql.ObjectTypeDeclaration name="User">
-        <gql.FieldDeclaration
+      <gql.ObjectTypeDefinition name="User">
+        <gql.FieldDefinition
           name="id"
           type={code`${builtInScalars.ID}!`}
           doc={`"""\nUnique identifier\n"""`}
         />
-        <gql.FieldDeclaration
+        <gql.FieldDefinition
           name="email"
           type={builtInScalars.String}
           doc={`"""\nUser's email address\n"""`}
         />
-      </gql.ObjectTypeDeclaration>,
+      </gql.ObjectTypeDefinition>,
     );
     expect(result).toRenderTo(d`
       type User {
@@ -102,17 +102,17 @@ describe("ObjectTypeDeclaration", () => {
 
   it("renders an object type with list fields", () => {
     const result = toGraphQLText(
-      <gql.ObjectTypeDeclaration name="User">
-        <gql.FieldDeclaration name="id" type={code`${builtInScalars.ID}!`} />
-        <gql.FieldDeclaration
+      <gql.ObjectTypeDefinition name="User">
+        <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+        <gql.FieldDefinition
           name="tags"
           type={code`[${builtInScalars.String}!]!`}
         />
-        <gql.FieldDeclaration
+        <gql.FieldDefinition
           name="scores"
           type={code`[${builtInScalars.Float}]`}
         />
-      </gql.ObjectTypeDeclaration>,
+      </gql.ObjectTypeDefinition>,
     );
     expect(result).toRenderTo(d`
       type User {
@@ -129,22 +129,22 @@ describe("ObjectTypeDeclaration", () => {
 
     const res = toGraphQLTextMultiple([
       <gql.SourceFile path="schema.graphql">
-        <gql.ObjectTypeDeclaration name="User" refkey={userRef}>
-          <gql.FieldDeclaration name="id" type={code`${builtInScalars.ID}!`} />
-          <gql.FieldDeclaration
+        <gql.ObjectTypeDefinition name="User" refkey={userRef}>
+          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
             name="name"
             type={code`${builtInScalars.String}!`}
           />
-          <gql.FieldDeclaration name="posts" type={code`[${postRef}]!`} />
-        </gql.ObjectTypeDeclaration>
-        <gql.ObjectTypeDeclaration name="Post" refkey={postRef}>
-          <gql.FieldDeclaration name="id" type={code`${builtInScalars.ID}!`} />
-          <gql.FieldDeclaration
+          <gql.FieldDefinition name="posts" type={code`[${postRef}]!`} />
+        </gql.ObjectTypeDefinition>
+        <gql.ObjectTypeDefinition name="Post" refkey={postRef}>
+          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
             name="title"
             type={code`${builtInScalars.String}!`}
           />
-          <gql.FieldDeclaration name="author" type={code`${userRef}!`} />
-        </gql.ObjectTypeDeclaration>
+          <gql.FieldDefinition name="author" type={code`${userRef}!`} />
+        </gql.ObjectTypeDefinition>
       </gql.SourceFile>,
     ]);
 
@@ -166,9 +166,7 @@ describe("ObjectTypeDeclaration", () => {
   });
 
   it("renders an empty object type", () => {
-    const result = toGraphQLText(
-      <gql.ObjectTypeDeclaration name="EmptyType" />,
-    );
+    const result = toGraphQLText(<gql.ObjectTypeDefinition name="EmptyType" />);
     expect(result).toRenderTo(d`
       type EmptyType {
 
@@ -182,16 +180,16 @@ describe("ObjectTypeDeclaration", () => {
 
     const result = toGraphQLText(
       <>
-        <gql.ObjectTypeDeclaration name="User" refkey={userRef}>
-          <gql.FieldDeclaration name="id" type={builtInScalars.ID} />
-        </gql.ObjectTypeDeclaration>
-        <gql.ObjectTypeDeclaration name="Post" refkey={postRef}>
-          <gql.FieldDeclaration name="id" type={builtInScalars.ID} />
-        </gql.ObjectTypeDeclaration>
-        <gql.ObjectTypeDeclaration name="Query">
-          <gql.FieldDeclaration name="user" type={userRef} />
-          <gql.FieldDeclaration name="post" type={postRef} />
-        </gql.ObjectTypeDeclaration>
+        <gql.ObjectTypeDefinition name="User" refkey={userRef}>
+          <gql.FieldDefinition name="id" type={builtInScalars.ID} />
+        </gql.ObjectTypeDefinition>
+        <gql.ObjectTypeDefinition name="Post" refkey={postRef}>
+          <gql.FieldDefinition name="id" type={builtInScalars.ID} />
+        </gql.ObjectTypeDefinition>
+        <gql.ObjectTypeDefinition name="Query">
+          <gql.FieldDefinition name="user" type={userRef} />
+          <gql.FieldDefinition name="post" type={postRef} />
+        </gql.ObjectTypeDefinition>
       </>,
     );
     expect(result).toRenderTo(d`
@@ -213,12 +211,12 @@ describe("ObjectTypeDeclaration", () => {
   it("renders a complete minimal schema", () => {
     const result = toGraphQLText(
       <>
-        <gql.ObjectTypeDeclaration name="Query">
-          <gql.FieldDeclaration
+        <gql.ObjectTypeDefinition name="Query">
+          <gql.FieldDefinition
             name="hello"
             type={code`${builtInScalars.String}!`}
           />
-        </gql.ObjectTypeDeclaration>
+        </gql.ObjectTypeDefinition>
       </>,
     );
     expect(result).toRenderTo(d`
@@ -231,20 +229,20 @@ describe("ObjectTypeDeclaration", () => {
   it("renders multiple object types in a schema", () => {
     const result = toGraphQLText(
       <>
-        <gql.ObjectTypeDeclaration name="User">
-          <gql.FieldDeclaration name="id" type={code`${builtInScalars.ID}!`} />
-          <gql.FieldDeclaration
+        <gql.ObjectTypeDefinition name="User">
+          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
             name="name"
             type={code`${builtInScalars.String}!`}
           />
-        </gql.ObjectTypeDeclaration>
-        <gql.ObjectTypeDeclaration name="Post">
-          <gql.FieldDeclaration name="id" type={code`${builtInScalars.ID}!`} />
-          <gql.FieldDeclaration
+        </gql.ObjectTypeDefinition>
+        <gql.ObjectTypeDefinition name="Post">
+          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
             name="title"
             type={code`${builtInScalars.String}!`}
           />
-        </gql.ObjectTypeDeclaration>
+        </gql.ObjectTypeDefinition>
       </>,
     );
     expect(result).toRenderTo(d`
@@ -264,13 +262,13 @@ describe("ObjectTypeDeclaration", () => {
     const nodeRef = refkey();
     const result = toGraphQLText(
       <>
-        <gql.ObjectTypeDeclaration name="Node" refkey={nodeRef}>
-          <gql.FieldDeclaration name="id" type={code`${builtInScalars.ID}!`} />
-        </gql.ObjectTypeDeclaration>
-        <gql.ObjectTypeDeclaration name="User" implements={[nodeRef]}>
-          <gql.FieldDeclaration name="id" type={code`${builtInScalars.ID}!`} />
-          <gql.FieldDeclaration name="name" type={builtInScalars.String} />
-        </gql.ObjectTypeDeclaration>
+        <gql.ObjectTypeDefinition name="Node" refkey={nodeRef}>
+          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+        </gql.ObjectTypeDefinition>
+        <gql.ObjectTypeDefinition name="User" implements={[nodeRef]}>
+          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition name="name" type={builtInScalars.String} />
+        </gql.ObjectTypeDefinition>
       </>,
     );
     expect(result).toRenderTo(d`
@@ -290,20 +288,20 @@ describe("ObjectTypeDeclaration", () => {
     const timestampedRef = refkey();
     const result = toGraphQLText(
       <>
-        <gql.ObjectTypeDeclaration name="Node" refkey={nodeRef}>
-          <gql.FieldDeclaration name="id" type={code`${builtInScalars.ID}!`} />
-        </gql.ObjectTypeDeclaration>
-        <gql.ObjectTypeDeclaration name="Timestamped" refkey={timestampedRef}>
-          <gql.FieldDeclaration name="createdAt" type={builtInScalars.String} />
-        </gql.ObjectTypeDeclaration>
-        <gql.ObjectTypeDeclaration
+        <gql.ObjectTypeDefinition name="Node" refkey={nodeRef}>
+          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+        </gql.ObjectTypeDefinition>
+        <gql.ObjectTypeDefinition name="Timestamped" refkey={timestampedRef}>
+          <gql.FieldDefinition name="createdAt" type={builtInScalars.String} />
+        </gql.ObjectTypeDefinition>
+        <gql.ObjectTypeDefinition
           name="User"
           implements={[nodeRef, timestampedRef]}
         >
-          <gql.FieldDeclaration name="id" type={code`${builtInScalars.ID}!`} />
-          <gql.FieldDeclaration name="createdAt" type={builtInScalars.String} />
-          <gql.FieldDeclaration name="name" type={builtInScalars.String} />
-        </gql.ObjectTypeDeclaration>
+          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition name="createdAt" type={builtInScalars.String} />
+          <gql.FieldDefinition name="name" type={builtInScalars.String} />
+        </gql.ObjectTypeDefinition>
       </>,
     );
     expect(result).toRenderTo(d`
@@ -325,14 +323,12 @@ describe("ObjectTypeDeclaration", () => {
 
   it("renders an object type with a directive", () => {
     const result = toGraphQLText(
-      <gql.ObjectTypeDeclaration
+      <gql.ObjectTypeDefinition
         name="User"
-        directives={
-          <gql.DirectiveApplication name="auth" args={{ requires: "ADMIN" }} />
-        }
+        directives={<gql.Directive name="auth" args={{ requires: "ADMIN" }} />}
       >
-        <gql.FieldDeclaration name="id" type={code`${builtInScalars.ID}!`} />
-      </gql.ObjectTypeDeclaration>,
+        <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+      </gql.ObjectTypeDefinition>,
     );
     expect(result).toRenderTo(d`
       type User @auth(requires: "ADMIN") {
@@ -343,20 +339,17 @@ describe("ObjectTypeDeclaration", () => {
 
   it("renders an object type with multiple directives", () => {
     const result = toGraphQLText(
-      <gql.ObjectTypeDeclaration
+      <gql.ObjectTypeDefinition
         name="User"
         directives={
           <>
-            <gql.DirectiveApplication
-              name="auth"
-              args={{ requires: "ADMIN" }}
-            />
-            <gql.DirectiveApplication name={builtInDirectives.deprecated} />
+            <gql.Directive name="auth" args={{ requires: "ADMIN" }} />
+            <gql.Directive name={builtInDirectives.deprecated} />
           </>
         }
       >
-        <gql.FieldDeclaration name="id" type={code`${builtInScalars.ID}!`} />
-      </gql.ObjectTypeDeclaration>,
+        <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+      </gql.ObjectTypeDefinition>,
     );
     expect(result).toRenderTo(d`
       type User @auth(requires: "ADMIN") @deprecated {

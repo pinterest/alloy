@@ -13,7 +13,7 @@ import { createGraphQLSymbol } from "../symbol-creation.js";
 import { GraphQLMemberScope } from "../symbols/graphql-member-scope.js";
 import { useGraphQLScope } from "../symbols/scopes.js";
 
-export interface FieldDeclarationProps {
+export interface FieldDefinitionProps {
   /**
    * The name of the field
    */
@@ -38,7 +38,7 @@ export interface FieldDeclarationProps {
    */
   type: Children;
   /**
-   * Field arguments (ArgumentDeclaration components)
+   * Field arguments (InputValueDefinition components)
    */
   args?: Children;
   /**
@@ -48,7 +48,7 @@ export interface FieldDeclarationProps {
 }
 
 /**
- * A field declaration for GraphQL object types, interfaces, and input types.
+ * A field definition for GraphQL object types, interfaces, and input types.
  *
  * @example
  * ```tsx
@@ -57,28 +57,28 @@ export interface FieldDeclarationProps {
  * const userRef = refkey();
  *
  * <>
- *   <FieldDeclaration name="id" type={code`${builtInScalars.ID}!`} />
- *   <FieldDeclaration
+ *   <FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+ *   <FieldDefinition
  *     name="name"
  *     type={builtInScalars.String}
  *     doc='"""User full name"""'
  *   />
- *   <FieldDeclaration name="tags" type={code`[${builtInScalars.String}!]!`} />
- *   <FieldDeclaration
+ *   <FieldDefinition name="tags" type={code`[${builtInScalars.String}!]!`} />
+ *   <FieldDefinition
  *     name="user"
  *     type={code`${userRef}!`}
  *     args={
  *       <>
- *         <ArgumentDeclaration name="id" type={code`${builtInScalars.ID}!`} />
- *         <ArgumentDeclaration name="includeDeleted" type={builtInScalars.Boolean} default={false} />
+ *         <InputValueDefinition name="id" type={code`${builtInScalars.ID}!`} />
+ *         <InputValueDefinition name="includeDeleted" type={builtInScalars.Boolean} default={false} />
  *       </>
  *     }
  *   />
- *   <FieldDeclaration
+ *   <FieldDefinition
  *     name="legacyField"
  *     type={builtInScalars.String}
  *     directives={
- *       <DirectiveApplication
+ *       <Directive
  *         name={builtInDirectives.deprecated}
  *         args={{ reason: "Use newField instead" }}
  *       />
@@ -96,7 +96,7 @@ export interface FieldDeclarationProps {
  * legacyField: String \@deprecated(reason: "Use newField instead")
  * ```
  */
-export function FieldDeclaration(props: FieldDeclarationProps) {
+export function FieldDefinition(props: FieldDefinitionProps) {
   const TypeSymbolSlot = createSymbolSlot();
   const scope = useGraphQLScope();
 
