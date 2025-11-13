@@ -2,45 +2,23 @@ import {
   Children,
   Declaration as CoreDeclaration,
   Name,
-  Refkey,
   Show,
   createSymbolSlot,
   memo,
 } from "@alloy-js/core";
 import { createGraphQLSymbol } from "../symbol-creation.js";
+import { TypedBaseDeclarationProps } from "./common-props.js";
 import { ValueExpression } from "./ValueExpression.js";
 
-export interface InputValueDefinitionProps {
-  /**
-   * The name of the argument
-   */
-  name: string;
-  /**
-   * The type of the argument. Type modifiers like non-null (!) should be included.
-   *
-   * Can be:
-   * - A string literal: `"String"`, `"ID!"`, `"Int"`
-   * - A built-in scalar: `builtInScalars.String`
-   * - A refkey to a user-defined type
-   * - A code template for composition: code`[${inputTypeRef}]!`
-   */
-  type: Children;
+export interface InputValueDefinitionProps extends TypedBaseDeclarationProps {
   /**
    * Default value for the argument
    */
   defaultValue?: Children;
   /**
-   * Description for the argument
+   * Whether the default value is an enum value (renders without quotes)
    */
-  description?: Children;
-  /**
-   * Directives to apply to the argument
-   */
-  directives?: Children;
-  /**
-   * Reference key for this argument symbol
-   */
-  refkey?: Refkey;
+  enumDefault?: boolean;
 }
 
 /**
@@ -98,7 +76,12 @@ export function InputValueDefinition(props: InputValueDefinitionProps) {
         <Name />: {inputType}
         <Show when={hasDefaultValue}>
           {" = "}
-          <ValueExpression jsValue={props.defaultValue} />
+          <Show
+            when={props.enumDefault}
+            fallback={<ValueExpression jsValue={props.defaultValue} />}
+          >
+            {props.defaultValue}
+          </Show>
         </Show>
         <Show when={Boolean(props.directives)}>{props.directives}</Show>
       </CoreDeclaration>

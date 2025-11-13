@@ -4,12 +4,12 @@ import {
   List,
   MemberScope,
   Name,
-  Refkey,
   Show,
 } from "@alloy-js/core";
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { GraphQLMemberScope } from "../symbols/graphql-member-scope.js";
 import { useGraphQLScope } from "../symbols/scopes.js";
+import { NamedDeclarationProps } from "./common-props.js";
 
 /**
  * Valid directive locations in GraphQL
@@ -38,11 +38,7 @@ export type DirectiveLocation =
   | "INPUT_OBJECT"
   | "INPUT_FIELD_DEFINITION";
 
-export interface DirectiveDefinitionProps {
-  /**
-   * The name of the directive (without the \@ symbol)
-   */
-  name: string;
+export interface DirectiveDefinitionProps extends NamedDeclarationProps {
   /**
    * Valid locations where this directive can be applied
    */
@@ -59,10 +55,6 @@ export interface DirectiveDefinitionProps {
    * Whether the directive can be applied multiple times to the same location
    */
   repeatable?: boolean;
-  /**
-   * Reference key for this directive symbol
-   */
-  refkey?: Refkey;
 }
 
 /**
@@ -88,7 +80,7 @@ export interface DirectiveDefinitionProps {
  * """
  * Authorization directive for fields and types
  * """
- * directive @auth(
+ * directive \@auth(
  *   requires: Role! = USER
  *   scopes: [String!]
  * ) repeatable on FIELD_DEFINITION | OBJECT
