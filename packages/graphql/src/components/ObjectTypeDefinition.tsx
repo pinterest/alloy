@@ -11,6 +11,7 @@ import {
 } from "@alloy-js/core";
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { GraphQLMemberScope, useGraphQLScope } from "../symbols/index.js";
+import { ImplementsInterfaces } from "./ImplementsInterfaces.js";
 
 export interface ObjectTypeDefinitionProps {
   /**
@@ -92,13 +93,6 @@ export function ObjectTypeDefinition(props: ObjectTypeDefinitionProps) {
 
   const ContentSlot = createContentSlot();
 
-  const implementsPart = props.implements && props.implements.length > 0 && (
-    <>
-      {" "}
-      implements <List children={props.implements} joiner=" & " />
-    </>
-  );
-
   return (
     <>
       <Show when={Boolean(props.description)}>
@@ -107,7 +101,9 @@ export function ObjectTypeDefinition(props: ObjectTypeDefinitionProps) {
       </Show>
       <CoreDeclaration symbol={sym}>
         type <Name />
-        {implementsPart}
+        <Show when={props.implements && props.implements.length > 0}>
+          <ImplementsInterfaces interfaces={props.implements!} />
+        </Show>
         <Show when={Boolean(props.directives)}>{props.directives}</Show>
         {" {"}
         <MemberScope value={memberScope}>

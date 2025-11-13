@@ -35,15 +35,13 @@ export interface SourceFileProps {
    */
   children?: Children;
   /**
-   * Header comment to add to the file, which will be rendered at the top of the file.
-   */
-  header?: Children;
-  /**
-   * Comment to add to the header, which will be rendered as a comment in the file.
+   * Comment to add at the top of the file (e.g., "Auto-generated. Do not edit.").
+   * Rendered as a GraphQL comment with # prefix.
    */
   headerComment?: string;
   /**
-   * Description for this schema file, which will be rendered as a schema-level description.
+   * Schema-level description that documents the purpose of this schema file.
+   * Rendered as a GraphQL description using triple-quoted strings.
    */
   description?: Children;
 }
@@ -102,7 +100,6 @@ export function SourceFile(props: SourceFileProps) {
             <hbr />
           </>
         )}
-        {props.header}
         {props.description && (
           <>
             {props.description}
