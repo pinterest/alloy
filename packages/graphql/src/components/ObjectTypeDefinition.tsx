@@ -67,7 +67,7 @@ export interface ObjectTypeDefinitionProps {
  * """
  * A user in the system
  * """
- * type User implements Node Timestamped @auth(requires: "ADMIN") {
+ * type User implements Node & Timestamped @auth(requires: "ADMIN") {
  *   id: ID!
  *   name: String!
  *   email: String
@@ -95,7 +95,7 @@ export function ObjectTypeDefinition(props: ObjectTypeDefinitionProps) {
   const implementsPart = props.implements && props.implements.length > 0 && (
     <>
       {" "}
-      implements <List children={props.implements} comma={false} space />
+      implements <List children={props.implements} joiner=" & " />
     </>
   );
 

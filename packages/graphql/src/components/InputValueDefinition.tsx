@@ -84,9 +84,7 @@ export function InputValueDefinition(props: InputValueDefinitionProps) {
     "argument",
   );
 
-  const typeAnnotation = memo(() => (
-    <TypeSymbolSlot>{props.type}</TypeSymbolSlot>
-  ));
+  const inputType = memo(() => <TypeSymbolSlot>{props.type}</TypeSymbolSlot>);
 
   const hasDefaultValue = props.defaultValue !== undefined;
 
@@ -97,7 +95,7 @@ export function InputValueDefinition(props: InputValueDefinitionProps) {
         <hbr />
       </Show>
       <CoreDeclaration symbol={sym}>
-        <Name />: {typeAnnotation}
+        <Name />: {inputType}
         <Show when={hasDefaultValue}>
           {" = "}
           <ValueExpression jsValue={props.defaultValue} />

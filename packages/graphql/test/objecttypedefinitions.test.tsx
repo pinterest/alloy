@@ -313,7 +313,7 @@ describe("ObjectTypeDefinition", () => {
         createdAt: String
       }
       
-      type User implements Node Timestamped {
+      type User implements Node & Timestamped {
         id: ID!
         createdAt: String
         name: String

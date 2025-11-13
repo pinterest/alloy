@@ -113,9 +113,7 @@ export function FieldDefinition(props: FieldDefinitionProps) {
     ownerSymbol: sym,
   });
 
-  const typeAnnotation = memo(() => (
-    <TypeSymbolSlot>{props.type}</TypeSymbolSlot>
-  ));
+  const fieldType = memo(() => <TypeSymbolSlot>{props.type}</TypeSymbolSlot>);
 
   const hasArgs = Boolean(props.args);
 
@@ -136,7 +134,7 @@ export function FieldDefinition(props: FieldDefinitionProps) {
           </MemberScope>
           )
         </Show>
-        : {typeAnnotation}
+        : {fieldType}
         <Show when={Boolean(props.directives)}>{props.directives}</Show>
       </CoreDeclaration>
     </>
