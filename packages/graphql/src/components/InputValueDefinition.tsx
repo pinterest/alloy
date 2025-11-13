@@ -24,20 +24,51 @@ export interface InputValueDefinitionProps extends TypedBaseDeclarationProps {
  *
  * @example
  * ```tsx
- * <InputValueDefinition
- *   name="reason"
- *   type={builtInScalars.String}
- *   defaultValue="Not specified"
- *   description="Reason for the action"
- *   directives={<Directive name={builtInDirectives.deprecated} />}
- * />
+ * <>
+ *   <InputValueDefinition name="id" type={code`${builtInScalars.ID}!`} />
+ *   <InputValueDefinition name="limit" type={builtInScalars.Int} defaultValue={10} />
+ *   <InputValueDefinition
+ *     name="reason"
+ *     type={builtInScalars.String}
+ *     defaultValue="Not specified"
+ *     description='"""Reason for the action"""'
+ *   />
+ *   <InputValueDefinition
+ *     name="priority"
+ *     type={builtInScalars.Int}
+ *     directives={<Directive name={builtInDirectives.deprecated} />}
+ *   />
+ * </>
+ *
+ * // Enum default values (use refkeys in code templates)
+ * const statusRef = refkey();
+ * const activeRef = refkey();
+ *
+ * <>
+ *   <EnumTypeDefinition name="Status" refkey={statusRef}>
+ *     <EnumValue name="ACTIVE" refkey={activeRef} />
+ *     <EnumValue name="INACTIVE" />
+ *   </EnumTypeDefinition>
+ *   <InputValueDefinition
+ *     name="status"
+ *     type={code`${statusRef}`}
+ *     defaultValue={code`${activeRef}`}
+ *   />
+ * </>
  * ```
  * renders to
  * ```graphql
- * """
- * Reason for the action
- * """
- * reason: String = "Not specified" @deprecated
+ * id: ID!
+ * limit: Int = 10
+ * """Reason for the action"""
+ * reason: String = "Not specified"
+ * priority: Int \@deprecated
+ *
+ * enum Status {
+ *   ACTIVE
+ *   INACTIVE
+ * }
+ * status: Status = ACTIVE
  * ```
  */
 export function InputValueDefinition(props: InputValueDefinitionProps) {
