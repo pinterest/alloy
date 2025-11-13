@@ -12,7 +12,7 @@ import { createGraphQLSymbol } from "../symbol-creation.js";
 import { GraphQLMemberScope, useGraphQLScope } from "../symbols/index.js";
 import { BaseDeclarationProps } from "./common-props.js";
 
-export interface EnumDeclarationProps extends BaseDeclarationProps {
+export interface EnumTypeDefinitionProps extends BaseDeclarationProps {
   /**
    * Enum values (EnumValue components)
    */
@@ -20,13 +20,13 @@ export interface EnumDeclarationProps extends BaseDeclarationProps {
 }
 
 /**
- * An enum type declaration for GraphQL schemas.
+ * An enum type definition for GraphQL schemas.
  *
  * @example
  * ```tsx
  * import { builtInDirectives } from "@alloy-js/graphql";
  *
- * <EnumDeclaration
+ * <EnumTypeDefinition
  *   name="Status"
  *   description='"""User status"""'
  * >
@@ -41,7 +41,7 @@ export interface EnumDeclarationProps extends BaseDeclarationProps {
  *       />
  *     }
  *   />
- * </EnumDeclaration>
+ * </EnumTypeDefinition>
  * ```
  * renders to
  * ```graphql
@@ -58,7 +58,7 @@ export interface EnumDeclarationProps extends BaseDeclarationProps {
  * }
  * ```
  */
-export function EnumDeclaration(props: EnumDeclarationProps) {
+export function EnumTypeDefinition(props: EnumTypeDefinitionProps) {
   const parentScope = useGraphQLScope();
 
   const sym = createGraphQLSymbol(

@@ -358,13 +358,16 @@ describe("ObjectTypeDefinition", () => {
 
     const result = toGraphQLText(
       <>
-        <gql.UnionDeclaration
+        <gql.UnionTypeDefinition
           name="SearchResult"
           members={["User", "Post", "Comment"]}
           refkey={searchResultRef}
         />
         <gql.ObjectTypeDefinition name="Query">
-          <gql.FieldDefinition name="search" type={code`[${searchResultRef}!]!`} />
+          <gql.FieldDefinition
+            name="search"
+            type={code`[${searchResultRef}!]!`}
+          />
         </gql.ObjectTypeDefinition>
       </>,
     );
@@ -383,7 +386,7 @@ describe("ObjectTypeDefinition", () => {
 
     const result = toGraphQLText(
       <>
-        <gql.ScalarDeclaration name="DateTime" refkey={dateTimeRef} />
+        <gql.ScalarTypeDefinition name="DateTime" refkey={dateTimeRef} />
         <gql.ObjectTypeDefinition name="Event">
           <gql.FieldDefinition name="startTime" type={code`${dateTimeRef}!`} />
           <gql.FieldDefinition name="endTime" type={dateTimeRef} />

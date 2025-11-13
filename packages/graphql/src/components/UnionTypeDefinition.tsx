@@ -8,7 +8,7 @@ import {
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { BaseDeclarationProps } from "./common-props.js";
 
-export interface UnionDeclarationProps extends BaseDeclarationProps {
+export interface UnionTypeDefinitionProps extends BaseDeclarationProps {
   /**
    * Union member types (refkeys or type names)
    */
@@ -16,7 +16,7 @@ export interface UnionDeclarationProps extends BaseDeclarationProps {
 }
 
 /**
- * A union type declaration for GraphQL schemas.
+ * A union type definition for GraphQL schemas.
  *
  * @example
  * ```tsx
@@ -27,12 +27,12 @@ export interface UnionDeclarationProps extends BaseDeclarationProps {
  * const commentRef = refkey();
  *
  * <>
- *   <UnionDeclaration
+ *   <UnionTypeDefinition
  *     name="SearchResult"
  *     members={[userRef, postRef, commentRef]}
  *     description='"""Search result types"""'
  *   />
- *   <UnionDeclaration
+ *   <UnionTypeDefinition
  *     name="Node"
  *     members={["User", "Post", "Comment"]}
  *   />
@@ -47,7 +47,7 @@ export interface UnionDeclarationProps extends BaseDeclarationProps {
  * union Node = User | Post | Comment
  * ```
  */
-export function UnionDeclaration(props: UnionDeclarationProps) {
+export function UnionTypeDefinition(props: UnionTypeDefinitionProps) {
   const sym = createGraphQLSymbol(
     props.name,
     {

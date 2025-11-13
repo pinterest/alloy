@@ -2,15 +2,16 @@
 import { code, refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
-import { builtInScalars } from "../src/builtins/scalars.js";
 import * as gql from "../src/index.js";
-import { assertFileContents, toGraphQLText, toGraphQLTextMultiple } from "./utils.jsx";
+import {
+  assertFileContents,
+  toGraphQLText,
+  toGraphQLTextMultiple,
+} from "./utils.jsx";
 
-describe("ScalarDeclaration", () => {
+describe("ScalarTypeDefinition", () => {
   it("renders a simple scalar", () => {
-    const result = toGraphQLText(
-      <gql.ScalarDeclaration name="DateTime" />,
-    );
+    const result = toGraphQLText(<gql.ScalarTypeDefinition name="DateTime" />);
     expect(result).toRenderTo(d`
       scalar DateTime
     `);
@@ -18,7 +19,7 @@ describe("ScalarDeclaration", () => {
 
   it("renders a scalar with documentation", () => {
     const result = toGraphQLText(
-      <gql.ScalarDeclaration
+      <gql.ScalarTypeDefinition
         name="DateTime"
         description={`"""\nISO-8601 date-time string\n"""`}
       />,
@@ -33,7 +34,7 @@ describe("ScalarDeclaration", () => {
 
   it("renders a scalar with multi-line documentation", () => {
     const result = toGraphQLText(
-      <gql.ScalarDeclaration
+      <gql.ScalarTypeDefinition
         name="DateTime"
         description={`"""\nRepresents a date and time.\nFormatted as ISO-8601.\n"""`}
       />,
@@ -49,7 +50,7 @@ describe("ScalarDeclaration", () => {
 
   it("renders a scalar with a directive", () => {
     const result = toGraphQLText(
-      <gql.ScalarDeclaration
+      <gql.ScalarTypeDefinition
         name="URL"
         directives={
           <gql.Directive
@@ -66,7 +67,7 @@ describe("ScalarDeclaration", () => {
 
   it("renders a scalar with documentation and directive", () => {
     const result = toGraphQLText(
-      <gql.ScalarDeclaration
+      <gql.ScalarTypeDefinition
         name="URL"
         description={`"""\nValid URL string\n"""`}
         directives={
@@ -88,9 +89,9 @@ describe("ScalarDeclaration", () => {
   it("renders multiple scalars", () => {
     const result = toGraphQLText(
       <>
-        <gql.ScalarDeclaration name="DateTime" />
-        <gql.ScalarDeclaration name="JSON" />
-        <gql.ScalarDeclaration name="URL" />
+        <gql.ScalarTypeDefinition name="DateTime" />
+        <gql.ScalarTypeDefinition name="JSON" />
+        <gql.ScalarTypeDefinition name="URL" />
       </>,
     );
     expect(result).toRenderTo(d`
@@ -107,7 +108,7 @@ describe("ScalarDeclaration", () => {
 
     const res = toGraphQLTextMultiple([
       <gql.SourceFile path="scalars.graphql">
-        <gql.ScalarDeclaration
+        <gql.ScalarTypeDefinition
           name="DateTime"
           refkey={dateTimeRef}
           description={`"""\nISO-8601 date-time\n"""`}
@@ -138,23 +139,23 @@ describe("ScalarDeclaration", () => {
   it("renders common custom scalars", () => {
     const result = toGraphQLText(
       <>
-        <gql.ScalarDeclaration
+        <gql.ScalarTypeDefinition
           name="DateTime"
           description={`"""\nISO-8601 date-time string\n"""`}
         />
-        <gql.ScalarDeclaration
+        <gql.ScalarTypeDefinition
           name="Date"
           description={`"""\nISO-8601 date string\n"""`}
         />
-        <gql.ScalarDeclaration
+        <gql.ScalarTypeDefinition
           name="Time"
           description={`"""\nISO-8601 time string\n"""`}
         />
-        <gql.ScalarDeclaration
+        <gql.ScalarTypeDefinition
           name="JSON"
           description={`"""\nArbitrary JSON value\n"""`}
         />
-        <gql.ScalarDeclaration
+        <gql.ScalarTypeDefinition
           name="UUID"
           description={`"""\nUUID string\n"""`}
         />
@@ -193,7 +194,7 @@ describe("ScalarDeclaration", () => {
 
     const result = toGraphQLText(
       <>
-        <gql.ScalarDeclaration name="DateTime" refkey={dateTimeRef} />
+        <gql.ScalarTypeDefinition name="DateTime" refkey={dateTimeRef} />
         <gql.ObjectTypeDefinition name="Query">
           <gql.FieldDefinition
             name="events"
@@ -218,4 +219,3 @@ describe("ScalarDeclaration", () => {
     `);
   });
 });
-
