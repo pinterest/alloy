@@ -48,7 +48,7 @@ export interface FieldDefinitionProps {
 }
 
 /**
- * A field definition for GraphQL object types, interfaces, and input types.
+ * A field definition for GraphQL object types and interfaces.
  *
  * @example
  * ```tsx

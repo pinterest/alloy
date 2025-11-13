@@ -13,7 +13,7 @@ import { useGraphQLScope } from "../symbols/scopes.js";
 
 /**
  * Valid directive locations in GraphQL
- * @see https://spec.graphql.org/October2021/#DirectiveLocation
+ * @see https://spec.graphql.org/September2025/#DirectiveLocation
  */
 export type DirectiveLocation =
   // Executable directive locations

@@ -19,6 +19,7 @@ export const builtInDirectives = {
   skip: "skip",
   include: "include",
   specifiedBy: "specifiedBy",
+  oneOf: "oneOf",
 } as const;
 
 export type BuiltInDirectiveName = keyof typeof builtInDirectives;
