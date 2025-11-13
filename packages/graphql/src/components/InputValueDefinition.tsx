@@ -26,16 +26,9 @@ export interface InputValueDefinitionProps {
    */
   type: Children;
   /**
-   * Default value for the argument (rendered as a GraphQL value literal).
-   * Numbers, booleans, arrays, and objects are rendered as expected.
-   * Strings are quoted unless `enumDefault` is true.
+   * Default value for the argument
    */
-  default?: unknown;
-  /**
-   * When true, treats the `default` value as an unquoted enum value.
-   * Only applies when `default` is a string.
-   */
-  enumDefault?: boolean;
+  default?: Children;
   /**
    * Documentation for the argument
    */
@@ -65,12 +58,6 @@ export interface InputValueDefinitionProps {
  *     doc='"""Reason for the action"""'
  *   />
  *   <InputValueDefinition
- *     name="status"
- *     type="Status!"
- *     default="ACTIVE"
- *     enumDefault
- *   />
- *   <InputValueDefinition
  *     name="priority"
  *     type={builtInScalars.Int}
  *     directives={<Directive name={builtInDirectives.deprecated} />}
@@ -83,7 +70,6 @@ export interface InputValueDefinitionProps {
  * limit: Int = 10
  * """Reason for the action"""
  * reason: String = "Not specified"
- * status: Status! = ACTIVE
  * priority: Int \@deprecated
  * ```
  */
@@ -114,7 +100,7 @@ export function InputValueDefinition(props: InputValueDefinitionProps) {
         <Name />: {typeAnnotation}
         <Show when={hasDefaultValue}>
           {" = "}
-          <ValueExpression jsValue={props.default} enum={props.enumDefault} />
+          <ValueExpression jsValue={props.default} />
         </Show>
         <Show when={Boolean(props.directives)}>{props.directives}</Show>
       </CoreDeclaration>

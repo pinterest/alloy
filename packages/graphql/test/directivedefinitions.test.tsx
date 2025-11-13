@@ -58,8 +58,7 @@ describe("DirectiveDefinition", () => {
             <gql.InputValueDefinition
               name="requires"
               type="Role!"
-              default="USER"
-              enumDefault
+              default={1}
             />
             <gql.InputValueDefinition
               name="scopes"
@@ -70,7 +69,7 @@ describe("DirectiveDefinition", () => {
       />,
     );
     expect(result).toBe(
-      "directive @auth(requires: Role! = USER, scopes: [String!]) on FIELD_DEFINITION | OBJECT",
+      "directive @auth(requires: Role! = 1, scopes: [String!]) on FIELD_DEFINITION | OBJECT",
     );
   });
 
@@ -250,8 +249,7 @@ describe("DirectiveDefinition", () => {
               <gql.InputValueDefinition
                 name="requires"
                 type="Role!"
-                default="USER"
-                enumDefault
+                default={1}
               />
               <gql.InputValueDefinition
                 name="level"
@@ -286,7 +284,7 @@ describe("DirectiveDefinition", () => {
     );
 
     expect(result).toRenderTo(d`
-      directive @auth(requires: Role! = USER, level: Int = 1) on FIELD_DEFINITION | OBJECT
+      directive @auth(requires: Role! = 1, level: Int = 1) on FIELD_DEFINITION | OBJECT
 
       type User @auth(requires: "ADMIN", level: 5) {
         id: ID!

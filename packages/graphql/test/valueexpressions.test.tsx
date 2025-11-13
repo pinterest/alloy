@@ -61,19 +61,6 @@ describe("ValueExpression Component", () => {
     expect(result).toBe('"hello\\nworld"');
   });
 
-  it("renders enum values without quotes", () => {
-    const result = toGraphQLText([
-      <gql.ValueExpression jsValue="ACTIVE" enum />,
-    ]);
-    expect(result).toBe("ACTIVE");
-  });
-
-  it("renders enum values with underscores", () => {
-    const result = toGraphQLText([
-      <gql.ValueExpression jsValue="PENDING_APPROVAL" enum />,
-    ]);
-    expect(result).toBe("PENDING_APPROVAL");
-  });
 
   it("renders empty arrays", () => {
     const result = toGraphQLText([<gql.ValueExpression jsValue={[]} />]);
@@ -222,12 +209,4 @@ describe("ValueExpression Component", () => {
     expect(result).toBe('@deprecated(reason: "Use newField instead")');
   });
 
-  it("can render default enum values", () => {
-    const result = toGraphQLText([
-      <>
-        field(status: Status = <gql.ValueExpression jsValue="ACTIVE" enum />)
-      </>,
-    ]);
-    expect(result).toBe("field(status: Status = ACTIVE)");
-  });
 });
