@@ -118,12 +118,7 @@ export function InputValueDefinition(props: InputValueDefinitionProps) {
         <Name />: {inputType}
         <Show when={hasDefaultValue}>
           {" = "}
-          <Show
-            when={props.enumDefault}
-            fallback={<ValueExpression jsValue={props.defaultValue} />}
-          >
-            {props.defaultValue}
-          </Show>
+          <ValueExpression jsValue={props.defaultValue} />
         </Show>
         <Show when={Boolean(props.directives)}>
           <Directives location="ARGUMENT_DEFINITION">
