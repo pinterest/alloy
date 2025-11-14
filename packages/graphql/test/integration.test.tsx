@@ -630,7 +630,6 @@ describe("Complete Schema Integration", () => {
 
   it("renders complex directive usage across different component types", () => {
     const authDirectiveRef = refkey();
-    const cacheDirectiveRef = refkey();
     const adminRoleRef = refkey();
 
     const result = toGraphQLText(
