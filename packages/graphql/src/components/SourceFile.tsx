@@ -60,15 +60,15 @@ export interface SourceFileProps {
  *   headerComment="This file is auto-generated. Do not edit manually."
  *   description='"""Main schema file for the API"""'
  * >
- *   <ObjectType name="User">
- *     <Field name="id" type={code`${builtInScalars.ID}!`} />
- *     <Field name="name" type={builtInScalars.String} />
- *   </ObjectType>
+ *   <ObjectTypeDefinition name="User">
+ *     <FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+ *     <FieldDefinition name="name" type={builtInScalars.String} />
+ *   </ObjectTypeDefinition>
  *
- *   <ObjectType name="Post">
- *     <Field name="id" type={code`${builtInScalars.ID}!`} />
- *     <Field name="title" type={builtInScalars.String} />
- *   </ObjectType>
+ *   <ObjectTypeDefinition name="Post">
+ *     <FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+ *     <FieldDefinition name="title" type={builtInScalars.String} />
+ *   </ObjectTypeDefinition>
  * </SourceFile>
  * ```
  * renders to
