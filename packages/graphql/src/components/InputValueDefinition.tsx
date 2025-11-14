@@ -8,6 +8,7 @@ import {
   memo,
 } from "@alloy-js/core";
 import { createGraphQLSymbol } from "../symbol-creation.js";
+import { Directives } from "./Directives.js";
 import { ValueExpression } from "./ValueExpression.js";
 
 export interface InputValueDefinitionProps {
@@ -80,6 +81,9 @@ export function InputValueDefinition(props: InputValueDefinitionProps) {
     props.name,
     {
       refkeys: props.refkey,
+      metadata: {
+        type: props.type,
+      },
     },
     "argument",
   );
@@ -100,7 +104,9 @@ export function InputValueDefinition(props: InputValueDefinitionProps) {
           {" = "}
           <ValueExpression jsValue={props.defaultValue} />
         </Show>
-        <Show when={Boolean(props.directives)}>{props.directives}</Show>
+        <Show when={Boolean(props.directives)}>
+          <Directives location="ARGUMENT_DEFINITION">{props.directives}</Directives>
+        </Show>
       </CoreDeclaration>
     </>
   );

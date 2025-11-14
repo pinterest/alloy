@@ -14,7 +14,7 @@ describe("DirectiveDefinition", () => {
         locations={["FIELD_DEFINITION"]}
       />,
     );
-    expect(result).toBe("directive @custom on FIELD_DEFINITION");
+    expect(result).toRenderTo("directive @custom on FIELD_DEFINITION");
   });
 
   it("renders a directive declaration with multiple locations", () => {
@@ -24,7 +24,7 @@ describe("DirectiveDefinition", () => {
         locations={["FIELD_DEFINITION", "OBJECT", "INTERFACE"]}
       />,
     );
-    expect(result).toBe(
+    expect(result).toRenderTo(
       "directive @auth on FIELD_DEFINITION | OBJECT | INTERFACE",
     );
   });
@@ -43,7 +43,7 @@ describe("DirectiveDefinition", () => {
         }
       />,
     );
-    expect(result).toBe(
+    expect(result).toRenderTo(
       'directive @deprecated(reason: String = "No longer supported") on FIELD_DEFINITION',
     );
   });
@@ -68,7 +68,7 @@ describe("DirectiveDefinition", () => {
         }
       />,
     );
-    expect(result).toBe(
+    expect(result).toRenderTo(
       "directive @auth(requires: Role! = 1, scopes: [String!]) on FIELD_DEFINITION | OBJECT",
     );
   });
@@ -87,7 +87,7 @@ describe("DirectiveDefinition", () => {
         }
       />,
     );
-    expect(result).toBe(
+    expect(result).toRenderTo(
       "directive @tag(name: String!) repeatable on FIELD_DEFINITION | OBJECT",
     );
   });
@@ -206,7 +206,7 @@ describe("DirectiveDefinition", () => {
         ]}
       />,
     );
-    expect(result).toBe(
+    expect(result).toRenderTo(
       "directive @trace on QUERY | MUTATION | SUBSCRIPTION | FIELD | FRAGMENT_DEFINITION | FRAGMENT_SPREAD | INLINE_FRAGMENT | VARIABLE_DEFINITION",
     );
   });
@@ -230,7 +230,7 @@ describe("DirectiveDefinition", () => {
         ]}
       />,
     );
-    expect(result).toBe(
+    expect(result).toRenderTo(
       "directive @metadata on SCHEMA | SCALAR | OBJECT | FIELD_DEFINITION | ARGUMENT_DEFINITION | INTERFACE | UNION | ENUM | ENUM_VALUE | INPUT_OBJECT | INPUT_FIELD_DEFINITION",
     );
   });
@@ -291,5 +291,53 @@ describe("DirectiveDefinition", () => {
         sensitiveData: String @auth(requires: "SUPER_ADMIN", level: 10)
       }
     `);
+  });
+
+  describe("directive definition validation", () => {
+    it("throws error when locations array is empty", () => {
+      expect(() => {
+        toGraphQLText(
+          <gql.DirectiveDefinition name="invalid" locations={[]} />,
+        );
+      }).toThrow(/must specify at least one location/);
+    });
+
+    it("throws error when directive name is already defined", () => {
+      expect(() => {
+        toGraphQLText(
+          <gql.SourceFile path="schema.graphql">
+            <gql.DirectiveDefinition
+              name="cache"
+              locations={["FIELD_DEFINITION"]}
+            />
+            <gql.DirectiveDefinition
+              name="cache"
+              locations={["OBJECT"]}
+            />
+          </gql.SourceFile>,
+        );
+      }).toThrow(/Directive @cache is already defined/);
+    });
+
+    it("allows different directive names", () => {
+      const result = toGraphQLText(
+        <gql.SourceFile path="schema.graphql">
+          <gql.DirectiveDefinition
+            name="cache"
+            locations={["FIELD_DEFINITION"]}
+          />
+          <gql.DirectiveDefinition
+            name="auth"
+            locations={["FIELD_DEFINITION"]}
+          />
+        </gql.SourceFile>,
+      );
+
+      expect(result).toRenderTo(d`
+        directive @cache on FIELD_DEFINITION
+        
+        directive @auth on FIELD_DEFINITION
+      `);
+    });
   });
 });

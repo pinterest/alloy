@@ -12,6 +12,7 @@ import {
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { GraphQLMemberScope } from "../symbols/graphql-member-scope.js";
 import { useGraphQLScope } from "../symbols/scopes.js";
+import { Directives } from "./Directives.js";
 
 export interface FieldDefinitionProps {
   /**
@@ -49,6 +50,11 @@ export interface FieldDefinitionProps {
 
 /**
  * A field definition for GraphQL object types and interfaces.
+ *
+ * @remarks
+ * Directives used on fields are automatically validated to ensure they can be used
+ * on `FIELD_DEFINITION` location. Invalid directive usage will throw an error during
+ * code generation.
  *
  * @example
  * ```tsx
@@ -135,7 +141,9 @@ export function FieldDefinition(props: FieldDefinitionProps) {
           )
         </Show>
         : {fieldType}
-        <Show when={Boolean(props.directives)}>{props.directives}</Show>
+        <Show when={Boolean(props.directives)}>
+          <Directives location="FIELD_DEFINITION">{props.directives}</Directives>
+        </Show>
       </CoreDeclaration>
     </>
   );

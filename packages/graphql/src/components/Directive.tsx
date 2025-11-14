@@ -1,4 +1,14 @@
-import { Children, For, Show, createSymbolSlot, memo } from "@alloy-js/core";
+import {
+  Children,
+  For,
+  isRefkey,
+  Refkey,
+  Show,
+  createSymbolSlot,
+  memo,
+} from "@alloy-js/core";
+import { ref } from "../symbols/reference.js";
+import { runDirectiveValidation } from "./Directives.js";
 import { ValueExpression } from "./ValueExpression.js";
 
 export interface DirectiveProps {
@@ -49,6 +59,12 @@ export interface DirectiveProps {
 export function Directive(props: DirectiveProps) {
   const NameSlot = createSymbolSlot();
 
+  // Extract directive name for validation
+  const directiveName = extractDirectiveName(props.name);
+  if (directiveName) {
+    runDirectiveValidation(directiveName, props.args);
+  }
+
   const hasArgs = props.args && Object.keys(props.args).length > 0;
   const argEntries = memo(() => (hasArgs ? Object.entries(props.args!) : []));
 
@@ -69,4 +85,23 @@ export function Directive(props: DirectiveProps) {
       </Show>
     </>
   );
+}
+
+/**
+ * Extracts the directive name from a Children value
+ */
+function extractDirectiveName(name: Children): string | null {
+  // If name is a refkey, resolve it
+  if (isRefkey(name)) {
+    const reference = ref(name as Refkey);
+    const [resolvedName] = reference();
+    return String(resolvedName);
+  }
+
+  // If name is a string, return it directly
+  if (typeof name === "string") {
+    return name;
+  }
+
+  return null;
 }

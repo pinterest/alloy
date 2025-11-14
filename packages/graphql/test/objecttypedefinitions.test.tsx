@@ -344,7 +344,7 @@ describe("ObjectTypeDefinition", () => {
         directives={
           <>
             <gql.Directive name="auth" args={{ requires: "ADMIN" }} />
-            <gql.Directive name={builtInDirectives.deprecated} />
+            <gql.Directive name="cacheControl" args={{ maxAge: 3600 }} />
           </>
         }
       >
@@ -352,7 +352,7 @@ describe("ObjectTypeDefinition", () => {
       </gql.ObjectTypeDefinition>,
     );
     expect(result).toRenderTo(d`
-      type User @auth(requires: "ADMIN") @deprecated {
+      type User @auth(requires: "ADMIN") @cacheControl(maxAge: 3600) {
         id: ID!
       }
     `);

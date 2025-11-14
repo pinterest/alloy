@@ -11,6 +11,7 @@ import {
 } from "@alloy-js/core";
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { GraphQLMemberScope, useGraphQLScope } from "../symbols/index.js";
+import { Directives } from "./Directives.js";
 import { ImplementsInterfaces } from "./ImplementsInterfaces.js";
 
 export interface ObjectTypeDefinitionProps {
@@ -43,6 +44,11 @@ export interface ObjectTypeDefinitionProps {
 /**
  * An object type definition for GraphQL schemas.
  *
+ * When a type implements interfaces, and those interfaces themselves implement other interfaces,
+ * the rendered output will automatically include all transitive interfaces. For example, if
+ * interface B implements interface C, and type A implements B, the output will be
+ * `type A implements B & C { ... }` even though you only specified `implements={[B]}`.
+ *
  * @example
  * ```tsx
  * import { code, refkey } from "@alloy-js/core";
@@ -74,6 +80,49 @@ export interface ObjectTypeDefinitionProps {
  *   email: String
  * }
  * ```
+ *
+ * @example
+ * Transitive interface implementation:
+ * ```tsx
+ * const nodeRef = refkey();
+ * const timestampedRef = refkey();
+ *
+ * <>
+ *   <ObjectTypeDefinition name="Node" refkey={nodeRef}>
+ *     <FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+ *   </ObjectTypeDefinition>
+ *
+ *   <ObjectTypeDefinition
+ *     name="Timestamped"
+ *     refkey={timestampedRef}
+ *     implements={[nodeRef]}
+ *   >
+ *     <FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+ *     <FieldDefinition name="createdAt" type={builtInScalars.String} />
+ *   </ObjectTypeDefinition>
+ *
+ *   <ObjectTypeDefinition name="User" implements={[timestampedRef]}>
+ *     <FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+ *     <FieldDefinition name="createdAt" type={builtInScalars.String} />
+ *   </ObjectTypeDefinition>
+ * </>
+ * ```
+ * renders to
+ * ```graphql
+ * type Node {
+ *   id: ID!
+ * }
+ *
+ * type Timestamped implements Node {
+ *   id: ID!
+ *   createdAt: String
+ * }
+ *
+ * type User implements Timestamped & Node {
+ *   id: ID!
+ *   createdAt: String
+ * }
+ * ```
  */
 export function ObjectTypeDefinition(props: ObjectTypeDefinitionProps) {
   const parentScope = useGraphQLScope();
@@ -82,6 +131,9 @@ export function ObjectTypeDefinition(props: ObjectTypeDefinitionProps) {
     props.name,
     {
       refkeys: props.refkey,
+      metadata: {
+        implements: props.implements ?? [],
+      },
     },
     "type",
   );
@@ -104,7 +156,9 @@ export function ObjectTypeDefinition(props: ObjectTypeDefinitionProps) {
         <Show when={props.implements && props.implements.length > 0}>
           <ImplementsInterfaces interfaces={props.implements!} />
         </Show>
-        <Show when={Boolean(props.directives)}>{props.directives}</Show>
+        <Show when={Boolean(props.directives)}>
+          <Directives location="OBJECT">{props.directives}</Directives>
+        </Show>
         {" {"}
         <MemberScope value={memberScope}>
           <Indent hardline>

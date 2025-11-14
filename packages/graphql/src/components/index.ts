@@ -1,5 +1,6 @@
 export * from "./Directive.js";
 export * from "./DirectiveDefinition.js";
+export * from "./Directives.js";
 export * from "./FieldDefinition.js";
 export * from "./ImplementsInterfaces.js";
 export * from "./InputValueDefinition.js";

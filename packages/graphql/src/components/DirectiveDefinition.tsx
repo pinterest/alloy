@@ -68,6 +68,12 @@ export interface DirectiveDefinitionProps {
 /**
  * Defines a custom GraphQL directive in the schema.
  *
+ * @remarks
+ * This component validates that:
+ * - At least one location is specified
+ * - All locations are valid GraphQL directive locations
+ * - The directive name is not already defined in the current scope
+ *
  * @example
  * ```tsx
  * <DirectiveDefinition
@@ -93,14 +99,40 @@ export interface DirectiveDefinitionProps {
  *   scopes: [String!]
  * ) repeatable on FIELD_DEFINITION | OBJECT
  * ```
+ *
+ * @throws {Error} If locations array is empty
+ * @throws {Error} If directive name is already defined
  */
 export function DirectiveDefinition(props: DirectiveDefinitionProps) {
   const scope = useGraphQLScope();
+
+  // Validate locations
+  if (!props.locations || props.locations.length === 0) {
+    throw new Error(
+      `Directive @${props.name} must specify at least one location`,
+    );
+  }
+
+  // Check for duplicate directive definitions
+  if (scope && "symbols" in scope) {
+    const existingSymbol = scope.symbols.symbolNames.get(props.name);
+    if (existingSymbol) {
+      throw new Error(
+        `Directive @${props.name} is already defined in this scope`,
+      );
+    }
+  }
 
   const sym = createGraphQLSymbol(
     props.name,
     {
       refkeys: props.refkey,
+      metadata: {
+        locations: props.locations,
+        repeatable: props.repeatable ?? false,
+        // Store a reference to the argument scope for later validation
+        hasArguments: Boolean(props.args),
+      },
     },
     "directive",
   );
