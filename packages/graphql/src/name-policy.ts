@@ -46,20 +46,15 @@ const BUILTIN_SCALARS = new Set(builtInScalarNames);
 function ensureNonReservedName(name: string, originalName: string): string {
   const suffix = "_";
 
-  // Check if the original name (before transformation) is exactly a lowercase operation keyword
-  // This ensures 'query', 'mutation', 'subscription' get renamed but 'Query', 'Mutation', 'Subscription' don't
-  if (OPERATION_KEYWORDS.has(originalName)) {
-    return `${name}${suffix}`;
-  }
-
-  // Check if the name is a built-in scalar (case-sensitive)
-  if (BUILTIN_SCALARS.has(name as BuiltInScalarName)) {
-    return `${name}${suffix}`;
-  }
-
-  // Check if it's an exact match for operation keywords (case-sensitive)
-  // This is a fallback in case the transformed name itself is an operation keyword
-  if (OPERATION_KEYWORDS.has(name)) {
+  // Check for conflicts that require renaming:
+  // - Original name is a lowercase operation keyword (query, mutation, subscription)
+  // - Transformed name is a built-in scalar (Int, Float, String, Boolean, ID)
+  // - Transformed name is an operation keyword (fallback check)
+  if (
+    OPERATION_KEYWORDS.has(originalName) ||
+    BUILTIN_SCALARS.has(name as BuiltInScalarName) ||
+    OPERATION_KEYWORDS.has(name)
+  ) {
     return `${name}${suffix}`;
   }
 

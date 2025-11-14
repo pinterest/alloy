@@ -21,9 +21,3 @@ export const builtInDirectives = {
   specifiedBy: "specifiedBy",
   oneOf: "oneOf",
 } as const;
-
-export type BuiltInDirectiveName = keyof typeof builtInDirectives;
-
-export const builtInDirectiveNames = Object.keys(
-  builtInDirectives,
-) as BuiltInDirectiveName[];
