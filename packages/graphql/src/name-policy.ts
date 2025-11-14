@@ -9,7 +9,10 @@ export type GraphQLElements =
   | "enum" // Enum type names
   | "enumValue" // Enum value names
   | "directive" // Directive names
-  | "scalar"; // Scalar type names
+  | "scalar" // Scalar type names
+  | "operation" // Operation names (queries, mutations, subscriptions)
+  | "fragment" // Fragment names
+  | "variable"; // Variable names
 
 // Keywords that are reserved in GraphQL SDL
 const GRAPHQL_RESERVED_WORDS = new Set([
@@ -80,6 +83,9 @@ function ensureNonReservedName(name: string, originalName: string): string {
  * - Enums: PascalCase
  * - Enum values: UPPER_SNAKE_CASE
  * - Directives: camelCase
+ * - Operations: PascalCase
+ * - Fragments: PascalCase
+ * - Variables: camelCase
  */
 export function createGraphQLNamePolicy(): NamePolicy<GraphQLElements> {
   return createNamePolicy((name, element) => {
@@ -89,6 +95,8 @@ export function createGraphQLNamePolicy(): NamePolicy<GraphQLElements> {
       case "type":
       case "enum":
       case "scalar":
+      case "operation":
+      case "fragment":
         transformedName = pascalCase(name);
         break;
       case "enumValue":
@@ -97,6 +105,7 @@ export function createGraphQLNamePolicy(): NamePolicy<GraphQLElements> {
       case "field":
       case "argument":
       case "directive":
+      case "variable":
         transformedName = camelCase(name);
         break;
       default:
