@@ -29,7 +29,7 @@ export interface FragmentSpreadProps {
  * // With directives
  * <FragmentSpread
  *   name="UserFields"
- *   directives={<Directive name="include" arguments={<Argument name="if" value={<Variable name="includeUser" />} />} />}
+ *   directives={<Directive name="include" args={{ if: <Variable name="includeUser" /> }} />}
  * />
  * ```
  * renders to
