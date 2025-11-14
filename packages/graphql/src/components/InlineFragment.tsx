@@ -33,7 +33,7 @@ export interface InlineFragmentProps {
  * </FieldSelection>
  *
  * // Inline fragment without type condition (for directives)
- * <InlineFragment directives={<Directive name="include" arguments={<Argument name="if" value={<Variable name="showDetails" />} />} />}>
+ * <InlineFragment directives={<Directive name="include" args={{ if: <Variable name="showDetails" /> }} />}>
  *   <FieldSelection name="details" />
  * </InlineFragment>
  * ```
