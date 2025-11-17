@@ -2,7 +2,6 @@
 import { code, refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
-import { builtInDirectives } from "../src/builtins/directives.js";
 import { builtInScalars } from "../src/builtins/scalars.js";
 import * as gql from "../src/index.js";
 import {
@@ -34,10 +33,7 @@ describe("ObjectTypeDefinition", () => {
 
   it("renders an object type with a description", () => {
     const result = toGraphQLText(
-      <gql.ObjectTypeDefinition
-        name="User"
-        description={`"""\nA user in the system\n"""`}
-      >
+      <gql.ObjectTypeDefinition name="User" description="A user in the system">
         <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
       </gql.ObjectTypeDefinition>,
     );
@@ -55,7 +51,7 @@ describe("ObjectTypeDefinition", () => {
     const result = toGraphQLText(
       <gql.ObjectTypeDefinition
         name="User"
-        description={`"""\nA user in the system.\nCan have multiple lines of documentation.\n"""`}
+        description="A user in the system.\nCan have multiple lines of documentation."
       >
         <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
       </gql.ObjectTypeDefinition>,
@@ -77,12 +73,12 @@ describe("ObjectTypeDefinition", () => {
         <gql.FieldDefinition
           name="id"
           type={code`${builtInScalars.ID}!`}
-          description={`"""\nUnique identifier\n"""`}
+          description="Unique identifier"
         />
         <gql.FieldDefinition
           name="email"
           type={builtInScalars.String}
-          description={`"""\nUser's email address\n"""`}
+          description="User's email address"
         />
       </gql.ObjectTypeDefinition>,
     );

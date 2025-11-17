@@ -96,7 +96,7 @@ describe("DirectiveDefinition", () => {
     const result = toGraphQLText(
       <gql.DirectiveDefinition
         name="validate"
-        description={`"""\nValidates field values against a pattern\n"""`}
+        description="Validates field values against a pattern"
         locations={["FIELD_DEFINITION"]}
         args={
           <gql.InputValueDefinition
@@ -310,10 +310,7 @@ describe("DirectiveDefinition", () => {
               name="cache"
               locations={["FIELD_DEFINITION"]}
             />
-            <gql.DirectiveDefinition
-              name="cache"
-              locations={["OBJECT"]}
-            />
+            <gql.DirectiveDefinition name="cache" locations={["OBJECT"]} />
           </gql.SourceFile>,
         );
       }).toThrow(/Directive @cache is already defined/);

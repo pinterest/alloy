@@ -38,6 +38,47 @@ const OPERATION_KEYWORDS = new Set(["query", "mutation", "subscription"]);
 const BUILTIN_SCALARS = new Set(builtInScalarNames);
 
 /**
+ * Regular expression for valid GraphQL names per the spec:
+ * - Must start with a letter (A-Z, a-z) or underscore (_)
+ * - Can contain letters, digits (0-9), and underscores
+ * @see https://spec.graphql.org/September2025/#Name
+ */
+const VALID_NAME_REGEX = /^[_A-Za-z][_0-9A-Za-z]*$/;
+
+/**
+ * Validates that a name follows the GraphQL specification format.
+ * Names must start with a letter or underscore, and can only contain
+ * letters, digits, and underscores.
+ *
+ * Note: Double underscore check is performed separately in preserveLeadingUnderscore
+ * after name transformation, as we need to check the ORIGINAL name, not the transformed one.
+ *
+ * @param name - The name to validate (after transformation)
+ * @throws {Error} If the name is invalid
+ */
+function validateGraphQLName(name: string): void {
+  if (!VALID_NAME_REGEX.test(name)) {
+    // Determine the specific issue for a better error message
+    if (/^[0-9]/.test(name)) {
+      throw new Error(
+        `Invalid GraphQL name "${name}": names cannot start with a digit. ` +
+          `Names must start with a letter (A-Z, a-z) or underscore (_).`,
+      );
+    } else if (!/^[_A-Za-z0-9]+$/.test(name)) {
+      throw new Error(
+        `Invalid GraphQL name "${name}": names can only contain letters (A-Z, a-z), ` +
+          `digits (0-9), and underscores (_).`,
+      );
+    } else {
+      throw new Error(
+        `Invalid GraphQL name "${name}": names must start with a letter (A-Z, a-z) ` +
+          `or underscore (_), and can only contain letters, digits, and underscores.`,
+      );
+    }
+  }
+}
+
+/**
  * Ensures a valid GraphQL identifier by adding a suffix if needed.
  * @param name - The transformed name to validate.
  * @param originalName - The original name before transformation.
@@ -45,6 +86,9 @@ const BUILTIN_SCALARS = new Set(builtInScalarNames);
  */
 function ensureNonReservedName(name: string, originalName: string): string {
   const suffix = "_";
+
+  // First, validate that the name follows GraphQL spec format
+  validateGraphQLName(name);
 
   // Check for conflicts that require renaming:
   // - Original name is a lowercase operation keyword (query, mutation, subscription)
@@ -68,6 +112,36 @@ function ensureNonReservedName(name: string, originalName: string): string {
 }
 
 /**
+ * Validates GraphQL names and handles leading underscores.
+ *
+ * This function:
+ * 1. Rejects names starting with __ (reserved for introspection)
+ * 2. Preserves single leading underscores
+ * 3. Returns the transformed name
+ *
+ * @param name - The original name
+ * @param transformed - The transformed name (after pascalCase/camelCase)
+ * @returns The validated name with leading underscore preserved if present
+ * @throws {Error} If the name starts with double underscore (reserved for introspection)
+ */
+function handleLeadingUnderscore(name: string, transformed: string): string {
+  // Check if original name starts with double underscore (reserved)
+  if (name.startsWith("__")) {
+    throw new Error(
+      `Invalid GraphQL name "${name}": names starting with "__" (double underscore) ` +
+        `are reserved for GraphQL introspection system.`,
+    );
+  }
+
+  // Preserve single leading underscore if present
+  if (name.startsWith("_") && !transformed.startsWith("_")) {
+    return "_" + transformed;
+  }
+
+  return transformed;
+}
+
+/**
  * Creates a name policy for GraphQL with appropriate naming conventions:
  * - Types: PascalCase
  * - Fields: camelCase
@@ -75,6 +149,9 @@ function ensureNonReservedName(name: string, originalName: string): string {
  * - Enums: PascalCase
  * - Enum values: UPPER_SNAKE_CASE
  * - Directives: camelCase
+ *
+ * Note: Single leading underscores are preserved per GraphQL spec.
+ * Double underscores (__) are reserved for introspection.
  */
 export function createGraphQLNamePolicy(): NamePolicy<GraphQLElements> {
   return createNamePolicy((name, element) => {
@@ -98,6 +175,9 @@ export function createGraphQLNamePolicy(): NamePolicy<GraphQLElements> {
         transformedName = camelCase(name);
         break;
     }
+
+    // Handle leading underscore preservation
+    transformedName = handleLeadingUnderscore(name, transformedName);
 
     return ensureNonReservedName(transformedName, name);
   });

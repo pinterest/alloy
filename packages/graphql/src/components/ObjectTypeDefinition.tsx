@@ -13,6 +13,7 @@ import { createGraphQLSymbol } from "../symbol-creation.js";
 import { GraphQLMemberScope, useGraphQLScope } from "../symbols/index.js";
 import { Directives } from "./Directives.js";
 import { ImplementsInterfaces } from "./ImplementsInterfaces.js";
+import { wrapDescription } from "./utils.js";
 
 export interface ObjectTypeDefinitionProps {
   /**
@@ -24,7 +25,7 @@ export interface ObjectTypeDefinitionProps {
    */
   children?: Children;
   /**
-   * Description for the type
+   * Description for the type. Will be automatically wrapped in triple quotes (""").
    */
   description?: Children;
   /**
@@ -55,72 +56,26 @@ export interface ObjectTypeDefinitionProps {
  *
  * const nodeRef = refkey();
  * const timestampedRef = refkey();
- * const userRef = refkey();
  *
  * <ObjectTypeDefinition
  *   name="User"
- *   refkey={userRef}
- *   description='"""A user in the system"""'
+ *   description="A user in the system.\nCan create posts and interact with other users."
  *   implements={[nodeRef, timestampedRef]}
  *   directives={<Directive name="auth" args={{ requires: "ADMIN" }} />}
  * >
  *   <FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
- *   <FieldDefinition name="name" type={code`${builtInScalars.String}!`} />
  *   <FieldDefinition name="email" type={builtInScalars.String} />
  * </ObjectTypeDefinition>
  * ```
  * renders to
  * ```graphql
  * """
- * A user in the system
+ * A user in the system.
+ * Can create posts and interact with other users.
  * """
  * type User implements Node & Timestamped @auth(requires: "ADMIN") {
  *   id: ID!
- *   name: String!
  *   email: String
- * }
- * ```
- *
- * @example
- * Transitive interface implementation:
- * ```tsx
- * const nodeRef = refkey();
- * const timestampedRef = refkey();
- *
- * <>
- *   <ObjectTypeDefinition name="Node" refkey={nodeRef}>
- *     <FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
- *   </ObjectTypeDefinition>
- *
- *   <ObjectTypeDefinition
- *     name="Timestamped"
- *     refkey={timestampedRef}
- *     implements={[nodeRef]}
- *   >
- *     <FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
- *     <FieldDefinition name="createdAt" type={builtInScalars.String} />
- *   </ObjectTypeDefinition>
- *
- *   <ObjectTypeDefinition name="User" implements={[timestampedRef]}>
- *     <FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
- *     <FieldDefinition name="createdAt" type={builtInScalars.String} />
- *   </ObjectTypeDefinition>
- * </>
- * ```
- * renders to
- * ```graphql
- * type Node {
- *   id: ID!
- * }
- *
- * type Timestamped implements Node {
- *   id: ID!
- *   createdAt: String
- * }
- *
- * type User implements Timestamped & Node {
- *   id: ID!
- *   createdAt: String
  * }
  * ```
  */
@@ -144,11 +99,12 @@ export function ObjectTypeDefinition(props: ObjectTypeDefinitionProps) {
   });
 
   const ContentSlot = createContentSlot();
+  const wrappedDescription = wrapDescription(props.description);
 
   return (
     <>
-      <Show when={Boolean(props.description)}>
-        {props.description}
+      <Show when={Boolean(wrappedDescription())}>
+        {wrappedDescription()}
         <hbr />
       </Show>
       <CoreDeclaration symbol={sym}>

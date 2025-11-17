@@ -13,6 +13,7 @@ import { createGraphQLSymbol } from "../symbol-creation.js";
 import { GraphQLMemberScope } from "../symbols/graphql-member-scope.js";
 import { useGraphQLScope } from "../symbols/scopes.js";
 import { Directives } from "./Directives.js";
+import { wrapDescription } from "./utils.js";
 
 export interface FieldDefinitionProps {
   /**
@@ -24,7 +25,7 @@ export interface FieldDefinitionProps {
    */
   refkey?: Refkey;
   /**
-   * Description for the field
+   * Description for the field. Will be automatically wrapped in triple quotes (""").
    */
   description?: Children;
   /**
@@ -62,44 +63,30 @@ export interface FieldDefinitionProps {
  *
  * const userRef = refkey();
  *
- * <>
- *   <FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
- *   <FieldDefinition
- *     name="name"
- *     type={builtInScalars.String}
- *     description='"""User full name"""'
- *   />
- *   <FieldDefinition name="tags" type={code`[${builtInScalars.String}!]!`} />
- *   <FieldDefinition
- *     name="user"
- *     type={code`${userRef}!`}
- *     args={
- *       <>
- *         <InputValueDefinition name="id" type={code`${builtInScalars.ID}!`} />
- *         <InputValueDefinition name="includeDeleted" type={builtInScalars.Boolean} defaultValue={false} />
- *       </>
- *     }
- *   />
- *   <FieldDefinition
- *     name="legacyField"
- *     type={builtInScalars.String}
- *     directives={
- *       <Directive
- *         name={builtInDirectives.deprecated}
- *         args={{ reason: "Use newField instead" }}
- *       />
- *     }
- *   />
- * </>
+ * <FieldDefinition
+ *   name="user"
+ *   type={code`${userRef}!`}
+ *   description="The user who created this post"
+ *   args={
+ *     <>
+ *       <InputValueDefinition name="id" type={code`${builtInScalars.ID}!`} />
+ *       <InputValueDefinition name="includeDeleted" type={builtInScalars.Boolean} defaultValue={false} />
+ *     </>
+ *   }
+ *   directives={
+ *     <Directive
+ *       name={builtInDirectives.deprecated}
+ *       args={{ reason: "Use author instead" }}
+ *     />
+ *   }
+ * />
  * ```
  * renders to
  * ```graphql
- * id: ID!
- * """User full name"""
- * name: String
- * tags: [String!]!
- * user(id: ID!, includeDeleted: Boolean = false): User!
- * legacyField: String \@deprecated(reason: "Use newField instead")
+ * """
+ * The user who created this post
+ * """
+ * user(id: ID!, includeDeleted: Boolean = false): User! @deprecated(reason: "Use author instead")
  * ```
  */
 export function FieldDefinition(props: FieldDefinitionProps) {
@@ -119,14 +106,16 @@ export function FieldDefinition(props: FieldDefinitionProps) {
     ownerSymbol: sym,
   });
 
+  const wrappedDescription = wrapDescription(props.description);
+
   const fieldType = memo(() => <TypeSymbolSlot>{props.type}</TypeSymbolSlot>);
 
   const hasArgs = Boolean(props.args);
 
   return (
     <>
-      <Show when={Boolean(props.description)}>
-        {props.description}
+      <Show when={Boolean(wrappedDescription())}>
+        {wrappedDescription()}
         <hbr />
       </Show>
       <CoreDeclaration symbol={sym}>
@@ -142,7 +131,9 @@ export function FieldDefinition(props: FieldDefinitionProps) {
         </Show>
         : {fieldType}
         <Show when={Boolean(props.directives)}>
-          <Directives location="FIELD_DEFINITION">{props.directives}</Directives>
+          <Directives location="FIELD_DEFINITION">
+            {props.directives}
+          </Directives>
         </Show>
       </CoreDeclaration>
     </>

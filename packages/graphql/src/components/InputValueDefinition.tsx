@@ -9,6 +9,7 @@ import {
 } from "@alloy-js/core";
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { Directives } from "./Directives.js";
+import { validateNonNullDefault, wrapDescription } from "./utils.js";
 import { ValueExpression } from "./ValueExpression.js";
 
 export interface InputValueDefinitionProps {
@@ -31,7 +32,7 @@ export interface InputValueDefinitionProps {
    */
   defaultValue?: Children;
   /**
-   * Description for the argument
+   * Description for the argument. Will be automatically wrapped in triple quotes (""").
    */
   description?: Children;
   /**
@@ -49,33 +50,34 @@ export interface InputValueDefinitionProps {
  *
  * @example
  * ```tsx
- * <>
- *   <InputValueDefinition name="id" type={code`${builtInScalars.ID}!`} />
- *   <InputValueDefinition name="limit" type={builtInScalars.Int} defaultValue={10} />
- *   <InputValueDefinition
- *     name="reason"
- *     type={builtInScalars.String}
- *     defaultValue="Not specified"
- *     description='"""Reason for the action"""'
- *   />
- *   <InputValueDefinition
- *     name="priority"
- *     type={builtInScalars.Int}
- *     directives={<Directive name={builtInDirectives.deprecated} />}
- *   />
- * </>
+ * <InputValueDefinition
+ *   name="reason"
+ *   type={builtInScalars.String}
+ *   defaultValue="Not specified"
+ *   description="Reason for the action"
+ *   directives={<Directive name={builtInDirectives.deprecated} />}
+ * />
  * ```
  * renders to
  * ```graphql
- * id: ID!
- * limit: Int = 10
- * """Reason for the action"""
- * reason: String = "Not specified"
- * priority: Int \@deprecated
+ * """
+ * Reason for the action
+ * """
+ * reason: String = "Not specified" @deprecated
  * ```
  */
 export function InputValueDefinition(props: InputValueDefinitionProps) {
   const TypeSymbolSlot = createSymbolSlot();
+
+  // Validate that non-null types don't have null default values
+  if (props.defaultValue !== undefined) {
+    validateNonNullDefault(
+      props.type,
+      props.defaultValue,
+      props.name,
+      "Argument",
+    );
+  }
 
   const sym = createGraphQLSymbol(
     props.name,
@@ -88,14 +90,16 @@ export function InputValueDefinition(props: InputValueDefinitionProps) {
     "argument",
   );
 
+  const wrappedDescription = wrapDescription(props.description);
+
   const inputType = memo(() => <TypeSymbolSlot>{props.type}</TypeSymbolSlot>);
 
   const hasDefaultValue = props.defaultValue !== undefined;
 
   return (
     <>
-      <Show when={Boolean(props.description)}>
-        {props.description}
+      <Show when={Boolean(wrappedDescription())}>
+        {wrappedDescription()}
         <hbr />
       </Show>
       <CoreDeclaration symbol={sym}>
@@ -105,7 +109,9 @@ export function InputValueDefinition(props: InputValueDefinitionProps) {
           <ValueExpression jsValue={props.defaultValue} />
         </Show>
         <Show when={Boolean(props.directives)}>
-          <Directives location="ARGUMENT_DEFINITION">{props.directives}</Directives>
+          <Directives location="ARGUMENT_DEFINITION">
+            {props.directives}
+          </Directives>
         </Show>
       </CoreDeclaration>
     </>

@@ -13,9 +13,17 @@ export interface BuiltInDirectiveMetadata {
  * All built-in directives are non-repeatable.
  * @see https://spec.graphql.org/September2025/#sec-Type-System.Directives
  */
-export const builtInDirectiveMetadata: Record<string, BuiltInDirectiveMetadata> = {
+export const builtInDirectiveMetadata: Record<
+  string,
+  BuiltInDirectiveMetadata
+> = {
   deprecated: {
-    locations: ["FIELD_DEFINITION", "ARGUMENT_DEFINITION", "INPUT_FIELD_DEFINITION", "ENUM_VALUE"],
+    locations: [
+      "FIELD_DEFINITION",
+      "ARGUMENT_DEFINITION",
+      "INPUT_FIELD_DEFINITION",
+      "ENUM_VALUE",
+    ],
   },
   skip: {
     locations: ["FIELD", "FRAGMENT_SPREAD", "INLINE_FRAGMENT"],
@@ -44,7 +52,7 @@ export const builtInDirectiveMetadata: Record<string, BuiltInDirectiveMetadata> 
  * ```
  * renders to
  * ```graphql
- * oldField: String \@deprecated(reason: "Use newField instead")
+ * oldField: String @deprecated(reason: "Use newField instead")
  * ```
  */
 export const builtInDirectives = {

@@ -87,7 +87,7 @@ describe("FieldDefinition", () => {
       <gql.FieldDefinition
         name="email"
         type={builtInScalars.String}
-        description={`"""\nThe user's email address\n"""`}
+        description="The user's email address"
       />,
     );
     expect(result).toRenderTo(d`
@@ -103,7 +103,7 @@ describe("FieldDefinition", () => {
       <gql.FieldDefinition
         name="bio"
         type={builtInScalars.String}
-        description={`"""\nThe user's biography.\nCan be multiple lines.\n"""`}
+        description="The user's biography.\nCan be multiple lines."
       />,
     );
     expect(result).toRenderTo(d`

@@ -1,7 +1,7 @@
 /** @jsxImportSource @alloy-js/core */
 import { code, refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
-import { expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { builtInScalars } from "../src/builtins/scalars.js";
 import * as gql from "../src/index.js";
 import { toGraphQLText } from "./utils.jsx";
@@ -307,4 +307,211 @@ it("applies name policy to refkeys", () => {
     }
   `;
   expect(result).toRenderTo(expected);
+});
+
+describe("GraphQL name format validation", () => {
+  it("throws error when name starts with a digit", () => {
+    expect(() => {
+      toGraphQLText(
+        <gql.ObjectTypeDefinition name="123User">
+          <gql.FieldDefinition name="id" type={builtInScalars.ID} />
+        </gql.ObjectTypeDefinition>,
+      );
+    }).toThrow(/Invalid GraphQL name "123User".*cannot start with a digit/);
+  });
+
+  it("throws error when field name starts with a digit", () => {
+    expect(() => {
+      toGraphQLText(
+        <gql.ObjectTypeDefinition name="User">
+          <gql.FieldDefinition name="1stName" type={builtInScalars.String} />
+        </gql.ObjectTypeDefinition>,
+      );
+    }).toThrow(/Invalid GraphQL name "1stName".*cannot start with a digit/);
+  });
+
+  it("throws error when argument name starts with a digit", () => {
+    expect(() => {
+      toGraphQLText(
+        <gql.ObjectTypeDefinition name="User">
+          <gql.FieldDefinition
+            name="field"
+            type={builtInScalars.String}
+            args={
+              <gql.InputValueDefinition
+                name="1stArg"
+                type={builtInScalars.String}
+              />
+            }
+          />
+        </gql.ObjectTypeDefinition>,
+      );
+    }).toThrow(/Invalid GraphQL name "1stArg".*cannot start with a digit/);
+  });
+
+  it("allows names with hyphens (gets transformed by pascalCase)", () => {
+    // pascalCase removes hyphens, so "User-Type" becomes "UserType"
+    const result = toGraphQLText(
+      <gql.ObjectTypeDefinition name="User-Type">
+        <gql.FieldDefinition name="id" type={builtInScalars.ID} />
+      </gql.ObjectTypeDefinition>,
+    );
+    expect(result).toRenderTo(d`
+      type UserType {
+        id: ID
+      }
+    `);
+  });
+
+  it("allows names with special chars (gets transformed by pascalCase)", () => {
+    // pascalCase removes special chars, so "User$Type" becomes "UserType"
+    const result = toGraphQLText(
+      <gql.ObjectTypeDefinition name="User$Type">
+        <gql.FieldDefinition name="id" type={builtInScalars.ID} />
+      </gql.ObjectTypeDefinition>,
+    );
+    expect(result).toRenderTo(d`
+      type UserType {
+        id: ID
+      }
+    `);
+  });
+
+  it("preserves single leading underscore", () => {
+    // Single underscore is valid per GraphQL spec and should be preserved
+    const result = toGraphQLText(
+      <gql.ObjectTypeDefinition name="_User">
+        <gql.FieldDefinition name="id" type={builtInScalars.ID} />
+      </gql.ObjectTypeDefinition>,
+    );
+    // Single leading underscore is now preserved
+    expect(result).toRenderTo(d`
+      type _User {
+        id: ID
+      }
+    `);
+  });
+
+  it("transforms snake_case to PascalCase (removes underscores)", () => {
+    // Following GraphQL conventions: types use PascalCase without underscores
+    // user_type → UserType
+    const result = toGraphQLText(
+      <gql.ObjectTypeDefinition name="user_type">
+        <gql.FieldDefinition name="id" type={builtInScalars.ID} />
+      </gql.ObjectTypeDefinition>,
+    );
+    expect(result).toRenderTo(d`
+      type UserType {
+        id: ID
+      }
+    `);
+  });
+
+  it("transforms field names with underscores to camelCase", () => {
+    // Following GraphQL conventions: fields use camelCase without underscores
+    // first_name → firstName
+    const result = toGraphQLText(
+      <gql.ObjectTypeDefinition name="User">
+        <gql.FieldDefinition name="first_name" type={builtInScalars.String} />
+      </gql.ObjectTypeDefinition>,
+    );
+    expect(result).toRenderTo(d`
+      type User {
+        firstName: String
+      }
+    `);
+  });
+
+  it("allows names with digits after the first character", () => {
+    const result = toGraphQLText(
+      <gql.ObjectTypeDefinition name="User123">
+        <gql.FieldDefinition name="id" type={builtInScalars.ID} />
+      </gql.ObjectTypeDefinition>,
+    );
+    expect(result).toRenderTo(d`
+      type User123 {
+        id: ID
+      }
+    `);
+  });
+
+  it("allows names with mixed case and digits", () => {
+    const result = toGraphQLText(
+      <gql.ObjectTypeDefinition name="MyType2024">
+        <gql.FieldDefinition name="field1" type={builtInScalars.String} />
+      </gql.ObjectTypeDefinition>,
+    );
+    expect(result).toRenderTo(d`
+      type MyType2024 {
+        field1: String
+      }
+    `);
+  });
+
+  it("validates directive names for invalid format", () => {
+    expect(() => {
+      toGraphQLText(
+        <gql.DirectiveDefinition
+          name="123invalid"
+          locations={["FIELD_DEFINITION"]}
+        />,
+      );
+    }).toThrow(/Invalid GraphQL name "123invalid".*cannot start with a digit/);
+  });
+
+  it("preserves single leading underscore in field names", () => {
+    // Single leading underscore is preserved, but rest follows camelCase convention
+    // _internal_field → _internalField (underscore in middle is removed)
+    const result = toGraphQLText(
+      <gql.ObjectTypeDefinition name="User">
+        <gql.FieldDefinition
+          name="_internal_field"
+          type={builtInScalars.String}
+        />
+      </gql.ObjectTypeDefinition>,
+    );
+    expect(result).toRenderTo(d`
+      type User {
+        _internalField: String
+      }
+    `);
+  });
+
+  it("throws error for names starting with double underscore (reserved for introspection)", () => {
+    // Names starting with __ are reserved per GraphQL spec
+    expect(() => {
+      toGraphQLText(
+        <gql.ObjectTypeDefinition name="__CustomType">
+          <gql.FieldDefinition name="id" type={builtInScalars.ID} />
+        </gql.ObjectTypeDefinition>,
+      );
+    }).toThrow(
+      /Invalid GraphQL name "__CustomType".*reserved for GraphQL introspection system/,
+    );
+  });
+
+  it("throws error for field names starting with double underscore", () => {
+    expect(() => {
+      toGraphQLText(
+        <gql.ObjectTypeDefinition name="User">
+          <gql.FieldDefinition name="__typename" type={builtInScalars.String} />
+        </gql.ObjectTypeDefinition>,
+      );
+    }).toThrow(
+      /Invalid GraphQL name "__typename".*reserved for GraphQL introspection system/,
+    );
+  });
+
+  it("throws error for directive names starting with double underscore", () => {
+    expect(() => {
+      toGraphQLText(
+        <gql.DirectiveDefinition
+          name="__internal"
+          locations={["FIELD_DEFINITION"]}
+        />,
+      );
+    }).toThrow(
+      /Invalid GraphQL name "__internal".*reserved for GraphQL introspection system/,
+    );
+  });
 });

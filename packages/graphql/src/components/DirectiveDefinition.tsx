@@ -10,6 +10,7 @@ import {
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { GraphQLMemberScope } from "../symbols/graphql-member-scope.js";
 import { useGraphQLScope } from "../symbols/scopes.js";
+import { wrapDescription } from "./utils.js";
 
 /**
  * Valid directive locations in GraphQL
@@ -40,7 +41,7 @@ export type DirectiveLocation =
 
 export interface DirectiveDefinitionProps {
   /**
-   * The name of the directive (without the \@ symbol)
+   * The name of the directive (without the @ symbol)
    */
   name: string;
   /**
@@ -52,7 +53,7 @@ export interface DirectiveDefinitionProps {
    */
   args?: Children;
   /**
-   * Description for the directive
+   * Description for the directive. Will be automatically wrapped in triple quotes (""").
    */
   description?: Children;
   /**
@@ -78,8 +79,8 @@ export interface DirectiveDefinitionProps {
  * ```tsx
  * <DirectiveDefinition
  *   name="auth"
- *   description='"""Authorization directive for fields and types"""'
  *   repeatable
+ *   description="Authorization directive for fields and types.\nRequires specific roles or scopes."
  *   locations={["FIELD_DEFINITION", "OBJECT"]}
  *   args={
  *     <>
@@ -92,7 +93,7 @@ export interface DirectiveDefinitionProps {
  * renders to
  * ```graphql
  * """
- * Authorization directive for fields and types
+ * Authorization directive for fields and types.
  * """
  * directive @auth(
  *   requires: Role! = USER
@@ -142,12 +143,14 @@ export function DirectiveDefinition(props: DirectiveDefinitionProps) {
     ownerSymbol: sym,
   });
 
+  const wrappedDescription = wrapDescription(props.description);
+
   const hasArgs = Boolean(props.args);
 
   return (
     <>
-      <Show when={Boolean(props.description)}>
-        {props.description}
+      <Show when={Boolean(wrappedDescription())}>
+        {wrappedDescription()}
         <hbr />
       </Show>
       <CoreDeclaration symbol={sym}>

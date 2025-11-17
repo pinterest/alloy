@@ -81,7 +81,7 @@ describe("InputValueDefinition", () => {
       <gql.InputValueDefinition
         name="reason"
         type={builtInScalars.String}
-        description={`"""\nReason for deprecation\n"""`}
+        description="Reason for deprecation"
       />,
     );
     expect(result).toRenderTo(d`

@@ -9,6 +9,7 @@ import {
 } from "@alloy-js/core";
 import { GraphQLModuleScope } from "../symbols/index.js";
 import { Reference } from "./Reference.js";
+import { wrapDescription } from "./utils.js";
 
 export interface GraphQLSourceFileContext {
   scope: GraphQLModuleScope;
@@ -47,49 +48,41 @@ export interface SourceFileProps {
 }
 
 /**
- * A GraphQL source file component that represents a GraphQL schema file.
+ * Defines a GraphQL source file, which can contain multiple GraphQL definitions.
  * It provides a scope for the file, which is a `GraphQLScope` that contains
  * all the type definitions in the file.
  *
  * @example
  * ```tsx
  * import { code } from "@alloy-js/core";
+ * import { builtInScalars } from "@alloy-js/graphql";
+ * import { ObjectTypeDefinition, FieldDefinition, SourceFile } from "@alloy-js/graphql/components";
  *
  * <SourceFile
  *   path="schema.graphql"
  *   headerComment="This file is auto-generated. Do not edit manually."
- *   description='"""Main schema file for the API"""'
+ *   description="Main schema file for the API"
  * >
- *   <ObjectType name="User">
- *     <Field name="id" type={code`${builtInScalars.ID}!`} />
- *     <Field name="name" type={builtInScalars.String} />
- *   </ObjectType>
- *
- *   <ObjectType name="Post">
- *     <Field name="id" type={code`${builtInScalars.ID}!`} />
- *     <Field name="title" type={builtInScalars.String} />
- *   </ObjectType>
+ *   <ObjectTypeDefinition name="User">
+ *     <FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+ *   </ObjectTypeDefinition>
  * </SourceFile>
  * ```
  * renders to
  * ```graphql
  * # This file is auto-generated. Do not edit manually.
- * """Main schema file for the API"""
- *
+ * """
+ * Main schema file for the API
+ * """
  * type User {
  *   id: ID!
- *   name: String
- * }
- *
- * type Post {
- *   id: ID!
- *   title: String
  * }
  * ```
  */
 export function SourceFile(props: SourceFileProps) {
   const schemaName = props.path.replace(/\.graphql$/, "");
   const scope = new GraphQLModuleScope(schemaName, undefined);
+  const wrappedDescription = wrapDescription(props.description);
 
   return (
     <CoreSourceFile path={props.path} filetype="graphql" reference={Reference}>
@@ -100,9 +93,9 @@ export function SourceFile(props: SourceFileProps) {
             <hbr />
           </>
         )}
-        {props.description && (
+        {wrappedDescription() && (
           <>
-            {props.description}
+            {wrappedDescription()}
             <hbr />
           </>
         )}

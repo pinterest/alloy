@@ -19,7 +19,8 @@ interface DirectiveValidationContext {
   usedDirectives: Map<string, number>;
 }
 
-const DirectiveValidationContext = createContext<DirectiveValidationContext | null>(null);
+const DirectiveValidationContext =
+  createContext<DirectiveValidationContext | null>(null);
 
 /**
  * Hook for directives to register themselves for validation
@@ -61,7 +62,11 @@ export function runDirectiveValidation(
 
   // Validate arguments if metadata is available
   if (metadata.arguments) {
-    validateDirectiveArguments(directiveName, providedArgs || {}, metadata.arguments);
+    validateDirectiveArguments(
+      directiveName,
+      providedArgs || {},
+      metadata.arguments,
+    );
   }
 }
 
@@ -144,7 +149,11 @@ function getDirectiveMetadata(directiveName: string): {
     // Check if this scope has a symbols space (lexical scopes do, member scopes don't)
     if ("symbols" in currentScope) {
       const symbol = currentScope.symbols.symbolNames.get(directiveName);
-      if (symbol && symbol.metadata.locations && symbol.metadata.repeatable !== undefined) {
+      if (
+        symbol &&
+        symbol.metadata.locations &&
+        symbol.metadata.repeatable !== undefined
+      ) {
         // Extract argument metadata from the symbol's members
         const argumentMetadata: DirectiveArgumentMetadata[] = [];
         for (const memberSpace of symbol.memberSpaces) {
@@ -207,4 +216,3 @@ function validateDirectiveArguments(
     }
   }
 }
-

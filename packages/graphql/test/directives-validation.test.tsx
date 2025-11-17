@@ -51,8 +51,10 @@ describe("Directives validation", () => {
     it("allows @skip on FIELD (executable location)", () => {
       // Note: In a real scenario, @skip would be used in queries, not schema definitions
       // This test is mainly to verify the validation logic works
-      const _directive = <gql.Directive name={gql.builtInDirectives.skip} args={{ if: true }} />;
-      
+      const _directive = (
+        <gql.Directive name={gql.builtInDirectives.skip} args={{ if: true }} />
+      );
+
       // We can't easily test this in schema context, but we can verify the metadata is correct
       expect(gql.builtInDirectiveMetadata.skip.locations).toContain("FIELD");
     });
@@ -60,7 +62,9 @@ describe("Directives validation", () => {
     it("allows @specifiedBy on SCALAR", () => {
       // For this test, we'd need a ScalarTypeDefinition component
       // which doesn't exist on this branch, so we just verify metadata
-      expect(gql.builtInDirectiveMetadata.specifiedBy.locations).toContain("SCALAR");
+      expect(gql.builtInDirectiveMetadata.specifiedBy.locations).toContain(
+        "SCALAR",
+      );
     });
 
     it("throws error when @include is used on FIELD_DEFINITION", () => {
@@ -71,7 +75,10 @@ describe("Directives validation", () => {
               name="field"
               type={gql.builtInScalars.String}
               directives={
-                <gql.Directive name={gql.builtInDirectives.include} args={{ if: true }} />
+                <gql.Directive
+                  name={gql.builtInDirectives.include}
+                  args={{ if: true }}
+                />
               }
             />
           </gql.ObjectTypeDefinition>,
@@ -275,8 +282,10 @@ describe("Directives validation", () => {
         </gql.SourceFile>,
       );
 
-      expect(result).toContain("directive @auth(requires: String) on FIELD_DEFINITION | OBJECT");
-      expect(result).toContain("type User @auth(requires: \"ADMIN\") {");
+      expect(result).toContain(
+        "directive @auth(requires: String) on FIELD_DEFINITION | OBJECT",
+      );
+      expect(result).toContain('type User @auth(requires: "ADMIN") {');
     });
 
     it("validates custom repeatable directive", () => {
@@ -308,8 +317,12 @@ describe("Directives validation", () => {
         </gql.SourceFile>,
       );
 
-      expect(result).toContain("directive @tag(name: String) repeatable on FIELD_DEFINITION");
-      expect(result).toContain('field: String @tag(name: "important") @tag(name: "public")');
+      expect(result).toContain(
+        "directive @tag(name: String) repeatable on FIELD_DEFINITION",
+      );
+      expect(result).toContain(
+        'field: String @tag(name: "important") @tag(name: "public")',
+      );
     });
 
     it("throws error when non-repeatable custom directive is used twice", () => {
@@ -388,7 +401,10 @@ describe("Directives validation", () => {
               name="email"
               type={gql.builtInScalars.String}
               directives={
-                <gql.Directive name="auth" args={{ requires: "ADMIN", level: 5 }} />
+                <gql.Directive
+                  name="auth"
+                  args={{ requires: "ADMIN", level: 5 }}
+                />
               }
             />
           </gql.ObjectTypeDefinition>
@@ -444,9 +460,7 @@ describe("Directives validation", () => {
               <gql.FieldDefinition
                 name="email"
                 type={gql.builtInScalars.String}
-                directives={
-                  <gql.Directive name="auth" args={{ level: 5 }} />
-                }
+                directives={<gql.Directive name="auth" args={{ level: 5 }} />}
               />
             </gql.ObjectTypeDefinition>
           </gql.SourceFile>,
@@ -461,22 +475,25 @@ describe("Directives validation", () => {
             <gql.DirectiveDefinition
               name="auth"
               locations={["FIELD_DEFINITION"]}
-              args={
-                <gql.InputValueDefinition name="requires" type="String!" />
-              }
+              args={<gql.InputValueDefinition name="requires" type="String!" />}
             />
             <gql.ObjectTypeDefinition name="User">
               <gql.FieldDefinition
                 name="email"
                 type={gql.builtInScalars.String}
                 directives={
-                  <gql.Directive name="auth" args={{ requires: "ADMIN", unknown: "value" }} />
+                  <gql.Directive
+                    name="auth"
+                    args={{ requires: "ADMIN", unknown: "value" }}
+                  />
                 }
               />
             </gql.ObjectTypeDefinition>
           </gql.SourceFile>,
         );
-      }).toThrow(/Directive @auth does not accept argument "unknown".*Valid arguments: requires/);
+      }).toThrow(
+        /Directive @auth does not accept argument "unknown".*Valid arguments: requires/,
+      );
     });
 
     it("throws error when directive with no arguments receives arguments", () => {
@@ -498,7 +515,9 @@ describe("Directives validation", () => {
             </gql.ObjectTypeDefinition>
           </gql.SourceFile>,
         );
-      }).toThrow(/Directive @noArgs does not accept argument "unexpected".*Valid arguments: none/);
+      }).toThrow(
+        /Directive @noArgs does not accept argument "unexpected".*Valid arguments: none/,
+      );
     });
 
     it("allows directive with no arguments when no arguments are provided", () => {
@@ -512,9 +531,7 @@ describe("Directives validation", () => {
             <gql.FieldDefinition
               name="email"
               type={gql.builtInScalars.String}
-              directives={
-                <gql.Directive name="noArgs" />
-              }
+              directives={<gql.Directive name="noArgs" />}
             />
           </gql.ObjectTypeDefinition>
         </gql.SourceFile>,
@@ -543,14 +560,19 @@ describe("Directives validation", () => {
               name="field"
               type={gql.builtInScalars.String}
               directives={
-                <gql.Directive name="complex" args={{ required1: "value", required2: 42, optional1: "opt" }} />
+                <gql.Directive
+                  name="complex"
+                  args={{ required1: "value", required2: 42, optional1: "opt" }}
+                />
               }
             />
           </gql.ObjectTypeDefinition>
         </gql.SourceFile>,
       );
 
-      expect(result).toContain('@complex(required1: "value", required2: 42, optional1: "opt")');
+      expect(result).toContain(
+        '@complex(required1: "value", required2: 42, optional1: "opt")',
+      );
     });
 
     it("throws error when multiple required arguments are missing", () => {
@@ -583,4 +605,3 @@ describe("Directives validation", () => {
     });
   });
 });
-

@@ -50,7 +50,10 @@ export function ImplementsInterfaces(props: ImplementsInterfacesProps) {
           // Recursively collect parent interfaces
           if (symbol?.metadata.implements) {
             const parentInterfaces = symbol.metadata.implements as Children[];
-            if (Array.isArray(parentInterfaces) && parentInterfaces.length > 0) {
+            if (
+              Array.isArray(parentInterfaces) &&
+              parentInterfaces.length > 0
+            ) {
               collectInterfaces(parentInterfaces);
             }
           }
