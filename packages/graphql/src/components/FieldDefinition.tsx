@@ -11,9 +11,9 @@ import {
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { GraphQLMemberScope } from "../symbols/graphql-member-scope.js";
 import { useGraphQLScope } from "../symbols/scopes.js";
+import { TypedBaseDeclarationProps } from "./common-props.js";
 import { Directives } from "./Directives.js";
 import { wrapDescription } from "./utils.js";
-import { TypedBaseDeclarationProps } from "./common-props.js";
 
 export interface FieldDefinitionProps extends TypedBaseDeclarationProps {
   /**

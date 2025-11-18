@@ -1,6 +1,7 @@
 import { Declaration as CoreDeclaration, Name, Show } from "@alloy-js/core";
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { BaseDeclarationProps } from "./common-props.js";
+import { wrapDescription } from "./utils.js";
 
 export interface ScalarTypeDefinitionProps extends BaseDeclarationProps {
   // All properties inherited from BaseDeclarationProps
@@ -16,7 +17,7 @@ export interface ScalarTypeDefinitionProps extends BaseDeclarationProps {
  * <>
  *   <ScalarTypeDefinition
  *     name="DateTime"
- *     description='"""ISO-8601 date-time string"""'
+ *     description="ISO-8601 date-time string"
  *   />
  *   <ScalarTypeDefinition name="JSON" />
  *   <ScalarTypeDefinition
@@ -37,7 +38,7 @@ export interface ScalarTypeDefinitionProps extends BaseDeclarationProps {
  * """
  * scalar DateTime
  * scalar JSON
- * scalar URL @specifiedBy(url: "https://tools.ietf.org/html/rfc3986")
+ * scalar URL \@specifiedBy(url: "https://tools.ietf.org/html/rfc3986")
  * ```
  */
 export function ScalarTypeDefinition(props: ScalarTypeDefinitionProps) {
@@ -49,10 +50,12 @@ export function ScalarTypeDefinition(props: ScalarTypeDefinitionProps) {
     "scalar",
   );
 
+  const wrappedDescription = wrapDescription(props.description);
+
   return (
     <>
-      <Show when={Boolean(props.description)}>
-        {props.description}
+      <Show when={Boolean(wrappedDescription())}>
+        {wrappedDescription()}
         <hbr />
       </Show>
       <CoreDeclaration symbol={sym}>

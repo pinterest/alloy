@@ -7,9 +7,9 @@ import {
   memo,
 } from "@alloy-js/core";
 import { createGraphQLSymbol } from "../symbol-creation.js";
+import { TypedBaseDeclarationProps } from "./common-props.js";
 import { Directives } from "./Directives.js";
 import { validateNonNullDefault, wrapDescription } from "./utils.js";
-import { TypedBaseDeclarationProps } from "./common-props.js";
 import { ValueExpression } from "./ValueExpression.js";
 
 export interface InputValueDefinitionProps extends TypedBaseDeclarationProps {

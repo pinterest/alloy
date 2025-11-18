@@ -7,6 +7,7 @@ import {
 } from "@alloy-js/core";
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { BaseDeclarationProps } from "./common-props.js";
+import { wrapDescription } from "./utils.js";
 
 export interface UnionTypeDefinitionProps extends BaseDeclarationProps {
   /**
@@ -30,7 +31,7 @@ export interface UnionTypeDefinitionProps extends BaseDeclarationProps {
  *   <UnionTypeDefinition
  *     name="SearchResult"
  *     members={[userRef, postRef, commentRef]}
- *     description='"""Search result types"""'
+ *     description="Search result types"
  *   />
  *   <UnionTypeDefinition
  *     name="Node"
@@ -56,10 +57,12 @@ export function UnionTypeDefinition(props: UnionTypeDefinitionProps) {
     "type",
   );
 
+  const wrappedDescription = wrapDescription(props.description);
+
   return (
     <>
-      <Show when={Boolean(props.description)}>
-        {props.description}
+      <Show when={Boolean(wrappedDescription())}>
+        {wrappedDescription()}
         <hbr />
       </Show>
       <CoreDeclaration symbol={sym}>

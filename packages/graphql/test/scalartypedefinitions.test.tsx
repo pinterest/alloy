@@ -21,7 +21,7 @@ describe("ScalarTypeDefinition", () => {
     const result = toGraphQLText(
       <gql.ScalarTypeDefinition
         name="DateTime"
-        description={`"""\nISO-8601 date-time string\n"""`}
+        description="ISO-8601 date-time string"
       />,
     );
     expect(result).toRenderTo(d`
@@ -36,7 +36,7 @@ describe("ScalarTypeDefinition", () => {
     const result = toGraphQLText(
       <gql.ScalarTypeDefinition
         name="DateTime"
-        description={`"""\nRepresents a date and time.\nFormatted as ISO-8601.\n"""`}
+        description="Represents a date and time.\nFormatted as ISO-8601."
       />,
     );
     expect(result).toRenderTo(d`
@@ -69,7 +69,7 @@ describe("ScalarTypeDefinition", () => {
     const result = toGraphQLText(
       <gql.ScalarTypeDefinition
         name="URL"
-        description={`"""\nValid URL string\n"""`}
+        description="Valid URL string"
         directives={
           <gql.Directive
             name="specifiedBy"
@@ -111,7 +111,7 @@ describe("ScalarTypeDefinition", () => {
         <gql.ScalarTypeDefinition
           name="DateTime"
           refkey={dateTimeRef}
-          description={`"""\nISO-8601 date-time\n"""`}
+          description="ISO-8601 date-time"
         />
       </gql.SourceFile>,
       <gql.SourceFile path="types.graphql">
@@ -141,24 +141,21 @@ describe("ScalarTypeDefinition", () => {
       <>
         <gql.ScalarTypeDefinition
           name="DateTime"
-          description={`"""\nISO-8601 date-time string\n"""`}
+          description="ISO-8601 date-time string"
         />
         <gql.ScalarTypeDefinition
           name="Date"
-          description={`"""\nISO-8601 date string\n"""`}
+          description="ISO-8601 date string"
         />
         <gql.ScalarTypeDefinition
           name="Time"
-          description={`"""\nISO-8601 time string\n"""`}
+          description="ISO-8601 time string"
         />
         <gql.ScalarTypeDefinition
           name="JSON"
-          description={`"""\nArbitrary JSON value\n"""`}
+          description="Arbitrary JSON value"
         />
-        <gql.ScalarTypeDefinition
-          name="UUID"
-          description={`"""\nUUID string\n"""`}
-        />
+        <gql.ScalarTypeDefinition name="UUID" description="UUID string" />
       </>,
     );
     expect(result).toRenderTo(d`
