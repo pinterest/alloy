@@ -41,7 +41,7 @@ export type DirectiveLocation =
 
 export interface DirectiveDefinitionProps {
   /**
-   * The name of the directive (without the @ symbol)
+   * The name of the directive (without the \@ symbol)
    */
   name: string;
   /**
@@ -95,14 +95,14 @@ export interface DirectiveDefinitionProps {
  * """
  * Authorization directive for fields and types.
  * """
- * directive @auth(
+ * directive \@auth(
  *   requires: Role! = USER
  *   scopes: [String!]
  * ) repeatable on FIELD_DEFINITION | OBJECT
  * ```
  *
- * @throws {Error} If locations array is empty
- * @throws {Error} If directive name is already defined
+ * @throws \{Error\} If locations array is empty
+ * @throws \{Error\} If directive name is already defined
  */
 export function DirectiveDefinition(props: DirectiveDefinitionProps) {
   const scope = useGraphQLScope();

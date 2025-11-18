@@ -92,10 +92,10 @@ export function runDirectiveValidation(
  * </Directives>
  * ```
  *
- * @throws {Error} If a directive is used in an invalid location
- * @throws {Error} If a non-repeatable directive is used multiple times
- * @throws {Error} If required arguments are missing
- * @throws {Error} If unknown arguments are provided
+ * @throws \{Error\} If a directive is used in an invalid location
+ * @throws \{Error\} If a non-repeatable directive is used multiple times
+ * @throws \{Error\} If required arguments are missing
+ * @throws \{Error\} If unknown arguments are provided
  */
 export function Directives(props: DirectivesProps) {
   const context: DirectiveValidationContext = {
