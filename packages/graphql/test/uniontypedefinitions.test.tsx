@@ -28,7 +28,7 @@ describe("UnionTypeDefinition", () => {
       <gql.UnionTypeDefinition
         name="SearchResult"
         members={["User", "Post"]}
-        description={`"""\nTypes that can be returned from search\n"""`}
+        description="Types that can be returned from search"
       />,
     );
     expect(result).toRenderTo(d`
@@ -44,7 +44,7 @@ describe("UnionTypeDefinition", () => {
       <gql.UnionTypeDefinition
         name="Node"
         members={["User", "Post"]}
-        description={`"""\nTypes implementing the Node interface.\nUsed for pagination and caching.\n"""`}
+        description="Types implementing the Node interface.\nUsed for pagination and caching."
       />,
     );
     expect(result).toRenderTo(d`
@@ -188,7 +188,7 @@ describe("UnionTypeDefinition", () => {
       <gql.UnionTypeDefinition
         name="SearchResult"
         members={["User", "Post"]}
-        description={`"""\nSearch result types\n"""`}
+        description="Search result types"
         directives={<gql.Directive name="auth" args={{ requires: "VIEWER" }} />}
       />,
     );

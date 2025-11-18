@@ -11,6 +11,7 @@ import {
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { GraphQLMemberScope, useGraphQLScope } from "../symbols/index.js";
 import { BaseDeclarationProps } from "./common-props.js";
+import { wrapDescription } from "./utils.js";
 
 export interface EnumTypeDefinitionProps extends BaseDeclarationProps {
   /**
@@ -28,9 +29,9 @@ export interface EnumTypeDefinitionProps extends BaseDeclarationProps {
  *
  * <EnumTypeDefinition
  *   name="Status"
- *   description='"""User status"""'
+ *   description="User status"
  * >
- *   <EnumValue name="ACTIVE" description='"""Currently active"""' />
+ *   <EnumValue name="ACTIVE" description="Currently active" />
  *   <EnumValue name="INACTIVE" />
  *   <EnumValue
  *     name="PENDING"
@@ -76,10 +77,12 @@ export function EnumTypeDefinition(props: EnumTypeDefinitionProps) {
 
   const ContentSlot = createContentSlot();
 
+  const wrappedDescription = wrapDescription(props.description);
+
   return (
     <>
-      <Show when={Boolean(props.description)}>
-        {props.description}
+      <Show when={Boolean(wrappedDescription())}>
+        {wrappedDescription()}
         <hbr />
       </Show>
       <CoreDeclaration symbol={sym}>

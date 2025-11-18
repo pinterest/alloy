@@ -32,7 +32,7 @@ describe("EnumTypeDefinition", () => {
     const result = toGraphQLText(
       <gql.EnumTypeDefinition
         name="Status"
-        description={`"""\nUser status in the system\n"""`}
+        description="User status in the system"
       >
         <gql.EnumValue name="ACTIVE" />
         <gql.EnumValue name="INACTIVE" />
@@ -53,7 +53,7 @@ describe("EnumTypeDefinition", () => {
     const result = toGraphQLText(
       <gql.EnumTypeDefinition
         name="Status"
-        description={`"""\nUser status in the system.\nCan be used to filter users.\n"""`}
+        description="User status in the system.\nCan be used to filter users."
       >
         <gql.EnumValue name="ACTIVE" />
       </gql.EnumTypeDefinition>,
@@ -72,18 +72,12 @@ describe("EnumTypeDefinition", () => {
   it("renders an enum with value descriptions", () => {
     const result = toGraphQLText(
       <gql.EnumTypeDefinition name="Status">
-        <gql.EnumValue
-          name="ACTIVE"
-          description={`"""\nUser is currently active\n"""`}
-        />
+        <gql.EnumValue name="ACTIVE" description="User is currently active" />
         <gql.EnumValue
           name="INACTIVE"
-          description={`"""\nUser is temporarily inactive\n"""`}
+          description="User is temporarily inactive"
         />
-        <gql.EnumValue
-          name="BANNED"
-          description={`"""\nUser has been banned\n"""`}
-        />
+        <gql.EnumValue name="BANNED" description="User has been banned" />
       </gql.EnumTypeDefinition>,
     );
     expect(result).toRenderTo(d`
@@ -313,17 +307,14 @@ describe("EnumTypeDefinition", () => {
     const result = toGraphQLText(
       <gql.EnumTypeDefinition
         name="Status"
-        description={`"""\nUser status options\n"""`}
+        description="User status options"
         directives={<gql.Directive name="auth" args={{ requires: "ADMIN" }} />}
       >
-        <gql.EnumValue name="ACTIVE" description={`"""\nActive user\n"""`} />
-        <gql.EnumValue
-          name="INACTIVE"
-          description={`"""\nInactive user\n"""`}
-        />
+        <gql.EnumValue name="ACTIVE" description="Active user" />
+        <gql.EnumValue name="INACTIVE" description="Inactive user" />
         <gql.EnumValue
           name="DEPRECATED_PENDING"
-          description={`"""\nOld pending status\n"""`}
+          description="Old pending status"
           directives={
             <gql.Directive
               name={builtInDirectives.deprecated}

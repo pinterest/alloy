@@ -1,6 +1,7 @@
 import { Declaration as CoreDeclaration, Name, Show } from "@alloy-js/core";
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { BaseDeclarationProps } from "./common-props.js";
+import { wrapDescription } from "./utils.js";
 
 export interface EnumValueProps extends BaseDeclarationProps {
   // All properties inherited from BaseDeclarationProps
@@ -14,7 +15,7 @@ export interface EnumValueProps extends BaseDeclarationProps {
  * import { builtInDirectives } from "@alloy-js/graphql";
  *
  * <>
- *   <EnumValue name="ACTIVE" description='"""Currently active"""' />
+ *   <EnumValue name="ACTIVE" description="Currently active" />
  *   <EnumValue name="INACTIVE" />
  *   <EnumValue
  *     name="DEPRECATED_STATUS"
@@ -46,10 +47,12 @@ export function EnumValue(props: EnumValueProps) {
     "enumValue",
   );
 
+  const wrappedDescription = wrapDescription(props.description);
+
   return (
     <>
-      <Show when={Boolean(props.description)}>
-        {props.description}
+      <Show when={Boolean(wrappedDescription())}>
+        {wrappedDescription()}
         <hbr />
       </Show>
       <CoreDeclaration symbol={sym}>

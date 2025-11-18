@@ -10,8 +10,8 @@ import {
 } from "@alloy-js/core";
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { GraphQLMemberScope, useGraphQLScope } from "../symbols/index.js";
-import { Directives } from "./Directives.js";
 import { BaseDeclarationProps } from "./common-props.js";
+import { Directives } from "./Directives.js";
 import { ImplementsInterfaces } from "./ImplementsInterfaces.js";
 import { wrapDescription } from "./utils.js";
 
