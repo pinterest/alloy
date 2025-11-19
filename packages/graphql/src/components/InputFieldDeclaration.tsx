@@ -7,8 +7,13 @@ import {
 } from "@alloy-js/core";
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { TypedBaseDeclarationProps } from "./common-props.js";
+import {
+  useOneOfInputContext,
+  validateOneOfFieldNoDefault,
+  validateOneOfFieldNullable,
+} from "./OneOfInputValidation.js";
+import { validateInputType, wrapDescription } from "./utils.js";
 import { ValueExpression } from "./ValueExpression.js";
-import { wrapDescription } from "./utils.js";
 
 export interface InputFieldDeclarationProps extends TypedBaseDeclarationProps {
   /**
@@ -92,6 +97,16 @@ export interface InputFieldDeclarationProps extends TypedBaseDeclarationProps {
  */
 export function InputFieldDeclaration(props: InputFieldDeclarationProps) {
   const TypeSymbolSlot = createSymbolSlot();
+  const isInOneOfInput = useOneOfInputContext();
+
+  // Validate that the field type is valid for input positions
+  validateInputType(props.type, props.name, "Input field");
+
+  // Validate @oneOf constraints if we're inside a @oneOf input object
+  if (isInOneOfInput) {
+    validateOneOfFieldNullable(props.type, props.name);
+    validateOneOfFieldNoDefault(props.defaultValue, props.name);
+  }
 
   const sym = createGraphQLSymbol(
     props.name,
