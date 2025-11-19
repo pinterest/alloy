@@ -1,4 +1,3 @@
-/** @jsxImportSource @alloy-js/core */
 import { refkey } from "@alloy-js/core";
 import { describe, expect, it } from "vitest";
 import * as gql from "../src/index.js";

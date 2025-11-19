@@ -1,4 +1,3 @@
-/** @jsxImportSource @alloy-js/core */
 import { code } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, it } from "vitest";
