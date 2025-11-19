@@ -14,6 +14,7 @@ import {
 } from "./OneOfInputValidation.js";
 import { validateInputType, wrapDescription } from "./utils.js";
 import { ValueExpression } from "./ValueExpression.js";
+import { wrapDescription } from "./utils.js";
 
 export interface InputFieldDeclarationProps extends TypedBaseDeclarationProps {
   /**
