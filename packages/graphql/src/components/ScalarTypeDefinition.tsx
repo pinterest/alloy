@@ -3,9 +3,7 @@ import { createGraphQLSymbol } from "../symbol-creation.js";
 import { BaseDeclarationProps } from "./common-props.js";
 import { wrapDescription } from "./utils.js";
 
-export interface ScalarTypeDefinitionProps extends BaseDeclarationProps {
-  // All properties inherited from BaseDeclarationProps
-}
+export interface ScalarTypeDefinitionProps extends BaseDeclarationProps {}
 
 /**
  * A scalar type definition for GraphQL schemas.
