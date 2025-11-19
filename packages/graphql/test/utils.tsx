@@ -13,7 +13,7 @@ import { expect } from "vitest";
 import {
   clearPendingValidations,
   getValidationErrors,
-  runPendingValidations,
+  _runPendingValidations,
 } from "../src/components/DeferredInterfaceValidation.js";
 import * as gql from "../src/components/index.js";
 import { createGraphQLNamePolicy } from "../src/name-policy.js";
@@ -105,7 +105,7 @@ export function toGraphQLText(
   });
 
   // Run interface implementation validations after rendering is complete
-  runPendingValidations();
+  _runPendingValidations();
 
   const file = findFile(res, "schema.graphql");
   return file.contents;
