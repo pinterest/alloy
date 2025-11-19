@@ -59,7 +59,7 @@ describe("InputFieldDeclaration", () => {
         <gql.InputFieldDeclaration
           name="age"
           type={builtInScalars.Int}
-          description={`"""\nUser's age in years\n"""`}
+          description="User's age in years"
         />
       </gql.InputObjectTypeDefinition>,
     );
@@ -212,7 +212,7 @@ describe("InputFieldDeclaration", () => {
           <gql.InputFieldDeclaration
             name="status"
             type="Status!"
-            description={`"""\nCurrent status of the entity\n"""`}
+            description="Current status of the entity"
             defaultValue={code`${activeRef}`}
             directives={
               <gql.Directive name="validate" args={{ required: true }} />

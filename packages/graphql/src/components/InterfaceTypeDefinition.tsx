@@ -12,6 +12,7 @@ import { createGraphQLSymbol } from "../symbol-creation.js";
 import { GraphQLMemberScope, useGraphQLScope } from "../symbols/index.js";
 import { BaseDeclarationProps } from "./common-props.js";
 import { ImplementsInterfaces } from "./ImplementsInterfaces.js";
+import { wrapDescription } from "./utils.js";
 
 export interface InterfaceTypeDefinitionProps extends BaseDeclarationProps {
   /**
@@ -80,8 +81,11 @@ export function InterfaceTypeDefinition(props: InterfaceTypeDefinitionProps) {
     props.name,
     {
       refkeys: props.refkey,
+      metadata: {
+        implements: props.implements ?? [],
+      },
     },
-    "type",
+    "interface",
   );
 
   // Create a member scope for this interface to hold its fields
@@ -90,11 +94,12 @@ export function InterfaceTypeDefinition(props: InterfaceTypeDefinitionProps) {
   });
 
   const ContentSlot = createContentSlot();
+  const wrappedDescription = wrapDescription(props.description);
 
   return (
     <>
-      <Show when={Boolean(props.description)}>
-        {props.description}
+      <Show when={Boolean(wrappedDescription())}>
+        {wrappedDescription()}
         <hbr />
       </Show>
       <CoreDeclaration symbol={sym}>

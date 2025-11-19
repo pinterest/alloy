@@ -57,7 +57,7 @@ export function InputObjectTypeExtension(props: InputObjectTypeExtensionProps) {
     {
       refkeys: props.refkey,
     },
-    "type",
+    "input",
   );
 
   // Create a member scope for the extended fields

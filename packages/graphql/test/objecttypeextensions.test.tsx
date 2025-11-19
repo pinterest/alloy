@@ -75,13 +75,15 @@ describe("ObjectTypeExtension", () => {
         <gql.FieldDefinition
           name="rating"
           type={builtInScalars.Float}
-          description='"""Average product rating"""'
+          description="Average product rating"
         />
       </gql.ObjectTypeExtension>,
     );
     expect(result).toRenderTo(d`
       extend type Product {
-        """Average product rating"""
+        """
+        Average product rating
+        """
         rating: Float
       }
     `);

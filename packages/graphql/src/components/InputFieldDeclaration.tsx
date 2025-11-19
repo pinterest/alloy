@@ -8,6 +8,7 @@ import {
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { TypedBaseDeclarationProps } from "./common-props.js";
 import { ValueExpression } from "./ValueExpression.js";
+import { wrapDescription } from "./utils.js";
 
 export interface InputFieldDeclarationProps extends TypedBaseDeclarationProps {
   /**
@@ -104,12 +105,13 @@ export function InputFieldDeclaration(props: InputFieldDeclarationProps) {
     <TypeSymbolSlot>{props.type}</TypeSymbolSlot>
   ));
 
+  const wrappedDescription = wrapDescription(props.description);
   const hasDefaultValue = props.defaultValue !== undefined;
 
   return (
     <>
-      <Show when={Boolean(props.description)}>
-        {props.description}
+      <Show when={Boolean(wrappedDescription())}>
+        {wrappedDescription()}
         <hbr />
       </Show>
       <CoreDeclaration symbol={sym}>

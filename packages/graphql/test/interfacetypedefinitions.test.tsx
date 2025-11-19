@@ -48,7 +48,7 @@ describe("InterfaceTypeDefinition", () => {
     const result = toGraphQLText(
       <gql.InterfaceTypeDefinition
         name="Node"
-        description={`"""\nAn object with a unique identifier\n"""`}
+        description="An object with a unique identifier"
       >
         <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
       </gql.InterfaceTypeDefinition>,
@@ -69,7 +69,7 @@ describe("InterfaceTypeDefinition", () => {
         <gql.FieldDefinition
           name="id"
           type={code`${builtInScalars.ID}!`}
-          description={`"""\nUnique identifier for the node\n"""`}
+          description="Unique identifier for the node"
         />
       </gql.InterfaceTypeDefinition>,
     );
@@ -266,18 +266,18 @@ describe("InterfaceTypeDefinition", () => {
         <gql.InterfaceTypeDefinition
           name="Searchable"
           implements={[nodeRef]}
-          description={`"""\nAn interface for searchable entities\n"""`}
+          description="An interface for searchable entities"
           directives={<gql.Directive name="auth" args={{ requires: "USER" }} />}
         >
           <gql.FieldDefinition
             name="id"
             type={code`${builtInScalars.ID}!`}
-            description={`"""\nUnique identifier\n"""`}
+            description="Unique identifier"
           />
           <gql.FieldDefinition
             name="search"
             type={code`[${builtInScalars.String}!]!`}
-            description={`"""\nSearch within this entity\n"""`}
+            description="Search within this entity"
             args={
               <gql.InputValueDefinition
                 name="searchQuery"

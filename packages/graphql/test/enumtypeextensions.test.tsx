@@ -27,13 +27,15 @@ describe("EnumTypeExtension", () => {
       <gql.EnumTypeExtension name="Role">
         <gql.EnumValue
           name="SUPER_ADMIN"
-          description='"""Highest level of access"""'
+          description="Highest level of access"
         />
       </gql.EnumTypeExtension>,
     );
     expect(result).toRenderTo(d`
       extend enum Role {
-        """Highest level of access"""
+        """
+        Highest level of access
+        """
         SUPER_ADMIN
       }
     `);
