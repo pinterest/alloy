@@ -11,6 +11,7 @@ import {
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { GraphQLMemberScope, useGraphQLScope } from "../symbols/index.js";
 import { BaseDeclarationProps } from "./common-props.js";
+import { wrapDescription } from "./utils.js";
 
 export interface InputObjectTypeDefinitionProps extends BaseDeclarationProps {
   /**
@@ -57,7 +58,7 @@ export function InputObjectTypeDefinition(
     {
       refkeys: props.refkey,
     },
-    "type",
+    "input",
   );
 
   // Create a member scope for this input type to hold its fields
@@ -66,11 +67,12 @@ export function InputObjectTypeDefinition(
   });
 
   const ContentSlot = createContentSlot();
+  const wrappedDescription = wrapDescription(props.description);
 
   return (
     <>
-      <Show when={Boolean(props.description)}>
-        {props.description}
+      <Show when={Boolean(wrappedDescription())}>
+        {wrappedDescription()}
         <hbr />
       </Show>
       <CoreDeclaration symbol={sym}>

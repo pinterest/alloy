@@ -38,7 +38,7 @@ describe("InputObjectTypeDefinition", () => {
     const result = toGraphQLText(
       <gql.InputObjectTypeDefinition
         name="CreateUserInput"
-        description={`"""\nInput for creating a new user\n"""`}
+        description="Input for creating a new user"
       >
         <gql.InputFieldDeclaration
           name="name"
@@ -335,7 +335,7 @@ describe("InputObjectTypeDefinition", () => {
     const result = toGraphQLText(
       <gql.InputObjectTypeDefinition
         name="SearchFilter"
-        description={`"""\nFilters for search queries\n"""`}
+        description="Filters for search queries"
         directives={<gql.Directive name="oneOf" />}
       >
         <gql.InputFieldDeclaration name="byName" type={builtInScalars.String} />

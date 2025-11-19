@@ -60,7 +60,7 @@ export function InterfaceTypeExtension(props: InterfaceTypeExtensionProps) {
     {
       refkeys: props.refkey,
     },
-    "type",
+    "interface",
   );
 
   // Create a member scope for the extended fields
