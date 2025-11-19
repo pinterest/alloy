@@ -10,6 +10,11 @@ import {
 } from "@alloy-js/core";
 import { dedent } from "@alloy-js/core/testing";
 import { expect } from "vitest";
+import {
+  clearPendingValidations,
+  getValidationErrors,
+  runPendingValidations,
+} from "../src/components/DeferredInterfaceValidation.js";
 import * as gql from "../src/components/index.js";
 import { createGraphQLNamePolicy } from "../src/name-policy.js";
 
@@ -92,11 +97,24 @@ export function toGraphQLText(
     printOptions?: PrintTreeOptions;
   } = {},
 ): string {
+  clearPendingValidations(); // Clear any previous errors and pending validations
   const content = <gql.SourceFile path="schema.graphql">{c}</gql.SourceFile>;
   const res = toGraphQLTextMultiple([content], {
     policy,
     printOptions,
   });
+
+  // Run interface implementation validations after rendering is complete
+  runPendingValidations();
+
   const file = findFile(res, "schema.graphql");
   return file.contents;
+}
+
+/**
+ * Get validation errors from the last render.
+ * This is useful for testing validation logic.
+ */
+export function getLastValidationErrors(): Error[] {
+  return getValidationErrors();
 }

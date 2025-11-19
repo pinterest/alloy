@@ -75,6 +75,9 @@ export function EnumTypeDefinition(props: EnumTypeDefinitionProps) {
     props.name,
     {
       refkeys: props.refkey,
+      metadata: {
+        kind: "enum",
+      },
     },
     "enum",
   );

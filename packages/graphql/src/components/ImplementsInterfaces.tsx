@@ -30,9 +30,13 @@ export function ImplementsInterfaces(props: ImplementsInterfacesProps) {
   // Compute the flattened list of interfaces including transitive ones
   const allInterfaces = memo(() => {
     const seen = new Set<string>();
+    const visiting = new Set<string>();
     const result: Children[] = [];
 
-    function collectInterfaces(interfaces: Children[]) {
+    function collectInterfaces(
+      interfaces: Children[],
+      currentPath: string[] = [],
+    ) {
       for (const iface of interfaces) {
         // Try to resolve if it's a refkey
         if (isRefkey(iface)) {
@@ -41,10 +45,20 @@ export function ImplementsInterfaces(props: ImplementsInterfacesProps) {
 
           // Track by name to avoid duplicates
           const nameStr = String(name);
+
+          // Check for circular inheritance
+          if (visiting.has(nameStr)) {
+            throw new Error(
+              `Circular interface inheritance detected: ${currentPath.join(" -> ")} -> ${nameStr}`,
+            );
+          }
+
           if (seen.has(nameStr)) {
             continue;
           }
+
           seen.add(nameStr);
+          visiting.add(nameStr);
           result.push(iface);
 
           // Recursively collect parent interfaces
@@ -54,9 +68,11 @@ export function ImplementsInterfaces(props: ImplementsInterfacesProps) {
               Array.isArray(parentInterfaces) &&
               parentInterfaces.length > 0
             ) {
-              collectInterfaces(parentInterfaces);
+              collectInterfaces(parentInterfaces, [...currentPath, nameStr]);
             }
           }
+
+          visiting.delete(nameStr);
         } else {
           // String literal interface name
           const nameStr = String(iface);

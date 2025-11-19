@@ -1,3 +1,4 @@
+import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import * as gql from "../src/index.js";
 import { toGraphQLText } from "./utils.jsx";
@@ -281,10 +282,13 @@ describe("Directives validation", () => {
         </gql.SourceFile>,
       );
 
-      expect(result).toContain(
-        "directive @auth(requires: String) on FIELD_DEFINITION | OBJECT",
-      );
-      expect(result).toContain('type User @auth(requires: "ADMIN") {');
+      expect(result).toRenderTo(d`
+        directive @auth(requires: String) on FIELD_DEFINITION | OBJECT
+
+        type User @auth(requires: "ADMIN") {
+          id: ID
+        }
+      `);
     });
 
     it("validates custom repeatable directive", () => {
@@ -316,12 +320,13 @@ describe("Directives validation", () => {
         </gql.SourceFile>,
       );
 
-      expect(result).toContain(
-        "directive @tag(name: String) repeatable on FIELD_DEFINITION",
-      );
-      expect(result).toContain(
-        'field: String @tag(name: "important") @tag(name: "public")',
-      );
+      expect(result).toRenderTo(d`
+        directive @tag(name: String) repeatable on FIELD_DEFINITION
+
+        type User {
+          field: String @tag(name: "important") @tag(name: "public")
+        }
+      `);
     });
 
     it("throws error when non-repeatable custom directive is used twice", () => {
@@ -410,7 +415,13 @@ describe("Directives validation", () => {
         </gql.SourceFile>,
       );
 
-      expect(result).toContain('@auth(requires: "ADMIN", level: 5)');
+      expect(result).toRenderTo(d`
+        directive @auth(requires: String!, level: Int) on FIELD_DEFINITION
+
+        type User {
+          email: String @auth(requires: "ADMIN", level: 5)
+        }
+      `);
     });
 
     it("allows directive with only required arguments (optional arguments omitted)", () => {
@@ -438,7 +449,13 @@ describe("Directives validation", () => {
         </gql.SourceFile>,
       );
 
-      expect(result).toContain('@auth(requires: "ADMIN")');
+      expect(result).toRenderTo(d`
+        directive @auth(requires: String!, level: Int) on FIELD_DEFINITION
+
+        type User {
+          email: String @auth(requires: "ADMIN")
+        }
+      `);
     });
 
     it("throws error when required argument is missing", () => {
@@ -536,7 +553,13 @@ describe("Directives validation", () => {
         </gql.SourceFile>,
       );
 
-      expect(result).toContain("@noArgs");
+      expect(result).toRenderTo(d`
+        directive @noArgs on FIELD_DEFINITION
+
+        type User {
+          email: String @noArgs
+        }
+      `);
     });
 
     it("validates complex directive with multiple required and optional arguments", () => {
@@ -569,9 +592,13 @@ describe("Directives validation", () => {
         </gql.SourceFile>,
       );
 
-      expect(result).toContain(
-        '@complex(required1: "value", required2: 42, optional1: "opt")',
-      );
+      expect(result).toRenderTo(d`
+        directive @complex(required1: String!, required2: Int!, optional1: String, optional2: Boolean) on FIELD_DEFINITION
+
+        type User {
+          field: String @complex(required1: "value", required2: 42, optional1: "opt")
+        }
+      `);
     });
 
     it("throws error when multiple required arguments are missing", () => {

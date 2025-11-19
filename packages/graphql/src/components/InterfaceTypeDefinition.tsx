@@ -83,6 +83,7 @@ export function InterfaceTypeDefinition(props: InterfaceTypeDefinitionProps) {
       refkeys: props.refkey,
       metadata: {
         implements: props.implements ?? [],
+        kind: "interface",
       },
     },
     "interface",

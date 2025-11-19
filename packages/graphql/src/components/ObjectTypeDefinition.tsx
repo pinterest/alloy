@@ -11,6 +11,7 @@ import {
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { GraphQLMemberScope, useGraphQLScope } from "../symbols/index.js";
 import { BaseDeclarationProps } from "./common-props.js";
+import { registerForValidation } from "./DeferredInterfaceValidation.js";
 import { Directives } from "./Directives.js";
 import { ImplementsInterfaces } from "./ImplementsInterfaces.js";
 import { wrapDescription } from "./utils.js";
@@ -72,6 +73,7 @@ export function ObjectTypeDefinition(props: ObjectTypeDefinitionProps) {
       refkeys: props.refkey,
       metadata: {
         implements: props.implements ?? [],
+        kind: "object",
       },
     },
     "type",
@@ -84,6 +86,11 @@ export function ObjectTypeDefinition(props: ObjectTypeDefinitionProps) {
 
   const ContentSlot = createContentSlot();
   const wrappedDescription = wrapDescription(props.description);
+
+  // Register for deferred validation if implementing interfaces
+  if (props.implements && props.implements.length > 0) {
+    registerForValidation(props.name, sym, props.implements);
+  }
 
   return (
     <>

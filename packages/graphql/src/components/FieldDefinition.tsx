@@ -13,7 +13,7 @@ import { GraphQLMemberScope } from "../symbols/graphql-member-scope.js";
 import { useGraphQLScope } from "../symbols/scopes.js";
 import { TypedBaseDeclarationProps } from "./common-props.js";
 import { Directives } from "./Directives.js";
-import { wrapDescription } from "./utils.js";
+import { validateOutputType, wrapDescription } from "./utils.js";
 
 export interface FieldDefinitionProps extends TypedBaseDeclarationProps {
   /**
@@ -114,15 +114,22 @@ export function FieldDefinition(props: FieldDefinitionProps) {
   const TypeSymbolSlot = createSymbolSlot();
   const scope = useGraphQLScope();
 
+  // Validate that the field type is valid for output positions
+  validateOutputType(props.type, props.name, "type/interface");
+
   const sym = createGraphQLSymbol(
     props.name,
     {
       refkeys: props.refkey,
+      metadata: {
+        type: props.type,
+      },
     },
     "field",
   );
 
   // Create a member scope for field arguments
+  // Arguments will be stored in sym.members when rendered
   const argScope = new GraphQLMemberScope(`${props.name}.args`, scope, {
     ownerSymbol: sym,
   });

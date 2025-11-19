@@ -44,6 +44,9 @@ export function ScalarTypeDefinition(props: ScalarTypeDefinitionProps) {
     props.name,
     {
       refkeys: props.refkey,
+      metadata: {
+        kind: "scalar",
+      },
     },
     "scalar",
   );

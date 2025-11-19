@@ -9,7 +9,11 @@ import {
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { TypedBaseDeclarationProps } from "./common-props.js";
 import { Directives } from "./Directives.js";
-import { validateNonNullDefault, wrapDescription } from "./utils.js";
+import {
+  validateInputType,
+  validateNonNullDefault,
+  wrapDescription,
+} from "./utils.js";
 import { ValueExpression } from "./ValueExpression.js";
 
 export interface InputValueDefinitionProps extends TypedBaseDeclarationProps {
@@ -73,6 +77,9 @@ export interface InputValueDefinitionProps extends TypedBaseDeclarationProps {
  */
 export function InputValueDefinition(props: InputValueDefinitionProps) {
   const TypeSymbolSlot = createSymbolSlot();
+
+  // Validate that the argument type is valid for input positions
+  validateInputType(props.type, props.name, "Argument");
 
   // Validate that non-null types don't have null default values
   if (props.defaultValue !== undefined) {
