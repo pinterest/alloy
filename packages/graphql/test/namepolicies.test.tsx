@@ -308,6 +308,37 @@ it("applies name policy to refkeys", () => {
   expect(result).toRenderTo(expected);
 });
 
+it("applies name policy to union member refkeys", () => {
+  const userTypeRef = refkey();
+  const postTypeRef = refkey();
+
+  const result = toGraphQLText(
+    <>
+      <gql.ObjectTypeDefinition name="user-type" refkey={userTypeRef}>
+        <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+      </gql.ObjectTypeDefinition>
+      <gql.ObjectTypeDefinition name="post-type" refkey={postTypeRef}>
+        <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+      </gql.ObjectTypeDefinition>
+      <gql.UnionTypeDefinition
+        name="search-result"
+        members={[userTypeRef, postTypeRef]}
+      />
+    </>,
+  );
+  expect(result).toRenderTo(d`
+    type UserType {
+      id: ID!
+    }
+
+    type PostType {
+      id: ID!
+    }
+
+    union SearchResult = UserType | PostType
+  `);
+});
+
 describe("GraphQL name format validation", () => {
   it("throws error when name starts with a digit", () => {
     expect(() => {
