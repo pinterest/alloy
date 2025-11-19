@@ -1,4 +1,5 @@
 export * from "./common-props.js";
+export * from "./DeferredInterfaceValidation.js";
 export * from "./Directive.js";
 export * from "./DirectiveDefinition.js";
 export * from "./Directives.js";
