@@ -34,13 +34,15 @@ describe("InputObjectTypeExtension", () => {
         <gql.InputFieldDeclaration
           name="timezone"
           type={builtInScalars.String}
-          description='"""User timezone preference"""'
+          description="User timezone preference"
         />
       </gql.InputObjectTypeExtension>,
     );
     expect(result).toRenderTo(d`
       extend input UserInput {
-        """User timezone preference"""
+        """
+        User timezone preference
+        """
         timezone: String
       }
     `);
