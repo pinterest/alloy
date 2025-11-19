@@ -144,7 +144,7 @@ export function registerForValidation(
  *
  * @internal
  */
-export function runPendingValidations(): void {
+export function _runPendingValidations(): void {
   const validations = [...pendingValidations];
   pendingValidations.length = 0; // Clear for next render
 

@@ -20,10 +20,10 @@ export interface InputObjectTypeDefinitionProps extends BaseDeclarationProps {
    */
   children?: Children;
   /**
-   * Whether this is a @oneOf input object.
+   * Whether this is a \@oneOf input object.
    * When true, all fields must be nullable and cannot have default values.
    *
-   * This must be explicitly set to true when using the @oneOf directive.
+   * This must be explicitly set to true when using the \@oneOf directive.
    * The component cannot automatically detect the directive due to JSX evaluation timing.
    *
    * @see https://spec.graphql.org/September2025/#sec-OneOf-Input-Objects
