@@ -27,6 +27,25 @@ export function createGraphQLSymbol(
   if (!options.space && currentScope) {
     if (currentScope.ownerSymbol) {
       targetSpace = currentScope.ownerSymbol.members;
+
+      // Check for duplicate members (fields, enum values, arguments, etc.)
+      // Only check if we're not explicitly ignoring conflicts
+      if (!options.ignoreNameConflict && targetSpace) {
+        const nameStr = typeof name === "string" ? name : name.name;
+        const existingSymbol = targetSpace.symbolNames.get(nameStr);
+        if (existingSymbol) {
+          const ownerName = currentScope.ownerSymbol.name;
+          const memberType =
+            kind === "field" ? "field"
+            : kind === "argument" ? "argument"
+            : kind === "enumValue" ? "enum value"
+            : "member";
+          throw new Error(
+            `Duplicate ${memberType} name "${nameStr}" in ${ownerName}. ` +
+              `Each ${memberType} must have a unique name within its parent type.`,
+          );
+        }
+      }
     } else if ("symbols" in currentScope) {
       targetSpace = currentScope.symbols;
     }

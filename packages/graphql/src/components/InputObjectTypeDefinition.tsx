@@ -11,6 +11,7 @@ import {
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { GraphQLMemberScope, useGraphQLScope } from "../symbols/index.js";
 import { BaseDeclarationProps } from "./common-props.js";
+import { OneOfInputProvider } from "./OneOfInputValidation.js";
 import { wrapDescription } from "./utils.js";
 
 export interface InputObjectTypeDefinitionProps extends BaseDeclarationProps {
@@ -18,6 +19,16 @@ export interface InputObjectTypeDefinitionProps extends BaseDeclarationProps {
    * Input fields of the input object type (InputFieldDeclaration components)
    */
   children?: Children;
+  /**
+   * Whether this is a @oneOf input object.
+   * When true, all fields must be nullable and cannot have default values.
+   *
+   * This must be explicitly set to true when using the @oneOf directive.
+   * The component cannot automatically detect the directive due to JSX evaluation timing.
+   *
+   * @see https://spec.graphql.org/September2025/#sec-OneOf-Input-Objects
+   */
+  isOneOf?: boolean;
 }
 
 /**
@@ -25,12 +36,14 @@ export interface InputObjectTypeDefinitionProps extends BaseDeclarationProps {
  * Input types are used for complex input arguments in queries and mutations.
  *
  * @example
+ * @example
  * ```tsx
  * <>
  *   <InputObjectTypeDefinition
  *     name="FilterInput"
+ *     isOneOf
  *     directives={<Directive name="oneOf" />}
- *     description='"""Filter input"""'
+ *     description="Filter input"
  *   >
  *     <InputFieldDeclaration name="nameContains" type={builtInScalars.String} />
  *     <InputFieldDeclaration name="emailEquals" type={builtInScalars.String} />
@@ -47,6 +60,11 @@ export interface InputObjectTypeDefinitionProps extends BaseDeclarationProps {
  *   emailEquals: String
  * }
  * ```
+ *
+ * @remarks
+ * When `isOneOf` is true, the component validates that:
+ * - All input fields are nullable (no `!` at the end of the type)
+ * - No input fields have default values
  */
 export function InputObjectTypeDefinition(
   props: InputObjectTypeDefinitionProps,
@@ -57,6 +75,9 @@ export function InputObjectTypeDefinition(
     props.name,
     {
       refkeys: props.refkey,
+      metadata: {
+        kind: "input",
+      },
     },
     "input",
   );
@@ -82,7 +103,14 @@ export function InputObjectTypeDefinition(
         <MemberScope value={memberScope}>
           <Indent hardline>
             <ContentSlot>
-              <List hardline>{props.children}</List>
+              <Show
+                when={props.isOneOf}
+                fallback={<List hardline>{props.children}</List>}
+              >
+                <OneOfInputProvider>
+                  <List hardline>{props.children}</List>
+                </OneOfInputProvider>
+              </Show>
             </ContentSlot>
           </Indent>
         </MemberScope>
