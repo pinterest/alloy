@@ -11,9 +11,9 @@ import {
 import { dedent } from "@alloy-js/core/testing";
 import { expect } from "vitest";
 import {
+  _runPendingValidations,
   clearPendingValidations,
   getValidationErrors,
-  _runPendingValidations,
 } from "../src/components/DeferredInterfaceValidation.js";
 import * as gql from "../src/components/index.js";
 import { createGraphQLNamePolicy } from "../src/name-policy.js";
