@@ -1,4 +1,3 @@
-/** @jsxImportSource @alloy-js/core */
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import { builtInScalars } from "../src/builtins/scalars.js";

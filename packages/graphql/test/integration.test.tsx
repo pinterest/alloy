@@ -1,4 +1,3 @@
-/** @jsxImportSource @alloy-js/core */
 import { code, refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
@@ -24,7 +23,7 @@ describe("Complete Schema Integration", () => {
         <gql.InterfaceTypeDefinition
           name="Node"
           refkey={nodeRef}
-          description='"""Object with a unique identifier"""'
+          description="Object with a unique identifier"
         >
           <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
         </gql.InterfaceTypeDefinition>
@@ -32,7 +31,7 @@ describe("Complete Schema Integration", () => {
         <gql.InterfaceTypeDefinition
           name="Timestamped"
           refkey={timestampedRef}
-          description='"""Object with timestamp fields"""'
+          description="Object with timestamp fields"
         >
           <gql.FieldDefinition
             name="createdAt"
@@ -48,19 +47,19 @@ describe("Complete Schema Integration", () => {
         <gql.EnumTypeDefinition
           name="PostStatus"
           refkey={postStatusRef}
-          description='"""Status of a blog post"""'
+          description="Status of a blog post"
         >
           <gql.EnumValue
             name="PUBLISHED"
             refkey={publishedRef}
-            description='"""Post is published and visible"""'
+            description="Post is published and visible"
           />
           <gql.EnumValue
             name="DRAFT"
             refkey={draftRef}
-            description='"""Post is in draft mode"""'
+            description="Post is in draft mode"
           />
-          <gql.EnumValue name="ARCHIVED" description='"""Post is archived"""' />
+          <gql.EnumValue name="ARCHIVED" description="Post is archived" />
         </gql.EnumTypeDefinition>
 
         {/* Object type definitions */}
@@ -68,13 +67,13 @@ describe("Complete Schema Integration", () => {
           name="User"
           refkey={userRef}
           implements={[nodeRef, timestampedRef]}
-          description='"""A user in the blog system"""'
+          description="A user in the blog system"
         >
           <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
           <gql.FieldDefinition
             name="username"
             type={code`${builtInScalars.String}!`}
-            description='"""Unique username"""'
+            description="Unique username"
           />
           <gql.FieldDefinition
             name="email"
@@ -95,7 +94,7 @@ describe("Complete Schema Integration", () => {
           name="Post"
           refkey={postRef}
           implements={[nodeRef, timestampedRef]}
-          description='"""A blog post"""'
+          description="A blog post"
         >
           <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
           <gql.FieldDefinition
@@ -123,7 +122,7 @@ describe("Complete Schema Integration", () => {
           name="Comment"
           refkey={commentRef}
           implements={[nodeRef, timestampedRef]}
-          description='"""A comment on a post"""'
+          description="A comment on a post"
         >
           <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
           <gql.FieldDefinition
@@ -145,7 +144,7 @@ describe("Complete Schema Integration", () => {
         {/* Query root type */}
         <gql.ObjectTypeDefinition
           name="Query"
-          description='"""Root query type"""'
+          description="Root query type"
         >
           <gql.FieldDefinition
             name="user"
@@ -190,7 +189,7 @@ describe("Complete Schema Integration", () => {
         {/* Mutation root type */}
         <gql.ObjectTypeDefinition
           name="Mutation"
-          description='"""Root mutation type"""'
+          description="Root mutation type"
         >
           <gql.FieldDefinition
             name="createPost"
@@ -246,7 +245,7 @@ describe("Complete Schema Integration", () => {
         <gql.OperationDefinition
           operationType="query"
           name="GetUserWithPosts"
-          description='"""Fetch a user with their posts and optional email"""'
+          description="Fetch a user with their posts and optional email"
           variableDefinitions={
             <>
               <gql.VariableDefinition
@@ -301,7 +300,7 @@ describe("Complete Schema Integration", () => {
         <gql.OperationDefinition
           operationType="mutation"
           name="CreateBlogPost"
-          description='"""Create a new blog post with title and content"""'
+          description="Create a new blog post with title and content"
           variableDefinitions={
             <>
               <gql.VariableDefinition
@@ -352,31 +351,47 @@ describe("Complete Schema Integration", () => {
     );
 
     expect(result).toRenderTo(d`
-      """Object with a unique identifier"""
+      """
+      Object with a unique identifier
+      """
       interface Node {
         id: ID!
       }
       
-      """Object with timestamp fields"""
+      """
+      Object with timestamp fields
+      """
       interface Timestamped {
         createdAt: String!
         updatedAt: String!
       }
       
-      """Status of a blog post"""
+      """
+      Status of a blog post
+      """
       enum PostStatus {
-        """Post is published and visible"""
+        """
+        Post is published and visible
+        """
         PUBLISHED
-        """Post is in draft mode"""
+        """
+        Post is in draft mode
+        """
         DRAFT
-        """Post is archived"""
+        """
+        Post is archived
+        """
         ARCHIVED
       }
       
-      """A user in the blog system"""
+      """
+      A user in the blog system
+      """
       type User implements Node & Timestamped {
         id: ID!
-        """Unique username"""
+        """
+        Unique username
+        """
         username: String!
         email: String!
         postCount: Int
@@ -384,7 +399,9 @@ describe("Complete Schema Integration", () => {
         updatedAt: String!
       }
       
-      """A blog post"""
+      """
+      A blog post
+      """
       type Post implements Node & Timestamped {
         id: ID!
         title: String!
@@ -396,7 +413,9 @@ describe("Complete Schema Integration", () => {
         updatedAt: String!
       }
       
-      """A comment on a post"""
+      """
+      A comment on a post
+      """
       type Comment implements Node & Timestamped {
         id: ID!
         content: String!
@@ -406,21 +425,27 @@ describe("Complete Schema Integration", () => {
         updatedAt: String!
       }
       
-      """Root query type"""
+      """
+      Root query type
+      """
       type Query {
         user(id: ID!): User
         post(id: ID!): Post
         posts(status: PostStatus = PUBLISHED, limit: Int = 10): [Post!]!
       }
       
-      """Root mutation type"""
+      """
+      Root mutation type
+      """
       type Mutation {
         createPost(title: String!, content: String!, status: PostStatus = DRAFT): Post!
         updatePost(id: ID!, title: String, status: PostStatus): Post
         deletePost(id: ID!): Boolean
       }
       
-      """Fetch a user with their posts and optional email"""
+      """
+      Fetch a user with their posts and optional email
+      """
       query GetUserWithPosts($userId: ID!, $postStatus: PostStatus = PUBLISHED, $includeEmail: Boolean = false) {
         user(id: $userId) {
           id
@@ -441,7 +466,9 @@ describe("Complete Schema Integration", () => {
         }
       }
       
-      """Create a new blog post with title and content"""
+      """
+      Create a new blog post with title and content
+      """
       mutation CreateBlogPost($title: String!, $content: String!, $status: PostStatus = DRAFT) {
         createPost(title: $title, content: $content, status: $status) {
           id

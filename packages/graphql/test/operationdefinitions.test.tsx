@@ -1,4 +1,3 @@
-/** @jsxImportSource @alloy-js/core */
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import * as gql from "../src/index.js";
@@ -183,7 +182,7 @@ describe("OperationDefinition", () => {
       <gql.OperationDefinition
         operationType="query"
         name="GetUser"
-        description='"""Fetch a user by their ID"""'
+        description="Fetch a user by their ID"
         variableDefinitions={<gql.VariableDefinition name="id" type="ID!" />}
       >
         <gql.FieldSelection name="user">
@@ -194,7 +193,9 @@ describe("OperationDefinition", () => {
       </gql.OperationDefinition>,
     );
     expect(result).toRenderTo(d`
-      """Fetch a user by their ID"""
+      """
+      Fetch a user by their ID
+      """
       query GetUser($id: ID!) {
         user {
           id
