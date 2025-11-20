@@ -8,6 +8,7 @@ import {
 } from "@alloy-js/core";
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { NamedDeclarationProps } from "./common-props.js";
+import { validateFragmentTypeCondition } from "./utils.js";
 
 export interface FragmentDefinitionProps extends NamedDeclarationProps {
   /**
@@ -53,6 +54,9 @@ export interface FragmentDefinitionProps extends NamedDeclarationProps {
  * ```
  */
 export function FragmentDefinition(props: FragmentDefinitionProps) {
+  // Validate that the type condition is a valid composite output type
+  validateFragmentTypeCondition(props.typeCondition, props.name);
+
   const sym = createGraphQLSymbol(
     props.name,
     {

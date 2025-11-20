@@ -1,4 +1,5 @@
 import { Children, Indent, List } from "@alloy-js/core";
+import { validateFragmentTypeCondition } from "./utils.js";
 
 export interface InlineFragmentProps {
   /**
@@ -56,6 +57,11 @@ export interface InlineFragmentProps {
  * ```
  */
 export function InlineFragment(props: InlineFragmentProps) {
+  // Validate that the type condition (if present) is a valid composite output type
+  if (props.typeCondition) {
+    validateFragmentTypeCondition(props.typeCondition, "inline fragment");
+  }
+
   const hasTypeCondition = Boolean(props.typeCondition);
   const hasDirectives = Boolean(props.directives);
 
