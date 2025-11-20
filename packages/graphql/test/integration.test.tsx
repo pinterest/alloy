@@ -142,10 +142,7 @@ describe("Complete Schema Integration", () => {
         </gql.ObjectTypeDefinition>
 
         {/* Query root type */}
-        <gql.ObjectTypeDefinition
-          name="Query"
-          description="Root query type"
-        >
+        <gql.ObjectTypeDefinition name="Query" description="Root query type">
           <gql.FieldDefinition
             name="user"
             type={userRef}
