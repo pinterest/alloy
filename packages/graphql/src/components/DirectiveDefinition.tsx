@@ -69,18 +69,43 @@ export interface DirectiveDefinitionProps extends NamedDeclarationProps {
  *
  * @example
  * ```tsx
- * <DirectiveDefinition
- *   name="auth"
- *   repeatable
- *   description="Authorization directive for fields and types.\nRequires specific roles or scopes."
- *   locations={["FIELD_DEFINITION", "OBJECT"]}
- *   args={
- *     <>
- *       <InputValueDefinition name="requires" type="Role!" defaultValue="USER" enumDefault />
- *       <InputValueDefinition name="scopes" type={code`[${builtInScalars.String}!]`} />
- *     </>
- *   }
- * />
+ * import { code, refkey } from "@alloy-js/core";
+ *
+ * const cacheControlRef = refkey();
+ * const publicRef = refkey();
+ *
+ * <>
+ *   <DirectiveDefinition
+ *     name="auth"
+ *     description="Authorization directive for fields and types.\nRequires specific roles or scopes."
+ *     repeatable
+ *     locations={["FIELD_DEFINITION", "OBJECT"]}
+ *     args={
+ *       <>
+ *         <InputValueDefinition name="requires" type={builtInScalars.String} defaultValue="admin" />
+ *         <InputValueDefinition name="scopes" type={code`[${builtInScalars.String}!]`} />
+ *       </>
+ *     }
+ *   />
+ *   <EnumTypeDefinition name="CacheControlScope" refkey={cacheControlRef}>
+ *     <EnumValue name="PUBLIC" refkey={publicRef} />
+ *     <EnumValue name="PRIVATE" />
+ *   </EnumTypeDefinition>
+ *   <DirectiveDefinition
+ *     name="cacheControl"
+ *     locations={["FIELD_DEFINITION", "OBJECT"]}
+ *     args={
+ *       <>
+ *         <InputValueDefinition name="maxAge" type={builtInScalars.Int} />
+ *         <InputValueDefinition
+ *           name="scope"
+ *           type={cacheControlRef}
+ *           defaultValue={code`${publicRef}`}
+ *         />
+ *       </>
+ *     }
+ *   />
+ * </>
  * ```
  * renders to
  * ```graphql
@@ -88,9 +113,19 @@ export interface DirectiveDefinitionProps extends NamedDeclarationProps {
  * Authorization directive for fields and types.
  * """
  * directive \@auth(
- *   requires: Role! = USER
+ *   requires: String = "admin"
  *   scopes: [String!]
  * ) repeatable on FIELD_DEFINITION | OBJECT
+ *
+ * enum CacheControlScope {
+ *   PUBLIC
+ *   PRIVATE
+ * }
+ *
+ * directive \@cacheControl(
+ *   maxAge: Int
+ *   scope: CacheControlScope = PUBLIC
+ * ) on FIELD_DEFINITION | OBJECT
  * ```
  *
  * @throws \{Error\} If locations array is empty

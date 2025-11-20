@@ -3,7 +3,9 @@ import { camelCase, constantCase, pascalCase } from "change-case";
 import { BuiltInScalarName, builtInScalarNames } from "./builtins/scalars.js";
 
 export type GraphQLElements =
-  | "type" // Type names (ObjectType, InterfaceType, etc.)
+  | "type" // Object type names
+  | "interface" // Interface type names
+  | "input" // Input object type names
   | "field" // Field names
   | "argument" // Argument names
   | "enum" // Enum type names
@@ -159,6 +161,8 @@ export function createGraphQLNamePolicy(): NamePolicy<GraphQLElements> {
 
     switch (element) {
       case "type":
+      case "interface":
+      case "input":
       case "enum":
       case "scalar":
         transformedName = pascalCase(name);

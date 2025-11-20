@@ -138,11 +138,28 @@ describe("FieldDefinition", () => {
     `);
   });
 
-  it("renders field with string type and non-null", () => {
+  it("renders field with custom type and non-null", () => {
+    const statusRef = refkey();
+
     const result = toGraphQLText(
-      <gql.FieldDefinition name="status" type="Status!" />,
+      <>
+        <gql.EnumTypeDefinition name="Status" refkey={statusRef}>
+          <gql.EnumValue name="ACTIVE" />
+        </gql.EnumTypeDefinition>
+        <gql.ObjectTypeDefinition name="Query">
+          <gql.FieldDefinition name="status" type={code`${statusRef}!`} />
+        </gql.ObjectTypeDefinition>
+      </>,
     );
-    expect(result).toBe("status: Status!");
+    expect(result).toRenderTo(d`
+      enum Status {
+        ACTIVE
+      }
+      
+      type Query {
+        status: Status!
+      }
+    `);
   });
 
   it("renders a field with a refkey to user-defined type", () => {
@@ -245,7 +262,9 @@ describe("FieldDefinition", () => {
         }
       />,
     );
-    expect(result).toBe("user(id: ID!): String");
+    expect(result).toRenderTo(d`
+      user(id: ID!): String
+    `);
   });
 
   it("renders a field with multiple arguments", () => {
