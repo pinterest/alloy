@@ -42,6 +42,7 @@ const apiPackages = {
     apiPath(resolve(packagesPath, "typescript")),
   ),
   csharp: apiModel.loadPackage(apiPath(resolve(packagesPath, "csharp"))),
+  graphql: apiModel.loadPackage(apiPath(resolve(packagesPath, "graphql"))),
   java: apiModel.loadPackage(apiPath(resolve(packagesPath, "java"))),
   json: apiModel.loadPackage(apiPath(resolve(packagesPath, "json"))),
   python: apiModel.loadPackage(apiPath(resolve(packagesPath, "python"))),
