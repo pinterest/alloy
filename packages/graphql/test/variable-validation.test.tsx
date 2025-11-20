@@ -242,4 +242,122 @@ describe("Variable Type Validation", () => {
       }).toThrow(/Variable "id" has a non-null type but a null default value/);
     });
   });
+
+  describe("Variable name uniqueness", () => {
+    it("allows unique variable names in an operation", () => {
+      const result = toGraphQLText(
+        <gql.OperationDefinition
+          operationType="query"
+          name="GetUser"
+          variableDefinitions={
+            <>
+              <gql.VariableDefinition name="id" type={gql.builtInScalars.ID} />
+              <gql.VariableDefinition
+                name="limit"
+                type={gql.builtInScalars.Int}
+              />
+              <gql.VariableDefinition
+                name="includeDeleted"
+                type={gql.builtInScalars.Boolean}
+              />
+            </>
+          }
+        >
+          <gql.FieldSelection name="user">
+            <gql.FieldSelection name="id" />
+          </gql.FieldSelection>
+        </gql.OperationDefinition>,
+      );
+
+      expect(result).toContain("$id: ID");
+      expect(result).toContain("$limit: Int");
+      expect(result).toContain("$includeDeleted: Boolean");
+    });
+
+    it("throws error when duplicate variable names are used in an operation", () => {
+      expect(() => {
+        toGraphQLText(
+          <gql.OperationDefinition
+            operationType="query"
+            name="InvalidQuery"
+            variableDefinitions={
+              <>
+                <gql.VariableDefinition
+                  name="id"
+                  type={gql.builtInScalars.ID}
+                />
+                <gql.VariableDefinition
+                  name="id"
+                  type={gql.builtInScalars.String}
+                />
+              </>
+            }
+          >
+            <gql.FieldSelection name="user">
+              <gql.FieldSelection name="id" />
+            </gql.FieldSelection>
+          </gql.OperationDefinition>,
+        );
+      }).toThrow(/Duplicate member name "id"/);
+    });
+
+    it("throws error with descriptive message for duplicate variables", () => {
+      expect(() => {
+        toGraphQLText(
+          <gql.OperationDefinition
+            operationType="mutation"
+            name="CreatePost"
+            variableDefinitions={
+              <>
+                <gql.VariableDefinition
+                  name="title"
+                  type={gql.builtInScalars.String}
+                />
+                <gql.VariableDefinition
+                  name="title"
+                  type={gql.builtInScalars.String}
+                />
+              </>
+            }
+          >
+            <gql.FieldSelection name="createPost">
+              <gql.FieldSelection name="id" />
+            </gql.FieldSelection>
+          </gql.OperationDefinition>,
+        );
+      }).toThrow(/Duplicate member name "title" in CreatePost/);
+    });
+
+    it("allows same variable name in different operations", () => {
+      const result = toGraphQLText(
+        <>
+          <gql.OperationDefinition
+            operationType="query"
+            name="GetUser"
+            variableDefinitions={
+              <gql.VariableDefinition name="id" type={gql.builtInScalars.ID} />
+            }
+          >
+            <gql.FieldSelection name="user">
+              <gql.FieldSelection name="id" />
+            </gql.FieldSelection>
+          </gql.OperationDefinition>
+          <gql.OperationDefinition
+            operationType="query"
+            name="GetPost"
+            variableDefinitions={
+              <gql.VariableDefinition name="id" type={gql.builtInScalars.ID} />
+            }
+          >
+            <gql.FieldSelection name="post">
+              <gql.FieldSelection name="id" />
+            </gql.FieldSelection>
+          </gql.OperationDefinition>
+        </>,
+      );
+
+      expect(result).toContain("query GetUser($id: ID)");
+      expect(result).toContain("query GetPost($id: ID)");
+    });
+  });
 });

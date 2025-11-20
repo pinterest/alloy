@@ -3,11 +3,13 @@ import {
   Declaration as CoreDeclaration,
   Indent,
   List,
+  MemberScope,
   Name,
   Show,
   createSymbolSlot,
 } from "@alloy-js/core";
 import { createGraphQLSymbol } from "../symbol-creation.js";
+import { GraphQLMemberScope, useGraphQLScope } from "../symbols/index.js";
 import { NamedDeclarationProps } from "./common-props.js";
 import { wrapDescription } from "./utils.js";
 
@@ -121,6 +123,7 @@ export interface OperationDefinitionProps
  */
 export function OperationDefinition(props: OperationDefinitionProps) {
   const TypeSymbolSlot = createSymbolSlot();
+  const scope = useGraphQLScope();
 
   // Anonymous operations (shorthand syntax) don't need a symbol
   const sym =
@@ -146,6 +149,16 @@ export function OperationDefinition(props: OperationDefinitionProps) {
 
   const wrappedDescription = wrapDescription(props.description);
 
+  // Create a member scope for variables to ensure uniqueness
+  const operationName = props.name || "anonymous operation";
+  const variableScope = new GraphQLMemberScope(
+    `${operationName}.variables`,
+    scope,
+    {
+      ownerSymbol: sym,
+    },
+  );
+
   const content = (
     <>
       <Show when={Boolean(wrappedDescription())}>
@@ -164,7 +177,10 @@ export function OperationDefinition(props: OperationDefinitionProps) {
           {hasVariables && (
             <>
               (
-              <List children={props.variableDefinitions} joiner=", " />)
+              <MemberScope value={variableScope}>
+                <List children={props.variableDefinitions} joiner=", " />
+              </MemberScope>
+              )
             </>
           )}
           {hasDirectives && <>{props.directives}</>}
