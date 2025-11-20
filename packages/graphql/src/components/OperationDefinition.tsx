@@ -6,7 +6,6 @@ import {
   Name,
   Show,
   createSymbolSlot,
-  memo,
 } from "@alloy-js/core";
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { NamedDeclarationProps } from "./common-props.js";
