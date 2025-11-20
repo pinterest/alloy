@@ -1,4 +1,11 @@
-import { Children, Show, createSymbolSlot, memo } from "@alloy-js/core";
+import {
+  Children,
+  Declaration as CoreDeclaration,
+  Show,
+  createSymbolSlot,
+  memo,
+} from "@alloy-js/core";
+import { createGraphQLSymbol } from "../symbol-creation.js";
 import { ValueExpression } from "./ValueExpression.js";
 import { validateInputType, validateNonNullDefault } from "./utils.js";
 
@@ -47,6 +54,17 @@ export function VariableDefinition(props: VariableDefinitionProps) {
     );
   }
 
+  // Create a symbol for uniqueness validation
+  const sym = createGraphQLSymbol(
+    props.name,
+    {
+      metadata: {
+        type: props.type,
+      },
+    },
+    "variable",
+  );
+
   const TypeSymbolSlot = createSymbolSlot();
 
   const typeAnnotation = memo(() => (
@@ -56,12 +74,12 @@ export function VariableDefinition(props: VariableDefinitionProps) {
   const hasDefaultValue = props.defaultValue !== undefined;
 
   return (
-    <>
+    <CoreDeclaration symbol={sym}>
       ${props.name}: {typeAnnotation}
       <Show when={hasDefaultValue}>
         {" = "}
         <ValueExpression jsValue={props.defaultValue} />
       </Show>
-    </>
+    </CoreDeclaration>
   );
 }
