@@ -214,3 +214,56 @@ export function validateInputType(
     );
   }
 }
+
+/**
+ * Validates that a fragment type condition is a valid composite output type.
+ * Fragment type conditions can be: Objects, Interfaces
+ * But NOT: Scalars, Enums, Input Objects, Unions
+ *
+ * @param typeCondition - The type condition to validate
+ * @param fragmentName - The fragment name for error messaging
+ * @throws {Error} If an invalid type is used as a fragment type condition
+ */
+export function validateFragmentTypeCondition(
+  typeCondition: Children,
+  fragmentName: string,
+): void {
+  // Check if this is a refkey we can resolve
+  if (isRefkey(typeCondition)) {
+    try {
+      const reference = ref(typeCondition as Refkey);
+      const [typeName, symbol] = reference();
+
+      const kind = symbol?.metadata?.kind as string | undefined;
+
+      if (kind === "scalar") {
+        throw new Error(
+          `Fragment "${fragmentName}" cannot have type condition "${typeName}" (scalar type). ` +
+            `Per the GraphQL spec, fragments can only be used on object types, interfaces, and unions.`,
+        );
+      }
+
+      if (kind === "enum") {
+        throw new Error(
+          `Fragment "${fragmentName}" cannot have type condition "${typeName}" (enum type). ` +
+            `Per the GraphQL spec, fragments can only be used on object types, interfaces, and unions.`,
+        );
+      }
+
+      if (kind === "input") {
+        throw new Error(
+          `Fragment "${fragmentName}" cannot have type condition "${typeName}" (input object type). ` +
+            `Per the GraphQL spec, fragments can only be used on object types, interfaces, and unions.`,
+        );
+      }
+    } catch (error) {
+      // If we can't resolve the reference, skip validation
+      if (error instanceof Error && !error.message.includes("cannot have")) {
+        return;
+      }
+      throw error;
+    }
+  }
+  // For non-refkey types (string literals), we can't validate at generation time
+  // The GraphQL schema validation will catch these errors
+}
