@@ -6,9 +6,11 @@ import {
   Name,
   Show,
   createSymbolSlot,
+  memo,
 } from "@alloy-js/core";
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { NamedDeclarationProps } from "./common-props.js";
+import { wrapDescription } from "./utils.js";
 
 export type OperationType = "query" | "mutation" | "subscription";
 
@@ -143,10 +145,12 @@ export function OperationDefinition(props: OperationDefinitionProps) {
     !hasDirectives &&
     props.operationType === "query";
 
+  const wrappedDescription = wrapDescription(props.description);
+
   const content = (
     <>
-      <Show when={Boolean(props.description)}>
-        {props.description}
+      <Show when={Boolean(wrappedDescription())}>
+        {wrappedDescription()}
         <hbr />
       </Show>
       {!isShorthand && (
