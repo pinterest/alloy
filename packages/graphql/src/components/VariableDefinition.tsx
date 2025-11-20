@@ -1,5 +1,6 @@
 import { Children, Show, createSymbolSlot, memo } from "@alloy-js/core";
 import { ValueExpression } from "./ValueExpression.js";
+import { validateInputType, validateNonNullDefault } from "./utils.js";
 
 export interface VariableDefinitionProps {
   /**
@@ -33,6 +34,19 @@ export interface VariableDefinitionProps {
  * ```
  */
 export function VariableDefinition(props: VariableDefinitionProps) {
+  // Validate that the variable type is valid for input positions
+  validateInputType(props.type, props.name, "Variable");
+
+  // Validate that non-null types don't have null default values
+  if (props.defaultValue !== undefined) {
+    validateNonNullDefault(
+      props.type,
+      props.defaultValue,
+      props.name,
+      "Variable",
+    );
+  }
+
   const TypeSymbolSlot = createSymbolSlot();
 
   const typeAnnotation = memo(() => (
