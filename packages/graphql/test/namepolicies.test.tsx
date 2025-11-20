@@ -308,6 +308,37 @@ it("applies name policy to refkeys", () => {
   expect(result).toRenderTo(expected);
 });
 
+it("applies name policy to union member refkeys", () => {
+  const userTypeRef = refkey();
+  const postTypeRef = refkey();
+
+  const result = toGraphQLText(
+    <>
+      <gql.ObjectTypeDefinition name="user-type" refkey={userTypeRef}>
+        <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+      </gql.ObjectTypeDefinition>
+      <gql.ObjectTypeDefinition name="post-type" refkey={postTypeRef}>
+        <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+      </gql.ObjectTypeDefinition>
+      <gql.UnionTypeDefinition
+        name="search-result"
+        members={[userTypeRef, postTypeRef]}
+      />
+    </>,
+  );
+  expect(result).toRenderTo(d`
+    type UserType {
+      id: ID!
+    }
+
+    type PostType {
+      id: ID!
+    }
+
+    union SearchResult = UserType | PostType
+  `);
+});
+
 describe("GraphQL name format validation", () => {
   it("throws error when name starts with a digit", () => {
     expect(() => {
@@ -513,4 +544,110 @@ describe("GraphQL name format validation", () => {
       /Invalid GraphQL name "__internal".*reserved for GraphQL introspection system/,
     );
   });
+});
+
+it("correct formatting of enum names (PascalCase)", () => {
+  const result = toGraphQLText(
+    <gql.EnumTypeDefinition name="user-status-type">
+      <gql.EnumValue name="active" />
+      <gql.EnumValue name="inactive" />
+    </gql.EnumTypeDefinition>,
+  );
+  const expected = d`
+    enum UserStatusType {
+      ACTIVE
+      INACTIVE
+    }
+  `;
+  expect(result).toRenderTo(expected);
+});
+
+it("correct formatting of enum values (UPPER_SNAKE_CASE)", () => {
+  const result = toGraphQLText(
+    <gql.EnumTypeDefinition name="Status">
+      <gql.EnumValue name="activeUser" />
+      <gql.EnumValue name="InactiveUser" />
+      <gql.EnumValue name="pending-approval" />
+      <gql.EnumValue name="waitingForReview" />
+    </gql.EnumTypeDefinition>,
+  );
+  const expected = d`
+    enum Status {
+      ACTIVE_USER
+      INACTIVE_USER
+      PENDING_APPROVAL
+      WAITING_FOR_REVIEW
+    }
+  `;
+  expect(result).toRenderTo(expected);
+});
+
+it("correct formatting of scalar names (PascalCase)", () => {
+  const result = toGraphQLText(
+    <>
+      <gql.ScalarTypeDefinition name="date-time-scalar" />
+      <gql.ScalarTypeDefinition name="json_value" />
+      <gql.ScalarTypeDefinition name="url_string" />
+    </>,
+  );
+  expect(result).toRenderTo(d`
+    scalar DateTimeScalar
+    
+    scalar JsonValue
+    
+    scalar UrlString
+  `);
+});
+
+it("correct formatting of union names (PascalCase)", () => {
+  const result = toGraphQLText(
+    <>
+      <gql.UnionTypeDefinition
+        name="search-result"
+        members={["User", "Post"]}
+      />
+      <gql.UnionTypeDefinition name="media_item" members={["Image", "Video"]} />
+      <gql.UnionTypeDefinition
+        name="notification-type"
+        members={["Email", "SMS"]}
+      />
+    </>,
+  );
+  expect(result).toRenderTo(d`
+    union SearchResult = User | Post
+    
+    union MediaItem = Image | Video
+    
+    union NotificationType = Email | SMS
+  `);
+});
+
+it("appends _ to enum names that conflict with reserved words", () => {
+  const result = toGraphQLText(
+    <>
+      <gql.EnumTypeDefinition name="enum">
+        <gql.EnumValue name="VALUE1" />
+      </gql.EnumTypeDefinition>
+      <gql.EnumTypeDefinition name="type">
+        <gql.EnumValue name="VALUE2" />
+      </gql.EnumTypeDefinition>
+      <gql.EnumTypeDefinition name="input">
+        <gql.EnumValue name="VALUE3" />
+      </gql.EnumTypeDefinition>
+    </>,
+  );
+  const expected = d`
+    enum Enum_ {
+      VALUE1
+    }
+
+    enum Type_ {
+      VALUE2
+    }
+
+    enum Input_ {
+      VALUE3
+    }
+  `;
+  expect(result).toRenderTo(expected);
 });
