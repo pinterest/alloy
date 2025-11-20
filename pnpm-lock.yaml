@@ -461,6 +461,9 @@ importers:
       '@alloy-js/csharp':
         specifier: workspace:~
         version: link:../csharp
+      '@alloy-js/graphql':
+        specifier: workspace:~
+        version: link:../graphql
       '@alloy-js/java':
         specifier: workspace:~
         version: link:../java
