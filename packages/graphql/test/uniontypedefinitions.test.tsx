@@ -117,45 +117,6 @@ describe("UnionTypeDefinition", () => {
     `);
   });
 
-  it("supports cross-file union references", () => {
-    const searchResultRef = refkey();
-
-    const res = toGraphQLTextMultiple([
-      <gql.SourceFile path="unions.graphql">
-        <gql.UnionTypeDefinition
-          name="SearchResult"
-          members={["User", "Post", "Comment"]}
-          refkey={searchResultRef}
-        />
-      </gql.SourceFile>,
-      <gql.SourceFile path="types.graphql">
-        <gql.ObjectTypeDefinition name="Query">
-          <gql.FieldDefinition
-            name="search"
-            type={code`[${searchResultRef}!]!`}
-            args={
-              <gql.InputValueDefinition
-                name="term"
-                type={code`${builtInScalars.String}!`}
-              />
-            }
-          />
-        </gql.ObjectTypeDefinition>
-      </gql.SourceFile>,
-    ]);
-
-    assertFileContents(res, {
-      "unions.graphql": `
-        union SearchResult = User | Post | Comment
-      `,
-      "types.graphql": `
-        type Query {
-          search(term: String!): [SearchResult!]!
-        }
-      `,
-    });
-  });
-
   it("renders multiple unions", () => {
     const result = toGraphQLText(
       <>

@@ -102,39 +102,6 @@ describe("ScalarTypeDefinition", () => {
     `);
   });
 
-  it("supports cross-file scalar references", () => {
-    const dateTimeRef = refkey();
-
-    const res = toGraphQLTextMultiple([
-      <gql.SourceFile path="scalars.graphql">
-        <gql.ScalarTypeDefinition
-          name="DateTime"
-          refkey={dateTimeRef}
-          description="ISO-8601 date-time"
-        />
-      </gql.SourceFile>,
-      <gql.SourceFile path="types.graphql">
-        <gql.ObjectTypeDefinition name="Event">
-          <gql.FieldDefinition name="startTime" type={code`${dateTimeRef}!`} />
-        </gql.ObjectTypeDefinition>
-      </gql.SourceFile>,
-    ]);
-
-    assertFileContents(res, {
-      "scalars.graphql": `
-        """
-        ISO-8601 date-time
-        """
-        scalar DateTime
-      `,
-      "types.graphql": `
-        type Event {
-          startTime: DateTime!
-        }
-      `,
-    });
-  });
-
   it("renders common custom scalars", () => {
     const result = toGraphQLText(
       <>

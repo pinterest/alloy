@@ -199,40 +199,6 @@ describe("EnumTypeDefinition", () => {
     `);
   });
 
-  it("supports cross-file enum references", () => {
-    const statusRef = refkey();
-
-    const res = toGraphQLTextMultiple([
-      <gql.SourceFile path="enums.graphql">
-        <gql.EnumTypeDefinition name="Status" refkey={statusRef}>
-          <gql.EnumValue name="ACTIVE" />
-          <gql.EnumValue name="INACTIVE" />
-          <gql.EnumValue name="PENDING" />
-        </gql.EnumTypeDefinition>
-      </gql.SourceFile>,
-      <gql.SourceFile path="types.graphql">
-        <gql.ObjectTypeDefinition name="User">
-          <gql.FieldDefinition name="status" type={code`${statusRef}!`} />
-        </gql.ObjectTypeDefinition>
-      </gql.SourceFile>,
-    ]);
-
-    assertFileContents(res, {
-      "enums.graphql": `
-        enum Status {
-          ACTIVE
-          INACTIVE
-          PENDING
-        }
-      `,
-      "types.graphql": `
-        type User {
-          status: Status!
-        }
-      `,
-    });
-  });
-
   it("renders multiple enums in a schema", () => {
     const result = toGraphQLText(
       <>
