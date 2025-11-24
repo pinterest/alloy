@@ -502,7 +502,7 @@ it("correct formatting of union names (PascalCase)", () => {
   `);
 });
 
-it("appends _ to enum names that conflict with reserved words", () => {
+it("transforms lowercase type keywords to PascalCase (not reserved after transformation)", () => {
   const result = toGraphQLText(
     <>
       <gql.EnumTypeDefinition name="enum">
@@ -517,15 +517,15 @@ it("appends _ to enum names that conflict with reserved words", () => {
     </>,
   );
   const expected = d`
-    enum Enum_ {
+    enum Enum {
       VALUE1
     }
 
-    enum Type_ {
+    enum Type {
       VALUE2
     }
 
-    enum Input_ {
+    enum Input {
       VALUE3
     }
   `;
