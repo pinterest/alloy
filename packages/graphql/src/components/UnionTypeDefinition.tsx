@@ -49,6 +49,13 @@ export interface UnionTypeDefinitionProps extends BaseDeclarationProps {
  * ```
  */
 export function UnionTypeDefinition(props: UnionTypeDefinitionProps) {
+  // Validate that union has at least one member
+  if (!props.members || props.members.length === 0) {
+    throw new Error(
+      `Union "${props.name}" must have at least one member type. Empty unions are not valid in GraphQL.`,
+    );
+  }
+
   const sym = createGraphQLSymbol(
     props.name,
     {

@@ -97,13 +97,10 @@ describe("EnumTypeDefinition", () => {
     `);
   });
 
-  it("renders an empty enum", () => {
-    const result = toGraphQLText(<gql.EnumTypeDefinition name="EmptyEnum" />);
-    expect(result).toRenderTo(d`
-      enum EmptyEnum {
-
-      }
-    `);
+  it("throws error for empty enum (invalid per GraphQL spec)", () => {
+    expect(() => {
+      toGraphQLText(<gql.EnumTypeDefinition name="EmptyEnum" />);
+    }).toThrow(/Enum "EmptyEnum" must have at least one value/);
   });
 
   it("renders an enum with a directive", () => {

@@ -1,12 +1,13 @@
 import {
   Children,
+  childrenArray,
   Declaration as CoreDeclaration,
+  createContentSlot,
   Indent,
   List,
   MemberScope,
   Name,
   Show,
-  createContentSlot,
 } from "@alloy-js/core";
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { GraphQLMemberScope, useGraphQLScope } from "../symbols/index.js";
@@ -61,6 +62,14 @@ export interface EnumTypeDefinitionProps extends BaseDeclarationProps {
  */
 export function EnumTypeDefinition(props: EnumTypeDefinitionProps) {
   const parentScope = useGraphQLScope();
+
+  // Validate that enum has at least one value
+  const children = childrenArray(() => props.children);
+  if (children.length === 0) {
+    throw new Error(
+      `Enum "${props.name}" must have at least one value. Empty enums are not valid in GraphQL.`,
+    );
+  }
 
   const sym = createGraphQLSymbol(
     props.name,

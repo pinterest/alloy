@@ -259,4 +259,10 @@ describe("UnionTypeDefinition", () => {
       }
     `);
   });
+
+  it("throws error for empty union (invalid per GraphQL spec)", () => {
+    expect(() => {
+      toGraphQLText(<gql.UnionTypeDefinition name="EmptyUnion" members={[]} />);
+    }).toThrow(/Union "EmptyUnion" must have at least one member type/);
+  });
 });
