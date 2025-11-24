@@ -69,21 +69,35 @@ export interface DirectiveDefinitionProps extends NamedDeclarationProps {
  *
  * @example
  * ```tsx
- * <DirectiveDefinition
- *   name="auth"
- *   repeatable
- *   description="Authorization directive for fields and types.\nRequires specific roles or scopes."
- *   locations={["FIELD_DEFINITION", "OBJECT"]}
- *   args={
- *     <>
- *       <InputValueDefinition name="requires" type="Role!" defaultValue="USER" enumDefault />
- *       <InputValueDefinition name="scopes" type={code`[${builtInScalars.String}!]`} />
- *     </>
- *   }
- * />
+ * const roleRef = refkey();
+ * const userRef = refkey();
+ *
+ * <>
+ *   <EnumTypeDefinition name="Role" refkey={roleRef}>
+ *     <EnumValue name="USER" refkey={userRef} />
+ *     <EnumValue name="ADMIN" />
+ *   </EnumTypeDefinition>
+ *   <DirectiveDefinition
+ *     name="auth"
+ *     repeatable
+ *     description="Authorization directive for fields and types.\nRequires specific roles or scopes."
+ *     locations={["FIELD_DEFINITION", "OBJECT"]}
+ *     args={
+ *       <>
+ *         <InputValueDefinition name="requires" type={code`${roleRef}!`} defaultValue={userRef} />
+ *         <InputValueDefinition name="scopes" type={code`[${builtInScalars.String}!]`} />
+ *       </>
+ *     }
+ *   />
+ * </>
  * ```
  * renders to
  * ```graphql
+ * enum Role {
+ *   USER
+ *   ADMIN
+ * }
+ *
  * """
  * Authorization directive for fields and types.
  * """

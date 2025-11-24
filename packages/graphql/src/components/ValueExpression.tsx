@@ -1,4 +1,4 @@
-import { For, Indent, memo } from "@alloy-js/core";
+import { For, Indent, isRefkey, memo } from "@alloy-js/core";
 
 export interface ValueExpressionProps {
   jsValue?: unknown;
@@ -33,6 +33,9 @@ export function ValueExpression(props: ValueExpressionProps): any {
       return `"${jsValue.replace(/"/g, '\\"')}"`;
     } else if (typeof jsValue === "function") {
       // functions are inserted as-is (handles refkeys and other Children)
+      return jsValue;
+    } else if (isRefkey(jsValue)) {
+      // Refkeys are rendered as-is (they resolve to symbol names)
       return jsValue;
     } else if (typeof jsValue === "object") {
       if (Array.isArray(jsValue)) {
