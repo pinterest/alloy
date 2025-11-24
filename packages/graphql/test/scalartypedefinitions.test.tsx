@@ -1,12 +1,8 @@
-import { code, refkey } from "@alloy-js/core";
+import { refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import * as gql from "../src/index.js";
-import {
-  assertFileContents,
-  toGraphQLText,
-  toGraphQLTextMultiple,
-} from "./utils.jsx";
+import { toGraphQLText } from "./utils.jsx";
 
 describe("ScalarTypeDefinition", () => {
   it("renders a simple scalar", () => {

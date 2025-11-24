@@ -3,11 +3,7 @@ import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import { builtInDirectives } from "../src/builtins/directives.js";
 import * as gql from "../src/index.js";
-import {
-  assertFileContents,
-  toGraphQLText,
-  toGraphQLTextMultiple,
-} from "./utils.jsx";
+import { toGraphQLText } from "./utils.jsx";
 
 describe("EnumTypeDefinition", () => {
   it("renders a simple enum with values", () => {

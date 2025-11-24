@@ -3,11 +3,7 @@ import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import { builtInScalars } from "../src/builtins/scalars.js";
 import * as gql from "../src/index.js";
-import {
-  assertFileContents,
-  toGraphQLText,
-  toGraphQLTextMultiple,
-} from "./utils.jsx";
+import { toGraphQLText } from "./utils.jsx";
 
 describe("UnionTypeDefinition", () => {
   it("renders a simple union with string type names", () => {
