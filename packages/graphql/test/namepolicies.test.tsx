@@ -93,53 +93,23 @@ it("correct formatting of directive names", () => {
   );
 });
 
-it("appends _ to lowercase operation keywords (query, mutation, subscription)", () => {
+it("allows operation type names (Query, Mutation, Subscription) regardless of input casing", () => {
   const result = toGraphQLText(
     <>
       <gql.ObjectTypeDefinition name="query">
         <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
       </gql.ObjectTypeDefinition>
-      <gql.ObjectTypeDefinition name="mutation">
-        <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
-      </gql.ObjectTypeDefinition>
-      <gql.ObjectTypeDefinition name="subscription">
-        <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
-      </gql.ObjectTypeDefinition>
-    </>,
-  );
-  const expected = d`
-    type Query_ {
-      id: ID!
-    }
-
-    type Mutation_ {
-      id: ID!
-    }
-
-    type Subscription_ {
-      id: ID!
-    }
-  `;
-  expect(result).toRenderTo(expected);
-});
-
-it("allows PascalCase operation type names (Query, Mutation, Subscription)", () => {
-  const result = toGraphQLText(
-    <>
-      <gql.ObjectTypeDefinition name="Query">
-        <gql.FieldDefinition name="hello" type={builtInScalars.String} />
-      </gql.ObjectTypeDefinition>
       <gql.ObjectTypeDefinition name="Mutation">
         <gql.FieldDefinition name="update" type={builtInScalars.Boolean} />
       </gql.ObjectTypeDefinition>
-      <gql.ObjectTypeDefinition name="Subscription">
+      <gql.ObjectTypeDefinition name="SUBSCRIPTION">
         <gql.FieldDefinition name="onChange" type={builtInScalars.String} />
       </gql.ObjectTypeDefinition>
     </>,
   );
   const expected = d`
     type Query {
-      hello: String
+      id: ID!
     }
 
     type Mutation {
@@ -348,30 +318,25 @@ describe("GraphQL name format validation", () => {
     }).toThrow(/Invalid GraphQL name "1stArg".*cannot start with a digit/);
   });
 
-  it("allows names with hyphens (gets transformed by pascalCase)", () => {
-    // pascalCase removes hyphens, so "User-Type" becomes "UserType"
+  it("transforms special characters to valid names", () => {
+    // pascalCase removes hyphens and special chars
     const result = toGraphQLText(
-      <gql.ObjectTypeDefinition name="User-Type">
-        <gql.FieldDefinition name="id" type={builtInScalars.ID} />
-      </gql.ObjectTypeDefinition>,
+      <>
+        <gql.ObjectTypeDefinition name="User-Type">
+          <gql.FieldDefinition name="id" type={builtInScalars.ID} />
+        </gql.ObjectTypeDefinition>
+        <gql.ObjectTypeDefinition name="User$Type">
+          <gql.FieldDefinition name="value" type={builtInScalars.String} />
+        </gql.ObjectTypeDefinition>
+      </>,
     );
     expect(result).toRenderTo(d`
       type UserType {
         id: ID
       }
-    `);
-  });
 
-  it("allows names with special chars (gets transformed by pascalCase)", () => {
-    // pascalCase removes special chars, so "User$Type" becomes "UserType"
-    const result = toGraphQLText(
-      <gql.ObjectTypeDefinition name="User$Type">
-        <gql.FieldDefinition name="id" type={builtInScalars.ID} />
-      </gql.ObjectTypeDefinition>,
-    );
-    expect(result).toRenderTo(d`
       type UserType {
-        id: ID
+        value: String
       }
     `);
   });
@@ -379,14 +344,25 @@ describe("GraphQL name format validation", () => {
   it("preserves single leading underscore", () => {
     // Single underscore is valid per GraphQL spec and should be preserved
     const result = toGraphQLText(
-      <gql.ObjectTypeDefinition name="_User">
-        <gql.FieldDefinition name="id" type={builtInScalars.ID} />
-      </gql.ObjectTypeDefinition>,
+      <>
+        <gql.ObjectTypeDefinition name="_User">
+          <gql.FieldDefinition name="id" type={builtInScalars.ID} />
+        </gql.ObjectTypeDefinition>
+        <gql.ObjectTypeDefinition name="Post">
+          <gql.FieldDefinition
+            name="_internal_field"
+            type={builtInScalars.String}
+          />
+        </gql.ObjectTypeDefinition>
+      </>,
     );
-    // Single leading underscore is now preserved
     expect(result).toRenderTo(d`
       type _User {
         id: ID
+      }
+
+      type Post {
+        _internalField: String
       }
     `);
   });
@@ -456,24 +432,6 @@ describe("GraphQL name format validation", () => {
         />,
       );
     }).toThrow(/Invalid GraphQL name "123invalid".*cannot start with a digit/);
-  });
-
-  it("preserves single leading underscore in field names", () => {
-    // Single leading underscore is preserved, but rest follows camelCase convention
-    // _internal_field → _internalField (underscore in middle is removed)
-    const result = toGraphQLText(
-      <gql.ObjectTypeDefinition name="User">
-        <gql.FieldDefinition
-          name="_internal_field"
-          type={builtInScalars.String}
-        />
-      </gql.ObjectTypeDefinition>,
-    );
-    expect(result).toRenderTo(d`
-      type User {
-        _internalField: String
-      }
-    `);
   });
 
   it("throws error for names starting with double underscore (reserved for introspection)", () => {

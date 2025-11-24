@@ -18,6 +18,9 @@ const GRAPHQL_RESERVED_WORDS = new Set([
   "true",
   "false",
   "null",
+  "query",
+  "mutation",
+  "subscription",
   "type",
   "interface",
   "union",
@@ -30,10 +33,6 @@ const GRAPHQL_RESERVED_WORDS = new Set([
   "implements",
   "repeatable",
 ]);
-
-// Operation keywords that are only reserved in lowercase
-// Query, Mutation, Subscription are conventional type names and should be allowed
-const OPERATION_KEYWORDS = new Set(["query", "mutation", "subscription"]);
 
 const BUILTIN_SCALARS = new Set(builtInScalarNames);
 
@@ -81,30 +80,38 @@ function validateGraphQLName(name: string): void {
 /**
  * Ensures a valid GraphQL identifier by adding a suffix if needed.
  * @param name - The transformed name to validate.
- * @param originalName - The original name before transformation.
+ * @param element - The element type (used to determine which reserved words apply).
  * @returns A GraphQL-safe name.
  */
-function ensureNonReservedName(name: string, originalName: string): string {
+function ensureNonReservedName(
+  name: string,
+  element?: GraphQLElements,
+): string {
   const suffix = "_";
 
   // First, validate that the name follows GraphQL spec format
   validateGraphQLName(name);
 
   // Check for conflicts that require renaming:
-  // - Original name is a lowercase operation keyword (query, mutation, subscription)
   // - Transformed name is a built-in scalar (Int, Float, String, Boolean, ID)
-  // - Transformed name is an operation keyword (fallback check)
-  if (
-    OPERATION_KEYWORDS.has(originalName) ||
-    BUILTIN_SCALARS.has(name as BuiltInScalarName) ||
-    OPERATION_KEYWORDS.has(name)
-  ) {
+  if (BUILTIN_SCALARS.has(name as BuiltInScalarName)) {
     return `${name}${suffix}`;
   }
 
   // Check if the lowercase version is a reserved word
   // This catches all SDL keywords regardless of casing
-  if (GRAPHQL_RESERVED_WORDS.has(name.toLowerCase())) {
+  const lowerName = name.toLowerCase();
+  if (GRAPHQL_RESERVED_WORDS.has(lowerName)) {
+    // Query, Mutation, and Subscription are allowed ONLY as object type names
+    // (they are the conventional root operation types in GraphQL schemas)
+    if (
+      (lowerName === "query" ||
+        lowerName === "mutation" ||
+        lowerName === "subscription") &&
+      element === "type"
+    ) {
+      return name; // Allow Query/Mutation/Subscription as object type names
+    }
     return `${name}${suffix}`;
   }
 
@@ -179,7 +186,7 @@ export function createGraphQLNamePolicy(): NamePolicy<GraphQLElements> {
     // Handle leading underscore preservation
     transformedName = handleLeadingUnderscore(name, transformedName);
 
-    return ensureNonReservedName(transformedName, name);
+    return ensureNonReservedName(transformedName, element);
   });
 }
 
