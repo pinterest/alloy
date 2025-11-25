@@ -102,9 +102,19 @@ export interface DirectiveDefinitionProps extends NamedDeclarationProps {
  * Authorization directive for fields and types.
  * """
  * directive \@auth(
- *   requires: Role! = USER
+ *   requires: String = "admin"
  *   scopes: [String!]
  * ) repeatable on FIELD_DEFINITION | OBJECT
+ *
+ * enum CacheControlScope {
+ *   PUBLIC
+ *   PRIVATE
+ * }
+ *
+ * directive \@cacheControl(
+ *   maxAge: Int
+ *   scope: CacheControlScope = PUBLIC
+ * ) on FIELD_DEFINITION | OBJECT
  * ```
  *
  * @throws \{Error\} If locations array is empty
