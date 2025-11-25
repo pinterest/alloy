@@ -4,7 +4,6 @@ import {
   List,
   MemberScope,
   Name,
-  Refkey,
   Show,
   createSymbolSlot,
   memo,
@@ -12,41 +11,15 @@ import {
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { GraphQLMemberScope } from "../symbols/graphql-member-scope.js";
 import { useGraphQLScope } from "../symbols/scopes.js";
+import { TypedBaseDeclarationProps } from "./common-props.js";
 import { Directives } from "./Directives.js";
 import { wrapDescription } from "./utils.js";
 
-export interface FieldDefinitionProps {
-  /**
-   * The name of the field
-   */
-  name: string;
-  /**
-   * Reference key for this field symbol
-   */
-  refkey?: Refkey;
-  /**
-   * Description for the field. Will be automatically wrapped in triple quotes (""").
-   */
-  description?: Children;
-  /**
-   * The type of the field. Type modifiers like non-null (!) and list ([])
-   * should be included in the type string itself.
-   *
-   * Aimed to be able to support:
-   * - A string literal: `"String"`, `"ID!"`, `"[String!]!"`
-   * - A built-in scalar: `builtInScalars.String` (which is `"String"`)
-   * - A refkey to a user-defined type
-   * - A code template for composition: code`[${userTypeRef}]!`
-   */
-  type: Children;
+export interface FieldDefinitionProps extends TypedBaseDeclarationProps {
   /**
    * Field arguments (InputValueDefinition components)
    */
   args?: Children;
-  /**
-   * Directives to apply to the field
-   */
-  directives?: Children;
 }
 
 /**

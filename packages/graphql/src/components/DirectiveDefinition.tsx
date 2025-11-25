@@ -4,12 +4,12 @@ import {
   List,
   MemberScope,
   Name,
-  Refkey,
   Show,
 } from "@alloy-js/core";
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { GraphQLMemberScope } from "../symbols/graphql-member-scope.js";
 import { useGraphQLScope } from "../symbols/scopes.js";
+import { NamedDeclarationProps } from "./common-props.js";
 import { wrapDescription } from "./utils.js";
 
 /**
@@ -39,11 +39,7 @@ export type DirectiveLocation =
   | "INPUT_OBJECT"
   | "INPUT_FIELD_DEFINITION";
 
-export interface DirectiveDefinitionProps {
-  /**
-   * The name of the directive (without the \@ symbol)
-   */
-  name: string;
+export interface DirectiveDefinitionProps extends NamedDeclarationProps {
   /**
    * Valid locations where this directive can be applied
    */
@@ -60,10 +56,6 @@ export interface DirectiveDefinitionProps {
    * Whether the directive can be applied multiple times to the same location
    */
   repeatable?: boolean;
-  /**
-   * Reference key for this directive symbol
-   */
-  refkey?: Refkey;
 }
 
 /**
@@ -77,21 +69,35 @@ export interface DirectiveDefinitionProps {
  *
  * @example
  * ```tsx
- * <DirectiveDefinition
- *   name="auth"
- *   repeatable
- *   description="Authorization directive for fields and types.\nRequires specific roles or scopes."
- *   locations={["FIELD_DEFINITION", "OBJECT"]}
- *   args={
- *     <>
- *       <InputValueDefinition name="requires" type="Role!" defaultValue="USER" enumDefault />
- *       <InputValueDefinition name="scopes" type={code`[${builtInScalars.String}!]`} />
- *     </>
- *   }
- * />
+ * const roleRef = refkey();
+ * const userRef = refkey();
+ *
+ * <>
+ *   <EnumTypeDefinition name="Role" refkey={roleRef}>
+ *     <EnumValue name="USER" refkey={userRef} />
+ *     <EnumValue name="ADMIN" />
+ *   </EnumTypeDefinition>
+ *   <DirectiveDefinition
+ *     name="auth"
+ *     repeatable
+ *     description="Authorization directive for fields and types.\nRequires specific roles or scopes."
+ *     locations={["FIELD_DEFINITION", "OBJECT"]}
+ *     args={
+ *       <>
+ *         <InputValueDefinition name="requires" type={code`${roleRef}!`} defaultValue={userRef} />
+ *         <InputValueDefinition name="scopes" type={code`[${builtInScalars.String}!]`} />
+ *       </>
+ *     }
+ *   />
+ * </>
  * ```
  * renders to
  * ```graphql
+ * enum Role {
+ *   USER
+ *   ADMIN
+ * }
+ *
  * """
  * Authorization directive for fields and types.
  * """
