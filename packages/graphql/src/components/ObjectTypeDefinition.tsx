@@ -5,41 +5,25 @@ import {
   List,
   MemberScope,
   Name,
-  Refkey,
   Show,
   createContentSlot,
 } from "@alloy-js/core";
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { GraphQLMemberScope, useGraphQLScope } from "../symbols/index.js";
+import { BaseDeclarationProps } from "./common-props.js";
 import { Directives } from "./Directives.js";
 import { ImplementsInterfaces } from "./ImplementsInterfaces.js";
 import { wrapDescription } from "./utils.js";
 
-export interface ObjectTypeDefinitionProps {
-  /**
-   * The name of the object type
-   */
-  name: string;
+export interface ObjectTypeDefinitionProps extends BaseDeclarationProps {
   /**
    * Fields of the object type (FieldDefinition components)
    */
   children?: Children;
   /**
-   * Description for the type. Will be automatically wrapped in triple quotes (""").
-   */
-  description?: Children;
-  /**
    * Interfaces this type implements
    */
   implements?: Children[];
-  /**
-   * Directives to apply to the type
-   */
-  directives?: Children;
-  /**
-   * Reference key for this type symbol
-   */
-  refkey?: Refkey;
 }
 
 /**

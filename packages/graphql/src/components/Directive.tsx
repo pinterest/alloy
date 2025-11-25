@@ -49,11 +49,11 @@ export interface DirectiveProps {
  * ```
  * renders to:
  * ```graphql
- * @deprecated
- * @deprecated(reason: "Use newField instead")
- * @auth(requires: "ADMIN")
- * @rateLimit(max: 100, window: 60, scopes: ["api", "admin"])
- * @customDirective(enabled: true)
+ * \@deprecated
+ * \@deprecated(reason: "Use newField instead")
+ * \@auth(requires: "ADMIN")
+ * \@rateLimit(max: 100, window: 60, scopes: ["api", "admin"])
+ * \@customDirective(enabled: true)
  * ```
  */
 export function Directive(props: DirectiveProps) {
