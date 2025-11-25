@@ -3,7 +3,9 @@ import { camelCase, constantCase, pascalCase } from "change-case";
 import { BuiltInScalarName, builtInScalarNames } from "./builtins/scalars.js";
 
 export type GraphQLElements =
-  | "type" // Type names (ObjectType, InterfaceType, etc.)
+  | "type" // Type names (ObjectType, UnionType)
+  | "interface" // Interface type names
+  | "input" // Input object type names
   | "field" // Field names
   | "argument" // Argument names
   | "enum" // Enum type names
@@ -93,6 +95,8 @@ function ensureNonReservedName(
 
   const isTopLevelDefinition =
     element === "type" ||
+    element === "interface" ||
+    element === "input" ||
     element === "enum" ||
     element === "scalar" ||
     element === "directive";
@@ -145,12 +149,13 @@ function handleLeadingUnderscore(name: string, transformed: string): string {
 
 /**
  * Creates a name policy for GraphQL with appropriate naming conventions:
- * - Types: PascalCase
+ * - Types (object, interface, input): PascalCase
+ * - Enums: PascalCase
+ * - Scalars: PascalCase
  * - Fields: camelCase
  * - Arguments: camelCase
- * - Enums: PascalCase
- * - Enum values: UPPER_SNAKE_CASE
  * - Directives: camelCase
+ * - Enum values: UPPER_SNAKE_CASE
  *
  * Note: Single leading underscores are preserved per GraphQL spec.
  * Double underscores (__) are reserved for introspection.
@@ -161,6 +166,8 @@ export function createGraphQLNamePolicy(): NamePolicy<GraphQLElements> {
 
     switch (element) {
       case "type":
+      case "interface":
+      case "input":
       case "enum":
       case "scalar":
         transformedName = pascalCase(name);
