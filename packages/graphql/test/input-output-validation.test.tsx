@@ -242,7 +242,7 @@ describe("Input/Output Type Usage Validation", () => {
         }
 
         type Mutation {
-          createUser(input_: UserInput!): String
+          createUser(input: UserInput!): String
         }
       `);
     });
