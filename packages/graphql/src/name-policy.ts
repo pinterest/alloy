@@ -43,8 +43,8 @@ const VALID_NAME_REGEX = /^[_A-Za-z][_0-9A-Za-z]*$/;
  * Names must start with a letter or underscore, and can only contain
  * letters, digits, and underscores.
  *
- * Note: Double underscore check is performed separately in preserveLeadingUnderscore
- * after name transformation, as we need to check the ORIGINAL name, not the transformed one.
+ * Note: Double underscore check is performed separately in handleLeadingUnderscore()
+ * which checks the ORIGINAL name before transformation.
  *
  * @param name - The name to validate (after transformation)
  * @throws {Error} If the name is invalid
