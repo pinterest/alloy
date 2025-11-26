@@ -36,7 +36,6 @@ export interface InputObjectTypeDefinitionProps extends BaseDeclarationProps {
  * Input types are used for complex input arguments in queries and mutations.
  *
  * @example
- * @example
  * ```tsx
  * <>
  *   <InputObjectTypeDefinition
