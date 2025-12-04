@@ -61,13 +61,8 @@ export function UnionTypeDefinition(props: UnionTypeDefinitionProps) {
 
   const sym = createGraphQLSymbol(
     props.name,
-    {
-      refkeys: props.refkey,
-      metadata: {
-        kind: "union",
-      },
-    },
-    "type",
+    { refkeys: props.refkey },
+    "union",
   );
 
   const wrappedDescription = wrapDescription(props.description);

@@ -164,7 +164,7 @@ describe("Schema Root Type Validation", () => {
           </>,
         );
       }).toThrow(
-        /Schema subscription type must be an object type, but "SubscriptionInput" is a input object/,
+        /Schema subscription type must be an object type, but "SubscriptionInput" is a input/,
       );
     });
 

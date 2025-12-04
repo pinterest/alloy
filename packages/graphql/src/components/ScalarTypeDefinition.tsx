@@ -42,12 +42,7 @@ export interface ScalarTypeDefinitionProps extends BaseDeclarationProps {}
 export function ScalarTypeDefinition(props: ScalarTypeDefinitionProps) {
   const sym = createGraphQLSymbol(
     props.name,
-    {
-      refkeys: props.refkey,
-      metadata: {
-        kind: "scalar",
-      },
-    },
+    { refkeys: props.refkey },
     "scalar",
   );
 

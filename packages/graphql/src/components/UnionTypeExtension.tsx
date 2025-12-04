@@ -50,13 +50,11 @@ export interface UnionTypeExtensionProps extends NamedDeclarationProps {
 export function UnionTypeExtension(props: UnionTypeExtensionProps) {
   const sym = createGraphQLSymbol(
     props.name,
-    {
-      refkeys: props.refkey,
-    },
-    "type",
+    { refkeys: props.refkey },
+    "union",
   );
 
-  const hasMembers = props.members && props.members.length > 0;
+  const hasMembers = !!props.members?.length;
 
   return (
     <CoreDeclaration symbol={sym}>

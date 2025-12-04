@@ -56,14 +56,13 @@ export interface ObjectTypeExtensionProps extends NamedDeclarationProps {
  * ```
  */
 export function ObjectTypeExtension(props: ObjectTypeExtensionProps) {
+  // Get parent scope for establishing member scope hierarchy
   const parentScope = useGraphQLScope();
 
   const sym = createGraphQLSymbol(
     props.name,
-    {
-      refkeys: props.refkey,
-    },
-    "type",
+    { refkeys: props.refkey },
+    "object",
   );
 
   // Create a member scope for the extended fields
@@ -77,7 +76,7 @@ export function ObjectTypeExtension(props: ObjectTypeExtensionProps) {
   return (
     <CoreDeclaration symbol={sym}>
       extend type <Name />
-      <Show when={props.implements && props.implements.length > 0}>
+      <Show when={Boolean(props.implements && props.implements.length)}>
         <ImplementsInterfaces interfaces={props.implements!} />
       </Show>
       <Show when={Boolean(props.directives)}>{props.directives}</Show>

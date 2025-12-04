@@ -67,7 +67,7 @@ describe("Union Type Validation", () => {
         </>,
       );
     }).toThrow(
-      /Union "Result" cannot include interface "Node".*union members must be object types, not interfaces/,
+      /Union "Result" cannot include "Node".*union members must be object types/,
     );
   });
 
@@ -82,7 +82,7 @@ describe("Union Type Validation", () => {
         </>,
       );
     }).toThrow(
-      /Union "Result" cannot include scalar "DateTime".*union members must be object types, not scalars/,
+      /Union "Result" cannot include "DateTime".*union members must be object types/,
     );
   });
 
@@ -99,7 +99,7 @@ describe("Union Type Validation", () => {
         </>,
       );
     }).toThrow(
-      /Union "Result" cannot include enum "Status".*union members must be object types, not enums/,
+      /Union "Result" cannot include "Status".*union members must be object types/,
     );
   });
 
@@ -116,7 +116,7 @@ describe("Union Type Validation", () => {
         </>,
       );
     }).toThrow(
-      /Union "Result" cannot include input object "UserInput".*union members must be object types, not input objects/,
+      /Union "Result" cannot include "UserInput".*union members must be object types/,
     );
   });
 
@@ -135,7 +135,7 @@ describe("Union Type Validation", () => {
         </>,
       );
     }).toThrow(
-      /Union "Union2" cannot include union "Union1".*union members must be object types, not other unions/,
+      /Union "Union2" cannot include "Union1".*union members must be object types/,
     );
   });
 

@@ -75,16 +75,14 @@ export interface InterfaceTypeDefinitionProps extends BaseDeclarationProps {
  * ```
  */
 export function InterfaceTypeDefinition(props: InterfaceTypeDefinitionProps) {
+  // Get parent scope for establishing member scope hierarchy
   const parentScope = useGraphQLScope();
 
   const sym = createGraphQLSymbol(
     props.name,
     {
       refkeys: props.refkey,
-      metadata: {
-        implements: props.implements ?? [],
-        kind: "interface",
-      },
+      metadata: { implements: props.implements ?? [] },
     },
     "interface",
   );
@@ -105,7 +103,7 @@ export function InterfaceTypeDefinition(props: InterfaceTypeDefinitionProps) {
       </Show>
       <CoreDeclaration symbol={sym}>
         interface <Name />
-        <Show when={props.implements && props.implements.length > 0}>
+        <Show when={Boolean(props.implements && props.implements.length)}>
           <ImplementsInterfaces interfaces={props.implements!} />
         </Show>
         <Show when={Boolean(props.directives)}>{props.directives}</Show>

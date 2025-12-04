@@ -1,8 +1,9 @@
 import { refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
+import { getValidationErrors } from "../src/components/DeferredInterfaceValidation.js";
 import * as gql from "../src/index.js";
-import { getLastValidationErrors, toGraphQLText } from "./utils.jsx";
+import { toGraphQLText } from "./utils.jsx";
 
 describe("Interface Implementation Validation", () => {
   describe("Field presence validation", () => {
@@ -47,7 +48,7 @@ describe("Interface Implementation Validation", () => {
         </>,
       );
 
-      const errors = getLastValidationErrors();
+      const errors = getValidationErrors();
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toMatch(
         /Type "User" must implement field "id" from interface "Node"/,
@@ -118,7 +119,7 @@ describe("Interface Implementation Validation", () => {
         </>,
       );
 
-      const errors = getLastValidationErrors();
+      const errors = getValidationErrors();
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toMatch(
         /Type "User" must implement field "id" from interface "Timestamped"/,
@@ -158,7 +159,7 @@ describe("Interface Implementation Validation", () => {
         </>,
       );
 
-      const errors = getLastValidationErrors();
+      const errors = getValidationErrors();
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toMatch(
         /Type "User" field "id" return type must be "ID!" to match interface "Node", but found "String"/,
@@ -179,7 +180,7 @@ describe("Interface Implementation Validation", () => {
         </>,
       );
 
-      const errors = getLastValidationErrors();
+      const errors = getValidationErrors();
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toMatch(
         /Type "User" field "id" return type must be "ID!" to match interface "Node", but found "ID"/,
@@ -249,10 +250,10 @@ describe("Interface Implementation Validation", () => {
         </>,
       );
 
-      const errors = getLastValidationErrors();
+      const errors = getValidationErrors();
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toMatch(
-        /Type "GitHubRepo" field "issue" must have 1 argument\(s\) to match interface "Repository", but has 0/,
+        /Type "GitHubRepo" field "issue": missing argument "number" to match interface "Repository"/,
       );
     });
 
@@ -288,10 +289,10 @@ describe("Interface Implementation Validation", () => {
         </>,
       );
 
-      const errors = getLastValidationErrors();
+      const errors = getValidationErrors();
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toMatch(
-        /Type "GitHubRepo" field "issue" argument at position 1 must be named "number" to match interface "Repository", but found "id"/,
+        /Type "GitHubRepo" field "issue": missing argument "number" to match interface "Repository"/,
       );
     });
 
@@ -327,10 +328,10 @@ describe("Interface Implementation Validation", () => {
         </>,
       );
 
-      const errors = getLastValidationErrors();
+      const errors = getValidationErrors();
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toMatch(
-        /Type "GitHubRepo" field "issue" argument "number" must have type "Int!" to match interface "Repository", but found "String"/,
+        /Type "GitHubRepo" field "issue": argument "number" type must be "Int!", found "String" to match interface "Repository"/,
       );
     });
 
@@ -429,7 +430,7 @@ describe("Interface Implementation Validation", () => {
         </>,
       );
 
-      const errors = getLastValidationErrors();
+      const errors = getValidationErrors();
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toMatch(
         /Type "User" must implement field "name" from interface "Named"/,

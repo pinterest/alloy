@@ -61,6 +61,7 @@ export interface EnumTypeDefinitionProps extends BaseDeclarationProps {
  * ```
  */
 export function EnumTypeDefinition(props: EnumTypeDefinitionProps) {
+  // Get parent scope for establishing member scope hierarchy
   const parentScope = useGraphQLScope();
 
   // Validate that enum has at least one value
@@ -73,12 +74,7 @@ export function EnumTypeDefinition(props: EnumTypeDefinitionProps) {
 
   const sym = createGraphQLSymbol(
     props.name,
-    {
-      refkeys: props.refkey,
-      metadata: {
-        kind: "enum",
-      },
-    },
+    { refkeys: props.refkey },
     "enum",
   );
 

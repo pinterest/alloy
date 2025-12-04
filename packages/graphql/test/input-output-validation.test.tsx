@@ -152,7 +152,7 @@ describe("Input/Output Type Usage Validation", () => {
           </>,
         );
       }).toThrow(
-        /Field "invalid" on type\/interface cannot use input object type "UserInput"/,
+        /Field "invalid" on type cannot use input object type "UserInput"/,
       );
     });
   });
