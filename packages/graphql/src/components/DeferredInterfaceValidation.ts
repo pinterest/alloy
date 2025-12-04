@@ -1,15 +1,63 @@
-import { Children, isRefkey, Refkey } from "@alloy-js/core";
+import { Children, isRefkey, OutputSymbol } from "@alloy-js/core";
 import { GraphQLOutputSymbol } from "../symbols/graphql-output-symbol.js";
 import { ref } from "../symbols/reference.js";
 
 interface FieldInfo {
   name: string;
   type: string;
-  args: Array<{ name: string; type: string }>;
+}
+
+/**
+ * A Set of FieldInfo objects, keyed by name for lookup.
+ * Provides set equality comparison for validating argument lists.
+ */
+class FieldInfoSet extends Set<FieldInfo> {
+  private byName = new Map<string, FieldInfo>();
+
+  add(field: FieldInfo): this {
+    if (!this.byName.has(field.name)) {
+      this.byName.set(field.name, field);
+      super.add(field);
+    }
+    return this;
+  }
+
+  get(name: string): FieldInfo | undefined {
+    return this.byName.get(name);
+  }
+
+  /**
+   * Checks if this set equals another set.
+   * Returns null if equal, or an error message describing the first difference.
+   */
+  equals(other: FieldInfoSet, context: string): string | null {
+    // Check for missing fields
+    for (const field of this) {
+      const otherField = other.get(field.name);
+      if (!otherField) {
+        return `${context}: missing argument "${field.name}"`;
+      }
+      if (field.type && otherField.type && field.type !== otherField.type) {
+        return `${context}: argument "${field.name}" type must be "${field.type}", found "${otherField.type}"`;
+      }
+    }
+
+    // Check for extra fields
+    for (const field of other) {
+      if (!this.byName.has(field.name)) {
+        return `${context}: unexpected argument "${field.name}"`;
+      }
+    }
+
+    return null;
+  }
+}
+
+interface ObjectFieldInfo extends FieldInfo {
+  args: FieldInfoSet;
 }
 
 interface ResolvedInterface {
-  name: string;
   symbol: GraphQLOutputSymbol;
 }
 
@@ -20,57 +68,40 @@ interface PendingValidation {
 }
 
 // Global registry for types that need validation
-const pendingValidations: PendingValidation[] = [];
-const validationErrors: Error[] = [];
+let pendingValidations: PendingValidation[] = [];
+let validationErrors: Error[] = [];
+
+/**
+ * Extract FieldInfo (name and type) from a symbol
+ */
+function toFieldInfo(name: string, symbol: OutputSymbol): FieldInfo {
+  const type = symbol.metadata.type;
+  return {
+    name,
+    type: type ? String(type).replace(/\s/g, "") : "",
+  };
+}
 
 /**
  * Extract field information from a symbol's member space
- * Note: symbolNames map values are actually OutputSymbol objects, not refkeys
  */
-function extractFieldInfo(symbol: GraphQLOutputSymbol): FieldInfo[] {
-  const fields: FieldInfo[] = [];
+function extractFieldInfo(symbol: GraphQLOutputSymbol): ObjectFieldInfo[] {
+  const fields: ObjectFieldInfo[] = [];
 
-  // Iterate through member names and their symbols
-  // The map values are OutputSymbol objects, not refkeys
   for (const [fieldName, fieldSymbol] of symbol.members.symbolNames.entries()) {
-    try {
-      // fieldSymbol is already an OutputSymbol, not a refkey
-      if (fieldSymbol && (fieldSymbol as any).metadata) {
-        const metadata = (fieldSymbol as any).metadata;
-        const type =
-          metadata.type ? String(metadata.type).replace(/\s/g, "") : "";
+    const { name, type } = toFieldInfo(fieldName, fieldSymbol);
 
-        // Extract arguments from the field symbol's own members
-        // Arguments are stored in fieldSymbol.members when rendered in the argScope
-        const args: Array<{ name: string; type: string }> = [];
-        const fieldMembers = (fieldSymbol as any).members;
+    // Extract arguments from the field symbol's own members
+    const args = new FieldInfoSet();
+    const fieldMembers = fieldSymbol.memberSpaceFor("members");
 
-        if (fieldMembers && fieldMembers.symbolNames) {
-          // Iterate over arguments in the field's member space
-          for (const [
-            argName,
-            argSymbol,
-          ] of fieldMembers.symbolNames.entries()) {
-            if (argSymbol && (argSymbol as any).metadata) {
-              const argMetadata = (argSymbol as any).metadata;
-              const argType =
-                argMetadata.type ?
-                  String(argMetadata.type).replace(/\s/g, "")
-                : "";
-              args.push({ name: argName, type: argType });
-            }
-          }
-        }
-
-        fields.push({
-          name: fieldName,
-          type,
-          args,
-        });
+    if (fieldMembers) {
+      for (const [argName, argSymbol] of fieldMembers.symbolNames.entries()) {
+        args.add(toFieldInfo(argName, argSymbol));
       }
-    } catch (e) {
-      // Skip fields that can't be processed
     }
+
+    fields.push({ name, type, args });
   }
 
   return fields;
@@ -87,39 +118,27 @@ export function registerForValidation(
   interfaces: Children[],
 ): void {
   // Resolve interfaces immediately while we have binder context, including transitive ones
-  const resolvedInterfaces: ResolvedInterface[] = [];
-  const seen = new Set<string>();
+  const resolvedInterfaces: Record<string, ResolvedInterface> = {};
 
   function resolveInterfacesRecursively(interfaces: Children[]) {
     for (const iface of interfaces) {
+      // An interface can be either a refkey or a string literal, only validate refkey references,
+      // as string literal interfaces are already validated and rendered as is.
       if (isRefkey(iface)) {
-        try {
-          const reference = ref(iface as Refkey);
-          const [name, ifaceSymbol] = reference();
-          const nameStr = String(name);
+        const reference = ref(iface);
+        const [, ifaceSymbol] = reference();
+        const nameStr = String(ifaceSymbol?.name);
 
-          if (ifaceSymbol && !seen.has(nameStr)) {
-            seen.add(nameStr);
+        if (ifaceSymbol && !(nameStr in resolvedInterfaces)) {
+          resolvedInterfaces[nameStr] = { symbol: ifaceSymbol };
 
-            resolvedInterfaces.push({
-              name: nameStr,
-              symbol: ifaceSymbol,
-            });
-
-            // Recursively resolve parent interfaces
-            if (ifaceSymbol.metadata.implements) {
-              const parentInterfaces = ifaceSymbol.metadata
-                .implements as Children[];
-              if (
-                Array.isArray(parentInterfaces) &&
-                parentInterfaces.length > 0
-              ) {
-                resolveInterfacesRecursively(parentInterfaces);
-              }
-            }
+          // Recursively resolve parent interfaces
+          const parentInterfaces = ifaceSymbol.metadata.implements as
+            | Children[]
+            | undefined;
+          if (parentInterfaces?.length) {
+            resolveInterfacesRecursively(parentInterfaces);
           }
-        } catch (e) {
-          // Skip interfaces that can't be resolved
         }
       }
     }
@@ -130,7 +149,7 @@ export function registerForValidation(
   pendingValidations.push({
     typeName,
     typeSymbol: symbol,
-    interfaces: resolvedInterfaces,
+    interfaces: Object.values(resolvedInterfaces),
   });
 }
 
@@ -144,9 +163,10 @@ export function registerForValidation(
  *
  * @internal
  */
-export function _runPendingValidations(): void {
-  const validations = [...pendingValidations];
-  pendingValidations.length = 0; // Clear for next render
+export function runPendingValidations(): void {
+  const validations = pendingValidations;
+  pendingValidations = [];
+  validationErrors = [];
 
   for (const { typeName, typeSymbol, interfaces } of validations) {
     // Extract field information now that all members have been added
@@ -154,17 +174,8 @@ export function _runPendingValidations(): void {
 
     try {
       // Validate each resolved interface
-      for (const {
-        name: interfaceName,
-        symbol: interfaceSymbol,
-      } of interfaces) {
-        const interfaceFields = extractFieldInfo(interfaceSymbol);
-        validateTypeImplementsInterface(
-          typeName,
-          typeFields,
-          interfaceName,
-          interfaceFields,
-        );
+      for (const { symbol: interfaceSymbol } of interfaces) {
+        validateTypeImplementsInterface(typeName, typeFields, interfaceSymbol);
       }
     } catch (e) {
       if (e instanceof Error) {
@@ -179,10 +190,12 @@ export function _runPendingValidations(): void {
  */
 function validateTypeImplementsInterface(
   typeName: string,
-  typeFields: FieldInfo[],
-  interfaceName: string,
-  interfaceFields: FieldInfo[],
+  typeFields: ObjectFieldInfo[],
+  interfaceSymbol: GraphQLOutputSymbol,
 ): void {
+  const interfaceName = String(interfaceSymbol.name);
+  const interfaceFields = extractFieldInfo(interfaceSymbol);
+
   // Create a map of type fields for quick lookup
   const typeFieldMap = new Map(typeFields.map((f) => [f.name, f]));
 
@@ -207,28 +220,13 @@ function validateTypeImplementsInterface(
       );
     }
 
-    // Validate arguments
-    if (interfaceField.args.length !== typeField.args.length) {
-      throw new Error(
-        `Type "${typeName}" field "${interfaceField.name}" must have ${interfaceField.args.length} argument(s) to match interface "${interfaceName}", but has ${typeField.args.length}.`,
-      );
-    }
-
-    for (let i = 0; i < interfaceField.args.length; i++) {
-      const interfaceArg = interfaceField.args[i];
-      const typeArg = typeField.args[i];
-
-      if (interfaceArg.name !== typeArg.name) {
-        throw new Error(
-          `Type "${typeName}" field "${interfaceField.name}" argument at position ${i + 1} must be named "${interfaceArg.name}" to match interface "${interfaceName}", but found "${typeArg.name}".`,
-        );
-      }
-
-      if (interfaceArg.type !== typeArg.type) {
-        throw new Error(
-          `Type "${typeName}" field "${interfaceField.name}" argument "${interfaceArg.name}" must have type "${interfaceArg.type}" to match interface "${interfaceName}", but found "${typeArg.type}".`,
-        );
-      }
+    // Validate arguments by name (not position)
+    const argsError = interfaceField.args.equals(
+      typeField.args,
+      `Type "${typeName}" field "${interfaceField.name}"`,
+    );
+    if (argsError) {
+      throw new Error(`${argsError} to match interface "${interfaceName}".`);
     }
   }
 }
@@ -237,13 +235,13 @@ function validateTypeImplementsInterface(
  * Get all validation errors collected during the last validation run
  */
 export function getValidationErrors(): Error[] {
-  return [...validationErrors];
+  return validationErrors;
 }
 
 /**
  * Clear all pending validations and errors (useful for testing)
  */
-export function clearPendingValidations(): void {
-  pendingValidations.length = 0;
-  validationErrors.length = 0;
+export function resetValidationState(): void {
+  pendingValidations = [];
+  validationErrors = [];
 }

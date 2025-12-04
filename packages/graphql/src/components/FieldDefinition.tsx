@@ -115,7 +115,7 @@ export function FieldDefinition(props: FieldDefinitionProps) {
   const scope = useGraphQLScope();
 
   // Validate that the field type is valid for output positions
-  validateOutputType(props.type, props.name, "type/interface");
+  validateOutputType(props.type, props.name, "type");
 
   const sym = createGraphQLSymbol(
     props.name,

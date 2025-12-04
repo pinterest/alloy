@@ -53,6 +53,7 @@ export interface InterfaceTypeExtensionProps extends NamedDeclarationProps {
  * ```
  */
 export function InterfaceTypeExtension(props: InterfaceTypeExtensionProps) {
+  // Get parent scope for establishing member scope hierarchy
   const parentScope = useGraphQLScope();
 
   const sym = createGraphQLSymbol(
@@ -74,7 +75,7 @@ export function InterfaceTypeExtension(props: InterfaceTypeExtensionProps) {
   return (
     <CoreDeclaration symbol={sym}>
       extend interface <Name />
-      <Show when={props.implements && props.implements.length > 0}>
+      <Show when={Boolean(props.implements && props.implements.length)}>
         <ImplementsInterfaces interfaces={props.implements!} />
       </Show>
       <Show when={Boolean(props.directives)}>{props.directives}</Show>

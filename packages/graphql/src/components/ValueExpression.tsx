@@ -40,15 +40,11 @@ export function ValueExpression(props: ValueExpressionProps): any {
       return jsValue;
     } else if (typeof jsValue === "object") {
       if (Array.isArray(jsValue)) {
-        // Check if array contains non-primitives (code templates with refkeys)
-        // Code templates contain objects with 'key' property (refkeys) or functions
+        // Check if array contains refkeys or functions (e.g., code templates)
         const hasNonPrimitive = jsValue.some(
-          (v) =>
-            typeof v === "function" ||
-            (typeof v === "object" && v !== null && "key" in v),
+          (v) => typeof v === "function" || isRefkey(v),
         );
         if (hasNonPrimitive) {
-          // This is a code template or contains refkeys, render as-is
           return jsValue;
         }
         // Regular array of primitives - render as GraphQL list
@@ -64,15 +60,11 @@ export function ValueExpression(props: ValueExpressionProps): any {
           </group>
         );
       } else {
-        // Check if object contains non-primitives
-        // Code templates contain objects with 'key' property (refkeys) or functions
+        // Check if object contains refkeys or functions (e.g., code templates)
         const hasNonPrimitive = Object.values(jsValue).some(
-          (v) =>
-            typeof v === "function" ||
-            (typeof v === "object" && v !== null && "key" in v),
+          (v) => typeof v === "function" || isRefkey(v),
         );
         if (hasNonPrimitive) {
-          // This object contains refkeys or code templates, render as-is
           return jsValue;
         }
         // Regular object - render as GraphQL input object

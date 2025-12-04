@@ -69,16 +69,12 @@ export interface InputObjectTypeDefinitionProps extends BaseDeclarationProps {
 export function InputObjectTypeDefinition(
   props: InputObjectTypeDefinitionProps,
 ) {
+  // Get parent scope for establishing member scope hierarchy
   const parentScope = useGraphQLScope();
 
   const sym = createGraphQLSymbol(
     props.name,
-    {
-      refkeys: props.refkey,
-      metadata: {
-        kind: "input",
-      },
-    },
+    { refkeys: props.refkey },
     "input",
   );
 

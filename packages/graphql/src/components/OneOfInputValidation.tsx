@@ -28,38 +28,30 @@ export function OneOfInputProvider(props: OneOfInputProviderProps) {
 }
 
 /**
- * Checks if a directives prop contains the @oneOf directive
- * This is a simple heuristic check that works for most cases
+ * Checks if a directives prop contains a directive with the given name.
+ * This is a simple heuristic check that works for most cases.
  */
-export function hasOneOfDirective(directives: Children | undefined): boolean {
+export function hasDirective(
+  name: string,
+  directives: Children | undefined,
+): boolean {
   if (!directives) return false;
 
-  // For JSX elements, check if it's a function (component) or object
-  // We need to render it to check, but we can do a simple check for "oneOf" in the tree
-  const checkForOneOf = (node: any): boolean => {
-    if (!node) return false;
-
-    // Check if it's an object with props that might contain "oneOf"
-    if (typeof node === "object") {
-      // Check props
-      if (node.props?.name === "oneOf") return true;
-      if (String(node.props?.name).includes("oneOf")) return true;
-
-      // Check children recursively
-      if (node.props?.children) {
-        return checkForOneOf(node.props.children);
-      }
-
-      // Check array elements
-      if (Array.isArray(node)) {
-        return node.some(checkForOneOf);
-      }
+  if (typeof directives === "object") {
+    if (Array.isArray(directives)) {
+      return directives.some((d) => hasDirective(name, d));
     }
 
-    return false;
-  };
+    const { props } = directives as {
+      props?: { name?: string; children?: Children };
+    };
+    if (props?.name === name) return true;
+    if (props?.children) {
+      return hasDirective(name, props.children);
+    }
+  }
 
-  return checkForOneOf(directives);
+  return false;
 }
 
 /**

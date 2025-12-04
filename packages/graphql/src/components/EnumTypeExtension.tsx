@@ -55,6 +55,7 @@ export interface EnumTypeExtensionProps extends NamedDeclarationProps {
  * ```
  */
 export function EnumTypeExtension(props: EnumTypeExtensionProps) {
+  // Get parent scope for establishing member scope hierarchy
   const parentScope = useGraphQLScope();
 
   const sym = createGraphQLSymbol(

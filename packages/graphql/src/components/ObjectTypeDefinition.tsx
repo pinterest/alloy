@@ -65,18 +65,16 @@ export interface ObjectTypeDefinitionProps extends BaseDeclarationProps {
  * ```
  */
 export function ObjectTypeDefinition(props: ObjectTypeDefinitionProps) {
+  // Get parent scope for establishing member scope hierarchy
   const parentScope = useGraphQLScope();
 
   const sym = createGraphQLSymbol(
     props.name,
     {
       refkeys: props.refkey,
-      metadata: {
-        implements: props.implements ?? [],
-        kind: "object",
-      },
+      metadata: { implements: props.implements ?? [] },
     },
-    "type",
+    "object",
   );
 
   // Create a member scope for this object type to hold its fields
@@ -88,7 +86,7 @@ export function ObjectTypeDefinition(props: ObjectTypeDefinitionProps) {
   const wrappedDescription = wrapDescription(props.description);
 
   // Register for deferred validation if implementing interfaces
-  if (props.implements && props.implements.length > 0) {
+  if (props.implements?.length) {
     registerForValidation(props.name, sym, props.implements);
   }
 
@@ -100,7 +98,7 @@ export function ObjectTypeDefinition(props: ObjectTypeDefinitionProps) {
       </Show>
       <CoreDeclaration symbol={sym}>
         type <Name />
-        <Show when={props.implements && props.implements.length > 0}>
+        <Show when={!!(props.implements && props.implements.length)}>
           <ImplementsInterfaces interfaces={props.implements!} />
         </Show>
         <Show when={Boolean(props.directives)}>
