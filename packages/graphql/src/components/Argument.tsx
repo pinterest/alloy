@@ -34,16 +34,9 @@ export interface ArgumentProps {
  * ```
  */
 export function Argument(props: ArgumentProps) {
-  const isChildren =
-    typeof props.value === "function" ||
-    (typeof props.value === "object" &&
-      props.value !== null &&
-      !Array.isArray(props.value));
-
   return (
     <>
-      {props.name}:{" "}
-      {isChildren ? props.value : <ValueExpression jsValue={props.value} />}
+      {props.name}: <ValueExpression jsValue={props.value} />
     </>
   );
 }

@@ -62,14 +62,11 @@ export function InlineFragment(props: InlineFragmentProps) {
     validateFragmentTypeCondition(props.typeCondition, "inline fragment");
   }
 
-  const hasTypeCondition = Boolean(props.typeCondition);
-  const hasDirectives = Boolean(props.directives);
-
   return (
     <>
       ...
-      {hasTypeCondition && <> on {props.typeCondition}</>}
-      {hasDirectives && <>{props.directives}</>}
+      {props.typeCondition && <> on {props.typeCondition}</>}
+      {props.directives}
       {" {"}
       <Indent hardline>
         <List children={props.children} joiner={<hardline />} />

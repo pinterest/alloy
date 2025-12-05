@@ -123,6 +123,7 @@ export interface OperationDefinitionProps
  */
 export function OperationDefinition(props: OperationDefinitionProps) {
   const TypeSymbolSlot = createSymbolSlot();
+  // Get parent scope for establishing member scope hierarchy
   const scope = useGraphQLScope();
 
   // Anonymous operations (shorthand syntax) don't need a symbol
@@ -137,14 +138,11 @@ export function OperationDefinition(props: OperationDefinitionProps) {
       )
     : undefined;
 
-  const hasVariables = Boolean(props.variableDefinitions);
-  const hasDirectives = Boolean(props.directives);
-
   // Shorthand syntax: { ... } for anonymous queries
   const isShorthand =
     !props.name &&
-    !hasVariables &&
-    !hasDirectives &&
+    !props.variableDefinitions &&
+    !props.directives &&
     props.operationType === "query";
 
   const wrappedDescription = wrapDescription(props.description);
@@ -174,7 +172,7 @@ export function OperationDefinition(props: OperationDefinitionProps) {
               <Name />
             </>
           )}
-          {hasVariables && (
+          {Boolean(props.variableDefinitions) && (
             <>
               (
               <MemberScope value={variableScope}>
@@ -183,7 +181,7 @@ export function OperationDefinition(props: OperationDefinitionProps) {
               )
             </>
           )}
-          {hasDirectives && <>{props.directives}</>}
+          {props.directives}
           {" {"}
         </>
       )}

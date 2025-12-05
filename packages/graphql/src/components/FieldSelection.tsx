@@ -73,22 +73,17 @@ export interface FieldSelectionProps {
  * ```
  */
 export function FieldSelection(props: FieldSelectionProps) {
-  const hasArguments = Boolean(props.arguments);
-  const hasDirectives = Boolean(props.directives);
-  const hasSelectionSet = Boolean(props.children);
-
   return (
     <>
       {props.alias && <>{props.alias}: </>}
       {props.name}
-      {hasArguments && (
+      {props.arguments && (
         <>
-          (
-          <List children={props.arguments} joiner=", " />)
+          (<List children={props.arguments} joiner=", " />)
         </>
       )}
-      {hasDirectives && <>{props.directives}</>}
-      {hasSelectionSet && (
+      {props.directives}
+      {props.children && (
         <>
           {" {"}
           <Indent hardline>
