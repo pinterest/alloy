@@ -160,8 +160,6 @@ export function registerForValidation(
  * Users don't need to call this manually - it's handled by the framework.
  *
  * Errors are collected rather than thrown, and can be retrieved with getValidationErrors().
- *
- * @internal
  */
 export function runPendingValidations(): void {
   const validations = pendingValidations;
