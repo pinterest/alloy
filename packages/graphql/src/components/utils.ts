@@ -228,42 +228,24 @@ export function validateFragmentTypeCondition(
   typeCondition: Children,
   fragmentName: string,
 ): void {
-  // Check if this is a refkey we can resolve
-  if (isRefkey(typeCondition)) {
-    try {
-      const reference = ref(typeCondition as Refkey);
-      const [typeName, symbol] = reference();
+  // Only validate refkey references - non-refkey types can't be validated
+  // at generation time. The GraphQL schema validation will catch these errors.
+  if (!isRefkey(typeCondition)) return;
 
-      const kind = symbol?.metadata?.kind as string | undefined;
+  const reference = ref(typeCondition);
+  const [typeName, symbol] = reference();
 
-      if (kind === "scalar") {
-        throw new Error(
-          `Fragment "${fragmentName}" cannot have type condition "${typeName}" (scalar type). ` +
-            `Per the GraphQL spec, fragments can only be used on object types, interfaces, and unions.`,
-        );
-      }
+  const kind = symbol?.metadata?.kind;
 
-      if (kind === "enum") {
-        throw new Error(
-          `Fragment "${fragmentName}" cannot have type condition "${typeName}" (enum type). ` +
-            `Per the GraphQL spec, fragments can only be used on object types, interfaces, and unions.`,
-        );
-      }
-
-      if (kind === "input") {
-        throw new Error(
-          `Fragment "${fragmentName}" cannot have type condition "${typeName}" (input object type). ` +
-            `Per the GraphQL spec, fragments can only be used on object types, interfaces, and unions.`,
-        );
-      }
-    } catch (error) {
-      // If we can't resolve the reference, skip validation
-      if (error instanceof Error && !error.message.includes("cannot have")) {
-        return;
-      }
-      throw error;
-    }
+  // Fragments can only be on composite types (object, interface, union)
+  if (kind === "scalar" || kind === "enum" || kind === "input") {
+    const kindDisplay =
+      kind === "input" ? "input object type"
+      : kind === "scalar" ? "scalar type"
+      : "enum type";
+    throw new Error(
+      `Fragment "${fragmentName}" cannot have type condition "${typeName}" (${kindDisplay}). ` +
+        `Per the GraphQL spec, fragments can only be used on object types, interfaces, and unions.`,
+    );
   }
-  // For non-refkey types (string literals), we can't validate at generation time
-  // The GraphQL schema validation will catch these errors
 }

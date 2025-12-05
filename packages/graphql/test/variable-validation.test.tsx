@@ -298,7 +298,7 @@ describe("Variable Type Validation", () => {
             </gql.FieldSelection>
           </gql.OperationDefinition>,
         );
-      }).toThrow(/Duplicate member name "id"/);
+      }).toThrow(/Duplicate variable name "id"/);
     });
 
     it("throws error with descriptive message for duplicate variables", () => {
@@ -325,7 +325,7 @@ describe("Variable Type Validation", () => {
             </gql.FieldSelection>
           </gql.OperationDefinition>,
         );
-      }).toThrow(/Duplicate member name "title" in CreatePost/);
+      }).toThrow(/Duplicate variable name "title" in CreatePost/);
     });
 
     it("allows same variable name in different operations", () => {
