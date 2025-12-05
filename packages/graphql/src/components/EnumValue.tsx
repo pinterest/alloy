@@ -3,9 +3,7 @@ import { createGraphQLSymbol } from "../symbol-creation.js";
 import { BaseDeclarationProps } from "./common-props.js";
 import { wrapDescription } from "./utils.js";
 
-export interface EnumValueProps extends BaseDeclarationProps {
-  // All properties inherited from BaseDeclarationProps
-}
+export interface EnumValueProps extends BaseDeclarationProps {}
 
 /**
  * An enum value declaration for GraphQL enum types.

@@ -6,12 +6,12 @@ import {
   OutputDirectory,
   OutputFile,
   PrintTreeOptions,
-  render,
 } from "@alloy-js/core";
 import { dedent } from "@alloy-js/core/testing";
 import { expect } from "vitest";
 import * as gql from "../src/components/index.js";
 import { createGraphQLNamePolicy } from "../src/name-policy.js";
+import { renderGraphQLWithErrors } from "../src/render.js";
 
 export function findFile(
   res: OutputDirectory,
@@ -79,7 +79,8 @@ export function toGraphQLTextMultiple(
     printOptions.tabWidth = 2;
   }
   const content = <Output namePolicy={policy}>{sourceFiles}</Output>;
-  return render(content, printOptions);
+  const { output } = renderGraphQLWithErrors(content, printOptions);
+  return output;
 }
 
 export function toGraphQLText(
@@ -92,11 +93,27 @@ export function toGraphQLText(
     printOptions?: PrintTreeOptions;
   } = {},
 ): string {
-  const content = <gql.SourceFile path="schema.graphql">{c}</gql.SourceFile>;
-  const res = toGraphQLTextMultiple([content], {
-    policy,
-    printOptions,
-  });
-  const file = findFile(res, "schema.graphql");
+  if (!policy) {
+    policy = createGraphQLNamePolicy();
+  }
+  if (printOptions === undefined) {
+    printOptions = {
+      printWidth: 80,
+      tabWidth: 2,
+      insertFinalNewLine: false,
+    };
+  } else {
+    printOptions.insertFinalNewLine = false;
+    printOptions.tabWidth = 2;
+  }
+
+  const content = (
+    <Output namePolicy={policy}>
+      <gql.SourceFile path="schema.graphql">{c}</gql.SourceFile>
+    </Output>
+  );
+
+  const { output } = renderGraphQLWithErrors(content, printOptions);
+  const file = findFile(output, "schema.graphql");
   return file.contents;
 }

@@ -11,29 +11,23 @@ import {
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { GraphQLMemberScope, useGraphQLScope } from "../symbols/index.js";
 import { BaseDeclarationProps } from "./common-props.js";
-import { registerForValidation } from "./DeferredInterfaceValidation.js";
-import { Directives } from "./Directives.js";
 import { ImplementsInterfaces } from "./ImplementsInterfaces.js";
 import { wrapDescription } from "./utils.js";
 
-export interface ObjectTypeDefinitionProps extends BaseDeclarationProps {
+export interface InterfaceTypeDefinitionProps extends BaseDeclarationProps {
   /**
-   * Fields of the object type (FieldDefinition components)
+   * Fields of the interface (FieldDefinition components)
    */
   children?: Children;
   /**
-   * Interfaces this type implements
+   * Interfaces this interface implements
    */
   implements?: Children[];
 }
 
 /**
- * An object type definition for GraphQL schemas.
- *
- * When a type implements interfaces, and those interfaces themselves implement other interfaces,
- * the rendered output will automatically include all transitive interfaces. For example, if
- * interface B implements interface C, and type A implements B, the output will be
- * `type A implements B & C { ... }` even though you only specified `implements={[B]}`.
+ * An interface type definition for GraphQL schemas.
+ * Interfaces define a set of fields that object types can implement.
  *
  * @example
  * ```tsx
@@ -42,29 +36,45 @@ export interface ObjectTypeDefinitionProps extends BaseDeclarationProps {
  * const nodeRef = refkey();
  * const timestampedRef = refkey();
  *
- * <ObjectTypeDefinition
- *   name="User"
- *   description="A user in the system.\nCan create posts and interact with other users."
- *   implements={[nodeRef, timestampedRef]}
- *   directives={<Directive name="auth" args={{ requires: "ADMIN" }} />}
+ * <InterfaceTypeDefinition
+ *   name="Node"
+ *   refkey={nodeRef}
+ *   description='"""An object with a unique identifier"""'
  * >
  *   <FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
- *   <FieldDefinition name="email" type={builtInScalars.String} />
- * </ObjectTypeDefinition>
+ * </InterfaceTypeDefinition>
+ *
+ * <InterfaceTypeDefinition
+ *   name="Timestamped"
+ *   refkey={timestampedRef}
+ *   implements={[nodeRef]}
+ *   description='"""An object with creation and update timestamps"""'
+ * >
+ *   <FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+ *   <FieldDefinition name="createdAt" type={code`${builtInScalars.String}!`} />
+ *   <FieldDefinition name="updatedAt" type={code`${builtInScalars.String}!`} />
+ * </InterfaceTypeDefinition>
  * ```
  * renders to
  * ```graphql
  * """
- * A user in the system.
- * Can create posts and interact with other users.
+ * An object with a unique identifier
  * """
- * type User implements Node & Timestamped @auth(requires: "ADMIN") {
+ * interface Node {
  *   id: ID!
- *   email: String
+ * }
+ *
+ * """
+ * An object with creation and update timestamps
+ * """
+ * interface Timestamped implements Node {
+ *   id: ID!
+ *   createdAt: String!
+ *   updatedAt: String!
  * }
  * ```
  */
-export function ObjectTypeDefinition(props: ObjectTypeDefinitionProps) {
+export function InterfaceTypeDefinition(props: InterfaceTypeDefinitionProps) {
   // Get parent scope for establishing member scope hierarchy
   const parentScope = useGraphQLScope();
 
@@ -74,21 +84,16 @@ export function ObjectTypeDefinition(props: ObjectTypeDefinitionProps) {
       refkeys: props.refkey,
       metadata: { implements: props.implements ?? [] },
     },
-    "object",
+    "interface",
   );
 
-  // Create a member scope for this object type to hold its fields
+  // Create a member scope for this interface to hold its fields
   const memberScope = new GraphQLMemberScope(props.name, parentScope, {
     ownerSymbol: sym,
   });
 
   const ContentSlot = createContentSlot();
   const wrappedDescription = wrapDescription(props.description);
-
-  // Register for deferred validation if implementing interfaces
-  if (props.implements?.length) {
-    registerForValidation(props.name, sym, props.implements);
-  }
 
   return (
     <>
@@ -97,13 +102,11 @@ export function ObjectTypeDefinition(props: ObjectTypeDefinitionProps) {
         <hbr />
       </Show>
       <CoreDeclaration symbol={sym}>
-        type <Name />
-        <Show when={!!(props.implements && props.implements.length)}>
+        interface <Name />
+        <Show when={Boolean(props.implements && props.implements.length)}>
           <ImplementsInterfaces interfaces={props.implements!} />
         </Show>
-        <Show when={Boolean(props.directives)}>
-          <Directives location="OBJECT">{props.directives}</Directives>
-        </Show>
+        <Show when={Boolean(props.directives)}>{props.directives}</Show>
         {" {"}
         <MemberScope value={memberScope}>
           <Indent hardline>
