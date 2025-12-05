@@ -187,3 +187,38 @@ export function validateInputType(
     }
   }
 }
+
+/**
+ * Validates that a fragment type condition is a valid composite output type.
+ * Fragment type conditions can be: Objects, Interfaces
+ * But NOT: Scalars, Enums, Input Objects, Unions
+ *
+ * @param typeCondition - The type condition to validate
+ * @param fragmentName - The fragment name for error messaging
+ * @throws {Error} If an invalid type is used as a fragment type condition
+ */
+export function validateFragmentTypeCondition(
+  typeCondition: Children,
+  fragmentName: string,
+): void {
+  // Only validate refkey references - non-refkey types can't be validated
+  // at generation time. The GraphQL schema validation will catch these errors.
+  if (!isRefkey(typeCondition)) return;
+
+  const reference = ref(typeCondition);
+  const [typeName, symbol] = reference();
+
+  const kind = symbol?.metadata?.kind;
+
+  // Fragments can only be on composite types (object, interface, union)
+  if (kind === "scalar" || kind === "enum" || kind === "input") {
+    const kindDisplay =
+      kind === "input" ? "input object type"
+      : kind === "scalar" ? "scalar type"
+      : "enum type";
+    throw new Error(
+      `Fragment "${fragmentName}" cannot have type condition "${typeName}" (${kindDisplay}). ` +
+        `Per the GraphQL spec, fragments can only be used on object types, interfaces, and unions.`,
+    );
+  }
+}

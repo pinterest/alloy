@@ -1,0 +1,78 @@
+import { Children, Indent, List } from "@alloy-js/core";
+import { validateFragmentTypeCondition } from "./utils.js";
+
+export interface InlineFragmentProps {
+  /**
+   * Optional type condition for the inline fragment
+   */
+  typeCondition?: Children;
+  /**
+   * Directives to apply to the inline fragment
+   */
+  directives?: Children;
+  /**
+   * Field selections in the inline fragment
+   */
+  children?: Children;
+}
+
+/**
+ * An inline fragment in a GraphQL operation.
+ *
+ * @example
+ * ```tsx
+ * // Inline fragment with type condition
+ * <FieldSelection name="search">
+ *   <InlineFragment typeCondition="User">
+ *     <FieldSelection name="name" />
+ *     <FieldSelection name="email" />
+ *   </InlineFragment>
+ *   <InlineFragment typeCondition="Post">
+ *     <FieldSelection name="title" />
+ *     <FieldSelection name="content" />
+ *   </InlineFragment>
+ * </FieldSelection>
+ *
+ * // Inline fragment without type condition (for directives)
+ * <InlineFragment directives={<Directive name="include" args={{ if: <Variable name="showDetails" /> }} />}>
+ *   <FieldSelection name="details" />
+ * </InlineFragment>
+ * ```
+ * renders to
+ * ```graphql
+ * search {
+ *   ... on User {
+ *     name
+ *     email
+ *   }
+ *   ... on Post {
+ *     title
+ *     content
+ *   }
+ * }
+ *
+ * ... @include(if: $showDetails) {
+ *   details
+ * }
+ * ```
+ */
+export function InlineFragment(props: InlineFragmentProps) {
+  // Validate that the type condition (if present) is a valid composite output type
+  if (props.typeCondition) {
+    validateFragmentTypeCondition(props.typeCondition, "inline fragment");
+  }
+
+  return (
+    <>
+      ...
+      {props.typeCondition && <> on {props.typeCondition}</>}
+      {props.directives}
+      {" {"}
+      <Indent hardline>
+        <List children={props.children} joiner={<hardline />} />
+      </Indent>
+      <hardline />
+      {"}"}
+    </>
+  );
+}
