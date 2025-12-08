@@ -7,11 +7,7 @@ import {
 } from "@alloy-js/core";
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { BaseDeclarationProps } from "./common-props.js";
-import {
-  validateUnionHasMembers,
-  validateUnionMemberTypes,
-  wrapDescription,
-} from "./utils.js";
+import { validateUnionMembers, wrapDescription } from "./utils.js";
 
 export interface UnionTypeDefinitionProps extends BaseDeclarationProps {
   /**
@@ -53,11 +49,7 @@ export interface UnionTypeDefinitionProps extends BaseDeclarationProps {
  * ```
  */
 export function UnionTypeDefinition(props: UnionTypeDefinitionProps) {
-  // Validate union has at least one member
-  validateUnionHasMembers(props.members, props.name);
-
-  // Validate that all members are object types (if they're refkeys)
-  validateUnionMemberTypes(props.members, props.name);
+  validateUnionMembers(props.members, props.name);
 
   const sym = createGraphQLSymbol(
     props.name,

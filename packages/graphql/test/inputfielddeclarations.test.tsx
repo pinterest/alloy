@@ -1,4 +1,4 @@
-import { code, refkey } from "@alloy-js/core";
+import { refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import { builtInDirectives } from "../src/builtins/directives.js";
@@ -25,7 +25,7 @@ describe("InputFieldDeclaration", () => {
       <gql.InputObjectTypeDefinition name="UserInput">
         <gql.InputFieldDeclaration
           name="email"
-          type={code`${builtInScalars.String}!`}
+          type={<gql.TypeReference type={builtInScalars.String} required />}
         />
       </gql.InputObjectTypeDefinition>,
     );
@@ -41,7 +41,13 @@ describe("InputFieldDeclaration", () => {
       <gql.InputObjectTypeDefinition name="BatchInput">
         <gql.InputFieldDeclaration
           name="ids"
-          type={code`[${builtInScalars.ID}!]!`}
+          type={
+            <gql.TypeReference
+              type={<gql.TypeReference type={builtInScalars.ID} required />}
+              list
+              required
+            />
+          }
         />
       </gql.InputObjectTypeDefinition>,
     );
@@ -110,17 +116,33 @@ describe("InputFieldDeclaration", () => {
           />
           <gql.InputFieldDeclaration
             name="enumDefault"
-            type={code`${statusRef}!`}
-            defaultValue={code`${activeRef}`}
+            type={<gql.TypeReference type={statusRef} required />}
+            defaultValue={activeRef}
           />
           <gql.InputFieldDeclaration
             name="arrayDefault"
-            type={code`[${builtInScalars.String}!]!`}
+            type={
+              <gql.TypeReference
+                type={
+                  <gql.TypeReference type={builtInScalars.String} required />
+                }
+                list
+                required
+              />
+            }
             defaultValue={["tag1", "tag2"]}
           />
           <gql.InputFieldDeclaration
             name="emptyArrayDefault"
-            type={code`[${builtInScalars.String}!]!`}
+            type={
+              <gql.TypeReference
+                type={
+                  <gql.TypeReference type={builtInScalars.String} required />
+                }
+                list
+                required
+              />
+            }
             defaultValue={[]}
           />
           <gql.InputFieldDeclaration
@@ -212,7 +234,7 @@ describe("InputFieldDeclaration", () => {
             name="status"
             type="Status!"
             description="Current status of the entity"
-            defaultValue={code`${activeRef}`}
+            defaultValue={activeRef}
             directives={
               <gql.Directive name="validate" args={{ required: true }} />
             }

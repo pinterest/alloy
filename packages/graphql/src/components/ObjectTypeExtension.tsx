@@ -34,7 +34,7 @@ export interface ObjectTypeExtensionProps extends NamedDeclarationProps {
  *
  * @example
  * ```tsx
- * import { code, refkey } from "@alloy-js/core";
+ * import { refkey } from "@alloy-js/core";
  *
  * const timestampedRef = refkey();
  *
@@ -43,8 +43,8 @@ export interface ObjectTypeExtensionProps extends NamedDeclarationProps {
  *   implements={[timestampedRef]}
  *   directives={<Directive name="key" args={{ fields: "id" }} />}
  * >
- *   <FieldDefinition name="createdAt" type={code`${builtInScalars.String}!`} />
- *   <FieldDefinition name="updatedAt" type={code`${builtInScalars.String}!`} />
+ *   <FieldDefinition name="createdAt" type={<TypeReference type={builtInScalars.String} required />} />
+ *   <FieldDefinition name="updatedAt" type={<TypeReference type={builtInScalars.String} required />} />
  * </ObjectTypeExtension>
  * ```
  * renders to

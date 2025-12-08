@@ -1,4 +1,4 @@
-import { code, refkey } from "@alloy-js/core";
+import { refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import { builtInDirectives } from "../src/builtins/directives.js";
@@ -18,7 +18,7 @@ describe("InputValueDefinition", () => {
     const result = toGraphQLText(
       <gql.InputValueDefinition
         name="email"
-        type={code`${builtInScalars.String}!`}
+        type={<gql.TypeReference type={builtInScalars.String} required />}
       />,
     );
     expect(result).toBe("email: String!");
@@ -109,7 +109,7 @@ describe("InputValueDefinition", () => {
         <gql.ObjectTypeDefinition name="UserInput" refkey={inputTypeRef}>
           <gql.FieldDefinition
             name="name"
-            type={code`${builtInScalars.String}!`}
+            type={<gql.TypeReference type={builtInScalars.String} required />}
           />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Query">
@@ -119,7 +119,7 @@ describe("InputValueDefinition", () => {
             args={
               <gql.InputValueDefinition
                 name="userInput"
-                type={code`${inputTypeRef}!`}
+                type={<gql.TypeReference type={inputTypeRef} required />}
               />
             }
           />
@@ -141,7 +141,13 @@ describe("InputValueDefinition", () => {
     const result = toGraphQLText(
       <gql.InputValueDefinition
         name="ids"
-        type={code`[${builtInScalars.ID}!]!`}
+        type={
+          <gql.TypeReference
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+            list
+            required
+          />
+        }
       />,
     );
     expect(result).toBe("ids: [ID!]!");
@@ -152,7 +158,7 @@ describe("InputValueDefinition", () => {
       <gql.ObjectTypeDefinition name="Query">
         <gql.FieldDefinition
           name="users"
-          type={code`[User]`}
+          type="[User]"
           args={
             <>
               <gql.InputValueDefinition
@@ -187,7 +193,7 @@ describe("InputValueDefinition", () => {
       <gql.ObjectTypeDefinition name="Query">
         <gql.FieldDefinition
           name="users"
-          type={code`[User]`}
+          type="[User]"
           args={
             <>
               <gql.InputValueDefinition
@@ -204,7 +210,7 @@ describe("InputValueDefinition", () => {
         />
         <gql.FieldDefinition
           name="posts"
-          type={code`[Post]`}
+          type="[Post]"
           args={
             <>
               <gql.InputValueDefinition

@@ -27,10 +27,10 @@ export interface InputFieldDeclarationProps extends TypedBaseDeclarationProps {
  *
  * @example
  * ```tsx
- * import { code, refkey } from "@alloy-js/core";
+ * import { refkey } from "@alloy-js/core";
  *
  * <>
- *   <InputFieldDeclaration name="id" type={code`${builtInScalars.ID}!`} />
+ *   <InputFieldDeclaration name="id" type={<TypeReference type={builtInScalars.ID} required />} />
  *   <InputFieldDeclaration
  *     name="name"
  *     type={builtInScalars.String}
@@ -43,7 +43,7 @@ export interface InputFieldDeclarationProps extends TypedBaseDeclarationProps {
  *   />
  *   <InputFieldDeclaration
  *     name="tags"
- *     type={code`[${builtInScalars.String}!]!`}
+ *     type={<TypeReference type={<TypeReference type={builtInScalars.String} required />} list required />}
  *     defaultValue={["tag1", "tag2"]}
  *   />
  *   <InputFieldDeclaration
@@ -58,7 +58,7 @@ export interface InputFieldDeclarationProps extends TypedBaseDeclarationProps {
  *   />
  * </>
  *
- * // Enum default values (use refkeys in code templates)
+ * // Enum default values (use refkeys)
  * const statusRef = refkey();
  * const activeRef = refkey();
  *
@@ -70,8 +70,8 @@ export interface InputFieldDeclarationProps extends TypedBaseDeclarationProps {
  *   <InputObjectTypeDefinition name="UserInput">
  *     <InputFieldDeclaration
  *       name="status"
- *       type={code`${statusRef}`}
- *       defaultValue={code`${activeRef}`}
+ *       type={statusRef}
+ *       defaultValue={activeRef}
  *     />
  *   </InputObjectTypeDefinition>
  * </>

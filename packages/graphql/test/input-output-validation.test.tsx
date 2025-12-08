@@ -1,4 +1,4 @@
-import { code, refkey } from "@alloy-js/core";
+import { refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import * as gql from "../src/index.js";
@@ -32,7 +32,10 @@ describe("Input/Output Type Usage Validation", () => {
             <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
           </gql.ObjectTypeDefinition>
           <gql.ObjectTypeDefinition name="Post" refkey={postRef}>
-            <gql.FieldDefinition name="author" type={code`${userRef}!`} />
+            <gql.FieldDefinition
+              name="author"
+              type={<gql.TypeReference type={userRef} required />}
+            />
           </gql.ObjectTypeDefinition>
         </>,
       );
@@ -56,7 +59,7 @@ describe("Input/Output Type Usage Validation", () => {
           <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
             <gql.FieldDefinition
               name="id"
-              type={code`${gql.builtInScalars.ID}!`}
+              type={<gql.TypeReference type={gql.builtInScalars.ID} required />}
             />
           </gql.InterfaceTypeDefinition>
           <gql.ObjectTypeDefinition name="User">
@@ -89,7 +92,13 @@ describe("Input/Output Type Usage Validation", () => {
           <gql.ObjectTypeDefinition name="Query">
             <gql.FieldDefinition
               name="search"
-              type={code`[${searchResultRef}!]!`}
+              type={
+                <gql.TypeReference
+                  type={<gql.TypeReference type={searchResultRef} required />}
+                  list
+                  required
+                />
+              }
             />
           </gql.ObjectTypeDefinition>
         </>,
@@ -167,7 +176,9 @@ describe("Input/Output Type Usage Validation", () => {
             args={
               <gql.InputValueDefinition
                 name="id"
-                type={code`${gql.builtInScalars.ID}!`}
+                type={
+                  <gql.TypeReference type={gql.builtInScalars.ID} required />
+                }
               />
             }
           />
@@ -192,7 +203,18 @@ describe("Input/Output Type Usage Validation", () => {
           <gql.ObjectTypeDefinition name="Query">
             <gql.FieldDefinition
               name="users"
-              type={code`[${gql.builtInScalars.String}!]!`}
+              type={
+                <gql.TypeReference
+                  type={
+                    <gql.TypeReference
+                      type={gql.builtInScalars.String}
+                      required
+                    />
+                  }
+                  list
+                  required
+                />
+              }
               args={<gql.InputValueDefinition name="status" type={statusRef} />}
             />
           </gql.ObjectTypeDefinition>
@@ -228,7 +250,7 @@ describe("Input/Output Type Usage Validation", () => {
               args={
                 <gql.InputValueDefinition
                   name="input"
-                  type={code`${userInputRef}!`}
+                  type={<gql.TypeReference type={userInputRef} required />}
                 />
               }
             />
@@ -277,7 +299,9 @@ describe("Input/Output Type Usage Validation", () => {
             <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
               <gql.FieldDefinition
                 name="id"
-                type={code`${gql.builtInScalars.ID}!`}
+                type={
+                  <gql.TypeReference type={gql.builtInScalars.ID} required />
+                }
               />
             </gql.InterfaceTypeDefinition>
             <gql.ObjectTypeDefinition name="Query">
@@ -346,7 +370,9 @@ describe("Input/Output Type Usage Validation", () => {
             <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
               <gql.FieldDefinition
                 name="id"
-                type={code`${gql.builtInScalars.ID}!`}
+                type={
+                  <gql.TypeReference type={gql.builtInScalars.ID} required />
+                }
               />
             </gql.InterfaceTypeDefinition>
             <gql.InputObjectTypeDefinition name="InvalidInput">

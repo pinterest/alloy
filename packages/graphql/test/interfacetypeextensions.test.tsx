@@ -1,4 +1,4 @@
-import { code, refkey } from "@alloy-js/core";
+import { refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import { builtInScalars } from "../src/builtins/scalars.js";
@@ -49,7 +49,13 @@ describe("InterfaceTypeExtension", () => {
       >
         <gql.FieldDefinition
           name="auditLog"
-          type={code`[${builtInScalars.String}!]!`}
+          type={
+            <gql.TypeReference
+              type={<gql.TypeReference type={builtInScalars.String} required />}
+              list
+              required
+            />
+          }
         />
       </gql.InterfaceTypeExtension>,
     );

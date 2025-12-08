@@ -54,8 +54,7 @@ export interface SourceFileProps {
  *
  * @example
  * ```tsx
- * import { code } from "@alloy-js/core";
- * import { builtInScalars } from "@alloy-js/graphql";
+ * import { builtInScalars, TypeReference } from "@alloy-js/graphql";
  * import { ObjectTypeDefinition, FieldDefinition, SourceFile } from "@alloy-js/graphql/components";
  *
  * <SourceFile
@@ -64,7 +63,7 @@ export interface SourceFileProps {
  *   description="Main schema file for the API"
  * >
  *   <ObjectTypeDefinition name="User">
- *     <FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+ *     <FieldDefinition name="id" type={<TypeReference type={builtInScalars.ID} required />} />
  *   </ObjectTypeDefinition>
  * </SourceFile>
  * ```

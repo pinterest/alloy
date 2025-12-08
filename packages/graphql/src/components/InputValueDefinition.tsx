@@ -29,7 +29,7 @@ export interface InputValueDefinitionProps extends TypedBaseDeclarationProps {
  * @example
  * ```tsx
  * <>
- *   <InputValueDefinition name="id" type={code`${builtInScalars.ID}!`} />
+ *   <InputValueDefinition name="id" type={<TypeReference type={builtInScalars.ID} required />} />
  *   <InputValueDefinition name="limit" type={builtInScalars.Int} defaultValue={10} />
  *   <InputValueDefinition
  *     name="reason"
@@ -44,7 +44,7 @@ export interface InputValueDefinitionProps extends TypedBaseDeclarationProps {
  *   />
  * </>
  *
- * // Enum default values (use refkeys in code templates)
+ * // Enum default values (use refkeys)
  * const statusRef = refkey();
  * const activeRef = refkey();
  *
@@ -55,8 +55,8 @@ export interface InputValueDefinitionProps extends TypedBaseDeclarationProps {
  *   </EnumTypeDefinition>
  *   <InputValueDefinition
  *     name="status"
- *     type={code`${statusRef}`}
- *     defaultValue={code`${activeRef}`}
+ *     type={statusRef}
+ *     defaultValue={activeRef}
  *   />
  * </>
  * ```

@@ -22,6 +22,7 @@ export * from "./ScalarTypeExtension.js";
 export * from "./SchemaDefinition.js";
 export * from "./SchemaExtension.js";
 export * from "./SourceFile.js";
+export * from "./TypeReference.js";
 export * from "./UnionTypeDefinition.js";
 export * from "./UnionTypeExtension.js";
 export * from "./ValueExpression.js";

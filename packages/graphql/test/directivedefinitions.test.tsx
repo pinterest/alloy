@@ -1,4 +1,4 @@
-import { code, refkey } from "@alloy-js/core";
+import { refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import { builtInScalars } from "../src/builtins/scalars.js";
@@ -61,7 +61,14 @@ describe("DirectiveDefinition", () => {
             />
             <gql.InputValueDefinition
               name="scopes"
-              type={code`[${builtInScalars.String}!]`}
+              type={
+                <gql.TypeReference
+                  type={
+                    <gql.TypeReference type={builtInScalars.String} required />
+                  }
+                  list
+                />
+              }
             />
           </>
         }
@@ -81,7 +88,7 @@ describe("DirectiveDefinition", () => {
         args={
           <gql.InputValueDefinition
             name="name"
-            type={code`${builtInScalars.String}!`}
+            type={<gql.TypeReference type={builtInScalars.String} required />}
           />
         }
       />,
@@ -100,7 +107,7 @@ describe("DirectiveDefinition", () => {
         args={
           <gql.InputValueDefinition
             name="pattern"
-            type={code`${builtInScalars.String}!`}
+            type={<gql.TypeReference type={builtInScalars.String} required />}
           />
         }
       />,
@@ -267,7 +274,10 @@ describe("DirectiveDefinition", () => {
             />
           }
         >
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
           <gql.FieldDefinition
             name="sensitiveData"
             type={builtInScalars.String}

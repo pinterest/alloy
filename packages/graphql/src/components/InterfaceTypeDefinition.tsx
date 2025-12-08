@@ -31,7 +31,7 @@ export interface InterfaceTypeDefinitionProps extends BaseDeclarationProps {
  *
  * @example
  * ```tsx
- * import { code, refkey } from "@alloy-js/core";
+ * import { refkey } from "@alloy-js/core";
  *
  * const nodeRef = refkey();
  * const timestampedRef = refkey();
@@ -41,7 +41,7 @@ export interface InterfaceTypeDefinitionProps extends BaseDeclarationProps {
  *   refkey={nodeRef}
  *   description='"""An object with a unique identifier"""'
  * >
- *   <FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+ *   <FieldDefinition name="id" type={<TypeReference type={builtInScalars.ID} required />} />
  * </InterfaceTypeDefinition>
  *
  * <InterfaceTypeDefinition
@@ -50,9 +50,9 @@ export interface InterfaceTypeDefinitionProps extends BaseDeclarationProps {
  *   implements={[nodeRef]}
  *   description='"""An object with creation and update timestamps"""'
  * >
- *   <FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
- *   <FieldDefinition name="createdAt" type={code`${builtInScalars.String}!`} />
- *   <FieldDefinition name="updatedAt" type={code`${builtInScalars.String}!`} />
+ *   <FieldDefinition name="id" type={<TypeReference type={builtInScalars.ID} required />} />
+ *   <FieldDefinition name="createdAt" type={<TypeReference type={builtInScalars.String} required />} />
+ *   <FieldDefinition name="updatedAt" type={<TypeReference type={builtInScalars.String} required />} />
  * </InterfaceTypeDefinition>
  * ```
  * renders to

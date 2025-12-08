@@ -37,7 +37,7 @@ export interface ObjectTypeDefinitionProps extends BaseDeclarationProps {
  *
  * @example
  * ```tsx
- * import { code, refkey } from "@alloy-js/core";
+ * import { refkey } from "@alloy-js/core";
  *
  * const nodeRef = refkey();
  * const timestampedRef = refkey();
@@ -48,7 +48,7 @@ export interface ObjectTypeDefinitionProps extends BaseDeclarationProps {
  *   implements={[nodeRef, timestampedRef]}
  *   directives={<Directive name="auth" args={{ requires: "ADMIN" }} />}
  * >
- *   <FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+ *   <FieldDefinition name="id" type={<TypeReference type={builtInScalars.ID} required />} />
  *   <FieldDefinition name="email" type={builtInScalars.String} />
  * </ObjectTypeDefinition>
  * ```
