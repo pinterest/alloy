@@ -33,7 +33,7 @@ export interface EnumTypeExtensionProps extends NamedDeclarationProps {
  *
  * <>
  *   <EnumTypeExtension name="Status">
- *     <EnumValue name="ARCHIVED" description='"""Archived status"""' />
+ *     <EnumValue name="ARCHIVED" description="Archived status" />
  *     <EnumValue name="SUSPENDED" />
  *   </EnumTypeExtension>
  *   <EnumTypeExtension

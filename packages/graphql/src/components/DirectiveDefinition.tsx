@@ -84,8 +84,8 @@ export interface DirectiveDefinitionProps extends NamedDeclarationProps {
  *     locations={["FIELD_DEFINITION", "OBJECT"]}
  *     args={
  *       <>
- *         <InputValueDefinition name="requires" type={code`${roleRef}!`} defaultValue={userRef} />
- *         <InputValueDefinition name="scopes" type={code`[${builtInScalars.String}!]`} />
+ *         <InputValueDefinition name="requires" type={<TypeReference type={roleRef} required />} defaultValue={userRef} />
+ *         <InputValueDefinition name="scopes" type={<TypeReference type={<TypeReference type={builtInScalars.String} required />} list />} />
  *       </>
  *     }
  *   />

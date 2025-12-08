@@ -7,32 +7,63 @@ interface FieldInfo {
   type: string;
 }
 
-/**
- * A Set of FieldInfo objects, keyed by name for lookup.
- * Provides set equality comparison for validating argument lists.
- */
-class FieldInfoSet extends Set<FieldInfo> {
-  private byName = new Map<string, FieldInfo>();
+interface ObjectFieldInfo extends FieldInfo {
+  args: FieldInfoSet<FieldInfo>;
+}
 
-  add(field: FieldInfo): this {
-    if (!this.byName.has(field.name)) {
-      this.byName.set(field.name, field);
-      super.add(field);
+/**
+ * Generates a unique key for a FieldInfo, including type and nested args.
+ * Enables Set-based comparisons when needed.
+ */
+function generateKey(field: FieldInfo | ObjectFieldInfo): string {
+  const parts = [field.name, field.type];
+  if ("args" in field) {
+    parts.push(
+      ...[...field.args.fields()]
+        .toSorted((a, b) => a.name.localeCompare(b.name))
+        .map(generateKey),
+    );
+  }
+  return parts.join("\0");
+}
+
+/**
+ * A Set of FieldInfo objects.
+ */
+class FieldInfoSet<T extends FieldInfo = FieldInfo> extends Set<string> {
+  #byName = new Map<string, T>();
+
+  add(field: T | string): this {
+    if (typeof field === "string") {
+      throw new Error("FieldInfoSet.add() does not support raw strings");
+    }
+    const key = generateKey(field);
+    if (!super.has(key)) {
+      super.add(key);
+      this.#byName.set(field.name, field);
     }
     return this;
   }
 
-  get(name: string): FieldInfo | undefined {
-    return this.byName.get(name);
+  get(name: string): T | undefined {
+    return this.#byName.get(name);
+  }
+
+  hasName(name: string): boolean {
+    return this.#byName.has(name);
+  }
+
+  fields(): IterableIterator<T> {
+    return this.#byName.values();
   }
 
   /**
    * Checks if this set equals another set.
    * Returns null if equal, or an error message describing the first difference.
    */
-  equals(other: FieldInfoSet, context: string): string | null {
+  equals(other: FieldInfoSet<T>, context: string): string | null {
     // Check for missing fields
-    for (const field of this) {
+    for (const field of this.fields()) {
       const otherField = other.get(field.name);
       if (!otherField) {
         return `${context}: missing argument "${field.name}"`;
@@ -43,18 +74,52 @@ class FieldInfoSet extends Set<FieldInfo> {
     }
 
     // Check for extra fields
-    for (const field of other) {
-      if (!this.byName.has(field.name)) {
+    for (const field of other.fields()) {
+      if (!this.hasName(field.name)) {
         return `${context}: unexpected argument "${field.name}"`;
       }
     }
 
     return null;
   }
-}
 
-interface ObjectFieldInfo extends FieldInfo {
-  args: FieldInfoSet;
+  isSupersetOf(
+    other: FieldInfoSet<T>,
+    context: { typeName: string; interfaceName: string },
+  ): string | null {
+    const { typeName, interfaceName } = context;
+
+    for (const otherField of other.fields()) {
+      const thisField = this.get(otherField.name);
+
+      // Check if field exists
+      if (!thisField) {
+        return `Type "${typeName}" must implement field "${otherField.name}" from interface "${interfaceName}".`;
+      }
+
+      // Validate return types
+      if (
+        otherField.type &&
+        thisField.type &&
+        otherField.type !== thisField.type
+      ) {
+        return `Type "${typeName}" field "${otherField.name}" return type must be "${otherField.type}" to match interface "${interfaceName}", but found "${thisField.type}".`;
+      }
+
+      // Validate arguments if present
+      if ("args" in otherField && "args" in thisField) {
+        const argsError = (otherField.args as FieldInfoSet).equals(
+          thisField.args as FieldInfoSet,
+          `Type "${typeName}" field "${otherField.name}"`,
+        );
+        if (argsError) {
+          return `${argsError} to match interface "${interfaceName}".`;
+        }
+      }
+    }
+
+    return null;
+  }
 }
 
 interface ResolvedInterface {
@@ -74,10 +139,10 @@ let validationErrors: Error[] = [];
 /**
  * Extract FieldInfo (name and type) from a symbol
  */
-function toFieldInfo(name: string, symbol: OutputSymbol): FieldInfo {
+function toFieldInfo(symbol: OutputSymbol): FieldInfo {
   const type = symbol.metadata.type;
   return {
-    name,
+    name: symbol.name,
     type: type ? String(type).replace(/\s/g, "") : "",
   };
 }
@@ -85,23 +150,25 @@ function toFieldInfo(name: string, symbol: OutputSymbol): FieldInfo {
 /**
  * Extract field information from a symbol's member space
  */
-function extractFieldInfo(symbol: GraphQLOutputSymbol): ObjectFieldInfo[] {
-  const fields: ObjectFieldInfo[] = [];
+function extractFieldInfo(
+  symbol: GraphQLOutputSymbol,
+): FieldInfoSet<ObjectFieldInfo> {
+  const fields = new FieldInfoSet<ObjectFieldInfo>();
 
-  for (const [fieldName, fieldSymbol] of symbol.members.symbolNames.entries()) {
-    const { name, type } = toFieldInfo(fieldName, fieldSymbol);
+  for (const fieldSymbol of symbol.members.symbolNames.values()) {
+    const { name, type } = toFieldInfo(fieldSymbol);
 
     // Extract arguments from the field symbol's own members
-    const args = new FieldInfoSet();
+    const args = new FieldInfoSet<FieldInfo>();
     const fieldMembers = fieldSymbol.memberSpaceFor("members");
 
     if (fieldMembers) {
-      for (const [argName, argSymbol] of fieldMembers.symbolNames.entries()) {
-        args.add(toFieldInfo(argName, argSymbol));
+      for (const argSymbol of fieldMembers.symbolNames.values()) {
+        args.add(toFieldInfo(argSymbol));
       }
     }
 
-    fields.push({ name, type, args });
+    fields.add({ name, type, args });
   }
 
   return fields;
@@ -124,21 +191,21 @@ export function registerForValidation(
     for (const iface of interfaces) {
       // An interface can be either a refkey or a string literal, only validate refkey references,
       // as string literal interfaces are already validated and rendered as is.
-      if (isRefkey(iface)) {
-        const reference = ref(iface);
-        const [, ifaceSymbol] = reference();
-        const nameStr = String(ifaceSymbol?.name);
+      if (!isRefkey(iface)) continue;
 
-        if (ifaceSymbol && !(nameStr in resolvedInterfaces)) {
-          resolvedInterfaces[nameStr] = { symbol: ifaceSymbol };
+      const reference = ref(iface);
+      const [, ifaceSymbol] = reference();
+      const nameStr = String(ifaceSymbol?.name);
 
-          // Recursively resolve parent interfaces
-          const parentInterfaces = ifaceSymbol.metadata.implements as
-            | Children[]
-            | undefined;
-          if (parentInterfaces?.length) {
-            resolveInterfacesRecursively(parentInterfaces);
-          }
+      if (ifaceSymbol && !(nameStr in resolvedInterfaces)) {
+        resolvedInterfaces[nameStr] = { symbol: ifaceSymbol };
+
+        // Recursively resolve parent interfaces
+        const parentInterfaces = ifaceSymbol.metadata.implements as
+          | Children[]
+          | undefined;
+        if (parentInterfaces?.length) {
+          resolveInterfacesRecursively(parentInterfaces);
         }
       }
     }
@@ -188,44 +255,18 @@ export function runPendingValidations(): void {
  */
 function validateTypeImplementsInterface(
   typeName: string,
-  typeFields: ObjectFieldInfo[],
+  typeFields: FieldInfoSet<ObjectFieldInfo>,
   interfaceSymbol: GraphQLOutputSymbol,
 ): void {
   const interfaceName = String(interfaceSymbol.name);
   const interfaceFields = extractFieldInfo(interfaceSymbol);
 
-  // Create a map of type fields for quick lookup
-  const typeFieldMap = new Map(typeFields.map((f) => [f.name, f]));
-
-  for (const interfaceField of interfaceFields) {
-    const typeField = typeFieldMap.get(interfaceField.name);
-
-    // Check if field exists
-    if (!typeField) {
-      throw new Error(
-        `Type "${typeName}" must implement field "${interfaceField.name}" from interface "${interfaceName}".`,
-      );
-    }
-
-    // Validate return types
-    if (
-      interfaceField.type &&
-      typeField.type &&
-      interfaceField.type !== typeField.type
-    ) {
-      throw new Error(
-        `Type "${typeName}" field "${interfaceField.name}" return type must be "${interfaceField.type}" to match interface "${interfaceName}", but found "${typeField.type}".`,
-      );
-    }
-
-    // Validate arguments by name (not position)
-    const argsError = interfaceField.args.equals(
-      typeField.args,
-      `Type "${typeName}" field "${interfaceField.name}"`,
-    );
-    if (argsError) {
-      throw new Error(`${argsError} to match interface "${interfaceName}".`);
-    }
+  const error = typeFields.isSupersetOf(interfaceFields, {
+    typeName,
+    interfaceName,
+  });
+  if (error) {
+    throw new Error(error);
   }
 }
 

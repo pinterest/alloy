@@ -28,26 +28,19 @@ export function OneOfInputProvider(props: OneOfInputProviderProps) {
 }
 
 /**
- * Checks if a directives prop contains a directive with the given name.
- * This is a simple heuristic check that works for most cases.
+ * Checks if a type is non-nullable (required).
+ * Handles string types, TypeReference components, and nested structures.
  */
-export function hasDirective(
-  name: string,
-  directives: Children | undefined,
-): boolean {
-  if (!directives) return false;
+function isNonNullableType(type: Children): boolean {
+  if (typeof type === "string" && type.trim().endsWith("!")) {
+    return true;
+  }
 
-  if (typeof directives === "object") {
-    if (Array.isArray(directives)) {
-      return directives.some((d) => hasDirective(name, d));
-    }
-
-    const { props } = directives as {
-      props?: { name?: string; children?: Children };
-    };
-    if (props?.name === name) return true;
-    if (props?.children) {
-      return hasDirective(name, props.children);
+  // JSX component (function with props) - e.g., TypeReference with required prop
+  if (typeof type === "function") {
+    const { props } = type as { props?: { required?: boolean } };
+    if (props?.required) {
+      return true;
     }
   }
 
@@ -64,11 +57,10 @@ export function validateOneOfFieldNullable(
   type: Children,
   fieldName: string,
 ): void {
-  const typeStr = String(type).trim();
-  if (typeStr.endsWith("!")) {
+  if (isNonNullableType(type)) {
     throw new Error(
       `Input field "${fieldName}" in a @oneOf input object must be nullable. ` +
-        `Remove the "!" from the type "${typeStr}". `,
+        `Remove the "!" or "required" from the type. `,
     );
   }
 }

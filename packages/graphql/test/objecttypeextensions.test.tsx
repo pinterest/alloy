@@ -1,4 +1,4 @@
-import { code, refkey } from "@alloy-js/core";
+import { refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import { builtInScalars } from "../src/builtins/scalars.js";
@@ -11,7 +11,7 @@ describe("ObjectTypeExtension", () => {
       <gql.ObjectTypeExtension name="User">
         <gql.FieldDefinition
           name="createdAt"
-          type={code`${builtInScalars.String}!`}
+          type={<gql.TypeReference type={builtInScalars.String} required />}
         />
         <gql.FieldDefinition name="updatedAt" type={builtInScalars.String} />
       </gql.ObjectTypeExtension>,
@@ -57,7 +57,13 @@ describe("ObjectTypeExtension", () => {
       >
         <gql.FieldDefinition
           name="roles"
-          type={code`[${builtInScalars.String}!]!`}
+          type={
+            <gql.TypeReference
+              type={<gql.TypeReference type={builtInScalars.String} required />}
+              list
+              required
+            />
+          }
         />
       </gql.ObjectTypeExtension>,
     );

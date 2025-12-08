@@ -33,24 +33,24 @@ export interface FieldDefinitionProps extends TypedBaseDeclarationProps {
  *
  * @example
  * ```tsx
- * import { code, refkey } from "@alloy-js/core";
+ * import { refkey } from "@alloy-js/core";
  *
  * const userRef = refkey();
  *
  * <>
- *   <FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+ *   <FieldDefinition name="id" type={<TypeReference type={builtInScalars.ID} required />} />
  *   <FieldDefinition
  *     name="name"
  *     type={builtInScalars.String}
  *     description='"""User full name"""'
  *   />
- *   <FieldDefinition name="tags" type={code`[${builtInScalars.String}!]!`} />
+ *   <FieldDefinition name="tags" type={<TypeReference type={<TypeReference type={builtInScalars.String} required />} list required />} />
  *   <FieldDefinition
  *     name="user"
- *     type={code`${userRef}!`}
+ *     type={<TypeReference type={userRef} required />}
  *     args={
  *       <>
- *         <InputValueDefinition name="id" type={code`${builtInScalars.ID}!`} />
+ *         <InputValueDefinition name="id" type={<TypeReference type={builtInScalars.ID} required />} />
  *         <InputValueDefinition name="includeDeleted" type={builtInScalars.Boolean} defaultValue={false} />
  *       </>
  *     }
@@ -83,8 +83,8 @@ export interface FieldDefinitionProps extends TypedBaseDeclarationProps {
  *       args={
  *         <InputValueDefinition
  *           name="status"
- *           type={code`${statusRef}`}
- *           defaultValue={code`${activeRef}`}
+ *           type={statusRef}
+ *           defaultValue={activeRef}
  *         />
  *       }
  *     />

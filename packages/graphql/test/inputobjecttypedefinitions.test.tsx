@@ -1,4 +1,4 @@
-import { code, refkey } from "@alloy-js/core";
+import { refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import { builtInScalars } from "../src/builtins/scalars.js";
@@ -15,11 +15,11 @@ describe("InputObjectTypeDefinition", () => {
       <gql.InputObjectTypeDefinition name="CreateUserInput">
         <gql.InputFieldDeclaration
           name="name"
-          type={code`${builtInScalars.String}!`}
+          type={<gql.TypeReference type={builtInScalars.String} required />}
         />
         <gql.InputFieldDeclaration
           name="email"
-          type={code`${builtInScalars.String}!`}
+          type={<gql.TypeReference type={builtInScalars.String} required />}
         />
         <gql.InputFieldDeclaration name="age" type={builtInScalars.Int} />
       </gql.InputObjectTypeDefinition>,
@@ -41,7 +41,7 @@ describe("InputObjectTypeDefinition", () => {
       >
         <gql.InputFieldDeclaration
           name="name"
-          type={code`${builtInScalars.String}!`}
+          type={<gql.TypeReference type={builtInScalars.String} required />}
         />
       </gql.InputObjectTypeDefinition>,
     );
@@ -90,11 +90,11 @@ describe("InputObjectTypeDefinition", () => {
         >
           <gql.InputFieldDeclaration
             name="street"
-            type={code`${builtInScalars.String}!`}
+            type={<gql.TypeReference type={builtInScalars.String} required />}
           />
           <gql.InputFieldDeclaration
             name="city"
-            type={code`${builtInScalars.String}!`}
+            type={<gql.TypeReference type={builtInScalars.String} required />}
           />
           <gql.InputFieldDeclaration
             name="zipCode"
@@ -104,11 +104,11 @@ describe("InputObjectTypeDefinition", () => {
         <gql.InputObjectTypeDefinition name="CreateUserInput">
           <gql.InputFieldDeclaration
             name="name"
-            type={code`${builtInScalars.String}!`}
+            type={<gql.TypeReference type={builtInScalars.String} required />}
           />
           <gql.InputFieldDeclaration
             name="address"
-            type={code`${addressInputRef}!`}
+            type={<gql.TypeReference type={addressInputRef} required />}
           />
         </gql.InputObjectTypeDefinition>
       </>,
@@ -139,11 +139,11 @@ describe("InputObjectTypeDefinition", () => {
         >
           <gql.InputFieldDeclaration
             name="name"
-            type={code`${builtInScalars.String}!`}
+            type={<gql.TypeReference type={builtInScalars.String} required />}
           />
           <gql.InputFieldDeclaration
             name="email"
-            type={code`${builtInScalars.String}!`}
+            type={<gql.TypeReference type={builtInScalars.String} required />}
           />
         </gql.InputObjectTypeDefinition>
       </gql.SourceFile>,
@@ -151,11 +151,11 @@ describe("InputObjectTypeDefinition", () => {
         <gql.ObjectTypeDefinition name="Mutation">
           <gql.FieldDefinition
             name="createUser"
-            type={code`User!`}
+            type="User!"
             args={
               <gql.InputValueDefinition
                 name="data"
-                type={code`${createUserInputRef}!`}
+                type={<gql.TypeReference type={createUserInputRef} required />}
               />
             }
           />
@@ -184,20 +184,20 @@ describe("InputObjectTypeDefinition", () => {
         <gql.InputObjectTypeDefinition name="CreateUserInput">
           <gql.InputFieldDeclaration
             name="name"
-            type={code`${builtInScalars.String}!`}
+            type={<gql.TypeReference type={builtInScalars.String} required />}
           />
         </gql.InputObjectTypeDefinition>
         <gql.InputObjectTypeDefinition name="UpdateUserInput">
           <gql.InputFieldDeclaration
             name="id"
-            type={code`${builtInScalars.ID}!`}
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
           />
           <gql.InputFieldDeclaration name="name" type={builtInScalars.String} />
         </gql.InputObjectTypeDefinition>
         <gql.InputObjectTypeDefinition name="DeleteUserInput">
           <gql.InputFieldDeclaration
             name="id"
-            type={code`${builtInScalars.ID}!`}
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
           />
         </gql.InputObjectTypeDefinition>
       </>,
@@ -241,7 +241,7 @@ describe("InputObjectTypeDefinition", () => {
         <gql.InputObjectTypeDefinition name="SortInput" refkey={sortInputRef}>
           <gql.InputFieldDeclaration
             name="field"
-            type={code`${builtInScalars.String}!`}
+            type={<gql.TypeReference type={builtInScalars.String} required />}
           />
           <gql.InputFieldDeclaration
             name="ascending"
@@ -308,7 +308,10 @@ describe("InputObjectTypeDefinition", () => {
             name="createUser"
             type={userRef}
             args={
-              <gql.InputValueDefinition name="data" type={code`${inputRef}!`} />
+              <gql.InputValueDefinition
+                name="data"
+                type={<gql.TypeReference type={inputRef} required />}
+              />
             }
           />
         </gql.ObjectTypeDefinition>

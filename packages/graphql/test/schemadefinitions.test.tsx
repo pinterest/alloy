@@ -1,4 +1,4 @@
-import { code, refkey } from "@alloy-js/core";
+import { refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import { builtInScalars } from "../src/builtins/scalars.js";
@@ -104,13 +104,13 @@ describe("SchemaDefinition", () => {
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="Query" refkey={queryRef}>
-          <gql.FieldDefinition name="user" type={code`User`} />
+          <gql.FieldDefinition name="user" type="User" />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Mutation" refkey={mutationRef}>
-          <gql.FieldDefinition name="createUser" type={code`User!`} />
+          <gql.FieldDefinition name="createUser" type="User!" />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Subscription" refkey={subscriptionRef}>
-          <gql.FieldDefinition name="userCreated" type={code`User!`} />
+          <gql.FieldDefinition name="userCreated" type="User!" />
         </gql.ObjectTypeDefinition>
         <gql.SchemaDefinition
           query={queryRef}

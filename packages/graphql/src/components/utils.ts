@@ -82,12 +82,12 @@ export function validateNonNullDefault(
 }
 
 /**
- * Validates that a union has at least one member type
+ * Validates union members: must have at least one member, and all must be object types.
  * @param members - The union members array
  * @param unionName - The union name for error messaging
- * @throws {Error} If the union has no members
+ * @throws {Error} If the union has no members or any member is not an object type
  */
-export function validateUnionHasMembers(
+export function validateUnionMembers(
   members: Children[] | undefined,
   unionName: string,
 ): void {
@@ -97,32 +97,20 @@ export function validateUnionHasMembers(
         `Per the GraphQL spec, unions cannot be empty.`,
     );
   }
-}
 
-/**
- * Validates that all union members are object types
- * This checks refkey symbols for their type metadata
- * @param members - The union members array
- * @param unionName - The union name for error messaging
- * @throws {Error} If any member is not an object type
- */
-export function validateUnionMemberTypes(
-  members: Children[],
-  unionName: string,
-): void {
   for (const member of members) {
     // Only validate refkey references - string literals can't be validated
     // at generation time. The GraphQL schema validation will catch these errors.
-    if (isRefkey(member)) {
-      const reference = ref(member);
-      const [name, symbol] = reference();
+    if (!isRefkey(member)) continue;
 
-      if (symbol?.metadata?.kind && symbol.metadata.kind !== "object") {
-        throw new Error(
-          `Union "${unionName}" cannot include "${name}". ` +
-            `Per the GraphQL spec, union members must be object types.`,
-        );
-      }
+    const reference = ref(member);
+    const [name, symbol] = reference();
+
+    if (symbol?.metadata?.kind && symbol.metadata.kind !== "object") {
+      throw new Error(
+        `Union "${unionName}" cannot include "${name}". ` +
+          `Per the GraphQL spec, union members must be object types.`,
+      );
     }
   }
 }
@@ -174,16 +162,16 @@ export function validateInputType(
 ): void {
   // Only validate refkey references - non-refkey types can't be validated
   // at generation time. The GraphQL schema validation will catch these errors.
-  if (isRefkey(type)) {
-    const reference = ref(type);
-    const [typeName, symbol] = reference();
+  if (!isRefkey(type)) return;
 
-    const kind = symbol?.metadata?.kind;
-    if (kind === "object" || kind === "interface" || kind === "union") {
-      throw new Error(
-        `${context} "${fieldName}" cannot use ${kind} type "${typeName}". ` +
-          `Only scalars, enums, and input objects can be used in input positions.`,
-      );
-    }
+  const reference = ref(type);
+  const [typeName, symbol] = reference();
+
+  const kind = symbol?.metadata?.kind;
+  if (kind && kind !== "scalar" && kind !== "enum" && kind !== "input") {
+    throw new Error(
+      `${context} "${fieldName}" cannot use ${kind} type "${typeName}". ` +
+        `Only scalars, enums, and input objects can be used in input positions.`,
+    );
   }
 }

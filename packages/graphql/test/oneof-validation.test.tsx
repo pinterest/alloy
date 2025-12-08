@@ -1,4 +1,3 @@
-import { code } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import * as gql from "../src/index.js";
@@ -36,7 +35,7 @@ describe("@oneOf Input Object Validation", () => {
         >
           <gql.InputFieldDeclaration
             name="name"
-            type={code`${builtInScalars.String}!`}
+            type={<gql.TypeReference type={builtInScalars.String} required />}
           />
         </gql.InputObjectTypeDefinition>,
       );
@@ -71,7 +70,7 @@ describe("@oneOf Input Object Validation", () => {
           isOneOf
           directives={<gql.Directive name={builtInDirectives.oneOf} />}
         >
-          <gql.InputFieldDeclaration name="ids" type={code`[ID!]!`} />
+          <gql.InputFieldDeclaration name="ids" type="[ID!]!" />
         </gql.InputObjectTypeDefinition>,
       );
     }).toThrow(/Input field "ids" in a @oneOf input object must be nullable/);
@@ -84,7 +83,7 @@ describe("@oneOf Input Object Validation", () => {
         isOneOf
         directives={<gql.Directive name={builtInDirectives.oneOf} />}
       >
-        <gql.InputFieldDeclaration name="ids" type={code`[ID!]`} />
+        <gql.InputFieldDeclaration name="ids" type="[ID!]" />
       </gql.InputObjectTypeDefinition>,
     );
 
@@ -126,7 +125,7 @@ describe("@oneOf Input Object Validation", () => {
       <gql.InputObjectTypeDefinition name="UserInput">
         <gql.InputFieldDeclaration
           name="name"
-          type={code`${builtInScalars.String}!`}
+          type={<gql.TypeReference type={builtInScalars.String} required />}
         />
         <gql.InputFieldDeclaration
           name="age"

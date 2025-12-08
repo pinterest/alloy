@@ -1,4 +1,4 @@
-import { code, refkey } from "@alloy-js/core";
+import { refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import { builtInDirectives } from "../src/builtins/directives.js";
@@ -18,7 +18,7 @@ describe("FieldDefinition", () => {
     const result = toGraphQLText(
       <gql.FieldDefinition
         name="name"
-        type={code`${builtInScalars.String}!`}
+        type={<gql.TypeReference type={builtInScalars.String} required />}
       />,
     );
     expect(result).toBe("name: String!");
@@ -28,7 +28,7 @@ describe("FieldDefinition", () => {
     const result = toGraphQLText(
       <gql.FieldDefinition
         name="tags"
-        type={code`[${builtInScalars.String}]`}
+        type={<gql.TypeReference type={builtInScalars.String} list />}
       />,
     );
     expect(result).toBe("tags: [String]");
@@ -38,7 +38,12 @@ describe("FieldDefinition", () => {
     const result = toGraphQLText(
       <gql.FieldDefinition
         name="tags"
-        type={code`[${builtInScalars.String}!]`}
+        type={
+          <gql.TypeReference
+            type={<gql.TypeReference type={builtInScalars.String} required />}
+            list
+          />
+        }
       />,
     );
     expect(result).toBe("tags: [String!]");
@@ -48,7 +53,13 @@ describe("FieldDefinition", () => {
     const result = toGraphQLText(
       <gql.FieldDefinition
         name="tags"
-        type={code`[${builtInScalars.String}!]!`}
+        type={
+          <gql.TypeReference
+            type={<gql.TypeReference type={builtInScalars.String} required />}
+            list
+            required
+          />
+        }
       />,
     );
     expect(result).toBe("tags: [String!]!");
@@ -58,7 +69,7 @@ describe("FieldDefinition", () => {
     const result = toGraphQLText(
       <gql.FieldDefinition
         name="tags"
-        type={code`[${builtInScalars.String}]!`}
+        type={<gql.TypeReference type={builtInScalars.String} list required />}
       />,
     );
     expect(result).toBe("tags: [String]!");
@@ -147,7 +158,10 @@ describe("FieldDefinition", () => {
           <gql.EnumValue name="ACTIVE" />
         </gql.EnumTypeDefinition>
         <gql.ObjectTypeDefinition name="Query">
-          <gql.FieldDefinition name="status" type={code`${statusRef}!`} />
+          <gql.FieldDefinition
+            name="status"
+            type={<gql.TypeReference type={statusRef} required />}
+          />
         </gql.ObjectTypeDefinition>
       </>,
     );
@@ -167,7 +181,10 @@ describe("FieldDefinition", () => {
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="User" refkey={userRef}>
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Post">
           <gql.FieldDefinition name="author" type={userRef} />
@@ -185,18 +202,30 @@ describe("FieldDefinition", () => {
     `);
   });
 
-  it("renders a field with code template combining refkey and modifiers", () => {
+  it("renders a field with TypeReference combining refkey and modifiers", () => {
     const userRef = refkey();
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="User" refkey={userRef}>
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Post">
-          <gql.FieldDefinition name="author" type={code`${userRef}!`} />
+          <gql.FieldDefinition
+            name="author"
+            type={<gql.TypeReference type={userRef} required />}
+          />
           <gql.FieldDefinition
             name="contributors"
-            type={code`[${userRef}!]!`}
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type={userRef} required />}
+                list
+                required
+              />
+            }
           />
         </gql.ObjectTypeDefinition>
       </>,
@@ -257,7 +286,7 @@ describe("FieldDefinition", () => {
         args={
           <gql.InputValueDefinition
             name="id"
-            type={code`${builtInScalars.ID}!`}
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
           />
         }
       />,
@@ -271,7 +300,7 @@ describe("FieldDefinition", () => {
     const result = toGraphQLText(
       <gql.FieldDefinition
         name="posts"
-        type={code`[Post!]!`}
+        type="[Post!]!"
         args={
           <>
             <gql.InputValueDefinition name="limit" type={builtInScalars.Int} />

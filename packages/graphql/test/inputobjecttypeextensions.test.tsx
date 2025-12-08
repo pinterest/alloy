@@ -1,4 +1,4 @@
-import { code, refkey } from "@alloy-js/core";
+import { refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import { builtInScalars } from "../src/builtins/scalars.js";
@@ -134,8 +134,8 @@ describe("InputObjectTypeExtension", () => {
         <gql.InputObjectTypeExtension name="UserInput">
           <gql.InputFieldDeclaration
             name="status"
-            type={code`${statusRef}`}
-            defaultValue={code`${activeRef}`}
+            type={statusRef}
+            defaultValue={activeRef}
           />
         </gql.InputObjectTypeExtension>
       </>,

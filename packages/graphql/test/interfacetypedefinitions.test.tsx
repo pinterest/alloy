@@ -1,4 +1,4 @@
-import { code, refkey } from "@alloy-js/core";
+import { refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import { builtInDirectives } from "../src/builtins/directives.js";
@@ -10,7 +10,10 @@ describe("InterfaceTypeDefinition", () => {
   it("renders a simple interface with fields", () => {
     const result = toGraphQLText(
       <gql.InterfaceTypeDefinition name="Node">
-        <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+        <gql.FieldDefinition
+          name="id"
+          type={<gql.TypeReference type={builtInScalars.ID} required />}
+        />
       </gql.InterfaceTypeDefinition>,
     );
     expect(result).toRenderTo(d`
@@ -23,14 +26,17 @@ describe("InterfaceTypeDefinition", () => {
   it("renders an interface with multiple fields", () => {
     const result = toGraphQLText(
       <gql.InterfaceTypeDefinition name="Timestamped">
-        <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+        <gql.FieldDefinition
+          name="id"
+          type={<gql.TypeReference type={builtInScalars.ID} required />}
+        />
         <gql.FieldDefinition
           name="createdAt"
-          type={code`${builtInScalars.String}!`}
+          type={<gql.TypeReference type={builtInScalars.String} required />}
         />
         <gql.FieldDefinition
           name="updatedAt"
-          type={code`${builtInScalars.String}!`}
+          type={<gql.TypeReference type={builtInScalars.String} required />}
         />
       </gql.InterfaceTypeDefinition>,
     );
@@ -49,7 +55,10 @@ describe("InterfaceTypeDefinition", () => {
         name="Node"
         description="An object with a unique identifier"
       >
-        <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+        <gql.FieldDefinition
+          name="id"
+          type={<gql.TypeReference type={builtInScalars.ID} required />}
+        />
       </gql.InterfaceTypeDefinition>,
     );
     expect(result).toRenderTo(d`
@@ -67,7 +76,7 @@ describe("InterfaceTypeDefinition", () => {
       <gql.InterfaceTypeDefinition name="Node">
         <gql.FieldDefinition
           name="id"
-          type={code`${builtInScalars.ID}!`}
+          type={<gql.TypeReference type={builtInScalars.ID} required />}
           description="Unique identifier for the node"
         />
       </gql.InterfaceTypeDefinition>,
@@ -88,13 +97,19 @@ describe("InterfaceTypeDefinition", () => {
     const result = toGraphQLText(
       <>
         <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
         </gql.InterfaceTypeDefinition>
         <gql.InterfaceTypeDefinition name="Timestamped" implements={[nodeRef]}>
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
           <gql.FieldDefinition
             name="createdAt"
-            type={code`${builtInScalars.String}!`}
+            type={<gql.TypeReference type={builtInScalars.String} required />}
           />
         </gql.InterfaceTypeDefinition>
       </>,
@@ -118,7 +133,10 @@ describe("InterfaceTypeDefinition", () => {
     const result = toGraphQLText(
       <>
         <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
         </gql.InterfaceTypeDefinition>
         <gql.InterfaceTypeDefinition name="Audited" refkey={auditedRef}>
           <gql.FieldDefinition name="auditLog" type={builtInScalars.String} />
@@ -127,11 +145,14 @@ describe("InterfaceTypeDefinition", () => {
           name="Timestamped"
           implements={[nodeRef, auditedRef]}
         >
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
           <gql.FieldDefinition name="auditLog" type={builtInScalars.String} />
           <gql.FieldDefinition
             name="createdAt"
-            type={code`${builtInScalars.String}!`}
+            type={<gql.TypeReference type={builtInScalars.String} required />}
           />
         </gql.InterfaceTypeDefinition>
       </>,
@@ -159,7 +180,10 @@ describe("InterfaceTypeDefinition", () => {
         name="Node"
         directives={<gql.Directive name="auth" args={{ requires: "ADMIN" }} />}
       >
-        <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+        <gql.FieldDefinition
+          name="id"
+          type={<gql.TypeReference type={builtInScalars.ID} required />}
+        />
       </gql.InterfaceTypeDefinition>,
     );
     expect(result).toRenderTo(d`
@@ -180,7 +204,10 @@ describe("InterfaceTypeDefinition", () => {
           </>
         }
       >
-        <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+        <gql.FieldDefinition
+          name="id"
+          type={<gql.TypeReference type={builtInScalars.ID} required />}
+        />
       </gql.InterfaceTypeDefinition>,
     );
     expect(result).toRenderTo(d`
@@ -195,12 +222,20 @@ describe("InterfaceTypeDefinition", () => {
       <gql.InterfaceTypeDefinition name="Searchable">
         <gql.FieldDefinition
           name="search"
-          type={code`[${builtInScalars.String}!]!`}
+          type={
+            <gql.TypeReference
+              type={<gql.TypeReference type={builtInScalars.String} required />}
+              list
+              required
+            />
+          }
           args={
             <>
               <gql.InputValueDefinition
                 name="searchQuery"
-                type={code`${builtInScalars.String}!`}
+                type={
+                  <gql.TypeReference type={builtInScalars.String} required />
+                }
               />
               <gql.InputValueDefinition
                 name="limit"
@@ -225,10 +260,16 @@ describe("InterfaceTypeDefinition", () => {
     const result = toGraphQLText(
       <>
         <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
         </gql.InterfaceTypeDefinition>
         <gql.ObjectTypeDefinition name="User" implements={[nodeRef]}>
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
           <gql.FieldDefinition name="name" type={builtInScalars.String} />
         </gql.ObjectTypeDefinition>
       </>,
@@ -260,7 +301,10 @@ describe("InterfaceTypeDefinition", () => {
     const result = toGraphQLText(
       <>
         <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
         </gql.InterfaceTypeDefinition>
         <gql.InterfaceTypeDefinition
           name="Searchable"
@@ -270,17 +314,27 @@ describe("InterfaceTypeDefinition", () => {
         >
           <gql.FieldDefinition
             name="id"
-            type={code`${builtInScalars.ID}!`}
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
             description="Unique identifier"
           />
           <gql.FieldDefinition
             name="search"
-            type={code`[${builtInScalars.String}!]!`}
+            type={
+              <gql.TypeReference
+                type={
+                  <gql.TypeReference type={builtInScalars.String} required />
+                }
+                list
+                required
+              />
+            }
             description="Search within this entity"
             args={
               <gql.InputValueDefinition
                 name="searchQuery"
-                type={code`${builtInScalars.String}!`}
+                type={
+                  <gql.TypeReference type={builtInScalars.String} required />
+                }
               />
             }
           />

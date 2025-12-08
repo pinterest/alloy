@@ -1,4 +1,4 @@
-import { code, refkey } from "@alloy-js/core";
+import { refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import { builtInScalars } from "../src/builtins/scalars.js";
@@ -59,13 +59,22 @@ describe("UnionTypeDefinition", () => {
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="User" refkey={userRef}>
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Post" refkey={postRef}>
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Comment" refkey={commentRef}>
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.UnionTypeDefinition
           name="SearchResult"
@@ -165,17 +174,23 @@ describe("UnionTypeDefinition", () => {
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="User" refkey={userRef}>
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
           <gql.FieldDefinition
             name="name"
-            type={code`${builtInScalars.String}!`}
+            type={<gql.TypeReference type={builtInScalars.String} required />}
           />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Post" refkey={postRef}>
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
           <gql.FieldDefinition
             name="title"
-            type={code`${builtInScalars.String}!`}
+            type={<gql.TypeReference type={builtInScalars.String} required />}
           />
         </gql.ObjectTypeDefinition>
         <gql.UnionTypeDefinition
@@ -186,11 +201,19 @@ describe("UnionTypeDefinition", () => {
         <gql.ObjectTypeDefinition name="Query">
           <gql.FieldDefinition
             name="search"
-            type={code`[${searchResultRef}!]!`}
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type={searchResultRef} required />}
+                list
+                required
+              />
+            }
             args={
               <gql.InputValueDefinition
                 name="term"
-                type={code`${builtInScalars.String}!`}
+                type={
+                  <gql.TypeReference type={builtInScalars.String} required />
+                }
               />
             }
           />

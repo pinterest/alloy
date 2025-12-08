@@ -1,4 +1,4 @@
-import { code, refkey } from "@alloy-js/core";
+import { refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import { builtInScalars } from "../src/builtins/scalars.js";
@@ -9,7 +9,10 @@ describe("Name transformations", () => {
   it("transforms type names to PascalCase", () => {
     const result = toGraphQLText(
       <gql.ObjectTypeDefinition name="a-really-WeirdType-name">
-        <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+        <gql.FieldDefinition
+          name="id"
+          type={<gql.TypeReference type={builtInScalars.ID} required />}
+        />
       </gql.ObjectTypeDefinition>,
     );
     const expected = d`
@@ -25,7 +28,7 @@ describe("Name transformations", () => {
       <gql.ObjectTypeDefinition name="User">
         <gql.FieldDefinition
           name="user-ID"
-          type={code`${builtInScalars.ID}!`}
+          type={<gql.TypeReference type={builtInScalars.ID} required />}
         />
         <gql.FieldDefinition name="FirstName" type={builtInScalars.String} />
         <gql.FieldDefinition name="last_name" type={builtInScalars.String} />
@@ -57,7 +60,7 @@ describe("Name transformations", () => {
               <>
                 <gql.InputValueDefinition
                   name="user-ID"
-                  type={code`${builtInScalars.ID}!`}
+                  type={<gql.TypeReference type={builtInScalars.ID} required />}
                 />
                 <gql.InputValueDefinition
                   name="FirstName"
@@ -129,11 +132,26 @@ describe("Name transformations", () => {
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="user-type" refkey={userRef}>
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
-          <gql.FieldDefinition name="posts" type={code`[${postRef}!]!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
+          <gql.FieldDefinition
+            name="posts"
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type={postRef} required />}
+                list
+                required
+              />
+            }
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="post-type" refkey={postRef}>
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
           <gql.FieldDefinition name="author" type={userRef} />
         </gql.ObjectTypeDefinition>
       </>,
@@ -158,7 +176,10 @@ describe("Keywords and reserved names", () => {
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="query">
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Mutation">
           <gql.FieldDefinition name="update" type={builtInScalars.Boolean} />
