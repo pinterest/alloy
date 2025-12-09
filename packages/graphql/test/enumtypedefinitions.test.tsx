@@ -239,11 +239,17 @@ describe("EnumTypeDefinition", () => {
         <gql.ObjectTypeDefinition name="Query">
           <gql.FieldDefinition
             name="users"
-            type="[User!]!"
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type="User" required />}
+                list
+                required
+              />
+            }
             args={
               <gql.InputValueDefinition
                 name="status"
-                type={statusRef}
+                type={<gql.TypeReference type={statusRef} />}
                 defaultValue={activeRef}
               />
             }

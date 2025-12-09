@@ -1,6 +1,12 @@
-import { Children, isRefkey, OutputSymbol } from "@alloy-js/core";
+import {
+  Children,
+  isComponentCreator,
+  isRefkey,
+  OutputSymbol,
+} from "@alloy-js/core";
 import { GraphQLOutputSymbol } from "../symbols/graphql-output-symbol.js";
 import { ref } from "../symbols/reference.js";
+import { TypeReference, TypeReferenceProps } from "./TypeReference.js";
 
 interface FieldInfo {
   name: string;
@@ -137,13 +143,45 @@ let pendingValidations: PendingValidation[] = [];
 let validationErrors: Error[] = [];
 
 /**
+ * Resolve a symbol's type annotation to a string.
+ * Expects the symbol's typeAnnotation metadata to be a TypeReference component.
+ */
+export function resolveTypeAnnotation(symbol: OutputSymbol): string {
+  const { binder } = symbol;
+
+  function resolve(type: Children): string {
+    // TypeReference - recursively resolve props
+    if (isComponentCreator(type, TypeReference)) {
+      const props = type.props as TypeReferenceProps;
+      let result = resolve(props.type);
+      if (props.list) result = `[${result}]`;
+      if (props.required) result = `${result}!`;
+      return result;
+    }
+
+    // Refkey - resolve to symbol name
+    if (isRefkey(type)) {
+      return binder!.getSymbolForRefkey(type).value?.name ?? "";
+    }
+
+    // String - use directly
+    if (typeof type === "string") {
+      return type;
+    }
+
+    throw new Error(`Invalid type annotation: ${typeof type}`);
+  }
+
+  return resolve(symbol.metadata.typeAnnotation as Children);
+}
+
+/**
  * Extract FieldInfo (name and type) from a symbol
  */
 function toFieldInfo(symbol: OutputSymbol): FieldInfo {
-  const type = symbol.metadata.typeAnnotation;
   return {
     name: symbol.name,
-    type: type ? String(type).replace(/\s/g, "") : "",
+    type: resolveTypeAnnotation(symbol).replace(/\s/g, ""),
   };
 }
 

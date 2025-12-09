@@ -36,7 +36,7 @@ describe("DirectiveDefinition", () => {
         args={
           <gql.InputValueDefinition
             name="reason"
-            type={builtInScalars.String}
+            type={<gql.TypeReference type={builtInScalars.String} />}
             defaultValue="No longer supported"
           />
         }
@@ -56,7 +56,7 @@ describe("DirectiveDefinition", () => {
           <>
             <gql.InputValueDefinition
               name="requires"
-              type="Role!"
+              type={<gql.TypeReference type="Role" required />}
               defaultValue={1}
             />
             <gql.InputValueDefinition
@@ -126,7 +126,12 @@ describe("DirectiveDefinition", () => {
         <gql.DirectiveDefinition
           name="auth"
           locations={["FIELD_DEFINITION", "OBJECT"]}
-          args={<gql.InputValueDefinition name="requires" type="Role!" />}
+          args={
+            <gql.InputValueDefinition
+              name="requires"
+              type={<gql.TypeReference type="Role" required />}
+            />
+          }
         />
         <gql.DirectiveDefinition
           name="rateLimit"
@@ -135,12 +140,12 @@ describe("DirectiveDefinition", () => {
             <>
               <gql.InputValueDefinition
                 name="limit"
-                type={builtInScalars.Int}
+                type={<gql.TypeReference type={builtInScalars.Int} />}
                 defaultValue={100}
               />
               <gql.InputValueDefinition
                 name="window"
-                type={builtInScalars.Int}
+                type={<gql.TypeReference type={builtInScalars.Int} />}
                 defaultValue={60}
               />
             </>
@@ -164,10 +169,13 @@ describe("DirectiveDefinition", () => {
           locations={["FIELD_DEFINITION"]}
           args={
             <>
-              <gql.InputValueDefinition name="requires" type="Role!" />
+              <gql.InputValueDefinition
+                name="requires"
+                type={<gql.TypeReference type="Role" required />}
+              />
               <gql.InputValueDefinition
                 name="level"
-                type={builtInScalars.Int}
+                type={<gql.TypeReference type={builtInScalars.Int} />}
                 defaultValue={1}
               />
             </>
@@ -178,10 +186,13 @@ describe("DirectiveDefinition", () => {
           locations={["OBJECT"]}
           args={
             <>
-              <gql.InputValueDefinition name="requires" type="Permission!" />
+              <gql.InputValueDefinition
+                name="requires"
+                type={<gql.TypeReference type="Permission" required />}
+              />
               <gql.InputValueDefinition
                 name="level"
-                type={builtInScalars.Int}
+                type={<gql.TypeReference type={builtInScalars.Int} />}
                 defaultValue={5}
               />
             </>
@@ -254,12 +265,12 @@ describe("DirectiveDefinition", () => {
             <>
               <gql.InputValueDefinition
                 name="requires"
-                type="Role!"
+                type={<gql.TypeReference type="Role" required />}
                 defaultValue={1}
               />
               <gql.InputValueDefinition
                 name="level"
-                type={builtInScalars.Int}
+                type={<gql.TypeReference type={builtInScalars.Int} />}
                 defaultValue={1}
               />
             </>
@@ -280,7 +291,7 @@ describe("DirectiveDefinition", () => {
           />
           <gql.FieldDefinition
             name="sensitiveData"
-            type={builtInScalars.String}
+            type={<gql.TypeReference type={builtInScalars.String} />}
             directives={
               <gql.Directive
                 name={authDirectiveRef}

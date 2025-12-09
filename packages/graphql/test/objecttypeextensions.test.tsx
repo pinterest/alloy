@@ -13,7 +13,10 @@ describe("ObjectTypeExtension", () => {
           name="createdAt"
           type={<gql.TypeReference type={builtInScalars.String} required />}
         />
-        <gql.FieldDefinition name="updatedAt" type={builtInScalars.String} />
+        <gql.FieldDefinition
+          name="updatedAt"
+          type={<gql.TypeReference type={builtInScalars.String} />}
+        />
       </gql.ObjectTypeExtension>,
     );
     expect(result).toRenderTo(d`
@@ -79,7 +82,7 @@ describe("ObjectTypeExtension", () => {
       <gql.ObjectTypeExtension name="Product">
         <gql.FieldDefinition
           name="rating"
-          type={builtInScalars.Float}
+          type={<gql.TypeReference type={builtInScalars.Float} />}
           description="Average product rating"
         />
       </gql.ObjectTypeExtension>,
@@ -99,7 +102,10 @@ describe("ObjectTypeExtension", () => {
 
     const result = toGraphQLText(
       <gql.ObjectTypeExtension name="User" refkey={userRef}>
-        <gql.FieldDefinition name="active" type={builtInScalars.Boolean} />
+        <gql.FieldDefinition
+          name="active"
+          type={<gql.TypeReference type={builtInScalars.Boolean} />}
+        />
       </gql.ObjectTypeExtension>,
     );
     expect(result).toRenderTo(d`

@@ -1,5 +1,6 @@
-import { Children, isRefkey, memo } from "@alloy-js/core";
+import { Children, isComponentCreator, isRefkey, memo } from "@alloy-js/core";
 import { ref } from "../symbols/reference.js";
+import { TypeReference } from "./TypeReference.js";
 
 /**
  * Validates that a root type is an object type.
@@ -116,6 +117,38 @@ export function validateUnionMembers(
 }
 
 /**
+ * Validates that the type prop is a TypeReference component.
+ *
+ * @param type - The type prop value
+ * @param fieldName - The field/argument name for error messaging
+ * @param context - The context for error messaging (e.g., "Field", "Argument")
+ * @throws {Error} If type is not a TypeReference component
+ */
+export function validateTypeReference(
+  type: Children,
+  fieldName: string,
+  context: string,
+): void {
+  if (!isComponentCreator(type, TypeReference)) {
+    throw new Error(
+      `${context} "${fieldName}" type must be a TypeReference component. ` +
+        `Use <TypeReference type={...} /> to specify the type.`,
+    );
+  }
+}
+
+/**
+ * Extracts the base type (innermost refkey or string) from a TypeReference.
+ * Traverses nested TypeReference components to find the base type.
+ */
+function getBaseType(type: Children): Children {
+  if (isComponentCreator(type, TypeReference)) {
+    return getBaseType(type.props.type);
+  }
+  return type;
+}
+
+/**
  * Validates that a type is valid for output positions (field return types).
  * Output types can be: Scalars, Objects, Interfaces, Unions, Enums
  * But not: Input Objects
@@ -130,11 +163,14 @@ export function validateOutputType(
   fieldName: string,
   contextType: string,
 ): void {
-  // Only validate refkey references - non-refkey types can't be validated
-  // at generation time. The GraphQL schema validation will catch these errors.
-  if (!isRefkey(type)) return;
+  // Extract base type from TypeReference
+  const baseType = getBaseType(type);
 
-  const reference = ref(type);
+  // Only validate refkey references - string types can't be validated
+  // at generation time. The GraphQL schema validation will catch these errors.
+  if (!isRefkey(baseType)) return;
+
+  const reference = ref(baseType);
   const [typeName, symbol] = reference();
 
   if (symbol?.metadata?.kind === "input") {
@@ -160,11 +196,14 @@ export function validateInputType(
   fieldName: string,
   context: string,
 ): void {
-  // Only validate refkey references - non-refkey types can't be validated
-  // at generation time. The GraphQL schema validation will catch these errors.
-  if (!isRefkey(type)) return;
+  // Extract base type from TypeReference
+  const baseType = getBaseType(type);
 
-  const reference = ref(type);
+  // Only validate refkey references - string types can't be validated
+  // at generation time. The GraphQL schema validation will catch these errors.
+  if (!isRefkey(baseType)) return;
+
+  const reference = ref(baseType);
   const [typeName, symbol] = reference();
 
   const kind = symbol?.metadata?.kind;

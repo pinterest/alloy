@@ -11,11 +11,11 @@ describe("InputObjectTypeExtension", () => {
       <gql.InputObjectTypeExtension name="FilterInput">
         <gql.InputFieldDeclaration
           name="createdAfter"
-          type={builtInScalars.String}
+          type={<gql.TypeReference type={builtInScalars.String} />}
         />
         <gql.InputFieldDeclaration
           name="createdBefore"
-          type={builtInScalars.String}
+          type={<gql.TypeReference type={builtInScalars.String} />}
         />
       </gql.InputObjectTypeExtension>,
     );
@@ -32,7 +32,7 @@ describe("InputObjectTypeExtension", () => {
       <gql.InputObjectTypeExtension name="UserInput">
         <gql.InputFieldDeclaration
           name="timezone"
-          type={builtInScalars.String}
+          type={<gql.TypeReference type={builtInScalars.String} />}
           description="User timezone preference"
         />
       </gql.InputObjectTypeExtension>,
@@ -65,10 +65,13 @@ describe("InputObjectTypeExtension", () => {
         name="FilterInput"
         directives={<gql.Directive name="oneOf" />}
       >
-        <gql.InputFieldDeclaration name="byId" type={builtInScalars.ID} />
+        <gql.InputFieldDeclaration
+          name="byId"
+          type={<gql.TypeReference type={builtInScalars.ID} />}
+        />
         <gql.InputFieldDeclaration
           name="byEmail"
-          type={builtInScalars.String}
+          type={<gql.TypeReference type={builtInScalars.String} />}
         />
       </gql.InputObjectTypeExtension>,
     );
@@ -85,12 +88,12 @@ describe("InputObjectTypeExtension", () => {
       <gql.InputObjectTypeExtension name="OptionsInput">
         <gql.InputFieldDeclaration
           name="limit"
-          type={builtInScalars.Int}
+          type={<gql.TypeReference type={builtInScalars.Int} />}
           defaultValue={100}
         />
         <gql.InputFieldDeclaration
           name="sortAscending"
-          type={builtInScalars.Boolean}
+          type={<gql.TypeReference type={builtInScalars.Boolean} />}
           defaultValue={true}
         />
       </gql.InputObjectTypeExtension>,
@@ -110,7 +113,7 @@ describe("InputObjectTypeExtension", () => {
       <gql.InputObjectTypeExtension name="FilterInput" refkey={filterRef}>
         <gql.InputFieldDeclaration
           name="archived"
-          type={builtInScalars.Boolean}
+          type={<gql.TypeReference type={builtInScalars.Boolean} />}
         />
       </gql.InputObjectTypeExtension>,
     );
@@ -134,7 +137,7 @@ describe("InputObjectTypeExtension", () => {
         <gql.InputObjectTypeExtension name="UserInput">
           <gql.InputFieldDeclaration
             name="status"
-            type={statusRef}
+            type={<gql.TypeReference type={statusRef} />}
             defaultValue={activeRef}
           />
         </gql.InputObjectTypeExtension>

@@ -21,7 +21,10 @@ describe("InputObjectTypeDefinition", () => {
           name="email"
           type={<gql.TypeReference type={builtInScalars.String} required />}
         />
-        <gql.InputFieldDeclaration name="age" type={builtInScalars.Int} />
+        <gql.InputFieldDeclaration
+          name="age"
+          type={<gql.TypeReference type={builtInScalars.Int} />}
+        />
       </gql.InputObjectTypeDefinition>,
     );
     expect(result).toRenderTo(d`
@@ -63,11 +66,11 @@ describe("InputObjectTypeDefinition", () => {
       >
         <gql.InputFieldDeclaration
           name="nameContains"
-          type={builtInScalars.String}
+          type={<gql.TypeReference type={builtInScalars.String} />}
         />
         <gql.InputFieldDeclaration
           name="emailEquals"
-          type={builtInScalars.String}
+          type={<gql.TypeReference type={builtInScalars.String} />}
         />
       </gql.InputObjectTypeDefinition>,
     );
@@ -98,7 +101,7 @@ describe("InputObjectTypeDefinition", () => {
           />
           <gql.InputFieldDeclaration
             name="zipCode"
-            type={builtInScalars.String}
+            type={<gql.TypeReference type={builtInScalars.String} />}
           />
         </gql.InputObjectTypeDefinition>
         <gql.InputObjectTypeDefinition name="CreateUserInput">
@@ -151,7 +154,7 @@ describe("InputObjectTypeDefinition", () => {
         <gql.ObjectTypeDefinition name="Mutation">
           <gql.FieldDefinition
             name="createUser"
-            type="User!"
+            type={<gql.TypeReference type="User" required />}
             args={
               <gql.InputValueDefinition
                 name="data"
@@ -192,7 +195,10 @@ describe("InputObjectTypeDefinition", () => {
             name="id"
             type={<gql.TypeReference type={builtInScalars.ID} required />}
           />
-          <gql.InputFieldDeclaration name="name" type={builtInScalars.String} />
+          <gql.InputFieldDeclaration
+            name="name"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
         </gql.InputObjectTypeDefinition>
         <gql.InputObjectTypeDefinition name="DeleteUserInput">
           <gql.InputFieldDeclaration
@@ -231,11 +237,11 @@ describe("InputObjectTypeDefinition", () => {
         >
           <gql.InputFieldDeclaration
             name="nameContains"
-            type={builtInScalars.String}
+            type={<gql.TypeReference type={builtInScalars.String} />}
           />
           <gql.InputFieldDeclaration
             name="ageGreaterThan"
-            type={builtInScalars.Int}
+            type={<gql.TypeReference type={builtInScalars.Int} />}
           />
         </gql.InputObjectTypeDefinition>
         <gql.InputObjectTypeDefinition name="SortInput" refkey={sortInputRef}>
@@ -245,16 +251,22 @@ describe("InputObjectTypeDefinition", () => {
           />
           <gql.InputFieldDeclaration
             name="ascending"
-            type={builtInScalars.Boolean}
+            type={<gql.TypeReference type={builtInScalars.Boolean} />}
             defaultValue={true}
           />
         </gql.InputObjectTypeDefinition>
         <gql.InputObjectTypeDefinition name="QueryUsersInput">
-          <gql.InputFieldDeclaration name="filter" type={filterInputRef} />
-          <gql.InputFieldDeclaration name="sort" type={sortInputRef} />
+          <gql.InputFieldDeclaration
+            name="filter"
+            type={<gql.TypeReference type={filterInputRef} />}
+          />
+          <gql.InputFieldDeclaration
+            name="sort"
+            type={<gql.TypeReference type={sortInputRef} />}
+          />
           <gql.InputFieldDeclaration
             name="limit"
-            type={builtInScalars.Int}
+            type={<gql.TypeReference type={builtInScalars.Int} />}
             defaultValue={10}
           />
         </gql.InputObjectTypeDefinition>
@@ -298,15 +310,21 @@ describe("InputObjectTypeDefinition", () => {
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="User" refkey={userRef}>
-          <gql.FieldDefinition name="id" type={builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.InputObjectTypeDefinition name="UserInput" refkey={inputRef}>
-          <gql.InputFieldDeclaration name="name" type={builtInScalars.String} />
+          <gql.InputFieldDeclaration
+            name="name"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
         </gql.InputObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Mutation">
           <gql.FieldDefinition
             name="createUser"
-            type={userRef}
+            type={<gql.TypeReference type={userRef} />}
             args={
               <gql.InputValueDefinition
                 name="data"
@@ -340,10 +358,13 @@ describe("InputObjectTypeDefinition", () => {
         description="Filters for search queries"
         directives={<gql.Directive name="oneOf" />}
       >
-        <gql.InputFieldDeclaration name="byName" type={builtInScalars.String} />
+        <gql.InputFieldDeclaration
+          name="byName"
+          type={<gql.TypeReference type={builtInScalars.String} />}
+        />
         <gql.InputFieldDeclaration
           name="byEmail"
-          type={builtInScalars.String}
+          type={<gql.TypeReference type={builtInScalars.String} />}
         />
       </gql.InputObjectTypeDefinition>,
     );

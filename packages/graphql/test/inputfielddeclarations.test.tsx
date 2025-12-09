@@ -10,7 +10,10 @@ describe("InputFieldDeclaration", () => {
   it("renders a simple field with optional type", () => {
     const result = toGraphQLText(
       <gql.InputObjectTypeDefinition name="UserInput">
-        <gql.InputFieldDeclaration name="name" type={builtInScalars.String} />
+        <gql.InputFieldDeclaration
+          name="name"
+          type={<gql.TypeReference type={builtInScalars.String} />}
+        />
       </gql.InputObjectTypeDefinition>,
     );
     expect(result).toRenderTo(d`
@@ -63,7 +66,7 @@ describe("InputFieldDeclaration", () => {
       <gql.InputObjectTypeDefinition name="UserInput">
         <gql.InputFieldDeclaration
           name="age"
-          type={builtInScalars.Int}
+          type={<gql.TypeReference type={builtInScalars.Int} />}
           description="User's age in years"
         />
       </gql.InputObjectTypeDefinition>,
@@ -90,28 +93,34 @@ describe("InputFieldDeclaration", () => {
           <gql.EnumValue name="INACTIVE" />
         </gql.EnumTypeDefinition>
         <gql.InputObjectTypeDefinition name="Config" refkey={configRef}>
-          <gql.InputFieldDeclaration name="key" type={builtInScalars.String} />
-          <gql.InputFieldDeclaration name="count" type={builtInScalars.Int} />
+          <gql.InputFieldDeclaration
+            name="key"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
+          <gql.InputFieldDeclaration
+            name="count"
+            type={<gql.TypeReference type={builtInScalars.Int} />}
+          />
         </gql.InputObjectTypeDefinition>
         <gql.InputObjectTypeDefinition name="DefaultValuesInput">
           <gql.InputFieldDeclaration
             name="numberDefault"
-            type={builtInScalars.Int}
+            type={<gql.TypeReference type={builtInScalars.Int} />}
             defaultValue={10}
           />
           <gql.InputFieldDeclaration
             name="stringDefault"
-            type={builtInScalars.String}
+            type={<gql.TypeReference type={builtInScalars.String} />}
             defaultValue="development"
           />
           <gql.InputFieldDeclaration
             name="booleanDefault"
-            type={builtInScalars.Boolean}
+            type={<gql.TypeReference type={builtInScalars.Boolean} />}
             defaultValue={false}
           />
           <gql.InputFieldDeclaration
             name="nullDefault"
-            type={builtInScalars.String}
+            type={<gql.TypeReference type={builtInScalars.String} />}
             defaultValue={null}
           />
           <gql.InputFieldDeclaration
@@ -147,7 +156,7 @@ describe("InputFieldDeclaration", () => {
           />
           <gql.InputFieldDeclaration
             name="objectDefault"
-            type={configRef}
+            type={<gql.TypeReference type={configRef} />}
             defaultValue={{ key: "value", count: 42 }}
           />
         </gql.InputObjectTypeDefinition>
@@ -182,7 +191,7 @@ describe("InputFieldDeclaration", () => {
       <gql.InputObjectTypeDefinition name="LegacyInput">
         <gql.InputFieldDeclaration
           name="oldField"
-          type={builtInScalars.String}
+          type={<gql.TypeReference type={builtInScalars.String} />}
           directives={
             <gql.Directive
               name={builtInDirectives.deprecated}
@@ -204,7 +213,7 @@ describe("InputFieldDeclaration", () => {
       <gql.InputObjectTypeDefinition name="CustomInput">
         <gql.InputFieldDeclaration
           name="field"
-          type={builtInScalars.String}
+          type={<gql.TypeReference type={builtInScalars.String} />}
           directives={
             <>
               <gql.Directive name="validate" args={{ pattern: ".*" }} />
@@ -222,17 +231,18 @@ describe("InputFieldDeclaration", () => {
   });
 
   it("renders a field with documentation, default, and directive", () => {
+    const statusRef = refkey();
     const activeRef = refkey();
 
     const result = toGraphQLText(
       <>
-        <gql.EnumTypeDefinition name="Status">
+        <gql.EnumTypeDefinition name="Status" refkey={statusRef}>
           <gql.EnumValue name="ACTIVE" refkey={activeRef} />
         </gql.EnumTypeDefinition>
         <gql.InputObjectTypeDefinition name="ComplexInput">
           <gql.InputFieldDeclaration
             name="status"
-            type="Status!"
+            type={<gql.TypeReference type={statusRef} required />}
             description="Current status of the entity"
             defaultValue={activeRef}
             directives={
@@ -259,13 +269,25 @@ describe("InputFieldDeclaration", () => {
   it("renders fields with different scalar types", () => {
     const result = toGraphQLText(
       <gql.InputObjectTypeDefinition name="AllTypesInput">
-        <gql.InputFieldDeclaration name="id" type={builtInScalars.ID} />
-        <gql.InputFieldDeclaration name="count" type={builtInScalars.Int} />
-        <gql.InputFieldDeclaration name="price" type={builtInScalars.Float} />
-        <gql.InputFieldDeclaration name="name" type={builtInScalars.String} />
+        <gql.InputFieldDeclaration
+          name="id"
+          type={<gql.TypeReference type={builtInScalars.ID} />}
+        />
+        <gql.InputFieldDeclaration
+          name="count"
+          type={<gql.TypeReference type={builtInScalars.Int} />}
+        />
+        <gql.InputFieldDeclaration
+          name="price"
+          type={<gql.TypeReference type={builtInScalars.Float} />}
+        />
+        <gql.InputFieldDeclaration
+          name="name"
+          type={<gql.TypeReference type={builtInScalars.String} />}
+        />
         <gql.InputFieldDeclaration
           name="active"
-          type={builtInScalars.Boolean}
+          type={<gql.TypeReference type={builtInScalars.Boolean} />}
         />
       </gql.InputObjectTypeDefinition>,
     );
@@ -286,10 +308,16 @@ describe("InputFieldDeclaration", () => {
     const result = toGraphQLText(
       <>
         <gql.InputObjectTypeDefinition name="UserInput" refkey={userInputRef}>
-          <gql.InputFieldDeclaration name="name" type={builtInScalars.String} />
+          <gql.InputFieldDeclaration
+            name="name"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
         </gql.InputObjectTypeDefinition>
         <gql.InputObjectTypeDefinition name="CreatePostInput">
-          <gql.InputFieldDeclaration name="author" type={userInputRef} />
+          <gql.InputFieldDeclaration
+            name="author"
+            type={<gql.TypeReference type={userInputRef} />}
+          />
         </gql.InputObjectTypeDefinition>
       </>,
     );

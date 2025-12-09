@@ -139,7 +139,10 @@ describe("InterfaceTypeDefinition", () => {
           />
         </gql.InterfaceTypeDefinition>
         <gql.InterfaceTypeDefinition name="Audited" refkey={auditedRef}>
-          <gql.FieldDefinition name="auditLog" type={builtInScalars.String} />
+          <gql.FieldDefinition
+            name="auditLog"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
         </gql.InterfaceTypeDefinition>
         <gql.InterfaceTypeDefinition
           name="Timestamped"
@@ -149,7 +152,10 @@ describe("InterfaceTypeDefinition", () => {
             name="id"
             type={<gql.TypeReference type={builtInScalars.ID} required />}
           />
-          <gql.FieldDefinition name="auditLog" type={builtInScalars.String} />
+          <gql.FieldDefinition
+            name="auditLog"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
           <gql.FieldDefinition
             name="createdAt"
             type={<gql.TypeReference type={builtInScalars.String} required />}
@@ -239,7 +245,7 @@ describe("InterfaceTypeDefinition", () => {
               />
               <gql.InputValueDefinition
                 name="limit"
-                type={builtInScalars.Int}
+                type={<gql.TypeReference type={builtInScalars.Int} />}
                 defaultValue={10}
               />
             </>
@@ -270,7 +276,10 @@ describe("InterfaceTypeDefinition", () => {
             name="id"
             type={<gql.TypeReference type={builtInScalars.ID} required />}
           />
-          <gql.FieldDefinition name="name" type={builtInScalars.String} />
+          <gql.FieldDefinition
+            name="name"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
         </gql.ObjectTypeDefinition>
       </>,
     );

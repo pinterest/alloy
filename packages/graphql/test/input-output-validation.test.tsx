@@ -9,8 +9,14 @@ describe("Input/Output Type Usage Validation", () => {
     it("allows scalar types in output positions", () => {
       const result = toGraphQLText(
         <gql.ObjectTypeDefinition name="User">
-          <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
-          <gql.FieldDefinition name="name" type={gql.builtInScalars.String} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+          />
+          <gql.FieldDefinition
+            name="name"
+            type={<gql.TypeReference type={gql.builtInScalars.String} />}
+          />
         </gql.ObjectTypeDefinition>,
       );
 
@@ -29,7 +35,10 @@ describe("Input/Output Type Usage Validation", () => {
       const result = toGraphQLText(
         <>
           <gql.ObjectTypeDefinition name="User" refkey={userRef}>
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
           </gql.ObjectTypeDefinition>
           <gql.ObjectTypeDefinition name="Post" refkey={postRef}>
             <gql.FieldDefinition
@@ -63,7 +72,10 @@ describe("Input/Output Type Usage Validation", () => {
             />
           </gql.InterfaceTypeDefinition>
           <gql.ObjectTypeDefinition name="User">
-            <gql.FieldDefinition name="node" type={nodeRef} />
+            <gql.FieldDefinition
+              name="node"
+              type={<gql.TypeReference type={nodeRef} />}
+            />
           </gql.ObjectTypeDefinition>
         </>,
       );
@@ -123,7 +135,10 @@ describe("Input/Output Type Usage Validation", () => {
             <gql.EnumValue name="INACTIVE" />
           </gql.EnumTypeDefinition>
           <gql.ObjectTypeDefinition name="User">
-            <gql.FieldDefinition name="status" type={statusRef} />
+            <gql.FieldDefinition
+              name="status"
+              type={<gql.TypeReference type={statusRef} />}
+            />
           </gql.ObjectTypeDefinition>
         </>,
       );
@@ -152,11 +167,14 @@ describe("Input/Output Type Usage Validation", () => {
             >
               <gql.InputFieldDeclaration
                 name="name"
-                type={gql.builtInScalars.String}
+                type={<gql.TypeReference type={gql.builtInScalars.String} />}
               />
             </gql.InputObjectTypeDefinition>
             <gql.ObjectTypeDefinition name="Query">
-              <gql.FieldDefinition name="invalid" type={userInputRef} />
+              <gql.FieldDefinition
+                name="invalid"
+                type={<gql.TypeReference type={userInputRef} />}
+              />
             </gql.ObjectTypeDefinition>
           </>,
         );
@@ -172,7 +190,7 @@ describe("Input/Output Type Usage Validation", () => {
         <gql.ObjectTypeDefinition name="Query">
           <gql.FieldDefinition
             name="user"
-            type={gql.builtInScalars.String}
+            type={<gql.TypeReference type={gql.builtInScalars.String} />}
             args={
               <gql.InputValueDefinition
                 name="id"
@@ -207,7 +225,7 @@ describe("Input/Output Type Usage Validation", () => {
                 <gql.TypeReference
                   type={
                     <gql.TypeReference
-                      type={gql.builtInScalars.String}
+                      type={<gql.TypeReference type={gql.builtInScalars.String} />}
                       required
                     />
                   }
@@ -215,7 +233,12 @@ describe("Input/Output Type Usage Validation", () => {
                   required
                 />
               }
-              args={<gql.InputValueDefinition name="status" type={statusRef} />}
+              args={
+                <gql.InputValueDefinition
+                  name="status"
+                  type={<gql.TypeReference type={statusRef} />}
+                />
+              }
             />
           </gql.ObjectTypeDefinition>
         </>,
@@ -240,13 +263,13 @@ describe("Input/Output Type Usage Validation", () => {
           <gql.InputObjectTypeDefinition name="UserInput" refkey={userInputRef}>
             <gql.InputFieldDeclaration
               name="name"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
             />
           </gql.InputObjectTypeDefinition>
           <gql.ObjectTypeDefinition name="Mutation">
             <gql.FieldDefinition
               name="createUser"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
               args={
                 <gql.InputValueDefinition
                   name="input"
@@ -276,13 +299,21 @@ describe("Input/Output Type Usage Validation", () => {
         toGraphQLText(
           <>
             <gql.ObjectTypeDefinition name="User" refkey={userRef}>
-              <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+              <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
             </gql.ObjectTypeDefinition>
             <gql.ObjectTypeDefinition name="Query">
               <gql.FieldDefinition
                 name="invalid"
-                type={gql.builtInScalars.String}
-                args={<gql.InputValueDefinition name="user" type={userRef} />}
+                type={<gql.TypeReference type={gql.builtInScalars.String} />}
+                args={
+                  <gql.InputValueDefinition
+                    name="user"
+                    type={<gql.TypeReference type={userRef} />}
+                  />
+                }
               />
             </gql.ObjectTypeDefinition>
           </>,
@@ -307,8 +338,13 @@ describe("Input/Output Type Usage Validation", () => {
             <gql.ObjectTypeDefinition name="Query">
               <gql.FieldDefinition
                 name="invalid"
-                type={gql.builtInScalars.String}
-                args={<gql.InputValueDefinition name="node" type={nodeRef} />}
+                type={<gql.TypeReference type={gql.builtInScalars.String} />}
+                args={
+                  <gql.InputValueDefinition
+                    name="node"
+                    type={<gql.TypeReference type={nodeRef} />}
+                  />
+                }
               />
             </gql.ObjectTypeDefinition>
           </>,
@@ -330,11 +366,11 @@ describe("Input/Output Type Usage Validation", () => {
             <gql.ObjectTypeDefinition name="Query">
               <gql.FieldDefinition
                 name="invalid"
-                type={gql.builtInScalars.String}
+                type={<gql.TypeReference type={gql.builtInScalars.String} />}
                 args={
                   <gql.InputValueDefinition
                     name="result"
-                    type={searchResultRef}
+                    type={<gql.TypeReference type={searchResultRef} />}
                   />
                 }
               />
@@ -351,10 +387,16 @@ describe("Input/Output Type Usage Validation", () => {
         toGraphQLText(
           <>
             <gql.ObjectTypeDefinition name="User" refkey={userRef}>
-              <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+              <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
             </gql.ObjectTypeDefinition>
             <gql.InputObjectTypeDefinition name="InvalidInput">
-              <gql.InputFieldDeclaration name="user" type={userRef} />
+              <gql.InputFieldDeclaration
+                name="user"
+                type={<gql.TypeReference type={userRef} />}
+              />
             </gql.InputObjectTypeDefinition>
           </>,
         );
@@ -376,7 +418,10 @@ describe("Input/Output Type Usage Validation", () => {
               />
             </gql.InterfaceTypeDefinition>
             <gql.InputObjectTypeDefinition name="InvalidInput">
-              <gql.InputFieldDeclaration name="node" type={nodeRef} />
+              <gql.InputFieldDeclaration
+                name="node"
+                type={<gql.TypeReference type={nodeRef} />}
+              />
             </gql.InputObjectTypeDefinition>
           </>,
         );
@@ -395,7 +440,10 @@ describe("Input/Output Type Usage Validation", () => {
               members={["User", "Post"]}
             />
             <gql.InputObjectTypeDefinition name="InvalidInput">
-              <gql.InputFieldDeclaration name="result" type={searchResultRef} />
+              <gql.InputFieldDeclaration
+                name="result"
+                type={<gql.TypeReference type={searchResultRef} />}
+              />
             </gql.InputObjectTypeDefinition>
           </>,
         );

@@ -8,10 +8,16 @@ describe("Name Uniqueness Validation", () => {
       const result = toGraphQLText(
         <>
           <gql.ObjectTypeDefinition name="User">
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
           </gql.ObjectTypeDefinition>
           <gql.ObjectTypeDefinition name="Post">
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
           </gql.ObjectTypeDefinition>
         </>,
       );
@@ -26,10 +32,16 @@ describe("Name Uniqueness Validation", () => {
       const result = toGraphQLText(
         <>
           <gql.ObjectTypeDefinition name="User">
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
           </gql.ObjectTypeDefinition>
           <gql.ObjectTypeDefinition name="User">
-            <gql.FieldDefinition name="name" type={gql.builtInScalars.String} />
+            <gql.FieldDefinition
+              name="name"
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
+            />
           </gql.ObjectTypeDefinition>
         </>,
       );
@@ -58,9 +70,18 @@ describe("Name Uniqueness Validation", () => {
     it("allows unique field names in object types", () => {
       const result = toGraphQLText(
         <gql.ObjectTypeDefinition name="User">
-          <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
-          <gql.FieldDefinition name="name" type={gql.builtInScalars.String} />
-          <gql.FieldDefinition name="email" type={gql.builtInScalars.String} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+          />
+          <gql.FieldDefinition
+            name="name"
+            type={<gql.TypeReference type={gql.builtInScalars.String} />}
+          />
+          <gql.FieldDefinition
+            name="email"
+            type={<gql.TypeReference type={gql.builtInScalars.String} />}
+          />
         </gql.ObjectTypeDefinition>,
       );
 
@@ -71,8 +92,14 @@ describe("Name Uniqueness Validation", () => {
       expect(() => {
         toGraphQLText(
           <gql.ObjectTypeDefinition name="User">
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.String} />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
+            />
           </gql.ObjectTypeDefinition>,
         );
       }).toThrow();
@@ -82,8 +109,14 @@ describe("Name Uniqueness Validation", () => {
       expect(() => {
         toGraphQLText(
           <gql.InterfaceTypeDefinition name="Node">
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.String} />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
+            />
           </gql.InterfaceTypeDefinition>,
         );
       }).toThrow();
@@ -95,11 +128,11 @@ describe("Name Uniqueness Validation", () => {
           <gql.InputObjectTypeDefinition name="UserInput">
             <gql.InputFieldDeclaration
               name="name"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
             />
             <gql.InputFieldDeclaration
               name="name"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
             />
           </gql.InputObjectTypeDefinition>,
         );
@@ -138,16 +171,16 @@ describe("Name Uniqueness Validation", () => {
         <gql.ObjectTypeDefinition name="Query">
           <gql.FieldDefinition
             name="user"
-            type={gql.builtInScalars.String}
+            type={<gql.TypeReference type={gql.builtInScalars.String} />}
             args={
               <>
                 <gql.InputValueDefinition
                   name="id"
-                  type={gql.builtInScalars.ID}
+                  type={<gql.TypeReference type={gql.builtInScalars.ID} />}
                 />
                 <gql.InputValueDefinition
                   name="name"
-                  type={gql.builtInScalars.String}
+                  type={<gql.TypeReference type={gql.builtInScalars.String} />}
                 />
               </>
             }
@@ -164,16 +197,16 @@ describe("Name Uniqueness Validation", () => {
           <gql.ObjectTypeDefinition name="Query">
             <gql.FieldDefinition
               name="user"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
               args={
                 <>
                   <gql.InputValueDefinition
                     name="id"
-                    type={gql.builtInScalars.ID}
+                    type={<gql.TypeReference type={gql.builtInScalars.ID} />}
                   />
                   <gql.InputValueDefinition
                     name="id"
-                    type={gql.builtInScalars.String}
+                    type={<gql.TypeReference type={gql.builtInScalars.String} />}
                   />
                 </>
               }

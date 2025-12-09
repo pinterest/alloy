@@ -77,7 +77,7 @@ describe("Directive", () => {
       <gql.ObjectTypeDefinition name="Query">
         <gql.FieldDefinition
           name="oldUsers"
-          type="[User]"
+          type={<gql.TypeReference type="User" list />}
           directives={
             <gql.Directive
               name={builtInDirectives.deprecated}
@@ -87,7 +87,7 @@ describe("Directive", () => {
         />
         <gql.FieldDefinition
           name="oldPosts"
-          type="[Post]"
+          type={<gql.TypeReference type="Post" list />}
           directives={
             <gql.Directive
               name={builtInDirectives.deprecated}
@@ -112,14 +112,14 @@ describe("Directive", () => {
       <gql.ObjectTypeDefinition name="Query">
         <gql.FieldDefinition
           name="adminUsers"
-          type="[User]"
+          type={<gql.TypeReference type="User" list />}
           directives={
             <gql.Directive name="auth" args={{ requires: "ADMIN", level: 5 }} />
           }
         />
         <gql.FieldDefinition
           name="moderatorUsers"
-          type="[User]"
+          type={<gql.TypeReference type="User" list />}
           directives={
             <gql.Directive
               name="auth"
