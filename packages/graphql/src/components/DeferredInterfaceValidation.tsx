@@ -226,4 +226,3 @@ export function createValidationState(): InterfaceValidationState {
     pendingValidations: [],
   };
 }
-

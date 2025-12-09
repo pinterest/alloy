@@ -8,14 +8,14 @@ import {
   type Children,
 } from "@alloy-js/core";
 import { GraphQLModuleScope } from "../symbols/index.js";
-import { Reference } from "./Reference.js";
-import { wrapDescription } from "./utils.js";
 import {
   createValidationState,
   InterfaceValidationProvider,
   InterfaceValidationState,
   runValidations,
 } from "./DeferredInterfaceValidation.js";
+import { Reference } from "./Reference.js";
+import { wrapDescription } from "./utils.js";
 
 // Registry to track all active validation states from SourceFile components
 const validationRegistry = new Set<InterfaceValidationState>();
