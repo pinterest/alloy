@@ -8,124 +8,25 @@ import { GraphQLOutputSymbol } from "../symbols/graphql-output-symbol.js";
 import { ref } from "../symbols/reference.js";
 import { TypeReference, TypeReferenceProps } from "./TypeReference.js";
 
-interface FieldInfo {
-  name: string;
-  type: string;
-}
-
-interface ObjectFieldInfo extends FieldInfo {
-  args: FieldInfoSet<FieldInfo>;
+/**
+ * Generates a unique key for a field, encoding name, type, and args.
+ */
+function generateFieldKey(
+  name: string,
+  type: string,
+  args: Set<string> = new Set(),
+): string {
+  return [name, type, ...[...args].sort()].join("\0");
 }
 
 /**
- * Generates a unique key for a FieldInfo, including type and nested args.
- * Enables Set-based comparisons when needed.
+ * Check if setA is a superset of setB (all items in B are in A).
  */
-function generateKey(field: FieldInfo | ObjectFieldInfo): string {
-  const parts = [field.name, field.type];
-  if ("args" in field) {
-    parts.push(
-      ...[...field.args.fields()]
-        .toSorted((a, b) => a.name.localeCompare(b.name))
-        .map(generateKey),
-    );
+function isSupersetOf(setA: Set<string>, setB: Set<string>): boolean {
+  for (const item of setB) {
+    if (!setA.has(item)) return false;
   }
-  return parts.join("\0");
-}
-
-/**
- * A Set of FieldInfo objects.
- */
-class FieldInfoSet<T extends FieldInfo = FieldInfo> extends Set<string> {
-  #byName = new Map<string, T>();
-
-  add(field: T | string): this {
-    if (typeof field === "string") {
-      throw new Error("FieldInfoSet.add() does not support raw strings");
-    }
-    const key = generateKey(field);
-    if (!super.has(key)) {
-      super.add(key);
-      this.#byName.set(field.name, field);
-    }
-    return this;
-  }
-
-  get(name: string): T | undefined {
-    return this.#byName.get(name);
-  }
-
-  hasName(name: string): boolean {
-    return this.#byName.has(name);
-  }
-
-  fields(): IterableIterator<T> {
-    return this.#byName.values();
-  }
-
-  /**
-   * Checks if this set equals another set.
-   * Returns null if equal, or an error message describing the first difference.
-   */
-  equals(other: FieldInfoSet<T>, context: string): string | null {
-    // Check for missing fields
-    for (const field of this.fields()) {
-      const otherField = other.get(field.name);
-      if (!otherField) {
-        return `${context}: missing argument "${field.name}"`;
-      }
-      if (field.type && otherField.type && field.type !== otherField.type) {
-        return `${context}: argument "${field.name}" type must be "${field.type}", found "${otherField.type}"`;
-      }
-    }
-
-    // Check for extra fields
-    for (const field of other.fields()) {
-      if (!this.hasName(field.name)) {
-        return `${context}: unexpected argument "${field.name}"`;
-      }
-    }
-
-    return null;
-  }
-
-  isSupersetOf(
-    other: FieldInfoSet<T>,
-    context: { typeName: string; interfaceName: string },
-  ): string | null {
-    const { typeName, interfaceName } = context;
-
-    for (const otherField of other.fields()) {
-      const thisField = this.get(otherField.name);
-
-      // Check if field exists
-      if (!thisField) {
-        return `Type "${typeName}" must implement field "${otherField.name}" from interface "${interfaceName}".`;
-      }
-
-      // Validate return types
-      if (
-        otherField.type &&
-        thisField.type &&
-        otherField.type !== thisField.type
-      ) {
-        return `Type "${typeName}" field "${otherField.name}" return type must be "${otherField.type}" to match interface "${interfaceName}", but found "${thisField.type}".`;
-      }
-
-      // Validate arguments if present
-      if ("args" in otherField && "args" in thisField) {
-        const argsError = (otherField.args as FieldInfoSet).equals(
-          thisField.args as FieldInfoSet,
-          `Type "${typeName}" field "${otherField.name}"`,
-        );
-        if (argsError) {
-          return `${argsError} to match interface "${interfaceName}".`;
-        }
-      }
-    }
-
-    return null;
-  }
+  return true;
 }
 
 interface ResolvedInterface {
@@ -176,37 +77,27 @@ export function resolveTypeAnnotation(symbol: OutputSymbol): string {
 }
 
 /**
- * Extract FieldInfo (name and type) from a symbol
+ * Extract field keys from a symbol's member space as a Set.
  */
-function toFieldInfo(symbol: OutputSymbol): FieldInfo {
-  return {
-    name: symbol.name,
-    type: resolveTypeAnnotation(symbol).replace(/\s/g, ""),
-  };
-}
-
-/**
- * Extract field information from a symbol's member space
- */
-function extractFieldInfo(
-  symbol: GraphQLOutputSymbol,
-): FieldInfoSet<ObjectFieldInfo> {
-  const fields = new FieldInfoSet<ObjectFieldInfo>();
+function extractFieldKeys(symbol: GraphQLOutputSymbol): Set<string> {
+  const fields = new Set<string>();
 
   for (const fieldSymbol of symbol.members.symbolNames.values()) {
-    const { name, type } = toFieldInfo(fieldSymbol);
+    const name = fieldSymbol.name;
+    const type = resolveTypeAnnotation(fieldSymbol).replace(/\s/g, "");
 
-    // Extract arguments from the field symbol's own members
-    const args = new FieldInfoSet<FieldInfo>();
+    // Extract argument keys
+    const args = new Set<string>();
     const fieldMembers = fieldSymbol.memberSpaceFor("members");
-
     if (fieldMembers) {
       for (const argSymbol of fieldMembers.symbolNames.values()) {
-        args.add(toFieldInfo(argSymbol));
+        const argName = argSymbol.name;
+        const argType = resolveTypeAnnotation(argSymbol).replace(/\s/g, "");
+        args.add(generateFieldKey(argName, argType));
       }
     }
 
-    fields.add({ name, type, args });
+    fields.add(generateFieldKey(name, type, args));
   }
 
   return fields;
@@ -271,39 +162,20 @@ export function runPendingValidations(): void {
   resetValidationState();
 
   for (const { typeName, typeSymbol, interfaces } of validations) {
-    // Extract field information now that all members have been added
-    const typeFields = extractFieldInfo(typeSymbol);
+    const typeFields = extractFieldKeys(typeSymbol);
 
-    try {
-      // Validate each resolved interface
-      for (const { symbol: interfaceSymbol } of interfaces) {
-        validateTypeImplementsInterface(typeName, typeFields, interfaceSymbol);
-      }
-    } catch (e) {
-      if (e instanceof Error) {
-        validationErrors.push(e);
+    for (const { symbol: interfaceSymbol } of interfaces) {
+      const interfaceName = String(interfaceSymbol.name);
+      const interfaceFields = extractFieldKeys(interfaceSymbol);
+
+      if (!isSupersetOf(typeFields, interfaceFields)) {
+        validationErrors.push(
+          new Error(
+            `Type "${typeName}" does not correctly implement interface "${interfaceName}".`,
+          ),
+        );
       }
     }
-  }
-}
-
-/**
- * Validates that a type correctly implements a single interface
- */
-function validateTypeImplementsInterface(
-  typeName: string,
-  typeFields: FieldInfoSet<ObjectFieldInfo>,
-  interfaceSymbol: GraphQLOutputSymbol,
-): void {
-  const interfaceName = String(interfaceSymbol.name);
-  const interfaceFields = extractFieldInfo(interfaceSymbol);
-
-  const error = typeFields.isSupersetOf(interfaceFields, {
-    typeName,
-    interfaceName,
-  });
-  if (error) {
-    throw new Error(error);
   }
 }
 
