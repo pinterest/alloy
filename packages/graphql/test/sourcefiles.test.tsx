@@ -29,7 +29,10 @@ describe("SourceFile", () => {
               <gql.TypeReference type={gql.builtInScalars.String} required />
             }
           />
-          <gql.FieldDefinition name="email" type={gql.builtInScalars.String} />
+          <gql.FieldDefinition
+            name="email"
+            type={<gql.TypeReference type={gql.builtInScalars.String} />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Post">
           <gql.FieldDefinition
@@ -44,7 +47,7 @@ describe("SourceFile", () => {
           />
           <gql.FieldDefinition
             name="content"
-            type={gql.builtInScalars.String}
+            type={<gql.TypeReference type={gql.builtInScalars.String} />}
           />
         </gql.ObjectTypeDefinition>
       </gql.SourceFile>

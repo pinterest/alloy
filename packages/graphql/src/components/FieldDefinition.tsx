@@ -13,7 +13,11 @@ import { GraphQLMemberScope } from "../symbols/graphql-member-scope.js";
 import { useGraphQLScope } from "../symbols/scopes.js";
 import { TypedBaseDeclarationProps } from "./common-props.js";
 import { Directives } from "./Directives.js";
-import { validateOutputType, wrapDescription } from "./utils.js";
+import {
+  validateOutputType,
+  validateTypeReference,
+  wrapDescription,
+} from "./utils.js";
 
 export interface FieldDefinitionProps extends TypedBaseDeclarationProps {
   /**
@@ -41,7 +45,7 @@ export interface FieldDefinitionProps extends TypedBaseDeclarationProps {
  *   <FieldDefinition name="id" type={<TypeReference type={builtInScalars.ID} required />} />
  *   <FieldDefinition
  *     name="name"
- *     type={builtInScalars.String}
+ *     type={<TypeReference type={builtInScalars.String} />}
  *     description='"""User full name"""'
  *   />
  *   <FieldDefinition name="tags" type={<TypeReference type={<TypeReference type={builtInScalars.String} required />} list required />} />
@@ -51,13 +55,13 @@ export interface FieldDefinitionProps extends TypedBaseDeclarationProps {
  *     args={
  *       <>
  *         <InputValueDefinition name="id" type={<TypeReference type={builtInScalars.ID} required />} />
- *         <InputValueDefinition name="includeDeleted" type={builtInScalars.Boolean} defaultValue={false} />
+ *         <InputValueDefinition name="includeDeleted" type={<TypeReference type={builtInScalars.Boolean} />} defaultValue={false} />
  *       </>
  *     }
  *   />
  *   <FieldDefinition
  *     name="legacyField"
- *     type={builtInScalars.String}
+ *     type={<TypeReference type={builtInScalars.String} />}
  *     directives={
  *       <Directive
  *         name={builtInDirectives.deprecated}
@@ -79,11 +83,11 @@ export interface FieldDefinitionProps extends TypedBaseDeclarationProps {
  *   <ObjectTypeDefinition name="Query">
  *     <FieldDefinition
  *       name="users"
- *       type="[User!]!"
+ *       type={<TypeReference type={<TypeReference type="User" required />} list required />}
  *       args={
  *         <InputValueDefinition
  *           name="status"
- *           type={statusRef}
+ *           type={<TypeReference type={statusRef} />}
  *           defaultValue={activeRef}
  *         />
  *       }
@@ -113,6 +117,9 @@ export interface FieldDefinitionProps extends TypedBaseDeclarationProps {
 export function FieldDefinition(props: FieldDefinitionProps) {
   const TypeSymbolSlot = createSymbolSlot();
   const scope = useGraphQLScope();
+
+  // Validate that type is a TypeReference component
+  validateTypeReference(props.type, props.name, "Field");
 
   // Validate that the field type is valid for output positions
   validateOutputType(props.type, props.name, "type");

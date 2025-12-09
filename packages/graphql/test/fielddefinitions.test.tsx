@@ -9,7 +9,10 @@ import { toGraphQLText } from "./utils.jsx";
 describe("FieldDefinition", () => {
   it("renders a simple field with scalar type", () => {
     const result = toGraphQLText(
-      <gql.FieldDefinition name="id" type={builtInScalars.ID} />,
+      <gql.FieldDefinition
+        name="id"
+        type={<gql.TypeReference type={builtInScalars.ID} />}
+      />,
     );
     expect(result).toBe("id: ID");
   });
@@ -77,17 +80,26 @@ describe("FieldDefinition", () => {
 
   it("renders different scalar types", () => {
     const intField = toGraphQLText(
-      <gql.FieldDefinition name="count" type={builtInScalars.Int} />,
+      <gql.FieldDefinition
+        name="count"
+        type={<gql.TypeReference type={builtInScalars.Int} />}
+      />,
     );
     expect(intField).toBe("count: Int");
 
     const floatField = toGraphQLText(
-      <gql.FieldDefinition name="score" type={builtInScalars.Float} />,
+      <gql.FieldDefinition
+        name="score"
+        type={<gql.TypeReference type={builtInScalars.Float} />}
+      />,
     );
     expect(floatField).toBe("score: Float");
 
     const boolField = toGraphQLText(
-      <gql.FieldDefinition name="active" type={builtInScalars.Boolean} />,
+      <gql.FieldDefinition
+        name="active"
+        type={<gql.TypeReference type={builtInScalars.Boolean} />}
+      />,
     );
     expect(boolField).toBe("active: Boolean");
   });
@@ -96,7 +108,7 @@ describe("FieldDefinition", () => {
     const result = toGraphQLText(
       <gql.FieldDefinition
         name="email"
-        type={builtInScalars.String}
+        type={<gql.TypeReference type={builtInScalars.String} />}
         description="The user's email address"
       />,
     );
@@ -112,7 +124,7 @@ describe("FieldDefinition", () => {
     const result = toGraphQLText(
       <gql.FieldDefinition
         name="bio"
-        type={builtInScalars.String}
+        type={<gql.TypeReference type={builtInScalars.String} />}
         description="The user's biography.\nCan be multiple lines."
       />,
     );
@@ -131,10 +143,16 @@ describe("FieldDefinition", () => {
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="CustomType" refkey={customTypeRef}>
-          <gql.FieldDefinition name="id" type={builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Query">
-          <gql.FieldDefinition name="custom" type={customTypeRef} />
+          <gql.FieldDefinition
+            name="custom"
+            type={<gql.TypeReference type={customTypeRef} />}
+          />
         </gql.ObjectTypeDefinition>
       </>,
     );
@@ -187,7 +205,10 @@ describe("FieldDefinition", () => {
           />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Post">
-          <gql.FieldDefinition name="author" type={userRef} />
+          <gql.FieldDefinition
+            name="author"
+            type={<gql.TypeReference type={userRef} />}
+          />
         </gql.ObjectTypeDefinition>
       </>,
     );
@@ -246,7 +267,7 @@ describe("FieldDefinition", () => {
     const result = toGraphQLText(
       <gql.FieldDefinition
         name="oldField"
-        type={builtInScalars.String}
+        type={<gql.TypeReference type={builtInScalars.String} />}
         directives={
           <gql.Directive
             name={builtInDirectives.deprecated}
@@ -264,7 +285,7 @@ describe("FieldDefinition", () => {
     const result = toGraphQLText(
       <gql.FieldDefinition
         name="adminField"
-        type={builtInScalars.String}
+        type={<gql.TypeReference type={builtInScalars.String} />}
         directives={
           <>
             <gql.Directive name="auth" args={{ requires: "ADMIN" }} />
@@ -282,7 +303,7 @@ describe("FieldDefinition", () => {
     const result = toGraphQLText(
       <gql.FieldDefinition
         name="user"
-        type={builtInScalars.String}
+        type={<gql.TypeReference type={builtInScalars.String} />}
         args={
           <gql.InputValueDefinition
             name="id"
@@ -297,24 +318,53 @@ describe("FieldDefinition", () => {
   });
 
   it("renders a field with multiple arguments", () => {
+    const postRef = refkey();
     const result = toGraphQLText(
-      <gql.FieldDefinition
-        name="posts"
-        type="[Post!]!"
-        args={
-          <>
-            <gql.InputValueDefinition name="limit" type={builtInScalars.Int} />
-            <gql.InputValueDefinition name="offset" type={builtInScalars.Int} />
-            <gql.InputValueDefinition
-              name="authorId"
-              type={builtInScalars.ID}
-            />
-          </>
-        }
-      />,
+      <>
+        <gql.ObjectTypeDefinition name="Post" refkey={postRef}>
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} />}
+          />
+        </gql.ObjectTypeDefinition>
+        <gql.ObjectTypeDefinition name="Query">
+          <gql.FieldDefinition
+            name="posts"
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type={postRef} required />}
+                list
+                required
+              />
+            }
+            args={
+              <>
+                <gql.InputValueDefinition
+                  name="limit"
+                  type={<gql.TypeReference type={builtInScalars.Int} />}
+                />
+                <gql.InputValueDefinition
+                  name="offset"
+                  type={<gql.TypeReference type={builtInScalars.Int} />}
+                />
+                <gql.InputValueDefinition
+                  name="authorId"
+                  type={<gql.TypeReference type={builtInScalars.ID} />}
+                />
+              </>
+            }
+          />
+        </gql.ObjectTypeDefinition>
+      </>,
     );
-    expect(result).toBe(
-      "posts(limit: Int, offset: Int, authorId: ID): [Post!]!",
-    );
+    expect(result).toRenderTo(d`
+      type Post {
+        id: ID
+      }
+      
+      type Query {
+        posts(limit: Int, offset: Int, authorId: ID): [Post!]!
+      }
+    `);
   });
 });

@@ -13,26 +13,38 @@ describe("Circular Reference Detection", () => {
       const result = toGraphQLText(
         <>
           <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
           </gql.InterfaceTypeDefinition>
           <gql.InterfaceTypeDefinition
             name="Timestamped"
             refkey={timestampedRef}
             implements={[nodeRef]}
           >
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
             <gql.FieldDefinition
               name="createdAt"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
             />
           </gql.InterfaceTypeDefinition>
           <gql.ObjectTypeDefinition name="User" implements={[timestampedRef]}>
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
             <gql.FieldDefinition
               name="createdAt"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
             />
-            <gql.FieldDefinition name="name" type={gql.builtInScalars.String} />
+            <gql.FieldDefinition
+              name="name"
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
+            />
           </gql.ObjectTypeDefinition>
         </>,
       );
@@ -69,7 +81,7 @@ describe("Circular Reference Detection", () => {
             >
               <gql.FieldDefinition
                 name="field"
-                type={gql.builtInScalars.String}
+                type={<gql.TypeReference type={gql.builtInScalars.String} />}
               />
             </gql.InterfaceTypeDefinition>
             <gql.InterfaceTypeDefinition
@@ -79,7 +91,7 @@ describe("Circular Reference Detection", () => {
             >
               <gql.FieldDefinition
                 name="field"
-                type={gql.builtInScalars.String}
+                type={<gql.TypeReference type={gql.builtInScalars.String} />}
               />
             </gql.InterfaceTypeDefinition>
           </>,
@@ -102,7 +114,7 @@ describe("Circular Reference Detection", () => {
             >
               <gql.FieldDefinition
                 name="field"
-                type={gql.builtInScalars.String}
+                type={<gql.TypeReference type={gql.builtInScalars.String} />}
               />
             </gql.InterfaceTypeDefinition>
             <gql.InterfaceTypeDefinition
@@ -112,7 +124,7 @@ describe("Circular Reference Detection", () => {
             >
               <gql.FieldDefinition
                 name="field"
-                type={gql.builtInScalars.String}
+                type={<gql.TypeReference type={gql.builtInScalars.String} />}
               />
             </gql.InterfaceTypeDefinition>
             <gql.InterfaceTypeDefinition
@@ -122,7 +134,7 @@ describe("Circular Reference Detection", () => {
             >
               <gql.FieldDefinition
                 name="field"
-                type={gql.builtInScalars.String}
+                type={<gql.TypeReference type={gql.builtInScalars.String} />}
               />
             </gql.InterfaceTypeDefinition>
           </>,
@@ -142,7 +154,7 @@ describe("Circular Reference Detection", () => {
           >
             <gql.FieldDefinition
               name="field"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
             />
           </gql.InterfaceTypeDefinition>,
         );

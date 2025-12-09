@@ -1,6 +1,7 @@
 import { refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
+import { builtInScalars } from "../src/builtins/scalars.js";
 import * as gql from "../src/index.js";
 import { toGraphQLText } from "./utils.jsx";
 
@@ -12,10 +13,16 @@ describe("Union Type Validation", () => {
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="User" refkey={userRef}>
-          <gql.FieldDefinition name="id" type="ID!" />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Post" refkey={postRef}>
-          <gql.FieldDefinition name="id" type="ID!" />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.UnionTypeDefinition
           name="SearchResult"
@@ -61,7 +68,10 @@ describe("Union Type Validation", () => {
       toGraphQLText(
         <>
           <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
-            <gql.FieldDefinition name="id" type="ID!" />
+            <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
           </gql.InterfaceTypeDefinition>
           <gql.UnionTypeDefinition name="Result" members={[nodeRef]} />
         </>,
@@ -110,7 +120,10 @@ describe("Union Type Validation", () => {
       toGraphQLText(
         <>
           <gql.InputObjectTypeDefinition name="UserInput" refkey={inputRef}>
-            <gql.InputFieldDeclaration name="name" type="String!" />
+            <gql.InputFieldDeclaration
+              name="name"
+              type={<gql.TypeReference type={builtInScalars.String} required />}
+            />
           </gql.InputObjectTypeDefinition>
           <gql.UnionTypeDefinition name="Result" members={[inputRef]} />
         </>,
@@ -161,13 +174,22 @@ describe("Union Type Validation", () => {
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="User" refkey={userRef}>
-          <gql.FieldDefinition name="id" type="ID!" />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Post" refkey={postRef}>
-          <gql.FieldDefinition name="id" type="ID!" />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Comment" refkey={commentRef}>
-          <gql.FieldDefinition name="id" type="ID!" />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.UnionTypeDefinition
           name="SearchResult"

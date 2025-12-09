@@ -12,7 +12,11 @@ import {
   validateOneOfFieldNoDefault,
   validateOneOfFieldNullable,
 } from "./OneOfInputValidation.js";
-import { validateInputType, wrapDescription } from "./utils.js";
+import {
+  validateInputType,
+  validateTypeReference,
+  wrapDescription,
+} from "./utils.js";
 import { ValueExpression } from "./ValueExpression.js";
 
 export interface InputFieldDeclarationProps extends TypedBaseDeclarationProps {
@@ -98,6 +102,9 @@ export interface InputFieldDeclarationProps extends TypedBaseDeclarationProps {
 export function InputFieldDeclaration(props: InputFieldDeclarationProps) {
   const TypeSymbolSlot = createSymbolSlot();
   const isInOneOfInput = useOneOfInputContext();
+
+  // Validate that type is a TypeReference component
+  validateTypeReference(props.type, props.name, "Input field");
 
   // Validate that the field type is valid for input positions
   validateInputType(props.type, props.name, "Input field");

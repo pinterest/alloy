@@ -13,11 +13,20 @@ describe("Interface Implementation Validation", () => {
       const result = toGraphQLText(
         <>
           <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
           </gql.InterfaceTypeDefinition>
           <gql.ObjectTypeDefinition name="User" implements={[nodeRef]}>
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
-            <gql.FieldDefinition name="name" type={gql.builtInScalars.String} />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
+            <gql.FieldDefinition
+              name="name"
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
+            />
           </gql.ObjectTypeDefinition>
         </>,
       );
@@ -40,10 +49,16 @@ describe("Interface Implementation Validation", () => {
       toGraphQLText(
         <>
           <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
           </gql.InterfaceTypeDefinition>
           <gql.ObjectTypeDefinition name="User" implements={[nodeRef]}>
-            <gql.FieldDefinition name="name" type={gql.builtInScalars.String} />
+            <gql.FieldDefinition
+              name="name"
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
+            />
           </gql.ObjectTypeDefinition>
         </>,
       );
@@ -62,26 +77,38 @@ describe("Interface Implementation Validation", () => {
       const result = toGraphQLText(
         <>
           <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
           </gql.InterfaceTypeDefinition>
           <gql.InterfaceTypeDefinition
             name="Timestamped"
             refkey={timestampedRef}
             implements={[nodeRef]}
           >
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
             <gql.FieldDefinition
               name="createdAt"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
             />
           </gql.InterfaceTypeDefinition>
           <gql.ObjectTypeDefinition name="User" implements={[timestampedRef]}>
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
             <gql.FieldDefinition
               name="createdAt"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
             />
-            <gql.FieldDefinition name="name" type={gql.builtInScalars.String} />
+            <gql.FieldDefinition
+              name="name"
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
+            />
           </gql.ObjectTypeDefinition>
         </>,
       );
@@ -96,25 +123,34 @@ describe("Interface Implementation Validation", () => {
       toGraphQLText(
         <>
           <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
           </gql.InterfaceTypeDefinition>
           <gql.InterfaceTypeDefinition
             name="Timestamped"
             refkey={timestampedRef}
             implements={[nodeRef]}
           >
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
             <gql.FieldDefinition
               name="createdAt"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
             />
           </gql.InterfaceTypeDefinition>
           <gql.ObjectTypeDefinition name="User" implements={[timestampedRef]}>
             <gql.FieldDefinition
               name="createdAt"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
             />
-            <gql.FieldDefinition name="name" type={gql.builtInScalars.String} />
+            <gql.FieldDefinition
+              name="name"
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
+            />
           </gql.ObjectTypeDefinition>
         </>,
       );
@@ -134,10 +170,16 @@ describe("Interface Implementation Validation", () => {
       const result = toGraphQLText(
         <>
           <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
-            <gql.FieldDefinition name="id" type="ID!" />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} required />}
+            />
           </gql.InterfaceTypeDefinition>
           <gql.ObjectTypeDefinition name="User" implements={[nodeRef]}>
-            <gql.FieldDefinition name="id" type="ID!" />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} required />}
+            />
           </gql.ObjectTypeDefinition>
         </>,
       );
@@ -151,10 +193,16 @@ describe("Interface Implementation Validation", () => {
       toGraphQLText(
         <>
           <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
-            <gql.FieldDefinition name="id" type="ID!" />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} required />}
+            />
           </gql.InterfaceTypeDefinition>
           <gql.ObjectTypeDefinition name="User" implements={[nodeRef]}>
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.String} />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
+            />
           </gql.ObjectTypeDefinition>
         </>,
       );
@@ -172,10 +220,16 @@ describe("Interface Implementation Validation", () => {
       toGraphQLText(
         <>
           <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
-            <gql.FieldDefinition name="id" type="ID!" />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} required />}
+            />
           </gql.InterfaceTypeDefinition>
           <gql.ObjectTypeDefinition name="User" implements={[nodeRef]}>
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
           </gql.ObjectTypeDefinition>
         </>,
       );
@@ -197,11 +251,11 @@ describe("Interface Implementation Validation", () => {
           <gql.InterfaceTypeDefinition name="Repository" refkey={nodeRef}>
             <gql.FieldDefinition
               name="issue"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
               args={
                 <gql.InputValueDefinition
                   name="number"
-                  type={`${gql.builtInScalars.Int}!`}
+                  type={<gql.TypeReference type={gql.builtInScalars.Int} required />}
                 />
               }
             />
@@ -209,11 +263,11 @@ describe("Interface Implementation Validation", () => {
           <gql.ObjectTypeDefinition name="GitHubRepo" implements={[nodeRef]}>
             <gql.FieldDefinition
               name="issue"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
               args={
                 <gql.InputValueDefinition
                   name="number"
-                  type={`${gql.builtInScalars.Int}!`}
+                  type={<gql.TypeReference type={gql.builtInScalars.Int} required />}
                 />
               }
             />
@@ -232,11 +286,11 @@ describe("Interface Implementation Validation", () => {
           <gql.InterfaceTypeDefinition name="Repository" refkey={nodeRef}>
             <gql.FieldDefinition
               name="issue"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
               args={
                 <gql.InputValueDefinition
                   name="number"
-                  type={`${gql.builtInScalars.Int}!`}
+                  type={<gql.TypeReference type={gql.builtInScalars.Int} required />}
                 />
               }
             />
@@ -244,7 +298,7 @@ describe("Interface Implementation Validation", () => {
           <gql.ObjectTypeDefinition name="GitHubRepo" implements={[nodeRef]}>
             <gql.FieldDefinition
               name="issue"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
             />
           </gql.ObjectTypeDefinition>
         </>,
@@ -265,11 +319,11 @@ describe("Interface Implementation Validation", () => {
           <gql.InterfaceTypeDefinition name="Repository" refkey={nodeRef}>
             <gql.FieldDefinition
               name="issue"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
               args={
                 <gql.InputValueDefinition
                   name="number"
-                  type={`${gql.builtInScalars.Int}!`}
+                  type={<gql.TypeReference type={gql.builtInScalars.Int} required />}
                 />
               }
             />
@@ -277,11 +331,11 @@ describe("Interface Implementation Validation", () => {
           <gql.ObjectTypeDefinition name="GitHubRepo" implements={[nodeRef]}>
             <gql.FieldDefinition
               name="issue"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
               args={
                 <gql.InputValueDefinition
                   name="id"
-                  type={`${gql.builtInScalars.Int}!`}
+                  type={<gql.TypeReference type={gql.builtInScalars.Int} required />}
                 />
               }
             />
@@ -304,11 +358,11 @@ describe("Interface Implementation Validation", () => {
           <gql.InterfaceTypeDefinition name="Repository" refkey={nodeRef}>
             <gql.FieldDefinition
               name="issue"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
               args={
                 <gql.InputValueDefinition
                   name="number"
-                  type={`${gql.builtInScalars.Int}!`}
+                  type={<gql.TypeReference type={gql.builtInScalars.Int} required />}
                 />
               }
             />
@@ -316,11 +370,11 @@ describe("Interface Implementation Validation", () => {
           <gql.ObjectTypeDefinition name="GitHubRepo" implements={[nodeRef]}>
             <gql.FieldDefinition
               name="issue"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
               args={
                 <gql.InputValueDefinition
                   name="number"
-                  type={gql.builtInScalars.String}
+                  type={<gql.TypeReference type={gql.builtInScalars.String} />}
                 />
               }
             />
@@ -343,16 +397,22 @@ describe("Interface Implementation Validation", () => {
           <gql.InterfaceTypeDefinition name="Repository" refkey={nodeRef}>
             <gql.FieldDefinition
               name="issues"
-              type="[String!]!"
+              type={
+                <gql.TypeReference
+                  type={<gql.TypeReference type={gql.builtInScalars.String} required />}
+                  list
+                  required
+                />
+              }
               args={
                 <>
                   <gql.InputValueDefinition
                     name="first"
-                    type={gql.builtInScalars.Int}
+                    type={<gql.TypeReference type={gql.builtInScalars.Int} />}
                   />
                   <gql.InputValueDefinition
                     name="after"
-                    type={gql.builtInScalars.String}
+                    type={<gql.TypeReference type={gql.builtInScalars.String} />}
                   />
                 </>
               }
@@ -361,16 +421,22 @@ describe("Interface Implementation Validation", () => {
           <gql.ObjectTypeDefinition name="GitHubRepo" implements={[nodeRef]}>
             <gql.FieldDefinition
               name="issues"
-              type="[String!]!"
+              type={
+                <gql.TypeReference
+                  type={<gql.TypeReference type={gql.builtInScalars.String} required />}
+                  list
+                  required
+                />
+              }
               args={
                 <>
                   <gql.InputValueDefinition
                     name="first"
-                    type={gql.builtInScalars.Int}
+                    type={<gql.TypeReference type={gql.builtInScalars.Int} />}
                   />
                   <gql.InputValueDefinition
                     name="after"
-                    type={gql.builtInScalars.String}
+                    type={<gql.TypeReference type={gql.builtInScalars.String} />}
                   />
                 </>
               }
@@ -391,17 +457,29 @@ describe("Interface Implementation Validation", () => {
       const result = toGraphQLText(
         <>
           <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
           </gql.InterfaceTypeDefinition>
           <gql.InterfaceTypeDefinition name="Named" refkey={namedRef}>
-            <gql.FieldDefinition name="name" type={gql.builtInScalars.String} />
+            <gql.FieldDefinition
+              name="name"
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
+            />
           </gql.InterfaceTypeDefinition>
           <gql.ObjectTypeDefinition
             name="User"
             implements={[nodeRef, namedRef]}
           >
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
-            <gql.FieldDefinition name="name" type={gql.builtInScalars.String} />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
+            <gql.FieldDefinition
+              name="name"
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
+            />
           </gql.ObjectTypeDefinition>
         </>,
       );
@@ -416,16 +494,25 @@ describe("Interface Implementation Validation", () => {
       toGraphQLText(
         <>
           <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
           </gql.InterfaceTypeDefinition>
           <gql.InterfaceTypeDefinition name="Named" refkey={namedRef}>
-            <gql.FieldDefinition name="name" type={gql.builtInScalars.String} />
+            <gql.FieldDefinition
+              name="name"
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
+            />
           </gql.InterfaceTypeDefinition>
           <gql.ObjectTypeDefinition
             name="User"
             implements={[nodeRef, namedRef]}
           >
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
           </gql.ObjectTypeDefinition>
         </>,
       );
@@ -435,6 +522,139 @@ describe("Interface Implementation Validation", () => {
       expect(errors[0].message).toMatch(
         /Type "User" must implement field "name" from interface "Named"/,
       );
+    });
+  });
+
+  describe("TypeReference support", () => {
+    it("validates matching types using TypeReference with refkeys", () => {
+      const nodeRef = refkey();
+
+      const result = toGraphQLText(
+        <>
+          <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} required />}
+            />
+          </gql.InterfaceTypeDefinition>
+          <gql.ObjectTypeDefinition name="User" implements={[nodeRef]}>
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} required />}
+            />
+          </gql.ObjectTypeDefinition>
+        </>,
+      );
+
+      expect(result).toBeDefined();
+      const errors = getValidationErrors();
+      expect(errors).toHaveLength(0);
+    });
+
+    it("throws when TypeReference types don't match", () => {
+      const nodeRef = refkey();
+
+      toGraphQLText(
+        <>
+          <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} required />}
+            />
+          </gql.InterfaceTypeDefinition>
+          <gql.ObjectTypeDefinition name="User" implements={[nodeRef]}>
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.String} required />}
+            />
+          </gql.ObjectTypeDefinition>
+        </>,
+      );
+
+      const errors = getValidationErrors();
+      expect(errors).toHaveLength(1);
+      expect(errors[0].message).toMatch(
+        /Type "User" field "id" return type must be "ID!" to match interface "Node"/,
+      );
+    });
+
+    it("validates list types with TypeReference", () => {
+      const nodeRef = refkey();
+
+      const result = toGraphQLText(
+        <>
+          <gql.InterfaceTypeDefinition name="Connection" refkey={nodeRef}>
+            <gql.FieldDefinition
+              name="nodes"
+              type={
+                <gql.TypeReference
+                  type={<gql.TypeReference type={gql.builtInScalars.String} required />}
+                  list
+                  required
+                />
+              }
+            />
+          </gql.InterfaceTypeDefinition>
+          <gql.ObjectTypeDefinition name="UserConnection" implements={[nodeRef]}>
+            <gql.FieldDefinition
+              name="nodes"
+              type={
+                <gql.TypeReference
+                  type={<gql.TypeReference type={gql.builtInScalars.String} required />}
+                  list
+                  required
+                />
+              }
+            />
+          </gql.ObjectTypeDefinition>
+        </>,
+      );
+
+      expect(result).toBeDefined();
+      const errors = getValidationErrors();
+      expect(errors).toHaveLength(0);
+    });
+
+    it("validates argument types with TypeReference and custom types", () => {
+      const nodeRef = refkey();
+      const statusRef = refkey();
+
+      const result = toGraphQLText(
+        <>
+          <gql.EnumTypeDefinition name="Status" refkey={statusRef}>
+            <gql.EnumValue name="ACTIVE" />
+            <gql.EnumValue name="INACTIVE" />
+          </gql.EnumTypeDefinition>
+          <gql.InterfaceTypeDefinition name="Filterable" refkey={nodeRef}>
+            <gql.FieldDefinition
+              name="items"
+              type={<gql.TypeReference type={gql.builtInScalars.String} list />}
+              args={
+                <gql.InputValueDefinition
+                  name="status"
+                  type={<gql.TypeReference type={statusRef} required />}
+                />
+              }
+            />
+          </gql.InterfaceTypeDefinition>
+          <gql.ObjectTypeDefinition name="UserList" implements={[nodeRef]}>
+            <gql.FieldDefinition
+              name="items"
+              type={<gql.TypeReference type={gql.builtInScalars.String} list />}
+              args={
+                <gql.InputValueDefinition
+                  name="status"
+                  type={<gql.TypeReference type={statusRef} required />}
+                />
+              }
+            />
+          </gql.ObjectTypeDefinition>
+        </>,
+      );
+
+      expect(result).toBeDefined();
+      const errors = getValidationErrors();
+      expect(errors).toHaveLength(0);
     });
   });
 });

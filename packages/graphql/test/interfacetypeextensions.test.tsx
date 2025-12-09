@@ -9,7 +9,10 @@ describe("InterfaceTypeExtension", () => {
   it("renders an interface extension with additional fields", () => {
     const result = toGraphQLText(
       <gql.InterfaceTypeExtension name="Node">
-        <gql.FieldDefinition name="createdAt" type={builtInScalars.String} />
+        <gql.FieldDefinition
+          name="createdAt"
+          type={<gql.TypeReference type={builtInScalars.String} />}
+        />
       </gql.InterfaceTypeExtension>,
     );
     expect(result).toRenderTo(d`
@@ -71,7 +74,10 @@ describe("InterfaceTypeExtension", () => {
 
     const result = toGraphQLText(
       <gql.InterfaceTypeExtension name="Audited" refkey={auditedRef}>
-        <gql.FieldDefinition name="deletedAt" type={builtInScalars.String} />
+        <gql.FieldDefinition
+          name="deletedAt"
+          type={<gql.TypeReference type={builtInScalars.String} />}
+        />
       </gql.InterfaceTypeExtension>,
     );
     expect(result).toRenderTo(d`

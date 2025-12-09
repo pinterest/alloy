@@ -104,13 +104,22 @@ describe("SchemaDefinition", () => {
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="Query" refkey={queryRef}>
-          <gql.FieldDefinition name="user" type="User" />
+          <gql.FieldDefinition
+            name="user"
+            type={<gql.TypeReference type="User" />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Mutation" refkey={mutationRef}>
-          <gql.FieldDefinition name="createUser" type="User!" />
+          <gql.FieldDefinition
+            name="createUser"
+            type={<gql.TypeReference type="User" required />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Subscription" refkey={subscriptionRef}>
-          <gql.FieldDefinition name="userCreated" type="User!" />
+          <gql.FieldDefinition
+            name="userCreated"
+            type={<gql.TypeReference type="User" required />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.SchemaDefinition
           query={queryRef}
@@ -152,10 +161,16 @@ describe("SchemaDefinition", () => {
     const res = toGraphQLTextMultiple([
       <gql.SourceFile path="operations.graphql">
         <gql.ObjectTypeDefinition name="Query" refkey={queryRef}>
-          <gql.FieldDefinition name="hello" type={builtInScalars.String} />
+          <gql.FieldDefinition
+            name="hello"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Mutation" refkey={mutationRef}>
-          <gql.FieldDefinition name="noop" type={builtInScalars.Boolean} />
+          <gql.FieldDefinition
+            name="noop"
+            type={<gql.TypeReference type={builtInScalars.Boolean} />}
+          />
         </gql.ObjectTypeDefinition>
       </gql.SourceFile>,
       <gql.SourceFile path="schema.graphql">

@@ -12,6 +12,7 @@ import { Directives } from "./Directives.js";
 import {
   validateInputType,
   validateNonNullDefault,
+  validateTypeReference,
   wrapDescription,
 } from "./utils.js";
 import { ValueExpression } from "./ValueExpression.js";
@@ -30,16 +31,16 @@ export interface InputValueDefinitionProps extends TypedBaseDeclarationProps {
  * ```tsx
  * <>
  *   <InputValueDefinition name="id" type={<TypeReference type={builtInScalars.ID} required />} />
- *   <InputValueDefinition name="limit" type={builtInScalars.Int} defaultValue={10} />
+ *   <InputValueDefinition name="limit" type={<TypeReference type={builtInScalars.Int} />} defaultValue={10} />
  *   <InputValueDefinition
  *     name="reason"
- *     type={builtInScalars.String}
+ *     type={<TypeReference type={builtInScalars.String} />}
  *     defaultValue="Not specified"
  *     description='"""Reason for the action"""'
  *   />
  *   <InputValueDefinition
  *     name="priority"
- *     type={builtInScalars.Int}
+ *     type={<TypeReference type={builtInScalars.Int} />}
  *     directives={<Directive name={builtInDirectives.deprecated} />}
  *   />
  * </>
@@ -55,7 +56,7 @@ export interface InputValueDefinitionProps extends TypedBaseDeclarationProps {
  *   </EnumTypeDefinition>
  *   <InputValueDefinition
  *     name="status"
- *     type={statusRef}
+ *     type={<TypeReference type={statusRef} />}
  *     defaultValue={activeRef}
  *   />
  * </>
@@ -77,6 +78,9 @@ export interface InputValueDefinitionProps extends TypedBaseDeclarationProps {
  */
 export function InputValueDefinition(props: InputValueDefinitionProps) {
   const TypeSymbolSlot = createSymbolSlot();
+
+  // Validate that type is a TypeReference component
+  validateTypeReference(props.type, props.name, "Argument");
 
   // Validate that the argument type is valid for input positions
   validateInputType(props.type, props.name, "Argument");

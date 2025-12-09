@@ -12,8 +12,14 @@ describe("@oneOf Input Object Validation", () => {
         isOneOf
         directives={<gql.Directive name={builtInDirectives.oneOf} />}
       >
-        <gql.InputFieldDeclaration name="name" type={builtInScalars.String} />
-        <gql.InputFieldDeclaration name="email" type={builtInScalars.String} />
+        <gql.InputFieldDeclaration
+          name="name"
+          type={<gql.TypeReference type={builtInScalars.String} />}
+        />
+        <gql.InputFieldDeclaration
+          name="email"
+          type={<gql.TypeReference type={builtInScalars.String} />}
+        />
       </gql.InputObjectTypeDefinition>,
     );
 
@@ -52,7 +58,7 @@ describe("@oneOf Input Object Validation", () => {
         >
           <gql.InputFieldDeclaration
             name="name"
-            type={builtInScalars.String}
+            type={<gql.TypeReference type={builtInScalars.String} />}
             defaultValue="default"
           />
         </gql.InputObjectTypeDefinition>,
@@ -70,7 +76,16 @@ describe("@oneOf Input Object Validation", () => {
           isOneOf
           directives={<gql.Directive name={builtInDirectives.oneOf} />}
         >
-          <gql.InputFieldDeclaration name="ids" type="[ID!]!" />
+          <gql.InputFieldDeclaration
+            name="ids"
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type={builtInScalars.ID} required />}
+                list
+                required
+              />
+            }
+          />
         </gql.InputObjectTypeDefinition>,
       );
     }).toThrow(/Input field "ids" in a @oneOf input object must be nullable/);
@@ -83,7 +98,15 @@ describe("@oneOf Input Object Validation", () => {
         isOneOf
         directives={<gql.Directive name={builtInDirectives.oneOf} />}
       >
-        <gql.InputFieldDeclaration name="ids" type="[ID!]" />
+        <gql.InputFieldDeclaration
+          name="ids"
+          type={
+            <gql.TypeReference
+              type={<gql.TypeReference type={builtInScalars.ID} required />}
+              list
+            />
+          }
+        />
       </gql.InputObjectTypeDefinition>,
     );
 
@@ -101,11 +124,17 @@ describe("@oneOf Input Object Validation", () => {
         isOneOf
         directives={<gql.Directive name={builtInDirectives.oneOf} />}
       >
-        <gql.InputFieldDeclaration name="id" type={builtInScalars.ID} />
-        <gql.InputFieldDeclaration name="email" type={builtInScalars.String} />
+        <gql.InputFieldDeclaration
+          name="id"
+          type={<gql.TypeReference type={builtInScalars.ID} />}
+        />
+        <gql.InputFieldDeclaration
+          name="email"
+          type={<gql.TypeReference type={builtInScalars.String} />}
+        />
         <gql.InputFieldDeclaration
           name="username"
-          type={builtInScalars.String}
+          type={<gql.TypeReference type={builtInScalars.String} />}
         />
       </gql.InputObjectTypeDefinition>,
     );
@@ -129,7 +158,7 @@ describe("@oneOf Input Object Validation", () => {
         />
         <gql.InputFieldDeclaration
           name="age"
-          type={builtInScalars.Int}
+          type={<gql.TypeReference type={builtInScalars.Int} />}
           defaultValue={0}
         />
       </gql.InputObjectTypeDefinition>,

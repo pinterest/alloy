@@ -14,7 +14,7 @@ describe("Schema Root Type Validation", () => {
           <gql.ObjectTypeDefinition name="Query" refkey={queryRef}>
             <gql.FieldDefinition
               name="hello"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
             />
           </gql.ObjectTypeDefinition>
           <gql.SchemaDefinition query={queryRef} />
@@ -42,13 +42,13 @@ describe("Schema Root Type Validation", () => {
           <gql.ObjectTypeDefinition name="Query" refkey={queryRef}>
             <gql.FieldDefinition
               name="hello"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
             />
           </gql.ObjectTypeDefinition>
           <gql.ObjectTypeDefinition name="Mutation" refkey={mutationRef}>
             <gql.FieldDefinition
               name="doSomething"
-              type={gql.builtInScalars.Boolean}
+              type={<gql.TypeReference type={gql.builtInScalars.Boolean} />}
             />
           </gql.ObjectTypeDefinition>
           <gql.ObjectTypeDefinition
@@ -57,7 +57,7 @@ describe("Schema Root Type Validation", () => {
           >
             <gql.FieldDefinition
               name="onEvent"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
             />
           </gql.ObjectTypeDefinition>
           <gql.SchemaDefinition
@@ -98,7 +98,7 @@ describe("Schema Root Type Validation", () => {
             <gql.InterfaceTypeDefinition name="IQuery" refkey={queryRef}>
               <gql.FieldDefinition
                 name="hello"
-                type={gql.builtInScalars.String}
+                type={<gql.TypeReference type={gql.builtInScalars.String} />}
               />
             </gql.InterfaceTypeDefinition>
             <gql.SchemaDefinition query={queryRef} />
@@ -119,7 +119,7 @@ describe("Schema Root Type Validation", () => {
             <gql.ObjectTypeDefinition name="Query" refkey={queryRef}>
               <gql.FieldDefinition
                 name="hello"
-                type={gql.builtInScalars.String}
+                type={<gql.TypeReference type={gql.builtInScalars.String} />}
               />
             </gql.ObjectTypeDefinition>
             <gql.UnionTypeDefinition
@@ -145,7 +145,7 @@ describe("Schema Root Type Validation", () => {
             <gql.ObjectTypeDefinition name="Query" refkey={queryRef}>
               <gql.FieldDefinition
                 name="hello"
-                type={gql.builtInScalars.String}
+                type={<gql.TypeReference type={gql.builtInScalars.String} />}
               />
             </gql.ObjectTypeDefinition>
             <gql.InputObjectTypeDefinition
@@ -154,7 +154,7 @@ describe("Schema Root Type Validation", () => {
             >
               <gql.InputFieldDeclaration
                 name="topic"
-                type={gql.builtInScalars.String}
+                type={<gql.TypeReference type={gql.builtInScalars.String} />}
               />
             </gql.InputObjectTypeDefinition>
             <gql.SchemaDefinition
@@ -210,7 +210,7 @@ describe("Schema Root Type Validation", () => {
           <gql.ObjectTypeDefinition name="ExtendedQuery" refkey={queryRef}>
             <gql.FieldDefinition
               name="newField"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
             />
           </gql.ObjectTypeDefinition>
           <gql.SchemaExtension query={queryRef} />
@@ -237,7 +237,7 @@ describe("Schema Root Type Validation", () => {
             <gql.InterfaceTypeDefinition name="IQuery" refkey={queryRef}>
               <gql.FieldDefinition
                 name="hello"
-                type={gql.builtInScalars.String}
+                type={<gql.TypeReference type={gql.builtInScalars.String} />}
               />
             </gql.InterfaceTypeDefinition>
             <gql.SchemaExtension query={queryRef} />
