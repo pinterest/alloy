@@ -31,11 +31,11 @@ function isSupersetOf(setA: Set<string>, setB: Set<string>): boolean {
   return true;
 }
 
-interface ResolvedInterface {
+export interface ResolvedInterface {
   symbol: GraphQLOutputSymbol;
 }
 
-interface PendingValidation {
+export interface PendingValidation {
   typeName: string;
   typeSymbol: GraphQLOutputSymbol;
   interfaces: ResolvedInterface[];
