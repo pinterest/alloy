@@ -140,7 +140,7 @@ let validationErrors: Error[] = [];
  * Extract FieldInfo (name and type) from a symbol
  */
 function toFieldInfo(symbol: OutputSymbol): FieldInfo {
-  const type = symbol.metadata.type;
+  const type = symbol.metadata.typeAnnotation;
   return {
     name: symbol.name,
     type: type ? String(type).replace(/\s/g, "") : "",
@@ -230,8 +230,7 @@ export function registerForValidation(
  */
 export function runPendingValidations(): void {
   const validations = pendingValidations;
-  pendingValidations = [];
-  validationErrors = [];
+  resetValidationState();
 
   for (const { typeName, typeSymbol, interfaces } of validations) {
     // Extract field information now that all members have been added

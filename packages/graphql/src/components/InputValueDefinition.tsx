@@ -96,7 +96,7 @@ export function InputValueDefinition(props: InputValueDefinitionProps) {
     {
       refkeys: props.refkey,
       metadata: {
-        type: props.type,
+        typeAnnotation: props.type,
       },
     },
     "argument",
