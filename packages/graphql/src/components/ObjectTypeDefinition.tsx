@@ -11,6 +11,7 @@ import {
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { GraphQLMemberScope, useGraphQLScope } from "../symbols/index.js";
 import { BaseDeclarationProps } from "./common-props.js";
+import { useRegisterForValidation } from "./DeferredInterfaceValidation.jsx";
 import { Directives } from "./Directives.js";
 import { ImplementsInterfaces } from "./ImplementsInterfaces.js";
 import { wrapDescription } from "./utils.js";
@@ -36,7 +37,7 @@ export interface ObjectTypeDefinitionProps extends BaseDeclarationProps {
  *
  * @example
  * ```tsx
- * import { code, refkey } from "@alloy-js/core";
+ * import { refkey } from "@alloy-js/core";
  *
  * const nodeRef = refkey();
  * const timestampedRef = refkey();
@@ -47,7 +48,7 @@ export interface ObjectTypeDefinitionProps extends BaseDeclarationProps {
  *   implements={[nodeRef, timestampedRef]}
  *   directives={<Directive name="auth" args={{ requires: "ADMIN" }} />}
  * >
- *   <FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+ *   <FieldDefinition name="id" type={<TypeReference type={builtInScalars.ID} required />} />
  *   <FieldDefinition name="email" type={builtInScalars.String} />
  * </ObjectTypeDefinition>
  * ```
@@ -64,17 +65,16 @@ export interface ObjectTypeDefinitionProps extends BaseDeclarationProps {
  * ```
  */
 export function ObjectTypeDefinition(props: ObjectTypeDefinitionProps) {
+  // Get parent scope for establishing member scope hierarchy
   const parentScope = useGraphQLScope();
 
   const sym = createGraphQLSymbol(
     props.name,
     {
       refkeys: props.refkey,
-      metadata: {
-        implements: props.implements ?? [],
-      },
+      metadata: { implements: props.implements ?? [] },
     },
-    "type",
+    "object",
   );
 
   // Create a member scope for this object type to hold its fields
@@ -85,6 +85,11 @@ export function ObjectTypeDefinition(props: ObjectTypeDefinitionProps) {
   const ContentSlot = createContentSlot();
   const wrappedDescription = wrapDescription(props.description);
 
+  // Register for deferred validation if implementing interfaces
+  if (props.implements?.length) {
+    useRegisterForValidation(props.name, sym, props.implements);
+  }
+
   return (
     <>
       <Show when={Boolean(wrappedDescription())}>
@@ -93,7 +98,7 @@ export function ObjectTypeDefinition(props: ObjectTypeDefinitionProps) {
       </Show>
       <CoreDeclaration symbol={sym}>
         type <Name />
-        <Show when={props.implements && props.implements.length > 0}>
+        <Show when={!!(props.implements && props.implements.length)}>
           <ImplementsInterfaces interfaces={props.implements!} />
         </Show>
         <Show when={Boolean(props.directives)}>

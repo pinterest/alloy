@@ -1,0 +1,334 @@
+import { refkey } from "@alloy-js/core";
+import { d } from "@alloy-js/core/testing";
+import { describe, expect, it } from "vitest";
+import { builtInDirectives } from "../src/builtins/directives.js";
+import { builtInScalars } from "../src/builtins/scalars.js";
+import * as gql from "../src/index.js";
+import { toGraphQLText } from "./utils.jsx";
+
+describe("InputFieldDeclaration", () => {
+  it("renders a simple field with optional type", () => {
+    const result = toGraphQLText(
+      <gql.InputObjectTypeDefinition name="UserInput">
+        <gql.InputFieldDeclaration
+          name="name"
+          type={<gql.TypeReference type={builtInScalars.String} />}
+        />
+      </gql.InputObjectTypeDefinition>,
+    );
+    expect(result).toRenderTo(d`
+      input UserInput {
+        name: String
+      }
+    `);
+  });
+
+  it("renders a field with required type", () => {
+    const result = toGraphQLText(
+      <gql.InputObjectTypeDefinition name="UserInput">
+        <gql.InputFieldDeclaration
+          name="email"
+          type={<gql.TypeReference type={builtInScalars.String} required />}
+        />
+      </gql.InputObjectTypeDefinition>,
+    );
+    expect(result).toRenderTo(d`
+      input UserInput {
+        email: String!
+      }
+    `);
+  });
+
+  it("renders a field with list type", () => {
+    const result = toGraphQLText(
+      <gql.InputObjectTypeDefinition name="BatchInput">
+        <gql.InputFieldDeclaration
+          name="ids"
+          type={
+            <gql.TypeReference
+              type={<gql.TypeReference type={builtInScalars.ID} required />}
+              list
+              required
+            />
+          }
+        />
+      </gql.InputObjectTypeDefinition>,
+    );
+    expect(result).toRenderTo(d`
+      input BatchInput {
+        ids: [ID!]!
+      }
+    `);
+  });
+
+  it("renders a field with documentation", () => {
+    const result = toGraphQLText(
+      <gql.InputObjectTypeDefinition name="UserInput">
+        <gql.InputFieldDeclaration
+          name="age"
+          type={<gql.TypeReference type={builtInScalars.Int} />}
+          description="User's age in years"
+        />
+      </gql.InputObjectTypeDefinition>,
+    );
+    expect(result).toRenderTo(d`
+      input UserInput {
+        """
+        User's age in years
+        """
+        age: Int
+      }
+    `);
+  });
+
+  it("renders fields with various default value types", () => {
+    const statusRef = refkey();
+    const activeRef = refkey();
+    const configRef = refkey();
+
+    const result = toGraphQLText(
+      <>
+        <gql.EnumTypeDefinition name="Status" refkey={statusRef}>
+          <gql.EnumValue name="ACTIVE" refkey={activeRef} />
+          <gql.EnumValue name="INACTIVE" />
+        </gql.EnumTypeDefinition>
+        <gql.InputObjectTypeDefinition name="Config" refkey={configRef}>
+          <gql.InputFieldDeclaration
+            name="key"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
+          <gql.InputFieldDeclaration
+            name="count"
+            type={<gql.TypeReference type={builtInScalars.Int} />}
+          />
+        </gql.InputObjectTypeDefinition>
+        <gql.InputObjectTypeDefinition name="DefaultValuesInput">
+          <gql.InputFieldDeclaration
+            name="numberDefault"
+            type={<gql.TypeReference type={builtInScalars.Int} />}
+            defaultValue={10}
+          />
+          <gql.InputFieldDeclaration
+            name="stringDefault"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+            defaultValue="development"
+          />
+          <gql.InputFieldDeclaration
+            name="booleanDefault"
+            type={<gql.TypeReference type={builtInScalars.Boolean} />}
+            defaultValue={false}
+          />
+          <gql.InputFieldDeclaration
+            name="nullDefault"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+            defaultValue={null}
+          />
+          <gql.InputFieldDeclaration
+            name="enumDefault"
+            type={<gql.TypeReference type={statusRef} required />}
+            defaultValue={activeRef}
+          />
+          <gql.InputFieldDeclaration
+            name="arrayDefault"
+            type={
+              <gql.TypeReference
+                type={
+                  <gql.TypeReference type={builtInScalars.String} required />
+                }
+                list
+                required
+              />
+            }
+            defaultValue={["tag1", "tag2"]}
+          />
+          <gql.InputFieldDeclaration
+            name="emptyArrayDefault"
+            type={
+              <gql.TypeReference
+                type={
+                  <gql.TypeReference type={builtInScalars.String} required />
+                }
+                list
+                required
+              />
+            }
+            defaultValue={[]}
+          />
+          <gql.InputFieldDeclaration
+            name="objectDefault"
+            type={<gql.TypeReference type={configRef} />}
+            defaultValue={{ key: "value", count: 42 }}
+          />
+        </gql.InputObjectTypeDefinition>
+      </>,
+    );
+    expect(result).toRenderTo(d`
+      enum Status {
+        ACTIVE
+        INACTIVE
+      }
+      
+      input Config {
+        key: String
+        count: Int
+      }
+      
+      input DefaultValuesInput {
+        numberDefault: Int = 10
+        stringDefault: String = "development"
+        booleanDefault: Boolean = false
+        nullDefault: String = null
+        enumDefault: Status! = ACTIVE
+        arrayDefault: [String!]! = ["tag1", "tag2"]
+        emptyArrayDefault: [String!]! = []
+        objectDefault: Config = {key: "value", count: 42}
+      }
+    `);
+  });
+
+  it("renders a field with a directive", () => {
+    const result = toGraphQLText(
+      <gql.InputObjectTypeDefinition name="LegacyInput">
+        <gql.InputFieldDeclaration
+          name="oldField"
+          type={<gql.TypeReference type={builtInScalars.String} />}
+          directives={
+            <gql.Directive
+              name={builtInDirectives.deprecated}
+              args={{ reason: "Use newField instead" }}
+            />
+          }
+        />
+      </gql.InputObjectTypeDefinition>,
+    );
+    expect(result).toRenderTo(d`
+      input LegacyInput {
+        oldField: String @deprecated(reason: "Use newField instead")
+      }
+    `);
+  });
+
+  it("renders a field with multiple directives", () => {
+    const result = toGraphQLText(
+      <gql.InputObjectTypeDefinition name="CustomInput">
+        <gql.InputFieldDeclaration
+          name="field"
+          type={<gql.TypeReference type={builtInScalars.String} />}
+          directives={
+            <>
+              <gql.Directive name="validate" args={{ pattern: ".*" }} />
+              <gql.Directive name="sensitive" />
+            </>
+          }
+        />
+      </gql.InputObjectTypeDefinition>,
+    );
+    expect(result).toRenderTo(d`
+      input CustomInput {
+        field: String @validate(pattern: ".*") @sensitive
+      }
+    `);
+  });
+
+  it("renders a field with documentation, default, and directive", () => {
+    const statusRef = refkey();
+    const activeRef = refkey();
+
+    const result = toGraphQLText(
+      <>
+        <gql.EnumTypeDefinition name="Status" refkey={statusRef}>
+          <gql.EnumValue name="ACTIVE" refkey={activeRef} />
+        </gql.EnumTypeDefinition>
+        <gql.InputObjectTypeDefinition name="ComplexInput">
+          <gql.InputFieldDeclaration
+            name="status"
+            type={<gql.TypeReference type={statusRef} required />}
+            description="Current status of the entity"
+            defaultValue={activeRef}
+            directives={
+              <gql.Directive name="validate" args={{ required: true }} />
+            }
+          />
+        </gql.InputObjectTypeDefinition>
+      </>,
+    );
+    expect(result).toRenderTo(d`
+      enum Status {
+        ACTIVE
+      }
+      
+      input ComplexInput {
+        """
+        Current status of the entity
+        """
+        status: Status! = ACTIVE @validate(required: true)
+      }
+    `);
+  });
+
+  it("renders fields with different scalar types", () => {
+    const result = toGraphQLText(
+      <gql.InputObjectTypeDefinition name="AllTypesInput">
+        <gql.InputFieldDeclaration
+          name="id"
+          type={<gql.TypeReference type={builtInScalars.ID} />}
+        />
+        <gql.InputFieldDeclaration
+          name="count"
+          type={<gql.TypeReference type={builtInScalars.Int} />}
+        />
+        <gql.InputFieldDeclaration
+          name="price"
+          type={<gql.TypeReference type={builtInScalars.Float} />}
+        />
+        <gql.InputFieldDeclaration
+          name="name"
+          type={<gql.TypeReference type={builtInScalars.String} />}
+        />
+        <gql.InputFieldDeclaration
+          name="active"
+          type={<gql.TypeReference type={builtInScalars.Boolean} />}
+        />
+      </gql.InputObjectTypeDefinition>,
+    );
+    expect(result).toRenderTo(d`
+      input AllTypesInput {
+        id: ID
+        count: Int
+        price: Float
+        name: String
+        active: Boolean
+      }
+    `);
+  });
+
+  it("renders a field with custom type reference using refkey", () => {
+    const userInputRef = refkey();
+
+    const result = toGraphQLText(
+      <>
+        <gql.InputObjectTypeDefinition name="UserInput" refkey={userInputRef}>
+          <gql.InputFieldDeclaration
+            name="name"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
+        </gql.InputObjectTypeDefinition>
+        <gql.InputObjectTypeDefinition name="CreatePostInput">
+          <gql.InputFieldDeclaration
+            name="author"
+            type={<gql.TypeReference type={userInputRef} />}
+          />
+        </gql.InputObjectTypeDefinition>
+      </>,
+    );
+    expect(result).toRenderTo(d`
+      input UserInput {
+        name: String
+      }
+      
+      input CreatePostInput {
+        author: UserInput
+      }
+    `);
+  });
+});
