@@ -253,7 +253,9 @@ describe("Interface Implementation Validation", () => {
               args={
                 <gql.InputValueDefinition
                   name="number"
-                  type={<gql.TypeReference type={gql.builtInScalars.Int} required />}
+                  type={
+                    <gql.TypeReference type={gql.builtInScalars.Int} required />
+                  }
                 />
               }
             />
@@ -265,7 +267,9 @@ describe("Interface Implementation Validation", () => {
               args={
                 <gql.InputValueDefinition
                   name="number"
-                  type={<gql.TypeReference type={gql.builtInScalars.Int} required />}
+                  type={
+                    <gql.TypeReference type={gql.builtInScalars.Int} required />
+                  }
                 />
               }
             />
@@ -288,7 +292,9 @@ describe("Interface Implementation Validation", () => {
               args={
                 <gql.InputValueDefinition
                   name="number"
-                  type={<gql.TypeReference type={gql.builtInScalars.Int} required />}
+                  type={
+                    <gql.TypeReference type={gql.builtInScalars.Int} required />
+                  }
                 />
               }
             />
@@ -320,7 +326,9 @@ describe("Interface Implementation Validation", () => {
               args={
                 <gql.InputValueDefinition
                   name="number"
-                  type={<gql.TypeReference type={gql.builtInScalars.Int} required />}
+                  type={
+                    <gql.TypeReference type={gql.builtInScalars.Int} required />
+                  }
                 />
               }
             />
@@ -332,7 +340,9 @@ describe("Interface Implementation Validation", () => {
               args={
                 <gql.InputValueDefinition
                   name="id"
-                  type={<gql.TypeReference type={gql.builtInScalars.Int} required />}
+                  type={
+                    <gql.TypeReference type={gql.builtInScalars.Int} required />
+                  }
                 />
               }
             />
@@ -358,7 +368,9 @@ describe("Interface Implementation Validation", () => {
               args={
                 <gql.InputValueDefinition
                   name="number"
-                  type={<gql.TypeReference type={gql.builtInScalars.Int} required />}
+                  type={
+                    <gql.TypeReference type={gql.builtInScalars.Int} required />
+                  }
                 />
               }
             />
@@ -394,7 +406,12 @@ describe("Interface Implementation Validation", () => {
               name="issues"
               type={
                 <gql.TypeReference
-                  type={<gql.TypeReference type={gql.builtInScalars.String} required />}
+                  type={
+                    <gql.TypeReference
+                      type={gql.builtInScalars.String}
+                      required
+                    />
+                  }
                   list
                   required
                 />
@@ -407,7 +424,9 @@ describe("Interface Implementation Validation", () => {
                   />
                   <gql.InputValueDefinition
                     name="after"
-                    type={<gql.TypeReference type={gql.builtInScalars.String} />}
+                    type={
+                      <gql.TypeReference type={gql.builtInScalars.String} />
+                    }
                   />
                 </>
               }
@@ -418,7 +437,12 @@ describe("Interface Implementation Validation", () => {
               name="issues"
               type={
                 <gql.TypeReference
-                  type={<gql.TypeReference type={gql.builtInScalars.String} required />}
+                  type={
+                    <gql.TypeReference
+                      type={gql.builtInScalars.String}
+                      required
+                    />
+                  }
                   list
                   required
                 />
@@ -431,7 +455,9 @@ describe("Interface Implementation Validation", () => {
                   />
                   <gql.InputValueDefinition
                     name="after"
-                    type={<gql.TypeReference type={gql.builtInScalars.String} />}
+                    type={
+                      <gql.TypeReference type={gql.builtInScalars.String} />
+                    }
                   />
                 </>
               }
@@ -558,7 +584,9 @@ describe("Interface Implementation Validation", () => {
           <gql.ObjectTypeDefinition name="User" implements={[nodeRef]}>
             <gql.FieldDefinition
               name="id"
-              type={<gql.TypeReference type={gql.builtInScalars.String} required />}
+              type={
+                <gql.TypeReference type={gql.builtInScalars.String} required />
+              }
             />
           </gql.ObjectTypeDefinition>
         </>,
@@ -580,19 +608,32 @@ describe("Interface Implementation Validation", () => {
               name="nodes"
               type={
                 <gql.TypeReference
-                  type={<gql.TypeReference type={gql.builtInScalars.String} required />}
+                  type={
+                    <gql.TypeReference
+                      type={gql.builtInScalars.String}
+                      required
+                    />
+                  }
                   list
                   required
                 />
               }
             />
           </gql.InterfaceTypeDefinition>
-          <gql.ObjectTypeDefinition name="UserConnection" implements={[nodeRef]}>
+          <gql.ObjectTypeDefinition
+            name="UserConnection"
+            implements={[nodeRef]}
+          >
             <gql.FieldDefinition
               name="nodes"
               type={
                 <gql.TypeReference
-                  type={<gql.TypeReference type={gql.builtInScalars.String} required />}
+                  type={
+                    <gql.TypeReference
+                      type={gql.builtInScalars.String}
+                      required
+                    />
+                  }
                   list
                   required
                 />

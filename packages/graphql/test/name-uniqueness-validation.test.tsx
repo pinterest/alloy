@@ -206,7 +206,9 @@ describe("Name Uniqueness Validation", () => {
                   />
                   <gql.InputValueDefinition
                     name="id"
-                    type={<gql.TypeReference type={gql.builtInScalars.String} />}
+                    type={
+                      <gql.TypeReference type={gql.builtInScalars.String} />
+                    }
                   />
                 </>
               }

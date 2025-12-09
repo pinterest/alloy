@@ -256,9 +256,9 @@ describe("Directives validation", () => {
               }
             >
               <gql.FieldDefinition
-              name="id"
-              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
-            />
+                name="id"
+                type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+              />
             </gql.ObjectTypeDefinition>
           </gql.SourceFile>,
         );
@@ -409,7 +409,12 @@ describe("Directives validation", () => {
               <>
                 <gql.InputValueDefinition
                   name="requires"
-                  type={<gql.TypeReference type={gql.builtInScalars.String} required />}
+                  type={
+                    <gql.TypeReference
+                      type={gql.builtInScalars.String}
+                      required
+                    />
+                  }
                 />
                 <gql.InputValueDefinition
                   name="level"
@@ -452,7 +457,12 @@ describe("Directives validation", () => {
               <>
                 <gql.InputValueDefinition
                   name="requires"
-                  type={<gql.TypeReference type={gql.builtInScalars.String} required />}
+                  type={
+                    <gql.TypeReference
+                      type={gql.builtInScalars.String}
+                      required
+                    />
+                  }
                 />
                 <gql.InputValueDefinition
                   name="level"
@@ -492,13 +502,18 @@ describe("Directives validation", () => {
               args={
                 <>
                   <gql.InputValueDefinition
-                  name="requires"
-                  type={<gql.TypeReference type={gql.builtInScalars.String} required />}
-                />
+                    name="requires"
+                    type={
+                      <gql.TypeReference
+                        type={gql.builtInScalars.String}
+                        required
+                      />
+                    }
+                  />
                   <gql.InputValueDefinition
-                  name="level"
-                  type={<gql.TypeReference type={gql.builtInScalars.Int} />}
-                />
+                    name="level"
+                    type={<gql.TypeReference type={gql.builtInScalars.Int} />}
+                  />
                 </>
               }
             />
@@ -524,7 +539,12 @@ describe("Directives validation", () => {
               args={
                 <gql.InputValueDefinition
                   name="requires"
-                  type={<gql.TypeReference type={gql.builtInScalars.String} required />}
+                  type={
+                    <gql.TypeReference
+                      type={gql.builtInScalars.String}
+                      required
+                    />
+                  }
                 />
               }
             />
@@ -607,11 +627,18 @@ describe("Directives validation", () => {
               <>
                 <gql.InputValueDefinition
                   name="required1"
-                  type={<gql.TypeReference type={gql.builtInScalars.String} required />}
+                  type={
+                    <gql.TypeReference
+                      type={gql.builtInScalars.String}
+                      required
+                    />
+                  }
                 />
                 <gql.InputValueDefinition
                   name="required2"
-                  type={<gql.TypeReference type={gql.builtInScalars.Int} required />}
+                  type={
+                    <gql.TypeReference type={gql.builtInScalars.Int} required />
+                  }
                 />
                 <gql.InputValueDefinition
                   name="optional1"
@@ -659,15 +686,30 @@ describe("Directives validation", () => {
                 <>
                   <gql.InputValueDefinition
                     name="arg1"
-                    type={<gql.TypeReference type={gql.builtInScalars.String} required />}
+                    type={
+                      <gql.TypeReference
+                        type={gql.builtInScalars.String}
+                        required
+                      />
+                    }
                   />
                   <gql.InputValueDefinition
                     name="arg2"
-                    type={<gql.TypeReference type={gql.builtInScalars.Int} required />}
+                    type={
+                      <gql.TypeReference
+                        type={gql.builtInScalars.Int}
+                        required
+                      />
+                    }
                   />
                   <gql.InputValueDefinition
                     name="arg3"
-                    type={<gql.TypeReference type={gql.builtInScalars.Boolean} required />}
+                    type={
+                      <gql.TypeReference
+                        type={gql.builtInScalars.Boolean}
+                        required
+                      />
+                    }
                   />
                 </>
               }

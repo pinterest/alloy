@@ -225,7 +225,9 @@ describe("Input/Output Type Usage Validation", () => {
                 <gql.TypeReference
                   type={
                     <gql.TypeReference
-                      type={<gql.TypeReference type={gql.builtInScalars.String} />}
+                      type={
+                        <gql.TypeReference type={gql.builtInScalars.String} />
+                      }
                       required
                     />
                   }
@@ -300,9 +302,9 @@ describe("Input/Output Type Usage Validation", () => {
           <>
             <gql.ObjectTypeDefinition name="User" refkey={userRef}>
               <gql.FieldDefinition
-              name="id"
-              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
-            />
+                name="id"
+                type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+              />
             </gql.ObjectTypeDefinition>
             <gql.ObjectTypeDefinition name="Query">
               <gql.FieldDefinition
@@ -388,9 +390,9 @@ describe("Input/Output Type Usage Validation", () => {
           <>
             <gql.ObjectTypeDefinition name="User" refkey={userRef}>
               <gql.FieldDefinition
-              name="id"
-              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
-            />
+                name="id"
+                type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+              />
             </gql.ObjectTypeDefinition>
             <gql.InputObjectTypeDefinition name="InvalidInput">
               <gql.InputFieldDeclaration

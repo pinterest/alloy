@@ -69,9 +69,9 @@ describe("Union Type Validation", () => {
         <>
           <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
             <gql.FieldDefinition
-            name="id"
-            type={<gql.TypeReference type={builtInScalars.ID} required />}
-          />
+              name="id"
+              type={<gql.TypeReference type={builtInScalars.ID} required />}
+            />
           </gql.InterfaceTypeDefinition>
           <gql.UnionTypeDefinition name="Result" members={[nodeRef]} />
         </>,
