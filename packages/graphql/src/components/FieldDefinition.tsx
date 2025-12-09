@@ -122,7 +122,7 @@ export function FieldDefinition(props: FieldDefinitionProps) {
     {
       refkeys: props.refkey,
       metadata: {
-        type: props.type,
+        typeAnnotation: props.type,
       },
     },
     "field",

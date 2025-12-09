@@ -159,7 +159,7 @@ function getDirectiveMetadata(directiveName: string): {
         for (const memberSpace of symbol.memberSpaces) {
           for (const argSymbol of memberSpace) {
             // Check if the argument type ends with ! (non-null = required)
-            const typeStr = String(argSymbol.metadata.type || "");
+            const typeStr = String(argSymbol.metadata.typeAnnotation || "");
             const required = typeStr.endsWith("!");
             argumentMetadata.push({
               name: String(argSymbol.name),

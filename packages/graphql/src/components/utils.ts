@@ -132,16 +132,16 @@ export function validateOutputType(
 ): void {
   // Only validate refkey references - non-refkey types can't be validated
   // at generation time. The GraphQL schema validation will catch these errors.
-  if (isRefkey(type)) {
-    const reference = ref(type);
-    const [typeName, symbol] = reference();
+  if (!isRefkey(type)) return;
 
-    if (symbol?.metadata?.kind === "input") {
-      throw new Error(
-        `Field "${fieldName}" on ${contextType} cannot use input object type "${typeName}". ` +
-          `Input objects can only be used in input positions (arguments, input fields).`,
-      );
-    }
+  const reference = ref(type);
+  const [typeName, symbol] = reference();
+
+  if (symbol?.metadata?.kind === "input") {
+    throw new Error(
+      `Field "${fieldName}" on ${contextType} cannot use input object type "${typeName}". ` +
+        `Input objects can only be used in input positions (arguments, input fields).`,
+    );
   }
 }
 
