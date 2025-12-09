@@ -11,10 +11,10 @@ import {
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { GraphQLMemberScope, useGraphQLScope } from "../symbols/index.js";
 import { BaseDeclarationProps } from "./common-props.js";
-import { registerForValidation } from "./DeferredInterfaceValidation.js";
 import { Directives } from "./Directives.js";
 import { ImplementsInterfaces } from "./ImplementsInterfaces.js";
 import { wrapDescription } from "./utils.js";
+import { useRegisterForValidation } from "./DeferredInterfaceValidation.jsx";
 
 export interface ObjectTypeDefinitionProps extends BaseDeclarationProps {
   /**
@@ -87,7 +87,7 @@ export function ObjectTypeDefinition(props: ObjectTypeDefinitionProps) {
 
   // Register for deferred validation if implementing interfaces
   if (props.implements?.length) {
-    registerForValidation(props.name, sym, props.implements);
+    useRegisterForValidation(props.name, sym, props.implements);
   }
 
   return (

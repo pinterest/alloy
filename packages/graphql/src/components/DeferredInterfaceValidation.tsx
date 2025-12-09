@@ -1,8 +1,10 @@
 import {
   Children,
+  createContext,
   isComponentCreator,
   isRefkey,
   OutputSymbol,
+  useContext,
 } from "@alloy-js/core";
 import { GraphQLOutputSymbol } from "../symbols/graphql-output-symbol.js";
 import { ref } from "../symbols/reference.js";
@@ -39,9 +41,37 @@ interface PendingValidation {
   interfaces: ResolvedInterface[];
 }
 
-// Global registry for types that need validation
-let pendingValidations: PendingValidation[] = [];
-let validationErrors: Error[] = [];
+/**
+ * Validation state that gets passed through context.
+ * This is a mutable object created by the render function and passed to the provider.
+ */
+export interface InterfaceValidationState {
+  pendingValidations: PendingValidation[];
+}
+
+/**
+ * Context for interface validation - scopes validation state to a render tree.
+ */
+const InterfaceValidationContext =
+  createContext<InterfaceValidationState | null>(null);
+
+/**
+ * Provider component that wraps the render tree and provides validation context.
+ */
+export interface InterfaceValidationProviderProps {
+  state: InterfaceValidationState;
+  children: Children;
+}
+
+export function InterfaceValidationProvider(
+  props: InterfaceValidationProviderProps,
+) {
+  return (
+    <InterfaceValidationContext.Provider value={props.state}>
+      {props.children}
+    </InterfaceValidationContext.Provider>
+  );
+}
 
 /**
  * Resolve a symbol's type annotation to a string.
@@ -104,15 +134,23 @@ function extractFieldKeys(symbol: GraphQLOutputSymbol): Set<string> {
 }
 
 /**
- * Register a type for deferred interface implementation validation.
+ * Hook to register a type for deferred interface implementation validation.
+ * Must be called from within a component during render.
+ *
  * Resolves interface refkeys immediately while we're still in the render context with access to the binder.
  * Field extraction is deferred until validation time to ensure all members have been added.
  */
-export function registerForValidation(
+export function useRegisterForValidation(
   typeName: string,
   symbol: GraphQLOutputSymbol,
   interfaces: Children[],
 ): void {
+  const ctx = useContext(InterfaceValidationContext);
+  if (!ctx) {
+    // No validation context, skip validation (e.g., when using plain render())
+    return;
+  }
+
   // Resolve interfaces immediately while we have binder context, including transitive ones
   const resolvedInterfaces: Record<string, ResolvedInterface> = {};
 
@@ -142,7 +180,7 @@ export function registerForValidation(
 
   resolveInterfacesRecursively(interfaces);
 
-  pendingValidations.push({
+  ctx.pendingValidations.push({
     typeName,
     typeSymbol: symbol,
     interfaces: Object.values(resolvedInterfaces),
@@ -150,18 +188,16 @@ export function registerForValidation(
 }
 
 /**
- * Run all pending interface implementation validations
+ * Run all pending interface implementation validations from the provided state.
  *
- * This is called automatically by the SourceFile component after rendering is complete.
- * Users don't need to call this manually - it's handled by the framework.
- *
- * Errors are collected rather than thrown, and can be retrieved with getValidationErrors().
+ * This is called automatically by SourceFile's validation mechanism after rendering.
+ * Each SourceFile creates its own validation state and registers it for collection.
+ * Use collectValidationErrors() from SourceFile.js to run validations on all registered states.
  */
-export function runPendingValidations(): void {
-  const validations = pendingValidations;
-  resetValidationState();
+export function runValidations(state: InterfaceValidationState): Error[] {
+  const errors: Error[] = [];
 
-  for (const { typeName, typeSymbol, interfaces } of validations) {
+  for (const { typeName, typeSymbol, interfaces } of state.pendingValidations) {
     const typeFields = extractFieldKeys(typeSymbol);
 
     for (const { symbol: interfaceSymbol } of interfaces) {
@@ -169,7 +205,7 @@ export function runPendingValidations(): void {
       const interfaceFields = extractFieldKeys(interfaceSymbol);
 
       if (!isSupersetOf(typeFields, interfaceFields)) {
-        validationErrors.push(
+        errors.push(
           new Error(
             `Type "${typeName}" does not correctly implement interface "${interfaceName}".`,
           ),
@@ -177,19 +213,17 @@ export function runPendingValidations(): void {
       }
     }
   }
+
+  return errors;
 }
 
 /**
- * Get all validation errors collected during the last validation run
+ * Create a fresh validation state object.
+ * This should be called by SourceFile before rendering.
  */
-export function getValidationErrors(): Error[] {
-  return validationErrors;
+export function createValidationState(): InterfaceValidationState {
+  return {
+    pendingValidations: [],
+  };
 }
 
-/**
- * Clear all pending validations and errors (useful for testing)
- */
-export function resetValidationState(): void {
-  pendingValidations = [];
-  validationErrors = [];
-}

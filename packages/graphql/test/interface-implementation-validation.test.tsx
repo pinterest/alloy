@@ -1,9 +1,8 @@
 import { refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
-import { getValidationErrors } from "../src/components/DeferredInterfaceValidation.js";
 import * as gql from "../src/index.js";
-import { toGraphQLText } from "./utils.jsx";
+import { toGraphQLText, toGraphQLTextWithErrors } from "./utils.jsx";
 
 describe("Interface Implementation Validation", () => {
   describe("Field presence validation", () => {
@@ -46,7 +45,7 @@ describe("Interface Implementation Validation", () => {
     it("throws when type is missing an interface field", () => {
       const nodeRef = refkey();
 
-      toGraphQLText(
+      const { errors } = toGraphQLTextWithErrors(
         <>
           <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
             <gql.FieldDefinition
@@ -63,7 +62,6 @@ describe("Interface Implementation Validation", () => {
         </>,
       );
 
-      const errors = getValidationErrors();
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toBe(
         'Type "User" does not correctly implement interface "Node".',
@@ -120,7 +118,7 @@ describe("Interface Implementation Validation", () => {
       const nodeRef = refkey();
       const timestampedRef = refkey();
 
-      toGraphQLText(
+      const { errors } = toGraphQLTextWithErrors(
         <>
           <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
             <gql.FieldDefinition
@@ -155,7 +153,6 @@ describe("Interface Implementation Validation", () => {
         </>,
       );
 
-      const errors = getValidationErrors();
       expect(errors).toHaveLength(2);
       expect(errors[0].message).toBe(
         'Type "User" does not correctly implement interface "Timestamped".',
@@ -193,7 +190,7 @@ describe("Interface Implementation Validation", () => {
     it("throws when return type doesn't match", () => {
       const nodeRef = refkey();
 
-      toGraphQLText(
+      const { errors } = toGraphQLTextWithErrors(
         <>
           <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
             <gql.FieldDefinition
@@ -210,7 +207,6 @@ describe("Interface Implementation Validation", () => {
         </>,
       );
 
-      const errors = getValidationErrors();
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toBe(
         'Type "User" does not correctly implement interface "Node".',
@@ -220,7 +216,7 @@ describe("Interface Implementation Validation", () => {
     it("throws when nullability doesn't match", () => {
       const nodeRef = refkey();
 
-      toGraphQLText(
+      const { errors } = toGraphQLTextWithErrors(
         <>
           <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
             <gql.FieldDefinition
@@ -237,7 +233,6 @@ describe("Interface Implementation Validation", () => {
         </>,
       );
 
-      const errors = getValidationErrors();
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toBe(
         'Type "User" does not correctly implement interface "Node".',
@@ -284,7 +279,7 @@ describe("Interface Implementation Validation", () => {
     it("throws when argument count doesn't match", () => {
       const nodeRef = refkey();
 
-      toGraphQLText(
+      const { errors } = toGraphQLTextWithErrors(
         <>
           <gql.InterfaceTypeDefinition name="Repository" refkey={nodeRef}>
             <gql.FieldDefinition
@@ -307,7 +302,6 @@ describe("Interface Implementation Validation", () => {
         </>,
       );
 
-      const errors = getValidationErrors();
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toBe(
         'Type "GitHubRepo" does not correctly implement interface "Repository".',
@@ -317,7 +311,7 @@ describe("Interface Implementation Validation", () => {
     it("throws when argument name doesn't match", () => {
       const nodeRef = refkey();
 
-      toGraphQLText(
+      const { errors } = toGraphQLTextWithErrors(
         <>
           <gql.InterfaceTypeDefinition name="Repository" refkey={nodeRef}>
             <gql.FieldDefinition
@@ -346,7 +340,6 @@ describe("Interface Implementation Validation", () => {
         </>,
       );
 
-      const errors = getValidationErrors();
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toBe(
         'Type "GitHubRepo" does not correctly implement interface "Repository".',
@@ -356,7 +349,7 @@ describe("Interface Implementation Validation", () => {
     it("throws when argument type doesn't match", () => {
       const nodeRef = refkey();
 
-      toGraphQLText(
+      const { errors } = toGraphQLTextWithErrors(
         <>
           <gql.InterfaceTypeDefinition name="Repository" refkey={nodeRef}>
             <gql.FieldDefinition
@@ -385,7 +378,6 @@ describe("Interface Implementation Validation", () => {
         </>,
       );
 
-      const errors = getValidationErrors();
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toBe(
         'Type "GitHubRepo" does not correctly implement interface "Repository".',
@@ -494,7 +486,7 @@ describe("Interface Implementation Validation", () => {
       const nodeRef = refkey();
       const namedRef = refkey();
 
-      toGraphQLText(
+      const { errors } = toGraphQLTextWithErrors(
         <>
           <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
             <gql.FieldDefinition
@@ -520,7 +512,6 @@ describe("Interface Implementation Validation", () => {
         </>,
       );
 
-      const errors = getValidationErrors();
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toBe(
         'Type "User" does not correctly implement interface "Named".',
@@ -532,7 +523,7 @@ describe("Interface Implementation Validation", () => {
     it("validates matching types using TypeReference with refkeys", () => {
       const nodeRef = refkey();
 
-      const result = toGraphQLText(
+      const { text, errors } = toGraphQLTextWithErrors(
         <>
           <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
             <gql.FieldDefinition
@@ -549,15 +540,14 @@ describe("Interface Implementation Validation", () => {
         </>,
       );
 
-      expect(result).toBeDefined();
-      const errors = getValidationErrors();
+      expect(text).toBeDefined();
       expect(errors).toHaveLength(0);
     });
 
     it("throws when TypeReference types don't match", () => {
       const nodeRef = refkey();
 
-      toGraphQLText(
+      const { errors } = toGraphQLTextWithErrors(
         <>
           <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
             <gql.FieldDefinition
@@ -574,7 +564,6 @@ describe("Interface Implementation Validation", () => {
         </>,
       );
 
-      const errors = getValidationErrors();
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toBe(
         'Type "User" does not correctly implement interface "Node".',
@@ -584,7 +573,7 @@ describe("Interface Implementation Validation", () => {
     it("validates list types with TypeReference", () => {
       const nodeRef = refkey();
 
-      const result = toGraphQLText(
+      const { text, errors } = toGraphQLTextWithErrors(
         <>
           <gql.InterfaceTypeDefinition name="Connection" refkey={nodeRef}>
             <gql.FieldDefinition
@@ -613,8 +602,7 @@ describe("Interface Implementation Validation", () => {
         </>,
       );
 
-      expect(result).toBeDefined();
-      const errors = getValidationErrors();
+      expect(text).toBeDefined();
       expect(errors).toHaveLength(0);
     });
 
@@ -622,7 +610,7 @@ describe("Interface Implementation Validation", () => {
       const nodeRef = refkey();
       const statusRef = refkey();
 
-      const result = toGraphQLText(
+      const { text, errors } = toGraphQLTextWithErrors(
         <>
           <gql.EnumTypeDefinition name="Status" refkey={statusRef}>
             <gql.EnumValue name="ACTIVE" />
@@ -655,8 +643,7 @@ describe("Interface Implementation Validation", () => {
         </>,
       );
 
-      expect(result).toBeDefined();
-      const errors = getValidationErrors();
+      expect(text).toBeDefined();
       expect(errors).toHaveLength(0);
     });
   });
