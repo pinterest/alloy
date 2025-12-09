@@ -83,7 +83,7 @@ export function toGraphQLTextMultiple(
   return output;
 }
 
-export function toGraphQLText(
+export function toGraphQLTextWithErrors(
   c: Children,
   {
     policy,
@@ -92,7 +92,7 @@ export function toGraphQLText(
     policy?: NamePolicy<string>;
     printOptions?: PrintTreeOptions;
   } = {},
-): string {
+): { text: string; errors: Error[] } {
   if (!policy) {
     policy = createGraphQLNamePolicy();
   }
@@ -113,7 +113,17 @@ export function toGraphQLText(
     </Output>
   );
 
-  const { output } = renderGraphQLWithErrors(content, printOptions);
+  const { output, errors } = renderGraphQLWithErrors(content, printOptions);
   const file = findFile(output, "schema.graphql");
-  return file.contents;
+  return { text: file.contents, errors };
+}
+
+export function toGraphQLText(
+  c: Children,
+  options: {
+    policy?: NamePolicy<string>;
+    printOptions?: PrintTreeOptions;
+  } = {},
+): string {
+  return toGraphQLTextWithErrors(c, options).text;
 }

@@ -10,6 +10,37 @@ import {
 import { GraphQLModuleScope } from "../symbols/index.js";
 import { Reference } from "./Reference.js";
 import { wrapDescription } from "./utils.js";
+import {
+  createValidationState,
+  InterfaceValidationProvider,
+  InterfaceValidationState,
+  runValidations,
+} from "./DeferredInterfaceValidation.js";
+
+// Registry to track all active validation states from SourceFile components
+const validationRegistry = new Set<InterfaceValidationState>();
+
+/**
+ * Get all validation errors from all rendered SourceFile components.
+ * This runs validations on all registered validation states and returns any errors.
+ *
+ * Call this after rendering is complete to check for schema validation errors.
+ */
+export function collectValidationErrors(): Error[] {
+  const errors: Error[] = [];
+  for (const state of validationRegistry) {
+    errors.push(...runValidations(state));
+  }
+  return errors;
+}
+
+/**
+ * Clear all registered validation states.
+ * Useful for testing or when starting a new render.
+ */
+export function clearValidationRegistry(): void {
+  validationRegistry.clear();
+}
 
 export interface GraphQLSourceFileContext {
   scope: GraphQLModuleScope;
@@ -17,6 +48,11 @@ export interface GraphQLSourceFileContext {
    * The schema name for this file, e.g. 'schema' for schema.graphql
    */
   schemaName: string;
+  /**
+   * The validation state for this source file.
+   * Used to collect and run interface implementation validations.
+   */
+  validationState: InterfaceValidationState;
 }
 
 export const GraphQLSourceFileContext: ComponentContext<GraphQLSourceFileContext> =
@@ -83,24 +119,32 @@ export function SourceFile(props: SourceFileProps) {
   const scope = new GraphQLModuleScope(schemaName, undefined);
   const wrappedDescription = wrapDescription(props.description);
 
+  // Create validation state for this source file and register it
+  const validationState = createValidationState();
+  validationRegistry.add(validationState);
+
   return (
     <CoreSourceFile path={props.path} filetype="graphql" reference={Reference}>
-      <GraphQLSourceFileContext.Provider value={{ scope, schemaName }}>
-        {props.headerComment && (
-          <>
-            {`# ${props.headerComment}`}
-            <hbr />
-          </>
-        )}
-        {wrappedDescription() && (
-          <>
-            {wrappedDescription()}
-            <hbr />
-          </>
-        )}
-        <Scope value={scope}>
-          <List doubleHardline>{props.children}</List>
-        </Scope>
+      <GraphQLSourceFileContext.Provider
+        value={{ scope, schemaName, validationState }}
+      >
+        <InterfaceValidationProvider state={validationState}>
+          {props.headerComment && (
+            <>
+              {`# ${props.headerComment}`}
+              <hbr />
+            </>
+          )}
+          {wrappedDescription() && (
+            <>
+              {wrappedDescription()}
+              <hbr />
+            </>
+          )}
+          <Scope value={scope}>
+            <List doubleHardline>{props.children}</List>
+          </Scope>
+        </InterfaceValidationProvider>
       </GraphQLSourceFileContext.Provider>
     </CoreSourceFile>
   );
