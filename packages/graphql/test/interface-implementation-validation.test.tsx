@@ -65,8 +65,8 @@ describe("Interface Implementation Validation", () => {
 
       const errors = getValidationErrors();
       expect(errors).toHaveLength(1);
-      expect(errors[0].message).toMatch(
-        /Type "User" must implement field "id" from interface "Node"/,
+      expect(errors[0].message).toBe(
+        'Type "User" does not correctly implement interface "Node".',
       );
     });
 
@@ -156,9 +156,12 @@ describe("Interface Implementation Validation", () => {
       );
 
       const errors = getValidationErrors();
-      expect(errors).toHaveLength(1);
-      expect(errors[0].message).toMatch(
-        /Type "User" must implement field "id" from interface "Timestamped"/,
+      expect(errors).toHaveLength(2);
+      expect(errors[0].message).toBe(
+        'Type "User" does not correctly implement interface "Timestamped".',
+      );
+      expect(errors[1].message).toBe(
+        'Type "User" does not correctly implement interface "Node".',
       );
     });
   });
@@ -209,8 +212,8 @@ describe("Interface Implementation Validation", () => {
 
       const errors = getValidationErrors();
       expect(errors).toHaveLength(1);
-      expect(errors[0].message).toMatch(
-        /Type "User" field "id" return type must be "ID!" to match interface "Node", but found "String"/,
+      expect(errors[0].message).toBe(
+        'Type "User" does not correctly implement interface "Node".',
       );
     });
 
@@ -236,8 +239,8 @@ describe("Interface Implementation Validation", () => {
 
       const errors = getValidationErrors();
       expect(errors).toHaveLength(1);
-      expect(errors[0].message).toMatch(
-        /Type "User" field "id" return type must be "ID!" to match interface "Node", but found "ID"/,
+      expect(errors[0].message).toBe(
+        'Type "User" does not correctly implement interface "Node".',
       );
     });
   });
@@ -306,8 +309,8 @@ describe("Interface Implementation Validation", () => {
 
       const errors = getValidationErrors();
       expect(errors).toHaveLength(1);
-      expect(errors[0].message).toMatch(
-        /Type "GitHubRepo" field "issue": missing argument "number" to match interface "Repository"/,
+      expect(errors[0].message).toBe(
+        'Type "GitHubRepo" does not correctly implement interface "Repository".',
       );
     });
 
@@ -345,8 +348,8 @@ describe("Interface Implementation Validation", () => {
 
       const errors = getValidationErrors();
       expect(errors).toHaveLength(1);
-      expect(errors[0].message).toMatch(
-        /Type "GitHubRepo" field "issue": missing argument "number" to match interface "Repository"/,
+      expect(errors[0].message).toBe(
+        'Type "GitHubRepo" does not correctly implement interface "Repository".',
       );
     });
 
@@ -384,8 +387,8 @@ describe("Interface Implementation Validation", () => {
 
       const errors = getValidationErrors();
       expect(errors).toHaveLength(1);
-      expect(errors[0].message).toMatch(
-        /Type "GitHubRepo" field "issue": argument "number" type must be "Int!", found "String" to match interface "Repository"/,
+      expect(errors[0].message).toBe(
+        'Type "GitHubRepo" does not correctly implement interface "Repository".',
       );
     });
 
@@ -519,8 +522,8 @@ describe("Interface Implementation Validation", () => {
 
       const errors = getValidationErrors();
       expect(errors).toHaveLength(1);
-      expect(errors[0].message).toMatch(
-        /Type "User" must implement field "name" from interface "Named"/,
+      expect(errors[0].message).toBe(
+        'Type "User" does not correctly implement interface "Named".',
       );
     });
   });
@@ -573,8 +576,8 @@ describe("Interface Implementation Validation", () => {
 
       const errors = getValidationErrors();
       expect(errors).toHaveLength(1);
-      expect(errors[0].message).toMatch(
-        /Type "User" field "id" return type must be "ID!" to match interface "Node"/,
+      expect(errors[0].message).toBe(
+        'Type "User" does not correctly implement interface "Node".',
       );
     });
 
