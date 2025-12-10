@@ -107,10 +107,13 @@ describe("Variable", () => {
         name="GetUser"
         variableDefinitions={
           <>
-            <gql.VariableDefinition name="id" type={builtInScalars.ID} />
+            <gql.VariableDefinition
+              name="id"
+              type={<gql.TypeReference type={builtInScalars.ID} />}
+            />
             <gql.VariableDefinition
               name="includeEmail"
-              type={builtInScalars.Boolean}
+              type={<gql.TypeReference type={builtInScalars.Boolean} />}
               defaultValue={false}
             />
           </>
@@ -156,11 +159,21 @@ describe("Variable", () => {
           <>
             <gql.VariableDefinition
               name="name"
-              type={`${builtInScalars.String}!`}
+              type={
+                <gql.TypeReference
+                  type={<gql.TypeReference type={builtInScalars.String} />}
+                  required
+                />
+              }
             />
             <gql.VariableDefinition
               name="email"
-              type={`${builtInScalars.String}!`}
+              type={
+                <gql.TypeReference
+                  type={<gql.TypeReference type={builtInScalars.String} />}
+                  required
+                />
+              }
             />
           </>
         }
@@ -200,7 +213,10 @@ describe("Variable", () => {
         operationType="mutation"
         name="UpdateUser"
         variableDefinitions={
-          <gql.VariableDefinition name="input" type="UserInput!" />
+          <gql.VariableDefinition
+            name="input"
+            type={<gql.TypeReference type="UserInput" required />}
+          />
         }
       >
         <gql.FieldSelection
@@ -232,7 +248,7 @@ describe("Variable", () => {
         variableDefinitions={
           <gql.VariableDefinition
             name="showDetails"
-            type={builtInScalars.Boolean}
+            type={<gql.TypeReference type={builtInScalars.Boolean} />}
             defaultValue={false}
           />
         }
@@ -273,17 +289,17 @@ describe("Variable", () => {
           <>
             <gql.VariableDefinition
               name="query"
-              type={builtInScalars.String}
+              type={<gql.TypeReference type={builtInScalars.String} />}
               defaultValue="default"
             />
             <gql.VariableDefinition
               name="limit"
-              type={builtInScalars.Int}
+              type={<gql.TypeReference type={builtInScalars.Int} />}
               defaultValue={10}
             />
             <gql.VariableDefinition
               name="includeDeleted"
-              type={builtInScalars.Boolean}
+              type={<gql.TypeReference type={builtInScalars.Boolean} />}
               defaultValue={false}
             />
           </>

@@ -1,5 +1,5 @@
 /** @jsxImportSource @alloy-js/core */
-import { code, refkey } from "@alloy-js/core";
+import { refkey } from "@alloy-js/core";
 import { describe, expect, it } from "vitest";
 import * as gql from "../src/index.js";
 import { toGraphQLText } from "./utils.jsx";
@@ -12,8 +12,14 @@ describe("Fragment Type Condition Validation", () => {
       const result = toGraphQLText(
         <>
           <gql.ObjectTypeDefinition name="User" refkey={userRef}>
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
-            <gql.FieldDefinition name="name" type={gql.builtInScalars.String} />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
+            <gql.FieldDefinition
+              name="name"
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
+            />
           </gql.ObjectTypeDefinition>
           <gql.FragmentDefinition name="UserFields" typeCondition={userRef}>
             <gql.FieldSelection name="id" />
@@ -33,7 +39,7 @@ describe("Fragment Type Condition Validation", () => {
           <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
             <gql.FieldDefinition
               name="id"
-              type={code`${gql.builtInScalars.ID}!`}
+              type={<gql.TypeReference type={gql.builtInScalars.ID} required />}
             />
           </gql.InterfaceTypeDefinition>
           <gql.FragmentDefinition name="NodeFields" typeCondition={nodeRef}>
@@ -142,7 +148,13 @@ describe("Fragment Type Condition Validation", () => {
             >
               <gql.InputFieldDeclaration
                 name="name"
-                type={gql.builtInScalars.String}
+                type={
+                  <gql.TypeReference
+                    type={
+                      <gql.TypeReference type={gql.builtInScalars.String} />
+                    }
+                  />
+                }
               />
             </gql.InputObjectTypeDefinition>
             <gql.FragmentDefinition
@@ -166,8 +178,14 @@ describe("Fragment Type Condition Validation", () => {
       const result = toGraphQLText(
         <>
           <gql.ObjectTypeDefinition name="User" refkey={userRef}>
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
-            <gql.FieldDefinition name="name" type={gql.builtInScalars.String} />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
+            <gql.FieldDefinition
+              name="name"
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
+            />
           </gql.ObjectTypeDefinition>
           <gql.OperationDefinition operationType="query" name="GetData">
             <gql.FieldSelection name="search">
@@ -241,7 +259,13 @@ describe("Fragment Type Condition Validation", () => {
             >
               <gql.InputFieldDeclaration
                 name="name"
-                type={gql.builtInScalars.String}
+                type={
+                  <gql.TypeReference
+                    type={
+                      <gql.TypeReference type={gql.builtInScalars.String} />
+                    }
+                  />
+                }
               />
             </gql.InputObjectTypeDefinition>
             <gql.OperationDefinition operationType="query" name="InvalidQuery">

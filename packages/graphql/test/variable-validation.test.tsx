@@ -1,5 +1,5 @@
 /** @jsxImportSource @alloy-js/core */
-import { code, refkey } from "@alloy-js/core";
+import { refkey } from "@alloy-js/core";
 import { describe, expect, it } from "vitest";
 import * as gql from "../src/index.js";
 import { toGraphQLText } from "./utils.jsx";
@@ -13,10 +13,13 @@ describe("Variable Type Validation", () => {
           name="GetUser"
           variableDefinitions={
             <>
-              <gql.VariableDefinition name="id" type={gql.builtInScalars.ID} />
+              <gql.VariableDefinition
+                name="id"
+                type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+              />
               <gql.VariableDefinition
                 name="name"
-                type={gql.builtInScalars.String}
+                type={<gql.TypeReference type={gql.builtInScalars.String} />}
               />
             </>
           }
@@ -44,7 +47,10 @@ describe("Variable Type Validation", () => {
             operationType="query"
             name="GetUsers"
             variableDefinitions={
-              <gql.VariableDefinition name="status" type={statusRef} />
+              <gql.VariableDefinition
+                name="status"
+                type={<gql.TypeReference type={statusRef} />}
+              />
             }
           >
             <gql.FieldSelection name="users">
@@ -65,11 +71,19 @@ describe("Variable Type Validation", () => {
           <gql.InputObjectTypeDefinition name="UserInput" refkey={userInputRef}>
             <gql.InputFieldDeclaration
               name="name"
-              type={gql.builtInScalars.String}
+              type={
+                <gql.TypeReference
+                  type={<gql.TypeReference type={gql.builtInScalars.String} />}
+                />
+              }
             />
             <gql.InputFieldDeclaration
               name="email"
-              type={gql.builtInScalars.String}
+              type={
+                <gql.TypeReference
+                  type={<gql.TypeReference type={gql.builtInScalars.String} />}
+                />
+              }
             />
           </gql.InputObjectTypeDefinition>
           <gql.OperationDefinition
@@ -78,7 +92,7 @@ describe("Variable Type Validation", () => {
             variableDefinitions={
               <gql.VariableDefinition
                 name="input"
-                type={code`${userInputRef}!`}
+                type={<gql.TypeReference type={userInputRef} required />}
               />
             }
           >
@@ -101,13 +115,19 @@ describe("Variable Type Validation", () => {
         toGraphQLText(
           <>
             <gql.ObjectTypeDefinition name="User" refkey={userRef}>
-              <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+              <gql.FieldDefinition
+                name="id"
+                type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+              />
             </gql.ObjectTypeDefinition>
             <gql.OperationDefinition
               operationType="query"
               name="InvalidQuery"
               variableDefinitions={
-                <gql.VariableDefinition name="user" type={userRef} />
+                <gql.VariableDefinition
+                  name="user"
+                  type={<gql.TypeReference type={userRef} />}
+                />
               }
             >
               <gql.FieldSelection name="something">
@@ -128,14 +148,19 @@ describe("Variable Type Validation", () => {
             <gql.InterfaceTypeDefinition name="Node" refkey={nodeRef}>
               <gql.FieldDefinition
                 name="id"
-                type={code`${gql.builtInScalars.ID}!`}
+                type={
+                  <gql.TypeReference type={gql.builtInScalars.ID} required />
+                }
               />
             </gql.InterfaceTypeDefinition>
             <gql.OperationDefinition
               operationType="query"
               name="InvalidQuery"
               variableDefinitions={
-                <gql.VariableDefinition name="node" type={nodeRef} />
+                <gql.VariableDefinition
+                  name="node"
+                  type={<gql.TypeReference type={nodeRef} />}
+                />
               }
             >
               <gql.FieldSelection name="something">
@@ -162,7 +187,10 @@ describe("Variable Type Validation", () => {
               operationType="query"
               name="InvalidQuery"
               variableDefinitions={
-                <gql.VariableDefinition name="result" type={searchResultRef} />
+                <gql.VariableDefinition
+                  name="result"
+                  type={<gql.TypeReference type={searchResultRef} />}
+                />
               }
             >
               <gql.FieldSelection name="something">
@@ -184,7 +212,7 @@ describe("Variable Type Validation", () => {
           variableDefinitions={
             <gql.VariableDefinition
               name="id"
-              type={gql.builtInScalars.ID}
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
               defaultValue={null}
             />
           }
@@ -206,7 +234,12 @@ describe("Variable Type Validation", () => {
           variableDefinitions={
             <gql.VariableDefinition
               name="limit"
-              type={code`${gql.builtInScalars.Int}!`}
+              type={
+                <gql.TypeReference
+                  type={<gql.TypeReference type={gql.builtInScalars.Int} />}
+                  required
+                />
+              }
               defaultValue={10}
             />
           }
@@ -229,7 +262,9 @@ describe("Variable Type Validation", () => {
             variableDefinitions={
               <gql.VariableDefinition
                 name="id"
-                type={code`${gql.builtInScalars.ID}!`}
+                type={
+                  <gql.TypeReference type={gql.builtInScalars.ID} required />
+                }
                 defaultValue={null}
               />
             }
@@ -251,14 +286,17 @@ describe("Variable Type Validation", () => {
           name="GetUser"
           variableDefinitions={
             <>
-              <gql.VariableDefinition name="id" type={gql.builtInScalars.ID} />
+              <gql.VariableDefinition
+                name="id"
+                type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+              />
               <gql.VariableDefinition
                 name="limit"
-                type={gql.builtInScalars.Int}
+                type={<gql.TypeReference type={gql.builtInScalars.Int} />}
               />
               <gql.VariableDefinition
                 name="includeDeleted"
-                type={gql.builtInScalars.Boolean}
+                type={<gql.TypeReference type={gql.builtInScalars.Boolean} />}
               />
             </>
           }
@@ -284,11 +322,11 @@ describe("Variable Type Validation", () => {
               <>
                 <gql.VariableDefinition
                   name="id"
-                  type={gql.builtInScalars.ID}
+                  type={<gql.TypeReference type={gql.builtInScalars.ID} />}
                 />
                 <gql.VariableDefinition
                   name="id"
-                  type={gql.builtInScalars.String}
+                  type={<gql.TypeReference type={gql.builtInScalars.String} />}
                 />
               </>
             }
@@ -311,11 +349,11 @@ describe("Variable Type Validation", () => {
               <>
                 <gql.VariableDefinition
                   name="title"
-                  type={gql.builtInScalars.String}
+                  type={<gql.TypeReference type={gql.builtInScalars.String} />}
                 />
                 <gql.VariableDefinition
                   name="title"
-                  type={gql.builtInScalars.String}
+                  type={<gql.TypeReference type={gql.builtInScalars.String} />}
                 />
               </>
             }
@@ -335,7 +373,10 @@ describe("Variable Type Validation", () => {
             operationType="query"
             name="GetUser"
             variableDefinitions={
-              <gql.VariableDefinition name="id" type={gql.builtInScalars.ID} />
+              <gql.VariableDefinition
+                name="id"
+                type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+              />
             }
           >
             <gql.FieldSelection name="user">
@@ -346,7 +387,10 @@ describe("Variable Type Validation", () => {
             operationType="query"
             name="GetPost"
             variableDefinitions={
-              <gql.VariableDefinition name="id" type={gql.builtInScalars.ID} />
+              <gql.VariableDefinition
+                name="id"
+                type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+              />
             }
           >
             <gql.FieldSelection name="post">

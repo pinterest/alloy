@@ -362,13 +362,22 @@ describe("Keywords and reserved names", () => {
     const result = toGraphQLText(
       <>
         <gql.InterfaceTypeDefinition name="interface">
-          <gql.FieldDefinition name="id" type={builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} />}
+          />
         </gql.InterfaceTypeDefinition>
         <gql.InterfaceTypeDefinition name="type">
-          <gql.FieldDefinition name="value" type={builtInScalars.String} />
+          <gql.FieldDefinition
+            name="value"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
         </gql.InterfaceTypeDefinition>
         <gql.InterfaceTypeDefinition name="enum">
-          <gql.FieldDefinition name="name" type={builtInScalars.String} />
+          <gql.FieldDefinition
+            name="name"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
         </gql.InterfaceTypeDefinition>
       </>,
     );
@@ -395,14 +404,20 @@ describe("Keywords and reserved names", () => {
         <gql.InputObjectTypeDefinition name="input">
           <gql.InputFieldDeclaration
             name="value"
-            type={builtInScalars.String}
+            type={<gql.TypeReference type={builtInScalars.String} />}
           />
         </gql.InputObjectTypeDefinition>
         <gql.InputObjectTypeDefinition name="type">
-          <gql.InputFieldDeclaration name="name" type={builtInScalars.String} />
+          <gql.InputFieldDeclaration
+            name="name"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
         </gql.InputObjectTypeDefinition>
         <gql.InputObjectTypeDefinition name="scalar">
-          <gql.InputFieldDeclaration name="id" type={builtInScalars.ID} />
+          <gql.InputFieldDeclaration
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} />}
+          />
         </gql.InputObjectTypeDefinition>
       </>,
     );
