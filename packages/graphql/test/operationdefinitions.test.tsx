@@ -90,10 +90,13 @@ describe("OperationDefinition", () => {
         name="GetUser"
         variableDefinitions={
           <>
-            <gql.VariableDefinition name="id" type="ID!" />
+            <gql.VariableDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} required />}
+            />
             <gql.VariableDefinition
               name="includeDeleted"
-              type="Boolean"
+              type={<gql.TypeReference type={gql.builtInScalars.Boolean} />}
               defaultValue={false}
             />
           </>
@@ -147,8 +150,15 @@ describe("OperationDefinition", () => {
         name="GetUserPosts"
         variableDefinitions={
           <>
-            <gql.VariableDefinition name="userId" type="ID!" />
-            <gql.VariableDefinition name="limit" type="Int" defaultValue={10} />
+            <gql.VariableDefinition
+              name="userId"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} required />}
+            />
+            <gql.VariableDefinition
+              name="limit"
+              type={<gql.TypeReference type={gql.builtInScalars.Int} />}
+              defaultValue={10}
+            />
           </>
         }
         directives={<gql.Directive name="cacheControl" args={{ maxAge: 60 }} />}
@@ -183,7 +193,12 @@ describe("OperationDefinition", () => {
         operationType="query"
         name="GetUser"
         description="Fetch a user by their ID"
-        variableDefinitions={<gql.VariableDefinition name="id" type="ID!" />}
+        variableDefinitions={
+          <gql.VariableDefinition
+            name="id"
+            type={<gql.TypeReference type={gql.builtInScalars.ID} required />}
+          />
+        }
       >
         <gql.FieldSelection name="user">
           <gql.FieldSelection name="id" />

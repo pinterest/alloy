@@ -1,4 +1,4 @@
-import { code, refkey } from "@alloy-js/core";
+import { refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import { builtInScalars } from "../src/builtins/scalars.js";
@@ -25,7 +25,10 @@ describe("Complete Schema Integration", () => {
           refkey={nodeRef}
           description="Object with a unique identifier"
         >
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
         </gql.InterfaceTypeDefinition>
 
         <gql.InterfaceTypeDefinition
@@ -35,11 +38,21 @@ describe("Complete Schema Integration", () => {
         >
           <gql.FieldDefinition
             name="createdAt"
-            type={code`${builtInScalars.String}!`}
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type={builtInScalars.String} />}
+                required
+              />
+            }
           />
           <gql.FieldDefinition
             name="updatedAt"
-            type={code`${builtInScalars.String}!`}
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type={builtInScalars.String} />}
+                required
+              />
+            }
           />
         </gql.InterfaceTypeDefinition>
 
@@ -69,24 +82,50 @@ describe("Complete Schema Integration", () => {
           implements={[nodeRef, timestampedRef]}
           description="A user in the blog system"
         >
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
           <gql.FieldDefinition
             name="username"
-            type={code`${builtInScalars.String}!`}
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type={builtInScalars.String} />}
+                required
+              />
+            }
             description="Unique username"
           />
           <gql.FieldDefinition
             name="email"
-            type={code`${builtInScalars.String}!`}
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type={builtInScalars.String} />}
+                required
+              />
+            }
           />
-          <gql.FieldDefinition name="postCount" type={builtInScalars.Int} />
+          <gql.FieldDefinition
+            name="postCount"
+            type={<gql.TypeReference type={builtInScalars.Int} />}
+          />
           <gql.FieldDefinition
             name="createdAt"
-            type={code`${builtInScalars.String}!`}
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type={builtInScalars.String} />}
+                required
+              />
+            }
           />
           <gql.FieldDefinition
             name="updatedAt"
-            type={code`${builtInScalars.String}!`}
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type={builtInScalars.String} />}
+                required
+              />
+            }
           />
         </gql.ObjectTypeDefinition>
 
@@ -96,25 +135,67 @@ describe("Complete Schema Integration", () => {
           implements={[nodeRef, timestampedRef]}
           description="A blog post"
         >
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
           <gql.FieldDefinition
             name="title"
-            type={code`${builtInScalars.String}!`}
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type={builtInScalars.String} />}
+                required
+              />
+            }
           />
           <gql.FieldDefinition
             name="content"
-            type={code`${builtInScalars.String}!`}
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type={builtInScalars.String} />}
+                required
+              />
+            }
           />
-          <gql.FieldDefinition name="status" type={code`${postStatusRef}!`} />
-          <gql.FieldDefinition name="author" type={code`${userRef}!`} />
-          <gql.FieldDefinition name="commentCount" type={builtInScalars.Int} />
+          <gql.FieldDefinition
+            name="status"
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type={postStatusRef} />}
+                required
+              />
+            }
+          />
+          <gql.FieldDefinition
+            name="author"
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type={userRef} />}
+                required
+              />
+            }
+          />
+          <gql.FieldDefinition
+            name="commentCount"
+            type={<gql.TypeReference type={builtInScalars.Int} />}
+          />
           <gql.FieldDefinition
             name="createdAt"
-            type={code`${builtInScalars.String}!`}
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type={builtInScalars.String} />}
+                required
+              />
+            }
           />
           <gql.FieldDefinition
             name="updatedAt"
-            type={code`${builtInScalars.String}!`}
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type={builtInScalars.String} />}
+                required
+              />
+            }
           />
         </gql.ObjectTypeDefinition>
 
@@ -124,20 +205,54 @@ describe("Complete Schema Integration", () => {
           implements={[nodeRef, timestampedRef]}
           description="A comment on a post"
         >
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
           <gql.FieldDefinition
             name="content"
-            type={code`${builtInScalars.String}!`}
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type={builtInScalars.String} />}
+                required
+              />
+            }
           />
-          <gql.FieldDefinition name="author" type={code`${userRef}!`} />
-          <gql.FieldDefinition name="post" type={code`${postRef}!`} />
+          <gql.FieldDefinition
+            name="author"
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type={userRef} />}
+                required
+              />
+            }
+          />
+          <gql.FieldDefinition
+            name="post"
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type={postRef} />}
+                required
+              />
+            }
+          />
           <gql.FieldDefinition
             name="createdAt"
-            type={code`${builtInScalars.String}!`}
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type={builtInScalars.String} />}
+                required
+              />
+            }
           />
           <gql.FieldDefinition
             name="updatedAt"
-            type={code`${builtInScalars.String}!`}
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type={builtInScalars.String} />}
+                required
+              />
+            }
           />
         </gql.ObjectTypeDefinition>
 
@@ -145,37 +260,48 @@ describe("Complete Schema Integration", () => {
         <gql.ObjectTypeDefinition name="Query" description="Root query type">
           <gql.FieldDefinition
             name="user"
-            type={userRef}
+            type={<gql.TypeReference type={userRef} />}
             args={
               <gql.InputValueDefinition
                 name="id"
-                type={code`${builtInScalars.ID}!`}
+                type={<gql.TypeReference type={builtInScalars.ID} required />}
               />
             }
           />
           <gql.FieldDefinition
             name="post"
-            type={postRef}
+            type={<gql.TypeReference type={postRef} />}
             args={
               <gql.InputValueDefinition
                 name="id"
-                type={code`${builtInScalars.ID}!`}
+                type={<gql.TypeReference type={builtInScalars.ID} required />}
               />
             }
           />
           <gql.FieldDefinition
             name="posts"
-            type={code`[${postRef}!]!`}
+            type={
+              <gql.TypeReference
+                type={
+                  <gql.TypeReference
+                    type={<gql.TypeReference type={postRef} />}
+                    required
+                  />
+                }
+                list
+                required
+              />
+            }
             args={
               <>
                 <gql.InputValueDefinition
                   name="status"
-                  type={postStatusRef}
-                  defaultValue={code`${publishedRef}`}
+                  type={<gql.TypeReference type={postStatusRef} />}
+                  defaultValue={publishedRef}
                 />
                 <gql.InputValueDefinition
                   name="limit"
-                  type={builtInScalars.Int}
+                  type={<gql.TypeReference type={builtInScalars.Int} />}
                   defaultValue={10}
                 />
               </>
@@ -190,49 +316,67 @@ describe("Complete Schema Integration", () => {
         >
           <gql.FieldDefinition
             name="createPost"
-            type={code`${postRef}!`}
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type={postRef} />}
+                required
+              />
+            }
             args={
               <>
                 <gql.InputValueDefinition
                   name="title"
-                  type={code`${builtInScalars.String}!`}
+                  type={
+                    <gql.TypeReference
+                      type={<gql.TypeReference type={builtInScalars.String} />}
+                      required
+                    />
+                  }
                 />
                 <gql.InputValueDefinition
                   name="content"
-                  type={code`${builtInScalars.String}!`}
+                  type={
+                    <gql.TypeReference
+                      type={<gql.TypeReference type={builtInScalars.String} />}
+                      required
+                    />
+                  }
                 />
                 <gql.InputValueDefinition
                   name="status"
-                  type={postStatusRef}
-                  defaultValue={code`${draftRef}`}
+                  type={<gql.TypeReference type={postStatusRef} />}
+                  defaultValue={draftRef}
                 />
               </>
             }
           />
           <gql.FieldDefinition
             name="updatePost"
-            type={postRef}
+            type={<gql.TypeReference type={postRef} />}
             args={
               <>
                 <gql.InputValueDefinition
                   name="id"
-                  type={code`${builtInScalars.ID}!`}
+                  type={<gql.TypeReference type={builtInScalars.ID} required />}
                 />
                 <gql.InputValueDefinition
                   name="title"
-                  type={builtInScalars.String}
+                  type={<gql.TypeReference type={builtInScalars.String} />}
                 />
-                <gql.InputValueDefinition name="status" type={postStatusRef} />
+                <gql.InputValueDefinition
+                  name="status"
+                  type={<gql.TypeReference type={postStatusRef} />}
+                />
               </>
             }
           />
           <gql.FieldDefinition
             name="deletePost"
-            type={builtInScalars.Boolean}
+            type={<gql.TypeReference type={builtInScalars.Boolean} />}
             args={
               <gql.InputValueDefinition
                 name="id"
-                type={code`${builtInScalars.ID}!`}
+                type={<gql.TypeReference type={builtInScalars.ID} required />}
               />
             }
           />
@@ -247,16 +391,16 @@ describe("Complete Schema Integration", () => {
             <>
               <gql.VariableDefinition
                 name="userId"
-                type={code`${builtInScalars.ID}!`}
+                type={<gql.TypeReference type={builtInScalars.ID} required />}
               />
               <gql.VariableDefinition
                 name="postStatus"
-                type={postStatusRef}
-                defaultValue={code`${publishedRef}`}
+                type={<gql.TypeReference type={postStatusRef} />}
+                defaultValue={publishedRef}
               />
               <gql.VariableDefinition
                 name="includeEmail"
-                type={builtInScalars.Boolean}
+                type={<gql.TypeReference type={builtInScalars.Boolean} />}
                 defaultValue={false}
               />
             </>
@@ -302,16 +446,26 @@ describe("Complete Schema Integration", () => {
             <>
               <gql.VariableDefinition
                 name="title"
-                type={code`${builtInScalars.String}!`}
+                type={
+                  <gql.TypeReference
+                    type={<gql.TypeReference type={builtInScalars.String} />}
+                    required
+                  />
+                }
               />
               <gql.VariableDefinition
                 name="content"
-                type={code`${builtInScalars.String}!`}
+                type={
+                  <gql.TypeReference
+                    type={<gql.TypeReference type={builtInScalars.String} />}
+                    required
+                  />
+                }
               />
               <gql.VariableDefinition
                 name="status"
-                type={postStatusRef}
-                defaultValue={code`${draftRef}`}
+                type={<gql.TypeReference type={postStatusRef} />}
+                defaultValue={draftRef}
               />
             </>
           }
@@ -488,13 +642,25 @@ describe("Complete Schema Integration", () => {
       <gql.SourceFile path="operations.graphql">
         {/* Type definitions */}
         <gql.ObjectTypeDefinition name="User" refkey={userRef}>
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
-          <gql.FieldDefinition name="name" type={builtInScalars.String} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
+          <gql.FieldDefinition
+            name="name"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
         </gql.ObjectTypeDefinition>
 
         <gql.ObjectTypeDefinition name="Post" refkey={postRef}>
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
-          <gql.FieldDefinition name="title" type={builtInScalars.String} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
+          <gql.FieldDefinition
+            name="title"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
         </gql.ObjectTypeDefinition>
 
         {/* Query operation */}
@@ -504,7 +670,7 @@ describe("Complete Schema Integration", () => {
           variableDefinitions={
             <gql.VariableDefinition
               name="id"
-              type={code`${builtInScalars.ID}!`}
+              type={<gql.TypeReference type={builtInScalars.ID} required />}
             />
           }
         >
@@ -526,7 +692,12 @@ describe("Complete Schema Integration", () => {
           variableDefinitions={
             <gql.VariableDefinition
               name="title"
-              type={code`${builtInScalars.String}!`}
+              type={
+                <gql.TypeReference
+                  type={<gql.TypeReference type={builtInScalars.String} />}
+                  required
+                />
+              }
             />
           }
         >
@@ -667,7 +838,7 @@ describe("Complete Schema Integration", () => {
           args={
             <gql.InputValueDefinition
               name="requires"
-              type={builtInScalars.String}
+              type={<gql.TypeReference type={builtInScalars.String} />}
             />
           }
         />
@@ -687,10 +858,13 @@ describe("Complete Schema Integration", () => {
             />
           }
         >
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
           <gql.FieldDefinition
             name="email"
-            type={builtInScalars.String}
+            type={<gql.TypeReference type={builtInScalars.String} />}
             directives={
               <gql.Directive
                 name={authDirectiveRef}
@@ -700,7 +874,7 @@ describe("Complete Schema Integration", () => {
           />
           <gql.FieldDefinition
             name="publicField"
-            type={builtInScalars.String}
+            type={<gql.TypeReference type={builtInScalars.String} />}
           />
         </gql.ObjectTypeDefinition>
 
@@ -712,7 +886,7 @@ describe("Complete Schema Integration", () => {
             <>
               <gql.VariableDefinition
                 name="includeEmail"
-                type={builtInScalars.Boolean}
+                type={<gql.TypeReference type={builtInScalars.Boolean} />}
                 defaultValue={false}
               />
             </>
@@ -750,8 +924,14 @@ describe("Complete Schema Integration", () => {
       <gql.SourceFile path="extensions.graphql">
         {/* Type extensions showcase */}
         <gql.ObjectTypeExtension name="User">
-          <gql.FieldDefinition name="email" type={builtInScalars.String} />
-          <gql.FieldDefinition name="phone" type={builtInScalars.String} />
+          <gql.FieldDefinition
+            name="email"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
+          <gql.FieldDefinition
+            name="phone"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
         </gql.ObjectTypeExtension>
 
         <gql.EnumTypeExtension name="Role">
@@ -765,7 +945,10 @@ describe("Complete Schema Integration", () => {
         />
 
         <gql.InterfaceTypeExtension name="Node">
-          <gql.FieldDefinition name="updatedAt" type="String" />
+          <gql.FieldDefinition
+            name="updatedAt"
+            type={<gql.TypeReference type="String" />}
+          />
         </gql.InterfaceTypeExtension>
 
         <gql.ScalarTypeExtension
@@ -779,7 +962,14 @@ describe("Complete Schema Integration", () => {
         />
 
         <gql.InputObjectTypeExtension name="FilterInput">
-          <gql.InputFieldDeclaration name="limit" type={builtInScalars.Int} />
+          <gql.InputFieldDeclaration
+            name="limit"
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type={builtInScalars.Int} />}
+              />
+            }
+          />
         </gql.InputObjectTypeExtension>
       </gql.SourceFile>,
     );
@@ -804,21 +994,48 @@ describe("Complete Schema Integration", () => {
     const result = toGraphQLText(
       <gql.SourceFile path="polymorphic.graphql">
         <gql.ObjectTypeDefinition name="User">
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
-          <gql.FieldDefinition name="name" type={builtInScalars.String} />
-          <gql.FieldDefinition name="email" type={builtInScalars.String} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
+          <gql.FieldDefinition
+            name="name"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
+          <gql.FieldDefinition
+            name="email"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
         </gql.ObjectTypeDefinition>
 
         <gql.ObjectTypeDefinition name="Post">
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
-          <gql.FieldDefinition name="title" type={builtInScalars.String} />
-          <gql.FieldDefinition name="content" type={builtInScalars.String} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
+          <gql.FieldDefinition
+            name="title"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
+          <gql.FieldDefinition
+            name="content"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
         </gql.ObjectTypeDefinition>
 
         <gql.ObjectTypeDefinition name="Comment">
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
-          <gql.FieldDefinition name="text" type={builtInScalars.String} />
-          <gql.FieldDefinition name="author" type={builtInScalars.String} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
+          <gql.FieldDefinition
+            name="text"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
+          <gql.FieldDefinition
+            name="author"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
         </gql.ObjectTypeDefinition>
 
         <gql.UnionTypeDefinition
@@ -834,11 +1051,11 @@ describe("Complete Schema Integration", () => {
             <>
               <gql.VariableDefinition
                 name="query"
-                type={builtInScalars.String}
+                type={<gql.TypeReference type={builtInScalars.String} />}
               />
               <gql.VariableDefinition
                 name="includeDetails"
-                type={builtInScalars.Boolean}
+                type={<gql.TypeReference type={builtInScalars.Boolean} />}
                 defaultValue={false}
               />
             </>

@@ -50,14 +50,16 @@ export function wrapDescription(description: Children | undefined) {
 }
 
 /**
- * Checks if a type string represents a non-null type (ends with !).
+ * Checks if a type represents a non-null type by checking the TypeReference's required prop.
  *
- * @param type - The type string to check
+ * @param type - The type to check (must be a TypeReference component)
  * @returns true if the type is non-null
  */
 export function isNonNullType(type: Children): boolean {
-  const typeStr = String(type).trim();
-  return typeStr.endsWith("!");
+  if (isComponentCreator(type, TypeReference)) {
+    return type.props.required === true;
+  }
+  return false;
 }
 
 /**
