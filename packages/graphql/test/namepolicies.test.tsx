@@ -356,6 +356,86 @@ describe("Keywords and reserved names", () => {
     expect(result).toContain("directive @query_ on FIELD_DEFINITION");
     expect(result).toContain("directive @type_ on FIELD_DEFINITION");
   });
+
+  it("transforms lowercase keywords for interface names (PascalCase makes them safe)", () => {
+    // Interfaces use PascalCase, so lowercase keywords become safe
+    const result = toGraphQLText(
+      <>
+        <gql.InterfaceTypeDefinition name="interface">
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} />}
+          />
+        </gql.InterfaceTypeDefinition>
+        <gql.InterfaceTypeDefinition name="type">
+          <gql.FieldDefinition
+            name="value"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
+        </gql.InterfaceTypeDefinition>
+        <gql.InterfaceTypeDefinition name="enum">
+          <gql.FieldDefinition
+            name="name"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
+        </gql.InterfaceTypeDefinition>
+      </>,
+    );
+    const expected = d`
+      interface Interface {
+        id: ID
+      }
+
+      interface Type {
+        value: String
+      }
+
+      interface Enum {
+        name: String
+      }
+    `;
+    expect(result).toRenderTo(expected);
+  });
+
+  it("transforms lowercase keywords for input object names (PascalCase makes them safe)", () => {
+    // Input objects use PascalCase, so lowercase keywords become safe
+    const result = toGraphQLText(
+      <>
+        <gql.InputObjectTypeDefinition name="input">
+          <gql.InputFieldDeclaration
+            name="value"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
+        </gql.InputObjectTypeDefinition>
+        <gql.InputObjectTypeDefinition name="type">
+          <gql.InputFieldDeclaration
+            name="name"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
+        </gql.InputObjectTypeDefinition>
+        <gql.InputObjectTypeDefinition name="scalar">
+          <gql.InputFieldDeclaration
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} />}
+          />
+        </gql.InputObjectTypeDefinition>
+      </>,
+    );
+    const expected = d`
+      input Input {
+        value: String
+      }
+
+      input Type {
+        name: String
+      }
+
+      input Scalar {
+        id: ID
+      }
+    `;
+    expect(result).toRenderTo(expected);
+  });
 });
 
 describe("Built-in scalar conflicts", () => {
