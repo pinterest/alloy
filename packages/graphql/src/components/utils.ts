@@ -50,14 +50,16 @@ export function wrapDescription(description: Children | undefined) {
 }
 
 /**
- * Checks if a type string represents a non-null type (ends with !).
+ * Checks if a type represents a non-null type by checking the TypeReference's required prop.
  *
- * @param type - The type string to check
+ * @param type - The type to check (must be a TypeReference component)
  * @returns true if the type is non-null
  */
 export function isNonNullType(type: Children): boolean {
-  const typeStr = String(type).trim();
-  return typeStr.endsWith("!");
+  if (isComponentCreator(type, TypeReference)) {
+    return type.props.required === true;
+  }
+  return false;
 }
 
 /**
@@ -211,6 +213,41 @@ export function validateInputType(
     throw new Error(
       `${context} "${fieldName}" cannot use ${kind} type "${typeName}". ` +
         `Only scalars, enums, and input objects can be used in input positions.`,
+    );
+  }
+}
+
+/**
+ * Validates that a fragment type condition is a valid composite output type.
+ * Fragment type conditions can be: Objects, Interfaces
+ * But NOT: Scalars, Enums, Input Objects, Unions
+ *
+ * @param typeCondition - The type condition to validate
+ * @param fragmentName - The fragment name for error messaging
+ * @throws {Error} If an invalid type is used as a fragment type condition
+ */
+export function validateFragmentTypeCondition(
+  typeCondition: Children,
+  fragmentName: string,
+): void {
+  // Only validate refkey references - non-refkey types can't be validated
+  // at generation time. The GraphQL schema validation will catch these errors.
+  if (!isRefkey(typeCondition)) return;
+
+  const reference = ref(typeCondition);
+  const [typeName, symbol] = reference();
+
+  const kind = symbol?.metadata?.kind;
+
+  // Fragments can only be on composite types (object, interface, union)
+  if (kind === "scalar" || kind === "enum" || kind === "input") {
+    const kindDisplay =
+      kind === "input" ? "input object type"
+      : kind === "scalar" ? "scalar type"
+      : "enum type";
+    throw new Error(
+      `Fragment "${fragmentName}" cannot have type condition "${typeName}" (${kindDisplay}). ` +
+        `Per the GraphQL spec, fragments can only be used on object types, interfaces, and unions.`,
     );
   }
 }

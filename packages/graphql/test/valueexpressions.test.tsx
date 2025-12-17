@@ -207,4 +207,175 @@ describe("ValueExpression Component", () => {
     ]);
     expect(result).toBe('@deprecated(reason: "Use newField instead")');
   });
+
+  it("renders zero value", () => {
+    const result = toGraphQLText([<gql.ValueExpression jsValue={0} />]);
+    expect(result).toBe("0");
+  });
+
+  it("renders negative zero", () => {
+    const result = toGraphQLText([<gql.ValueExpression jsValue={-0} />]);
+    expect(result).toBe("0");
+  });
+
+  it("renders empty string", () => {
+    const result = toGraphQLText([<gql.ValueExpression jsValue="" />]);
+    expect(result).toBe('""');
+  });
+
+  it("renders very large numbers", () => {
+    const result = toGraphQLText([
+      <gql.ValueExpression jsValue={9999999999} />,
+    ]);
+    expect(result).toBe("9999999999");
+  });
+
+  it("renders very small decimal numbers", () => {
+    const result = toGraphQLText([<gql.ValueExpression jsValue={0.0001} />]);
+    expect(result).toBe("0.0001");
+  });
+
+  it("renders scientific notation numbers", () => {
+    const result = toGraphQLText([<gql.ValueExpression jsValue={1e10} />]);
+    expect(result).toBe("10000000000");
+  });
+
+  it("renders negative float", () => {
+    const result = toGraphQLText([<gql.ValueExpression jsValue={-3.14159} />]);
+    expect(result).toBe("-3.14159");
+  });
+
+  it("renders deeply nested arrays", () => {
+    const result = toGraphQLText([
+      <gql.ValueExpression
+        jsValue={[
+          [
+            [1, 2],
+            [3, 4],
+          ],
+          [
+            [5, 6],
+            [7, 8],
+          ],
+        ]}
+      />,
+    ]);
+    expect(result).toRenderTo(d`
+      [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]
+    `);
+  });
+
+  it("renders deeply nested objects", () => {
+    const result = toGraphQLText([
+      <gql.ValueExpression
+        jsValue={{
+          level1: {
+            level2: {
+              level3: {
+                level4: {
+                  value: "deep",
+                },
+              },
+            },
+          },
+        }}
+      />,
+    ]);
+    expect(result).toRenderTo(d`
+      {level1: {level2: {level3: {level4: {value: "deep"}}}}}
+    `);
+  });
+
+  it("renders array with only null values", () => {
+    const result = toGraphQLText([
+      <gql.ValueExpression jsValue={[null, null, null]} />,
+    ]);
+    expect(result).toRenderTo(d`
+      [null, null, null]
+    `);
+  });
+
+  it("renders object with null values", () => {
+    const result = toGraphQLText([
+      <gql.ValueExpression jsValue={{ a: null, b: null, c: "value" }} />,
+    ]);
+    expect(result).toRenderTo(d`
+      {a: null, b: null, c: "value"}
+    `);
+  });
+
+  it("renders array with mixed nested structures", () => {
+    const result = toGraphQLText([
+      <gql.ValueExpression
+        jsValue={[1, "string", { nested: "object" }, [1, 2, 3], true, null]}
+      />,
+    ]);
+    expect(result).toRenderTo(d`
+      [1, "string", {nested: "object"}, [1, 2, 3], true, null]
+    `);
+  });
+
+  it("renders string with tab characters", () => {
+    const result = toGraphQLText([
+      <gql.ValueExpression jsValue="hello\tworld" />,
+    ]);
+    expect(result).toBe('"hello\\tworld"');
+  });
+
+  it("renders string with carriage return", () => {
+    const result = toGraphQLText([
+      <gql.ValueExpression jsValue="hello\rworld" />,
+    ]);
+    expect(result).toBe('"hello\\rworld"');
+  });
+
+  it("renders string with backslash", () => {
+    const result = toGraphQLText([
+      <gql.ValueExpression jsValue="path\\to\\file" />,
+    ]);
+    expect(result).toBe('"path\\\\to\\\\file"');
+  });
+
+  it("renders unicode characters in strings", () => {
+    const result = toGraphQLText([
+      <gql.ValueExpression jsValue="Hello 🌍 World" />,
+    ]);
+    expect(result).toBe('"Hello 🌍 World"');
+  });
+
+  it("renders very long strings", () => {
+    const longString = "a".repeat(1000);
+    const result = toGraphQLText([
+      <gql.ValueExpression jsValue={longString} />,
+    ]);
+    expect(result).toBe(`"${longString}"`);
+  });
+
+  it("renders object with special key names", () => {
+    const result = toGraphQLText([
+      <gql.ValueExpression
+        jsValue={{
+          "special-key": "value1",
+          special_key: "value2",
+          specialKey: "value3",
+        }}
+      />,
+    ]);
+    // Note: GraphQL doesn't quote object keys (they're not strings in the SDL)
+    expect(result).toContain("special-key:");
+    expect(result).toContain("special_key:");
+    expect(result).toContain("specialKey:");
+  });
+
+  it("renders large arrays with many elements", () => {
+    const largeArray = Array.from({ length: 100 }, (_, i) => i);
+    const result = toGraphQLText([
+      <gql.ValueExpression jsValue={largeArray} />,
+    ]);
+    // Large arrays are formatted with line breaks
+    expect(result).toContain("0");
+    expect(result).toContain("99");
+    expect(result).toMatch(/^\[/); // starts with [
+    expect(result).toMatch(/\]$/); // ends with ]
+  });
 });
