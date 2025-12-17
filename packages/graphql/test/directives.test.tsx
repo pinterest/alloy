@@ -1,4 +1,3 @@
-import { code } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import { builtInDirectives } from "../src/builtins/directives.js";
@@ -42,7 +41,10 @@ describe("Directive", () => {
         name="User"
         directives={<gql.Directive name="auth" args={{ requires: "USER" }} />}
       >
-        <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+        <gql.FieldDefinition
+          name="id"
+          type={<gql.TypeReference type={builtInScalars.ID} required />}
+        />
       </gql.ObjectTypeDefinition>,
     );
     expect(result).toRenderTo(d`
@@ -75,7 +77,7 @@ describe("Directive", () => {
       <gql.ObjectTypeDefinition name="Query">
         <gql.FieldDefinition
           name="oldUsers"
-          type={code`[User]`}
+          type={<gql.TypeReference type="User" list />}
           directives={
             <gql.Directive
               name={builtInDirectives.deprecated}
@@ -85,7 +87,7 @@ describe("Directive", () => {
         />
         <gql.FieldDefinition
           name="oldPosts"
-          type={code`[Post]`}
+          type={<gql.TypeReference type="Post" list />}
           directives={
             <gql.Directive
               name={builtInDirectives.deprecated}
@@ -110,14 +112,14 @@ describe("Directive", () => {
       <gql.ObjectTypeDefinition name="Query">
         <gql.FieldDefinition
           name="adminUsers"
-          type={code`[User]`}
+          type={<gql.TypeReference type="User" list />}
           directives={
             <gql.Directive name="auth" args={{ requires: "ADMIN", level: 5 }} />
           }
         />
         <gql.FieldDefinition
           name="moderatorUsers"
-          type={code`[User]`}
+          type={<gql.TypeReference type="User" list />}
           directives={
             <gql.Directive
               name="auth"

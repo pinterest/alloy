@@ -1,4 +1,4 @@
-import { code, refkey } from "@alloy-js/core";
+import { refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import { builtInScalars } from "../src/builtins/scalars.js";
@@ -13,12 +13,18 @@ describe("ObjectTypeDefinition", () => {
   it("renders a simple object type with fields", () => {
     const result = toGraphQLText(
       <gql.ObjectTypeDefinition name="User">
-        <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+        <gql.FieldDefinition
+          name="id"
+          type={<gql.TypeReference type={builtInScalars.ID} required />}
+        />
         <gql.FieldDefinition
           name="name"
-          type={code`${builtInScalars.String}!`}
+          type={<gql.TypeReference type={builtInScalars.String} required />}
         />
-        <gql.FieldDefinition name="email" type={builtInScalars.String} />
+        <gql.FieldDefinition
+          name="email"
+          type={<gql.TypeReference type={builtInScalars.String} />}
+        />
       </gql.ObjectTypeDefinition>,
     );
     expect(result).toRenderTo(d`
@@ -33,7 +39,10 @@ describe("ObjectTypeDefinition", () => {
   it("renders an object type with a description", () => {
     const result = toGraphQLText(
       <gql.ObjectTypeDefinition name="User" description="A user in the system">
-        <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+        <gql.FieldDefinition
+          name="id"
+          type={<gql.TypeReference type={builtInScalars.ID} required />}
+        />
       </gql.ObjectTypeDefinition>,
     );
     expect(result).toRenderTo(d`
@@ -52,7 +61,10 @@ describe("ObjectTypeDefinition", () => {
         name="User"
         description="A user in the system.\nCan have multiple lines of documentation."
       >
-        <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+        <gql.FieldDefinition
+          name="id"
+          type={<gql.TypeReference type={builtInScalars.ID} required />}
+        />
       </gql.ObjectTypeDefinition>,
     );
     expect(result).toRenderTo(d`
@@ -71,12 +83,12 @@ describe("ObjectTypeDefinition", () => {
       <gql.ObjectTypeDefinition name="User">
         <gql.FieldDefinition
           name="id"
-          type={code`${builtInScalars.ID}!`}
+          type={<gql.TypeReference type={builtInScalars.ID} required />}
           description="Unique identifier"
         />
         <gql.FieldDefinition
           name="email"
-          type={builtInScalars.String}
+          type={<gql.TypeReference type={builtInScalars.String} />}
           description="User's email address"
         />
       </gql.ObjectTypeDefinition>,
@@ -98,14 +110,23 @@ describe("ObjectTypeDefinition", () => {
   it("renders an object type with list fields", () => {
     const result = toGraphQLText(
       <gql.ObjectTypeDefinition name="User">
-        <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+        <gql.FieldDefinition
+          name="id"
+          type={<gql.TypeReference type={builtInScalars.ID} required />}
+        />
         <gql.FieldDefinition
           name="tags"
-          type={code`[${builtInScalars.String}!]!`}
+          type={
+            <gql.TypeReference
+              type={<gql.TypeReference type={builtInScalars.String} required />}
+              list
+              required
+            />
+          }
         />
         <gql.FieldDefinition
           name="scores"
-          type={code`[${builtInScalars.Float}]`}
+          type={<gql.TypeReference type={builtInScalars.Float} list />}
         />
       </gql.ObjectTypeDefinition>,
     );
@@ -125,20 +146,32 @@ describe("ObjectTypeDefinition", () => {
     const res = toGraphQLTextMultiple([
       <gql.SourceFile path="schema.graphql">
         <gql.ObjectTypeDefinition name="User" refkey={userRef}>
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
           <gql.FieldDefinition
             name="name"
-            type={code`${builtInScalars.String}!`}
+            type={<gql.TypeReference type={builtInScalars.String} required />}
           />
-          <gql.FieldDefinition name="posts" type={code`[${postRef}]!`} />
+          <gql.FieldDefinition
+            name="posts"
+            type={<gql.TypeReference type={postRef} list required />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Post" refkey={postRef}>
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
           <gql.FieldDefinition
             name="title"
-            type={code`${builtInScalars.String}!`}
+            type={<gql.TypeReference type={builtInScalars.String} required />}
           />
-          <gql.FieldDefinition name="author" type={code`${userRef}!`} />
+          <gql.FieldDefinition
+            name="author"
+            type={<gql.TypeReference type={userRef} required />}
+          />
         </gql.ObjectTypeDefinition>
       </gql.SourceFile>,
     ]);
@@ -176,14 +209,26 @@ describe("ObjectTypeDefinition", () => {
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="User" refkey={userRef}>
-          <gql.FieldDefinition name="id" type={builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Post" refkey={postRef}>
-          <gql.FieldDefinition name="id" type={builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Query">
-          <gql.FieldDefinition name="user" type={userRef} />
-          <gql.FieldDefinition name="post" type={postRef} />
+          <gql.FieldDefinition
+            name="user"
+            type={<gql.TypeReference type={userRef} />}
+          />
+          <gql.FieldDefinition
+            name="post"
+            type={<gql.TypeReference type={postRef} />}
+          />
         </gql.ObjectTypeDefinition>
       </>,
     );
@@ -209,7 +254,7 @@ describe("ObjectTypeDefinition", () => {
         <gql.ObjectTypeDefinition name="Query">
           <gql.FieldDefinition
             name="hello"
-            type={code`${builtInScalars.String}!`}
+            type={<gql.TypeReference type={builtInScalars.String} required />}
           />
         </gql.ObjectTypeDefinition>
       </>,
@@ -225,17 +270,23 @@ describe("ObjectTypeDefinition", () => {
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="User">
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
           <gql.FieldDefinition
             name="name"
-            type={code`${builtInScalars.String}!`}
+            type={<gql.TypeReference type={builtInScalars.String} required />}
           />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Post">
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
           <gql.FieldDefinition
             name="title"
-            type={code`${builtInScalars.String}!`}
+            type={<gql.TypeReference type={builtInScalars.String} required />}
           />
         </gql.ObjectTypeDefinition>
       </>,
@@ -258,11 +309,20 @@ describe("ObjectTypeDefinition", () => {
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="Node" refkey={nodeRef}>
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="User" implements={[nodeRef]}>
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
-          <gql.FieldDefinition name="name" type={builtInScalars.String} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
+          <gql.FieldDefinition
+            name="name"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
         </gql.ObjectTypeDefinition>
       </>,
     );
@@ -284,18 +344,33 @@ describe("ObjectTypeDefinition", () => {
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="Node" refkey={nodeRef}>
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Timestamped" refkey={timestampedRef}>
-          <gql.FieldDefinition name="createdAt" type={builtInScalars.String} />
+          <gql.FieldDefinition
+            name="createdAt"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition
           name="User"
           implements={[nodeRef, timestampedRef]}
         >
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
-          <gql.FieldDefinition name="createdAt" type={builtInScalars.String} />
-          <gql.FieldDefinition name="name" type={builtInScalars.String} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
+          <gql.FieldDefinition
+            name="createdAt"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
+          <gql.FieldDefinition
+            name="name"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
         </gql.ObjectTypeDefinition>
       </>,
     );
@@ -322,7 +397,10 @@ describe("ObjectTypeDefinition", () => {
         name="User"
         directives={<gql.Directive name="auth" args={{ requires: "ADMIN" }} />}
       >
-        <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+        <gql.FieldDefinition
+          name="id"
+          type={<gql.TypeReference type={builtInScalars.ID} required />}
+        />
       </gql.ObjectTypeDefinition>,
     );
     expect(result).toRenderTo(d`
@@ -343,7 +421,10 @@ describe("ObjectTypeDefinition", () => {
           </>
         }
       >
-        <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+        <gql.FieldDefinition
+          name="id"
+          type={<gql.TypeReference type={builtInScalars.ID} required />}
+        />
       </gql.ObjectTypeDefinition>,
     );
     expect(result).toRenderTo(d`
@@ -366,7 +447,13 @@ describe("ObjectTypeDefinition", () => {
         <gql.ObjectTypeDefinition name="Query">
           <gql.FieldDefinition
             name="search"
-            type={code`[${searchResultRef}!]!`}
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type={searchResultRef} required />}
+                list
+                required
+              />
+            }
           />
         </gql.ObjectTypeDefinition>
       </>,
@@ -388,8 +475,14 @@ describe("ObjectTypeDefinition", () => {
       <>
         <gql.ScalarTypeDefinition name="DateTime" refkey={dateTimeRef} />
         <gql.ObjectTypeDefinition name="Event">
-          <gql.FieldDefinition name="startTime" type={code`${dateTimeRef}!`} />
-          <gql.FieldDefinition name="endTime" type={dateTimeRef} />
+          <gql.FieldDefinition
+            name="startTime"
+            type={<gql.TypeReference type={dateTimeRef} required />}
+          />
+          <gql.FieldDefinition
+            name="endTime"
+            type={<gql.TypeReference type={dateTimeRef} />}
+          />
         </gql.ObjectTypeDefinition>
       </>,
     );

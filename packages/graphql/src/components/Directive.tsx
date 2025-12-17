@@ -4,7 +4,6 @@ import {
   For,
   isRefkey,
   memo,
-  Refkey,
   Show,
 } from "@alloy-js/core";
 import { ref } from "../symbols/reference.js";
@@ -65,7 +64,7 @@ export function Directive(props: DirectiveProps) {
     runDirectiveValidation(directiveName, props.args);
   }
 
-  const hasArgs = props.args && Object.keys(props.args).length > 0;
+  const hasArgs = !!Object.keys(props.args ?? {}).length;
   const argEntries = memo(() => (hasArgs ? Object.entries(props.args!) : []));
 
   return (
@@ -93,7 +92,7 @@ export function Directive(props: DirectiveProps) {
 function extractDirectiveName(name: Children): string | null {
   // If name is a refkey, resolve it
   if (isRefkey(name)) {
-    const reference = ref(name as Refkey);
+    const reference = ref(name);
     const [resolvedName] = reference();
     return String(resolvedName);
   }

@@ -157,11 +157,23 @@ describe("ScalarTypeDefinition", () => {
         <gql.ObjectTypeDefinition name="Query">
           <gql.FieldDefinition
             name="events"
-            type="[Event!]!"
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type="Event" required />}
+                list
+                required
+              />
+            }
             args={
               <>
-                <gql.InputValueDefinition name="after" type={dateTimeRef} />
-                <gql.InputValueDefinition name="before" type={dateTimeRef} />
+                <gql.InputValueDefinition
+                  name="after"
+                  type={<gql.TypeReference type={dateTimeRef} />}
+                />
+                <gql.InputValueDefinition
+                  name="before"
+                  type={<gql.TypeReference type={dateTimeRef} />}
+                />
               </>
             }
           />

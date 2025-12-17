@@ -7,7 +7,7 @@ import {
 } from "@alloy-js/core";
 import { createGraphQLSymbol } from "../symbol-creation.js";
 import { BaseDeclarationProps } from "./common-props.js";
-import { wrapDescription } from "./utils.js";
+import { validateUnionMembers, wrapDescription } from "./utils.js";
 
 export interface UnionTypeDefinitionProps extends BaseDeclarationProps {
   /**
@@ -49,19 +49,12 @@ export interface UnionTypeDefinitionProps extends BaseDeclarationProps {
  * ```
  */
 export function UnionTypeDefinition(props: UnionTypeDefinitionProps) {
-  // Validate that union has at least one member
-  if (!props.members || props.members.length === 0) {
-    throw new Error(
-      `Union "${props.name}" must have at least one member type. Empty unions are not valid in GraphQL.`,
-    );
-  }
+  validateUnionMembers(props.members, props.name);
 
   const sym = createGraphQLSymbol(
     props.name,
-    {
-      refkeys: props.refkey,
-    },
-    "type",
+    { refkeys: props.refkey },
+    "union",
   );
 
   const wrappedDescription = wrapDescription(props.description);

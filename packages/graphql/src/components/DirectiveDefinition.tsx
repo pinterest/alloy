@@ -84,8 +84,8 @@ export interface DirectiveDefinitionProps extends NamedDeclarationProps {
  *     locations={["FIELD_DEFINITION", "OBJECT"]}
  *     args={
  *       <>
- *         <InputValueDefinition name="requires" type={code`${roleRef}!`} defaultValue={userRef} />
- *         <InputValueDefinition name="scopes" type={code`[${builtInScalars.String}!]`} />
+ *         <InputValueDefinition name="requires" type={<TypeReference type={roleRef} required />} defaultValue={userRef} />
+ *         <InputValueDefinition name="scopes" type={<TypeReference type={<TypeReference type={builtInScalars.String} required />} list />} />
  *       </>
  *     }
  *   />
@@ -102,9 +102,19 @@ export interface DirectiveDefinitionProps extends NamedDeclarationProps {
  * Authorization directive for fields and types.
  * """
  * directive \@auth(
- *   requires: Role! = USER
+ *   requires: String = "admin"
  *   scopes: [String!]
  * ) repeatable on FIELD_DEFINITION | OBJECT
+ *
+ * enum CacheControlScope {
+ *   PUBLIC
+ *   PRIVATE
+ * }
+ *
+ * directive \@cacheControl(
+ *   maxAge: Int
+ *   scope: CacheControlScope = PUBLIC
+ * ) on FIELD_DEFINITION | OBJECT
  * ```
  *
  * @throws \{Error\} If locations array is empty

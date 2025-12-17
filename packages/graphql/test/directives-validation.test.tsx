@@ -1,3 +1,4 @@
+import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import * as gql from "../src/index.js";
 import { toGraphQLText } from "./utils.jsx";
@@ -9,7 +10,7 @@ describe("Directives validation", () => {
         <gql.ObjectTypeDefinition name="User">
           <gql.FieldDefinition
             name="oldField"
-            type={gql.builtInScalars.String}
+            type={<gql.TypeReference type={gql.builtInScalars.String} />}
             directives={
               <gql.Directive
                 name={gql.builtInDirectives.deprecated}
@@ -39,7 +40,10 @@ describe("Directives validation", () => {
               />
             }
           >
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
           </gql.ObjectTypeDefinition>,
         );
       }).toThrow(
@@ -72,7 +76,7 @@ describe("Directives validation", () => {
           <gql.ObjectTypeDefinition name="User">
             <gql.FieldDefinition
               name="field"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
               directives={
                 <gql.Directive
                   name={gql.builtInDirectives.include}
@@ -92,11 +96,11 @@ describe("Directives validation", () => {
         <gql.ObjectTypeDefinition name="User">
           <gql.FieldDefinition
             name="field"
-            type={gql.builtInScalars.String}
+            type={<gql.TypeReference type={gql.builtInScalars.String} />}
             args={
               <gql.InputValueDefinition
                 name="oldArg"
-                type={gql.builtInScalars.Int}
+                type={<gql.TypeReference type={gql.builtInScalars.Int} />}
                 directives={
                   <gql.Directive
                     name={gql.builtInDirectives.deprecated}
@@ -124,7 +128,7 @@ describe("Directives validation", () => {
           <gql.ObjectTypeDefinition name="User">
             <gql.FieldDefinition
               name="field"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
               directives={
                 <>
                   <gql.Directive
@@ -150,7 +154,7 @@ describe("Directives validation", () => {
         <gql.ObjectTypeDefinition name="User">
           <gql.FieldDefinition
             name="field"
-            type={gql.builtInScalars.String}
+            type={<gql.TypeReference type={gql.builtInScalars.String} />}
             directives={
               <gql.Directive
                 name={gql.builtInDirectives.deprecated}
@@ -185,7 +189,7 @@ describe("Directives validation", () => {
         <gql.ObjectTypeDefinition name="User">
           <gql.FieldDefinition
             name="field"
-            type={gql.builtInScalars.String}
+            type={<gql.TypeReference type={gql.builtInScalars.String} />}
             directives={
               <>
                 <gql.Directive
@@ -217,7 +221,10 @@ describe("Directives validation", () => {
             <gql.Directive name="customDirective" args={{ value: "test" }} />
           }
         >
-          <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+          />
         </gql.ObjectTypeDefinition>,
       );
 
@@ -238,7 +245,7 @@ describe("Directives validation", () => {
               args={
                 <gql.InputValueDefinition
                   name="requires"
-                  type={gql.builtInScalars.String}
+                  type={<gql.TypeReference type={gql.builtInScalars.String} />}
                 />
               }
             />
@@ -248,7 +255,10 @@ describe("Directives validation", () => {
                 <gql.Directive name="auth" args={{ requires: "ADMIN" }} />
               }
             >
-              <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+              <gql.FieldDefinition
+                name="id"
+                type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+              />
             </gql.ObjectTypeDefinition>
           </gql.SourceFile>,
         );
@@ -266,7 +276,7 @@ describe("Directives validation", () => {
             args={
               <gql.InputValueDefinition
                 name="requires"
-                type={gql.builtInScalars.String}
+                type={<gql.TypeReference type={gql.builtInScalars.String} />}
               />
             }
           />
@@ -276,15 +286,21 @@ describe("Directives validation", () => {
               <gql.Directive name="auth" args={{ requires: "ADMIN" }} />
             }
           >
-            <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+            <gql.FieldDefinition
+              name="id"
+              type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+            />
           </gql.ObjectTypeDefinition>
         </gql.SourceFile>,
       );
 
-      expect(result).toContain(
-        "directive @auth(requires: String) on FIELD_DEFINITION | OBJECT",
-      );
-      expect(result).toContain('type User @auth(requires: "ADMIN") {');
+      expect(result).toRenderTo(d`
+        directive @auth(requires: String) on FIELD_DEFINITION | OBJECT
+
+        type User @auth(requires: "ADMIN") {
+          id: ID
+        }
+      `);
     });
 
     it("validates custom repeatable directive", () => {
@@ -297,14 +313,14 @@ describe("Directives validation", () => {
             args={
               <gql.InputValueDefinition
                 name="name"
-                type={gql.builtInScalars.String}
+                type={<gql.TypeReference type={gql.builtInScalars.String} />}
               />
             }
           />
           <gql.ObjectTypeDefinition name="User">
             <gql.FieldDefinition
               name="field"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
               directives={
                 <>
                   <gql.Directive name="tag" args={{ name: "important" }} />
@@ -316,12 +332,13 @@ describe("Directives validation", () => {
         </gql.SourceFile>,
       );
 
-      expect(result).toContain(
-        "directive @tag(name: String) repeatable on FIELD_DEFINITION",
-      );
-      expect(result).toContain(
-        'field: String @tag(name: "important") @tag(name: "public")',
-      );
+      expect(result).toRenderTo(d`
+        directive @tag(name: String) repeatable on FIELD_DEFINITION
+
+        type User {
+          field: String @tag(name: "important") @tag(name: "public")
+        }
+      `);
     });
 
     it("throws error when non-repeatable custom directive is used twice", () => {
@@ -334,14 +351,14 @@ describe("Directives validation", () => {
               args={
                 <gql.InputValueDefinition
                   name="maxAge"
-                  type={gql.builtInScalars.Int}
+                  type={<gql.TypeReference type={gql.builtInScalars.Int} />}
                 />
               }
             />
             <gql.ObjectTypeDefinition name="User">
               <gql.FieldDefinition
                 name="field"
-                type={gql.builtInScalars.String}
+                type={<gql.TypeReference type={gql.builtInScalars.String} />}
                 directives={
                   <>
                     <gql.Directive name="cache" args={{ maxAge: 100 }} />
@@ -369,7 +386,7 @@ describe("Directives validation", () => {
           args={
             <gql.InputValueDefinition
               name="requires"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
             />
           }
         />,
@@ -390,15 +407,26 @@ describe("Directives validation", () => {
             locations={["FIELD_DEFINITION"]}
             args={
               <>
-                <gql.InputValueDefinition name="requires" type="String!" />
-                <gql.InputValueDefinition name="level" type="Int" />
+                <gql.InputValueDefinition
+                  name="requires"
+                  type={
+                    <gql.TypeReference
+                      type={gql.builtInScalars.String}
+                      required
+                    />
+                  }
+                />
+                <gql.InputValueDefinition
+                  name="level"
+                  type={<gql.TypeReference type={gql.builtInScalars.Int} />}
+                />
               </>
             }
           />
           <gql.ObjectTypeDefinition name="User">
             <gql.FieldDefinition
               name="email"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
               directives={
                 <gql.Directive
                   name="auth"
@@ -410,7 +438,13 @@ describe("Directives validation", () => {
         </gql.SourceFile>,
       );
 
-      expect(result).toContain('@auth(requires: "ADMIN", level: 5)');
+      expect(result).toRenderTo(d`
+        directive @auth(requires: String!, level: Int) on FIELD_DEFINITION
+
+        type User {
+          email: String @auth(requires: "ADMIN", level: 5)
+        }
+      `);
     });
 
     it("allows directive with only required arguments (optional arguments omitted)", () => {
@@ -421,15 +455,26 @@ describe("Directives validation", () => {
             locations={["FIELD_DEFINITION"]}
             args={
               <>
-                <gql.InputValueDefinition name="requires" type="String!" />
-                <gql.InputValueDefinition name="level" type="Int" />
+                <gql.InputValueDefinition
+                  name="requires"
+                  type={
+                    <gql.TypeReference
+                      type={gql.builtInScalars.String}
+                      required
+                    />
+                  }
+                />
+                <gql.InputValueDefinition
+                  name="level"
+                  type={<gql.TypeReference type={gql.builtInScalars.Int} />}
+                />
               </>
             }
           />
           <gql.ObjectTypeDefinition name="User">
             <gql.FieldDefinition
               name="email"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
               directives={
                 <gql.Directive name="auth" args={{ requires: "ADMIN" }} />
               }
@@ -438,7 +483,13 @@ describe("Directives validation", () => {
         </gql.SourceFile>,
       );
 
-      expect(result).toContain('@auth(requires: "ADMIN")');
+      expect(result).toRenderTo(d`
+        directive @auth(requires: String!, level: Int) on FIELD_DEFINITION
+
+        type User {
+          email: String @auth(requires: "ADMIN")
+        }
+      `);
     });
 
     it("throws error when required argument is missing", () => {
@@ -450,15 +501,26 @@ describe("Directives validation", () => {
               locations={["FIELD_DEFINITION"]}
               args={
                 <>
-                  <gql.InputValueDefinition name="requires" type="String!" />
-                  <gql.InputValueDefinition name="level" type="Int" />
+                  <gql.InputValueDefinition
+                    name="requires"
+                    type={
+                      <gql.TypeReference
+                        type={gql.builtInScalars.String}
+                        required
+                      />
+                    }
+                  />
+                  <gql.InputValueDefinition
+                    name="level"
+                    type={<gql.TypeReference type={gql.builtInScalars.Int} />}
+                  />
                 </>
               }
             />
             <gql.ObjectTypeDefinition name="User">
               <gql.FieldDefinition
                 name="email"
-                type={gql.builtInScalars.String}
+                type={<gql.TypeReference type={gql.builtInScalars.String} />}
                 directives={<gql.Directive name="auth" args={{ level: 5 }} />}
               />
             </gql.ObjectTypeDefinition>
@@ -474,12 +536,22 @@ describe("Directives validation", () => {
             <gql.DirectiveDefinition
               name="auth"
               locations={["FIELD_DEFINITION"]}
-              args={<gql.InputValueDefinition name="requires" type="String!" />}
+              args={
+                <gql.InputValueDefinition
+                  name="requires"
+                  type={
+                    <gql.TypeReference
+                      type={gql.builtInScalars.String}
+                      required
+                    />
+                  }
+                />
+              }
             />
             <gql.ObjectTypeDefinition name="User">
               <gql.FieldDefinition
                 name="email"
-                type={gql.builtInScalars.String}
+                type={<gql.TypeReference type={gql.builtInScalars.String} />}
                 directives={
                   <gql.Directive
                     name="auth"
@@ -506,7 +578,7 @@ describe("Directives validation", () => {
             <gql.ObjectTypeDefinition name="User">
               <gql.FieldDefinition
                 name="email"
-                type={gql.builtInScalars.String}
+                type={<gql.TypeReference type={gql.builtInScalars.String} />}
                 directives={
                   <gql.Directive name="noArgs" args={{ unexpected: "value" }} />
                 }
@@ -529,14 +601,20 @@ describe("Directives validation", () => {
           <gql.ObjectTypeDefinition name="User">
             <gql.FieldDefinition
               name="email"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
               directives={<gql.Directive name="noArgs" />}
             />
           </gql.ObjectTypeDefinition>
         </gql.SourceFile>,
       );
 
-      expect(result).toContain("@noArgs");
+      expect(result).toRenderTo(d`
+        directive @noArgs on FIELD_DEFINITION
+
+        type User {
+          email: String @noArgs
+        }
+      `);
     });
 
     it("validates complex directive with multiple required and optional arguments", () => {
@@ -547,17 +625,36 @@ describe("Directives validation", () => {
             locations={["FIELD_DEFINITION"]}
             args={
               <>
-                <gql.InputValueDefinition name="required1" type="String!" />
-                <gql.InputValueDefinition name="required2" type="Int!" />
-                <gql.InputValueDefinition name="optional1" type="String" />
-                <gql.InputValueDefinition name="optional2" type="Boolean" />
+                <gql.InputValueDefinition
+                  name="required1"
+                  type={
+                    <gql.TypeReference
+                      type={gql.builtInScalars.String}
+                      required
+                    />
+                  }
+                />
+                <gql.InputValueDefinition
+                  name="required2"
+                  type={
+                    <gql.TypeReference type={gql.builtInScalars.Int} required />
+                  }
+                />
+                <gql.InputValueDefinition
+                  name="optional1"
+                  type={<gql.TypeReference type={gql.builtInScalars.String} />}
+                />
+                <gql.InputValueDefinition
+                  name="optional2"
+                  type={<gql.TypeReference type={gql.builtInScalars.Boolean} />}
+                />
               </>
             }
           />
           <gql.ObjectTypeDefinition name="User">
             <gql.FieldDefinition
               name="field"
-              type={gql.builtInScalars.String}
+              type={<gql.TypeReference type={gql.builtInScalars.String} />}
               directives={
                 <gql.Directive
                   name="complex"
@@ -569,9 +666,13 @@ describe("Directives validation", () => {
         </gql.SourceFile>,
       );
 
-      expect(result).toContain(
-        '@complex(required1: "value", required2: 42, optional1: "opt")',
-      );
+      expect(result).toRenderTo(d`
+        directive @complex(required1: String!, required2: Int!, optional1: String, optional2: Boolean) on FIELD_DEFINITION
+
+        type User {
+          field: String @complex(required1: "value", required2: 42, optional1: "opt")
+        }
+      `);
     });
 
     it("throws error when multiple required arguments are missing", () => {
@@ -583,16 +684,40 @@ describe("Directives validation", () => {
               locations={["FIELD_DEFINITION"]}
               args={
                 <>
-                  <gql.InputValueDefinition name="arg1" type="String!" />
-                  <gql.InputValueDefinition name="arg2" type="Int!" />
-                  <gql.InputValueDefinition name="arg3" type="Boolean!" />
+                  <gql.InputValueDefinition
+                    name="arg1"
+                    type={
+                      <gql.TypeReference
+                        type={gql.builtInScalars.String}
+                        required
+                      />
+                    }
+                  />
+                  <gql.InputValueDefinition
+                    name="arg2"
+                    type={
+                      <gql.TypeReference
+                        type={gql.builtInScalars.Int}
+                        required
+                      />
+                    }
+                  />
+                  <gql.InputValueDefinition
+                    name="arg3"
+                    type={
+                      <gql.TypeReference
+                        type={gql.builtInScalars.Boolean}
+                        required
+                      />
+                    }
+                  />
                 </>
               }
             />
             <gql.ObjectTypeDefinition name="User">
               <gql.FieldDefinition
                 name="field"
-                type={gql.builtInScalars.String}
+                type={<gql.TypeReference type={gql.builtInScalars.String} />}
                 directives={
                   <gql.Directive name="multi" args={{ arg1: "value" }} />
                 }

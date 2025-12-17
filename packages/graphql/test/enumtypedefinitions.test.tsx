@@ -1,4 +1,4 @@
-import { code, refkey } from "@alloy-js/core";
+import { refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import { builtInDirectives } from "../src/builtins/directives.js";
@@ -178,7 +178,10 @@ describe("EnumTypeDefinition", () => {
           <gql.EnumValue name="INACTIVE" />
         </gql.EnumTypeDefinition>
         <gql.ObjectTypeDefinition name="User">
-          <gql.FieldDefinition name="status" type={code`${statusRef}!`} />
+          <gql.FieldDefinition
+            name="status"
+            type={<gql.TypeReference type={statusRef} required />}
+          />
         </gql.ObjectTypeDefinition>
       </>,
     );
@@ -236,11 +239,17 @@ describe("EnumTypeDefinition", () => {
         <gql.ObjectTypeDefinition name="Query">
           <gql.FieldDefinition
             name="users"
-            type="[User!]!"
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type="User" required />}
+                list
+                required
+              />
+            }
             args={
               <gql.InputValueDefinition
                 name="status"
-                type={code`${statusRef}`}
+                type={<gql.TypeReference type={statusRef} />}
                 defaultValue={activeRef}
               />
             }

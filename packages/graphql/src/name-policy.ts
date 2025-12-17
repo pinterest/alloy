@@ -3,7 +3,8 @@ import { camelCase, constantCase, pascalCase } from "change-case";
 import { BuiltInScalarName, builtInScalarNames } from "./builtins/scalars.js";
 
 export type GraphQLElements =
-  | "type" // Type names (ObjectType, UnionType)
+  | "object" // Object type names
+  | "union" // Union type names
   | "interface" // Interface type names
   | "input" // Input object type names
   | "field" // Field names
@@ -94,7 +95,8 @@ function ensureNonReservedName(
   validateGraphQLName(name);
 
   const isTopLevelDefinition =
-    element === "type" ||
+    element === "object" ||
+    element === "union" ||
     element === "interface" ||
     element === "input" ||
     element === "enum" ||
@@ -165,7 +167,8 @@ export function createGraphQLNamePolicy(): NamePolicy<GraphQLElements> {
     let transformedName: string;
 
     switch (element) {
-      case "type":
+      case "object":
+      case "union":
       case "interface":
       case "input":
       case "enum":

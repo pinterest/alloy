@@ -1,4 +1,4 @@
-import { code, refkey } from "@alloy-js/core";
+import { refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import { builtInDirectives } from "../src/builtins/directives.js";
@@ -9,7 +9,10 @@ import { toGraphQLText } from "./utils.jsx";
 describe("InputValueDefinition", () => {
   it("renders a simple argument with scalar type", () => {
     const result = toGraphQLText(
-      <gql.InputValueDefinition name="id" type={builtInScalars.ID} />,
+      <gql.InputValueDefinition
+        name="id"
+        type={<gql.TypeReference type={builtInScalars.ID} />}
+      />,
     );
     expect(result).toBe("id: ID");
   });
@@ -18,24 +21,39 @@ describe("InputValueDefinition", () => {
     const result = toGraphQLText(
       <gql.InputValueDefinition
         name="email"
-        type={code`${builtInScalars.String}!`}
+        type={<gql.TypeReference type={builtInScalars.String} required />}
       />,
     );
     expect(result).toBe("email: String!");
   });
 
   it("renders an argument with string type", () => {
+    const statusRef = refkey();
     const result = toGraphQLText(
-      <gql.InputValueDefinition name="status" type="Status!" />,
+      <>
+        <gql.EnumTypeDefinition name="Status" refkey={statusRef}>
+          <gql.EnumValue name="ACTIVE" />
+        </gql.EnumTypeDefinition>
+        <gql.InputValueDefinition
+          name="status"
+          type={<gql.TypeReference type={statusRef} required />}
+        />
+      </>,
     );
-    expect(result).toBe("status: Status!");
+    expect(result).toRenderTo(d`
+      enum Status {
+        ACTIVE
+      }
+      
+      status: Status!
+    `);
   });
 
   it("renders an argument with default value (number)", () => {
     const result = toGraphQLText(
       <gql.InputValueDefinition
         name="limit"
-        type={builtInScalars.Int}
+        type={<gql.TypeReference type={builtInScalars.Int} />}
         defaultValue={10}
       />,
     );
@@ -46,7 +64,7 @@ describe("InputValueDefinition", () => {
     const result = toGraphQLText(
       <gql.InputValueDefinition
         name="includeDeleted"
-        type={builtInScalars.Boolean}
+        type={<gql.TypeReference type={builtInScalars.Boolean} />}
         defaultValue={false}
       />,
     );
@@ -57,7 +75,7 @@ describe("InputValueDefinition", () => {
     const result = toGraphQLText(
       <gql.InputValueDefinition
         name="orderBy"
-        type={builtInScalars.String}
+        type={<gql.TypeReference type={builtInScalars.String} />}
         defaultValue="createdAt"
       />,
     );
@@ -68,7 +86,7 @@ describe("InputValueDefinition", () => {
     const result = toGraphQLText(
       <gql.InputValueDefinition
         name="filter"
-        type={builtInScalars.String}
+        type={<gql.TypeReference type={builtInScalars.String} />}
         defaultValue={null}
       />,
     );
@@ -79,7 +97,7 @@ describe("InputValueDefinition", () => {
     const result = toGraphQLText(
       <gql.InputValueDefinition
         name="reason"
-        type={builtInScalars.String}
+        type={<gql.TypeReference type={builtInScalars.String} />}
         description="Reason for deprecation"
       />,
     );
@@ -95,7 +113,7 @@ describe("InputValueDefinition", () => {
     const result = toGraphQLText(
       <gql.InputValueDefinition
         name="legacyArg"
-        type={builtInScalars.String}
+        type={<gql.TypeReference type={builtInScalars.String} />}
         directives={<gql.Directive name={builtInDirectives.deprecated} />}
       />,
     );
@@ -106,20 +124,20 @@ describe("InputValueDefinition", () => {
     const inputTypeRef = refkey();
     const result = toGraphQLText(
       <>
-        <gql.ObjectTypeDefinition name="UserInput" refkey={inputTypeRef}>
-          <gql.FieldDefinition
+        <gql.InputObjectTypeDefinition name="UserInput" refkey={inputTypeRef}>
+          <gql.InputFieldDeclaration
             name="name"
-            type={code`${builtInScalars.String}!`}
+            type={<gql.TypeReference type={builtInScalars.String} required />}
           />
-        </gql.ObjectTypeDefinition>
+        </gql.InputObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Query">
           <gql.FieldDefinition
             name="createUser"
-            type={builtInScalars.Boolean}
+            type={<gql.TypeReference type={builtInScalars.Boolean} />}
             args={
               <gql.InputValueDefinition
                 name="userInput"
-                type={code`${inputTypeRef}!`}
+                type={<gql.TypeReference type={inputTypeRef} required />}
               />
             }
           />
@@ -127,7 +145,7 @@ describe("InputValueDefinition", () => {
       </>,
     );
     expect(result).toRenderTo(d`
-      type UserInput {
+      input UserInput {
         name: String!
       }
 
@@ -141,41 +159,60 @@ describe("InputValueDefinition", () => {
     const result = toGraphQLText(
       <gql.InputValueDefinition
         name="ids"
-        type={code`[${builtInScalars.ID}!]!`}
+        type={
+          <gql.TypeReference
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+            list
+            required
+          />
+        }
       />,
     );
     expect(result).toBe("ids: [ID!]!");
   });
 
   it("renders multiple arguments in a field", () => {
+    const userRef = refkey();
     const result = toGraphQLText(
-      <gql.ObjectTypeDefinition name="Query">
-        <gql.FieldDefinition
-          name="users"
-          type={code`[User]`}
-          args={
-            <>
-              <gql.InputValueDefinition
-                name="limit"
-                type={builtInScalars.Int}
-                defaultValue={10}
-              />
-              <gql.InputValueDefinition
-                name="offset"
-                type={builtInScalars.Int}
-                defaultValue={0}
-              />
-              <gql.InputValueDefinition
-                name="includeDeleted"
-                type={builtInScalars.Boolean}
-                defaultValue={false}
-              />
-            </>
-          }
-        />
-      </gql.ObjectTypeDefinition>,
+      <>
+        <gql.ObjectTypeDefinition name="User" refkey={userRef}>
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} />}
+          />
+        </gql.ObjectTypeDefinition>
+        <gql.ObjectTypeDefinition name="Query">
+          <gql.FieldDefinition
+            name="users"
+            type={<gql.TypeReference type={userRef} list />}
+            args={
+              <>
+                <gql.InputValueDefinition
+                  name="limit"
+                  type={<gql.TypeReference type={builtInScalars.Int} />}
+                  defaultValue={10}
+                />
+                <gql.InputValueDefinition
+                  name="offset"
+                  type={<gql.TypeReference type={builtInScalars.Int} />}
+                  defaultValue={0}
+                />
+                <gql.InputValueDefinition
+                  name="includeDeleted"
+                  type={<gql.TypeReference type={builtInScalars.Boolean} />}
+                  defaultValue={false}
+                />
+              </>
+            }
+          />
+        </gql.ObjectTypeDefinition>
+      </>,
     );
     expect(result).toRenderTo(d`
+      type User {
+        id: ID
+      }
+      
       type Query {
         users(limit: Int = 10, offset: Int = 0, includeDeleted: Boolean = false): [User]
       }
@@ -183,45 +220,69 @@ describe("InputValueDefinition", () => {
   });
 
   it("allows same argument names in different fields (checks correct scoping)", () => {
+    const userRef = refkey();
+    const postRef = refkey();
     const result = toGraphQLText(
-      <gql.ObjectTypeDefinition name="Query">
-        <gql.FieldDefinition
-          name="users"
-          type={code`[User]`}
-          args={
-            <>
-              <gql.InputValueDefinition
-                name="limit"
-                type={builtInScalars.Int}
-                defaultValue={10}
-              />
-              <gql.InputValueDefinition
-                name="filter"
-                type={builtInScalars.String}
-              />
-            </>
-          }
-        />
-        <gql.FieldDefinition
-          name="posts"
-          type={code`[Post]`}
-          args={
-            <>
-              <gql.InputValueDefinition
-                name="limit"
-                type={builtInScalars.Int}
-                defaultValue={20}
-              />
-              <gql.InputValueDefinition
-                name="filter"
-                type={builtInScalars.String}
-              />
-            </>
-          }
-        />
-      </gql.ObjectTypeDefinition>,
+      <>
+        <gql.ObjectTypeDefinition name="User" refkey={userRef}>
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} />}
+          />
+        </gql.ObjectTypeDefinition>
+        <gql.ObjectTypeDefinition name="Post" refkey={postRef}>
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} />}
+          />
+        </gql.ObjectTypeDefinition>
+        <gql.ObjectTypeDefinition name="Query">
+          <gql.FieldDefinition
+            name="users"
+            type={<gql.TypeReference type={userRef} list />}
+            args={
+              <>
+                <gql.InputValueDefinition
+                  name="limit"
+                  type={<gql.TypeReference type={builtInScalars.Int} />}
+                  defaultValue={10}
+                />
+                <gql.InputValueDefinition
+                  name="filter"
+                  type={<gql.TypeReference type={builtInScalars.String} />}
+                />
+              </>
+            }
+          />
+          <gql.FieldDefinition
+            name="posts"
+            type={<gql.TypeReference type={postRef} list />}
+            args={
+              <>
+                <gql.InputValueDefinition
+                  name="limit"
+                  type={<gql.TypeReference type={builtInScalars.Int} />}
+                  defaultValue={20}
+                />
+                <gql.InputValueDefinition
+                  name="filter"
+                  type={<gql.TypeReference type={builtInScalars.String} />}
+                />
+              </>
+            }
+          />
+        </gql.ObjectTypeDefinition>
+      </>,
     );
     expect(result).toRenderTo(d`
+      type User {
+        id: ID
+      }
+      
+      type Post {
+        id: ID
+      }
+      
       type Query {
         users(limit: Int = 10, filter: String): [User]
         posts(limit: Int = 20, filter: String): [Post]

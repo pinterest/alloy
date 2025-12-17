@@ -7,7 +7,10 @@ describe("ImplementsInterfaces", () => {
   it("renders a single interface", () => {
     const result = toGraphQLText(
       <gql.ObjectTypeDefinition name="User" implements={["Node"]}>
-        <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+        <gql.FieldDefinition
+          name="id"
+          type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+        />
       </gql.ObjectTypeDefinition>,
     );
     expect(result).toRenderTo(`
@@ -23,7 +26,10 @@ describe("ImplementsInterfaces", () => {
         name="User"
         implements={["Node", "Timestamped", "Auditable"]}
       >
-        <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+        <gql.FieldDefinition
+          name="id"
+          type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+        />
       </gql.ObjectTypeDefinition>,
     );
     expect(result).toRenderTo(`
@@ -40,22 +46,28 @@ describe("ImplementsInterfaces", () => {
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="Node" refkey={nodeRef}>
-          <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Timestamped" refkey={timestampedRef}>
           <gql.FieldDefinition
             name="createdAt"
-            type={gql.builtInScalars.String}
+            type={<gql.TypeReference type={gql.builtInScalars.String} />}
           />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition
           name="User"
           implements={[nodeRef, timestampedRef]}
         >
-          <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+          />
           <gql.FieldDefinition
             name="createdAt"
-            type={gql.builtInScalars.String}
+            type={<gql.TypeReference type={gql.builtInScalars.String} />}
           />
         </gql.ObjectTypeDefinition>
       </>,
@@ -79,7 +91,10 @@ describe("ImplementsInterfaces", () => {
   it("does not render when array is empty", () => {
     const result = toGraphQLText(
       <gql.ObjectTypeDefinition name="User" implements={[]}>
-        <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+        <gql.FieldDefinition
+          name="id"
+          type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+        />
       </gql.ObjectTypeDefinition>,
     );
     expect(result).toRenderTo(`
@@ -96,7 +111,10 @@ describe("ImplementsInterfaces", () => {
         implements={["Node"]}
         directives={<gql.Directive name="auth" args={{ requires: "ADMIN" }} />}
       >
-        <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+        <gql.FieldDefinition
+          name="id"
+          type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+        />
       </gql.ObjectTypeDefinition>,
     );
     expect(result).toRenderTo(`
@@ -113,24 +131,33 @@ describe("ImplementsInterfaces", () => {
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="Node" refkey={nodeRef}>
-          <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition
           name="Timestamped"
           refkey={timestampedRef}
           implements={[nodeRef]}
         >
-          <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+          />
           <gql.FieldDefinition
             name="createdAt"
-            type={gql.builtInScalars.String}
+            type={<gql.TypeReference type={gql.builtInScalars.String} />}
           />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="User" implements={[timestampedRef]}>
-          <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+          />
           <gql.FieldDefinition
             name="createdAt"
-            type={gql.builtInScalars.String}
+            type={<gql.TypeReference type={gql.builtInScalars.String} />}
           />
         </gql.ObjectTypeDefinition>
       </>,
@@ -163,31 +190,43 @@ describe("ImplementsInterfaces", () => {
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="Entity" refkey={entityRef}>
-          <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition
           name="Node"
           refkey={nodeRef}
           implements={[entityRef]}
         >
-          <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition
           name="Timestamped"
           refkey={timestampedRef}
           implements={[nodeRef]}
         >
-          <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+          />
           <gql.FieldDefinition
             name="createdAt"
-            type={gql.builtInScalars.String}
+            type={<gql.TypeReference type={gql.builtInScalars.String} />}
           />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="User" implements={[timestampedRef]}>
-          <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+          />
           <gql.FieldDefinition
             name="createdAt"
-            type={gql.builtInScalars.String}
+            type={<gql.TypeReference type={gql.builtInScalars.String} />}
           />
         </gql.ObjectTypeDefinition>
       </>,
@@ -223,17 +262,23 @@ describe("ImplementsInterfaces", () => {
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="Node" refkey={nodeRef}>
-          <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition
           name="Timestamped"
           refkey={timestampedRef}
           implements={[nodeRef]}
         >
-          <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+          />
           <gql.FieldDefinition
             name="createdAt"
-            type={gql.builtInScalars.String}
+            type={<gql.TypeReference type={gql.builtInScalars.String} />}
           />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition
@@ -241,24 +286,30 @@ describe("ImplementsInterfaces", () => {
           refkey={auditableRef}
           implements={[nodeRef]}
         >
-          <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+          />
           <gql.FieldDefinition
             name="updatedBy"
-            type={gql.builtInScalars.String}
+            type={<gql.TypeReference type={gql.builtInScalars.String} />}
           />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition
           name="User"
           implements={[timestampedRef, auditableRef]}
         >
-          <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+          />
           <gql.FieldDefinition
             name="createdAt"
-            type={gql.builtInScalars.String}
+            type={<gql.TypeReference type={gql.builtInScalars.String} />}
           />
           <gql.FieldDefinition
             name="updatedBy"
-            type={gql.builtInScalars.String}
+            type={<gql.TypeReference type={gql.builtInScalars.String} />}
           />
         </gql.ObjectTypeDefinition>
       </>,
@@ -295,13 +346,19 @@ describe("ImplementsInterfaces", () => {
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="Node" refkey={nodeRef}>
-          <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition
           name="User"
           implements={[nodeRef, "Timestamped"]}
         >
-          <gql.FieldDefinition name="id" type={gql.builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={gql.builtInScalars.ID} />}
+          />
         </gql.ObjectTypeDefinition>
       </>,
     );

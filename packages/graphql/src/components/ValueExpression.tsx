@@ -4,18 +4,22 @@ export interface ValueExpressionProps {
   jsValue?: unknown;
 }
 
+const isNonPrimitive = (v: unknown) => typeof v === "function" || isRefkey(v);
+
 /**
  * A component that renders a JavaScript value as a GraphQL value.
  * It handles various types of values including numbers, booleans, strings,
- * arrays (lists), and objects (input objects), converting them to GraphQL syntax.
+ * arrays (lists), objects (input objects), and refkeys (e.g., for enum values).
+ * Nested structures (e.g., lists of objects, objects with nested objects) are supported as well.
  *
  * @example
  * ```tsx
- * <ValueExpression jsValue={42} /> // renders "42"
- * <ValueExpression jsValue={true} /> // renders "true"
- * <ValueExpression jsValue="Hello" /> // renders '"Hello"'
- * <ValueExpression jsValue={[1, 2, 3]} /> // renders "[1, 2, 3]"
- * <ValueExpression jsValue={{ key: "value" }} /> // renders '{key: "value"}'
+ * <ValueExpression jsValue={42} /> // renders: 42
+ * <ValueExpression jsValue={true} /> // renders: true
+ * <ValueExpression jsValue="Hello" /> // renders: "Hello"
+ * <ValueExpression jsValue={[1, 2, 3]} /> // renders: [1, 2, 3]
+ * <ValueExpression jsValue={{ key: "value" }} /> // renders: {key: "value"}
+ * <ValueExpression jsValue={enumValueRef} /> // renders: ENUM_VALUE (via refkey)
  * ```
  */
 export function ValueExpression(props: ValueExpressionProps): any {
@@ -39,6 +43,11 @@ export function ValueExpression(props: ValueExpressionProps): any {
       return jsValue;
     } else if (typeof jsValue === "object") {
       if (Array.isArray(jsValue)) {
+        // If array contains refkeys or functions, return as-is
+        if (jsValue.some(isNonPrimitive)) {
+          return jsValue;
+        }
+        // Regular array of primitives - render as GraphQL list
         return (
           <group>
             {"["}
@@ -51,6 +60,11 @@ export function ValueExpression(props: ValueExpressionProps): any {
           </group>
         );
       } else {
+        // If object contains refkeys or functions, return as-is
+        if (Object.values(jsValue).some(isNonPrimitive)) {
+          return jsValue;
+        }
+        // Regular object - render as GraphQL input object
         const entries = Object.entries(jsValue);
         if (entries.length === 0) {
           return "{}";

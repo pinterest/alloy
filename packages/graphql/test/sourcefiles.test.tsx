@@ -1,4 +1,3 @@
-import { code } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, it } from "vitest";
 import * as gql from "../src/index.js";
@@ -22,26 +21,33 @@ describe("SourceFile", () => {
         <gql.ObjectTypeDefinition name="User">
           <gql.FieldDefinition
             name="id"
-            type={code`${gql.builtInScalars.ID}!`}
+            type={<gql.TypeReference type={gql.builtInScalars.ID} required />}
           />
           <gql.FieldDefinition
             name="name"
-            type={code`${gql.builtInScalars.String}!`}
+            type={
+              <gql.TypeReference type={gql.builtInScalars.String} required />
+            }
           />
-          <gql.FieldDefinition name="email" type={gql.builtInScalars.String} />
+          <gql.FieldDefinition
+            name="email"
+            type={<gql.TypeReference type={gql.builtInScalars.String} />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Post">
           <gql.FieldDefinition
             name="id"
-            type={code`${gql.builtInScalars.ID}!`}
+            type={<gql.TypeReference type={gql.builtInScalars.ID} required />}
           />
           <gql.FieldDefinition
             name="title"
-            type={code`${gql.builtInScalars.String}!`}
+            type={
+              <gql.TypeReference type={gql.builtInScalars.String} required />
+            }
           />
           <gql.FieldDefinition
             name="content"
-            type={gql.builtInScalars.String}
+            type={<gql.TypeReference type={gql.builtInScalars.String} />}
           />
         </gql.ObjectTypeDefinition>
       </gql.SourceFile>
@@ -75,7 +81,7 @@ describe("SourceFile", () => {
         <gql.ObjectTypeDefinition name="User">
           <gql.FieldDefinition
             name="id"
-            type={code`${gql.builtInScalars.ID}!`}
+            type={<gql.TypeReference type={gql.builtInScalars.ID} required />}
           />
         </gql.ObjectTypeDefinition>
       </gql.SourceFile>
@@ -102,7 +108,7 @@ describe("SourceFile", () => {
         <gql.ObjectTypeDefinition name="User">
           <gql.FieldDefinition
             name="id"
-            type={code`${gql.builtInScalars.ID}!`}
+            type={<gql.TypeReference type={gql.builtInScalars.ID} required />}
           />
         </gql.ObjectTypeDefinition>
       </gql.SourceFile>
@@ -132,11 +138,13 @@ describe("SourceFile", () => {
         <gql.ObjectTypeDefinition name="User">
           <gql.FieldDefinition
             name="id"
-            type={code`${gql.builtInScalars.ID}!`}
+            type={<gql.TypeReference type={gql.builtInScalars.ID} required />}
           />
           <gql.FieldDefinition
             name="name"
-            type={code`${gql.builtInScalars.String}!`}
+            type={
+              <gql.TypeReference type={gql.builtInScalars.String} required />
+            }
           />
         </gql.ObjectTypeDefinition>
       </gql.SourceFile>
@@ -164,11 +172,13 @@ describe("SourceFile", () => {
         <gql.ObjectTypeDefinition name="User">
           <gql.FieldDefinition
             name="id"
-            type={code`${gql.builtInScalars.ID}!`}
+            type={<gql.TypeReference type={gql.builtInScalars.ID} required />}
           />
           <gql.FieldDefinition
             name="name"
-            type={code`${gql.builtInScalars.String}!`}
+            type={
+              <gql.TypeReference type={gql.builtInScalars.String} required />
+            }
           />
         </gql.ObjectTypeDefinition>
       </gql.SourceFile>,
@@ -176,11 +186,13 @@ describe("SourceFile", () => {
         <gql.ObjectTypeDefinition name="Post">
           <gql.FieldDefinition
             name="id"
-            type={code`${gql.builtInScalars.ID}!`}
+            type={<gql.TypeReference type={gql.builtInScalars.ID} required />}
           />
           <gql.FieldDefinition
             name="title"
-            type={code`${gql.builtInScalars.String}!`}
+            type={
+              <gql.TypeReference type={gql.builtInScalars.String} required />
+            }
           />
         </gql.ObjectTypeDefinition>
       </gql.SourceFile>,

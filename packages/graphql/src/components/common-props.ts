@@ -33,14 +33,25 @@ export interface BaseDeclarationProps extends NamedDeclarationProps {
  */
 export interface TypedBaseDeclarationProps extends BaseDeclarationProps {
   /**
-   * The type of the declaration. Type modifiers like non-null (!) and list ([])
-   * should be included in the type string itself.
+   * The type of the declaration. Must be a TypeReference component.
    *
-   * Can be:
-   * - A string literal: `"String"`, `"ID!"`, `"[String!]!"`
-   * - A built-in scalar: `builtInScalars.String`
-   * - A refkey to a user-defined type
-   * - A code template for composition: code`[${typeRef}]!`
+   * @example
+   * ```tsx
+   * // Simple type
+   * <TypeReference type={builtInScalars.String} />
+   *
+   * // Required type (non-nullable)
+   * <TypeReference type={builtInScalars.ID} required />
+   *
+   * // List type
+   * <TypeReference type={builtInScalars.String} list />
+   *
+   * // Required list of required items: [String!]!
+   * <TypeReference type={<TypeReference type={builtInScalars.String} required />} list required />
+   *
+   * // Custom type reference
+   * <TypeReference type={userRef} required />
+   * ```
    */
   type: Children;
 }

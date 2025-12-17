@@ -1,4 +1,4 @@
-import { code, refkey } from "@alloy-js/core";
+import { refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import { builtInScalars } from "../src/builtins/scalars.js";
@@ -9,7 +9,10 @@ describe("Name transformations", () => {
   it("transforms type names to PascalCase", () => {
     const result = toGraphQLText(
       <gql.ObjectTypeDefinition name="a-really-WeirdType-name">
-        <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+        <gql.FieldDefinition
+          name="id"
+          type={<gql.TypeReference type={builtInScalars.ID} required />}
+        />
       </gql.ObjectTypeDefinition>,
     );
     const expected = d`
@@ -25,10 +28,16 @@ describe("Name transformations", () => {
       <gql.ObjectTypeDefinition name="User">
         <gql.FieldDefinition
           name="user-ID"
-          type={code`${builtInScalars.ID}!`}
+          type={<gql.TypeReference type={builtInScalars.ID} required />}
         />
-        <gql.FieldDefinition name="FirstName" type={builtInScalars.String} />
-        <gql.FieldDefinition name="last_name" type={builtInScalars.String} />
+        <gql.FieldDefinition
+          name="FirstName"
+          type={<gql.TypeReference type={builtInScalars.String} />}
+        />
+        <gql.FieldDefinition
+          name="last_name"
+          type={<gql.TypeReference type={builtInScalars.String} />}
+        />
       </gql.ObjectTypeDefinition>,
     );
     const expected = d`
@@ -47,25 +56,28 @@ describe("Name transformations", () => {
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="User" refkey={userRef}>
-          <gql.FieldDefinition name="id" type={builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Query">
           <gql.FieldDefinition
             name="user"
-            type={userRef}
+            type={<gql.TypeReference type={userRef} />}
             args={
               <>
                 <gql.InputValueDefinition
                   name="user-ID"
-                  type={code`${builtInScalars.ID}!`}
+                  type={<gql.TypeReference type={builtInScalars.ID} required />}
                 />
                 <gql.InputValueDefinition
                   name="FirstName"
-                  type={builtInScalars.String}
+                  type={<gql.TypeReference type={builtInScalars.String} />}
                 />
                 <gql.InputValueDefinition
                   name="include_deleted"
-                  type={builtInScalars.Boolean}
+                  type={<gql.TypeReference type={builtInScalars.Boolean} />}
                 />
               </>
             }
@@ -89,7 +101,12 @@ describe("Name transformations", () => {
       <gql.DirectiveDefinition
         name="custom-Auth-Directive"
         locations={["FIELD_DEFINITION"]}
-        args={<gql.InputValueDefinition name="required-Role" type="Role!" />}
+        args={
+          <gql.InputValueDefinition
+            name="required-Role"
+            type={<gql.TypeReference type="Role" required />}
+          />
+        }
       />,
     );
     expect(result).toBe(
@@ -101,12 +118,15 @@ describe("Name transformations", () => {
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="_User">
-          <gql.FieldDefinition name="id" type={builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Post">
           <gql.FieldDefinition
             name="_internal_field"
-            type={builtInScalars.String}
+            type={<gql.TypeReference type={builtInScalars.String} />}
           />
         </gql.ObjectTypeDefinition>
       </>,
@@ -129,12 +149,30 @@ describe("Name transformations", () => {
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="user-type" refkey={userRef}>
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
-          <gql.FieldDefinition name="posts" type={code`[${postRef}!]!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
+          <gql.FieldDefinition
+            name="posts"
+            type={
+              <gql.TypeReference
+                type={<gql.TypeReference type={postRef} required />}
+                list
+                required
+              />
+            }
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="post-type" refkey={postRef}>
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
-          <gql.FieldDefinition name="author" type={userRef} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
+          <gql.FieldDefinition
+            name="author"
+            type={<gql.TypeReference type={userRef} />}
+          />
         </gql.ObjectTypeDefinition>
       </>,
     );
@@ -158,13 +196,22 @@ describe("Keywords and reserved names", () => {
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="query">
-          <gql.FieldDefinition name="id" type={code`${builtInScalars.ID}!`} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} required />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Mutation">
-          <gql.FieldDefinition name="update" type={builtInScalars.Boolean} />
+          <gql.FieldDefinition
+            name="update"
+            type={<gql.TypeReference type={builtInScalars.Boolean} />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="SUBSCRIPTION">
-          <gql.FieldDefinition name="onChange" type={builtInScalars.String} />
+          <gql.FieldDefinition
+            name="onChange"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
         </gql.ObjectTypeDefinition>
       </>,
     );
@@ -187,9 +234,18 @@ describe("Keywords and reserved names", () => {
   it("allows keywords as field names (keywords only reserved at top level)", () => {
     const result = toGraphQLText(
       <gql.ObjectTypeDefinition name="User">
-        <gql.FieldDefinition name="type" type={builtInScalars.String} />
-        <gql.FieldDefinition name="interface" type={builtInScalars.String} />
-        <gql.FieldDefinition name="enum" type={builtInScalars.String} />
+        <gql.FieldDefinition
+          name="type"
+          type={<gql.TypeReference type={builtInScalars.String} />}
+        />
+        <gql.FieldDefinition
+          name="interface"
+          type={<gql.TypeReference type={builtInScalars.String} />}
+        />
+        <gql.FieldDefinition
+          name="enum"
+          type={<gql.TypeReference type={builtInScalars.String} />}
+        />
       </gql.ObjectTypeDefinition>,
     );
     const expected = d`
@@ -208,21 +264,24 @@ describe("Keywords and reserved names", () => {
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="User" refkey={userRef}>
-          <gql.FieldDefinition name="id" type={builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Query">
           <gql.FieldDefinition
             name="user"
-            type={userRef}
+            type={<gql.TypeReference type={userRef} />}
             args={
               <>
                 <gql.InputValueDefinition
                   name="fragment"
-                  type={builtInScalars.String}
+                  type={<gql.TypeReference type={builtInScalars.String} />}
                 />
                 <gql.InputValueDefinition
                   name="query"
-                  type={builtInScalars.Boolean}
+                  type={<gql.TypeReference type={builtInScalars.Boolean} />}
                 />
               </>
             }
@@ -248,13 +307,22 @@ describe("Keywords and reserved names", () => {
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="type">
-          <gql.FieldDefinition name="value" type={builtInScalars.String} />
+          <gql.FieldDefinition
+            name="value"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Enum">
-          <gql.FieldDefinition name="value" type={builtInScalars.String} />
+          <gql.FieldDefinition
+            name="value"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="INTERFACE">
-          <gql.FieldDefinition name="id" type={builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} />}
+          />
         </gql.ObjectTypeDefinition>
       </>,
     );
@@ -295,19 +363,34 @@ describe("Built-in scalar conflicts", () => {
     const result = toGraphQLText(
       <>
         <gql.ObjectTypeDefinition name="Int">
-          <gql.FieldDefinition name="value" type={builtInScalars.Int} />
+          <gql.FieldDefinition
+            name="value"
+            type={<gql.TypeReference type={builtInScalars.Int} />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Float">
-          <gql.FieldDefinition name="value" type={builtInScalars.Float} />
+          <gql.FieldDefinition
+            name="value"
+            type={<gql.TypeReference type={builtInScalars.Float} />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="String">
-          <gql.FieldDefinition name="value" type={builtInScalars.String} />
+          <gql.FieldDefinition
+            name="value"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="Boolean">
-          <gql.FieldDefinition name="value" type={builtInScalars.Boolean} />
+          <gql.FieldDefinition
+            name="value"
+            type={<gql.TypeReference type={builtInScalars.Boolean} />}
+          />
         </gql.ObjectTypeDefinition>
         <gql.ObjectTypeDefinition name="ID">
-          <gql.FieldDefinition name="value" type={builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="value"
+            type={<gql.TypeReference type={builtInScalars.ID} />}
+          />
         </gql.ObjectTypeDefinition>
       </>,
     );
@@ -339,8 +422,14 @@ describe("Built-in scalar conflicts", () => {
   it("allows built-in scalar names as field names", () => {
     const result = toGraphQLText(
       <gql.ObjectTypeDefinition name="User">
-        <gql.FieldDefinition name="Int" type={builtInScalars.String} />
-        <gql.FieldDefinition name="String" type={builtInScalars.Boolean} />
+        <gql.FieldDefinition
+          name="Int"
+          type={<gql.TypeReference type={builtInScalars.String} />}
+        />
+        <gql.FieldDefinition
+          name="String"
+          type={<gql.TypeReference type={builtInScalars.Boolean} />}
+        />
       </gql.ObjectTypeDefinition>,
     );
     // Field names use camelCase, so "Int" -> "int", "String" -> "string"
@@ -359,7 +448,10 @@ describe("Name format validation", () => {
     expect(() => {
       toGraphQLText(
         <gql.ObjectTypeDefinition name="123User">
-          <gql.FieldDefinition name="id" type={builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} />}
+          />
         </gql.ObjectTypeDefinition>,
       );
     }).toThrow(/Invalid GraphQL name "123User".*cannot start with a digit/);
@@ -369,7 +461,10 @@ describe("Name format validation", () => {
     expect(() => {
       toGraphQLText(
         <gql.ObjectTypeDefinition name="User">
-          <gql.FieldDefinition name="1stName" type={builtInScalars.String} />
+          <gql.FieldDefinition
+            name="1stName"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
         </gql.ObjectTypeDefinition>,
       );
     }).toThrow(/Invalid GraphQL name "1stName".*cannot start with a digit/);
@@ -378,7 +473,10 @@ describe("Name format validation", () => {
   it("allows names with digits after the first character", () => {
     const result = toGraphQLText(
       <gql.ObjectTypeDefinition name="User123">
-        <gql.FieldDefinition name="field1" type={builtInScalars.String} />
+        <gql.FieldDefinition
+          name="field1"
+          type={<gql.TypeReference type={builtInScalars.String} />}
+        />
       </gql.ObjectTypeDefinition>,
     );
     expect(result).toRenderTo(d`
@@ -392,7 +490,10 @@ describe("Name format validation", () => {
     expect(() => {
       toGraphQLText(
         <gql.ObjectTypeDefinition name="__CustomType">
-          <gql.FieldDefinition name="id" type={builtInScalars.ID} />
+          <gql.FieldDefinition
+            name="id"
+            type={<gql.TypeReference type={builtInScalars.ID} />}
+          />
         </gql.ObjectTypeDefinition>,
       );
     }).toThrow(
@@ -404,7 +505,10 @@ describe("Name format validation", () => {
     expect(() => {
       toGraphQLText(
         <gql.ObjectTypeDefinition name="User">
-          <gql.FieldDefinition name="__typename" type={builtInScalars.String} />
+          <gql.FieldDefinition
+            name="__typename"
+            type={<gql.TypeReference type={builtInScalars.String} />}
+          />
         </gql.ObjectTypeDefinition>,
       );
     }).toThrow(

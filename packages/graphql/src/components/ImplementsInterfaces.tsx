@@ -1,4 +1,4 @@
-import { Children, isRefkey, List, memo, Refkey } from "@alloy-js/core";
+import { Children, isRefkey, List, memo } from "@alloy-js/core";
 import { ref } from "../symbols/reference.js";
 
 export interface ImplementsInterfacesProps {
@@ -29,36 +29,52 @@ export function ImplementsInterfaces(props: ImplementsInterfacesProps) {
 
   // Compute the flattened list of interfaces including transitive ones
   const allInterfaces = memo(() => {
+    // Tracks all interfaces we've processed to avoid duplicates in result
     const seen = new Set<string>();
+    // Tracks interfaces in current DFS path to detect circular inheritance
+    const visiting = new Set<string>();
+    // Accumulates the final list of interfaces to render
     const result: Children[] = [];
 
-    function collectInterfaces(interfaces: Children[]) {
+    function collectInterfaces(
+      interfaces: Children[],
+      currentPath: string[] = [],
+    ) {
       for (const iface of interfaces) {
         // Try to resolve if it's a refkey
         if (isRefkey(iface)) {
-          const reference = ref(iface as Refkey);
+          const reference = ref(iface);
           const [name, symbol] = reference();
 
           // Track by name to avoid duplicates
           const nameStr = String(name);
+
+          // Check for circular inheritance
+          if (visiting.has(nameStr)) {
+            throw new Error(
+              `Circular interface inheritance detected: ${currentPath.join(" -> ")} -> ${nameStr}`,
+            );
+          }
+
           if (seen.has(nameStr)) {
             continue;
           }
+
           seen.add(nameStr);
+          visiting.add(nameStr);
           result.push(iface);
 
           // Recursively collect parent interfaces
-          if (symbol?.metadata.implements) {
-            const parentInterfaces = symbol.metadata.implements as Children[];
-            if (
-              Array.isArray(parentInterfaces) &&
-              parentInterfaces.length > 0
-            ) {
-              collectInterfaces(parentInterfaces);
-            }
+          const parentInterfaces = symbol?.metadata.implements as Children[];
+          if (parentInterfaces?.length > 0) {
+            collectInterfaces(parentInterfaces, [...currentPath, nameStr]);
           }
+
+          visiting.delete(nameStr);
         } else {
-          // String literal interface name
+          // String literal interface name - can't resolve parent interfaces
+          // or detect circular inheritance. The GraphQL schema validation
+          // will catch these errors.
           const nameStr = String(iface);
           if (!seen.has(nameStr)) {
             seen.add(nameStr);

@@ -12,7 +12,7 @@ export function ref(
   refkey: Refkey,
 ): () => [Children, GraphQLOutputSymbol | undefined] {
   const resolveResult = resolve<GraphQLOutputScope, GraphQLOutputSymbol>(
-    refkey as Refkey,
+    refkey,
   );
 
   return memo(() => {
