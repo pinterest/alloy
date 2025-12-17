@@ -76,8 +76,9 @@ export function InterfaceValidationProvider(
 /**
  * Resolve a symbol's type annotation to a string.
  * Expects the symbol's typeAnnotation metadata to be a TypeReference component.
+ * @internal
  */
-export function resolveTypeAnnotation(symbol: OutputSymbol): string {
+export function _resolveTypeAnnotation(symbol: OutputSymbol): string {
   const { binder } = symbol;
 
   function resolve(type: Children): string {
@@ -114,7 +115,7 @@ function extractFieldKeys(symbol: GraphQLOutputSymbol): Set<string> {
 
   for (const fieldSymbol of symbol.members.symbolNames.values()) {
     const name = fieldSymbol.name;
-    const type = resolveTypeAnnotation(fieldSymbol).replace(/\s/g, "");
+    const type = _resolveTypeAnnotation(fieldSymbol).replace(/\s/g, "");
 
     // Extract argument keys
     const args = new Set<string>();
@@ -122,7 +123,7 @@ function extractFieldKeys(symbol: GraphQLOutputSymbol): Set<string> {
     if (fieldMembers) {
       for (const argSymbol of fieldMembers.symbolNames.values()) {
         const argName = argSymbol.name;
-        const argType = resolveTypeAnnotation(argSymbol).replace(/\s/g, "");
+        const argType = _resolveTypeAnnotation(argSymbol).replace(/\s/g, "");
         args.add(generateFieldKey(argName, argType));
       }
     }

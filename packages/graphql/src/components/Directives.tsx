@@ -1,7 +1,7 @@
 import { Children, createContext, useContext } from "@alloy-js/core";
 import { builtInDirectiveMetadata } from "../builtins/directives.js";
 import { useGraphQLScope } from "../symbols/scopes.js";
-import { resolveTypeAnnotation } from "./DeferredInterfaceValidation.js";
+import { _resolveTypeAnnotation } from "./DeferredInterfaceValidation.js";
 import type { DirectiveLocation } from "./DirectiveDefinition.js";
 
 export interface DirectivesProps {
@@ -160,7 +160,7 @@ function getDirectiveMetadata(directiveName: string): {
         for (const memberSpace of symbol.memberSpaces) {
           for (const argSymbol of memberSpace) {
             // Check if the argument type ends with ! (non-null = required)
-            const typeStr = resolveTypeAnnotation(argSymbol);
+            const typeStr = _resolveTypeAnnotation(argSymbol);
             const required = typeStr.endsWith("!");
             argumentMetadata.push({
               name: String(argSymbol.name),
