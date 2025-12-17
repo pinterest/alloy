@@ -28,7 +28,7 @@
     "@types/node": "catalog:",
     "@types/prompts": "^2.4.9",
     "concurrently": "catalog:",
-    "js-yaml": "^4.1.0",
+    "js-yaml": "^4.1.1",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"
