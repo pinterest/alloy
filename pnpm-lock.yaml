@@ -461,6 +461,9 @@ importers:
       '@alloy-js/csharp':
         specifier: workspace:~
         version: link:../csharp
+      '@alloy-js/graphql':
+        specifier: workspace:~
+        version: link:../graphql
       '@alloy-js/java':
         specifier: workspace:~
         version: link:../java
@@ -507,6 +510,46 @@ importers:
       '@rollup/plugin-typescript':
         specifier: 'catalog:'
         version: 12.1.4(rollup@4.46.2)(tslib@2.8.1)(typescript@5.8.3)
+      concurrently:
+        specifier: 'catalog:'
+        version: 9.2.0
+      typescript:
+        specifier: 'catalog:'
+        version: 5.8.3
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.4(@types/debug@4.1.12)(@types/node@24.1.0)(tsx@4.20.3)(yaml@2.8.0)
+
+  packages/graphql:
+    dependencies:
+      '@alloy-js/core':
+        specifier: workspace:~
+        version: link:../core
+      graphql:
+        specifier: ^17.0.0-alpha.9
+        version: 17.0.0-alpha.9
+      pathe:
+        specifier: 'catalog:'
+        version: 2.0.3
+      pluralize:
+        specifier: ^8.0.0
+        version: 8.0.0
+    devDependencies:
+      '@alloy-js/cli':
+        specifier: workspace:~
+        version: link:../cli
+      '@alloy-js/rollup-plugin':
+        specifier: workspace:~
+        version: link:../rollup-plugin
+      '@microsoft/api-extractor':
+        specifier: 'catalog:'
+        version: 7.52.9(@types/node@24.1.0)
+      '@rollup/plugin-typescript':
+        specifier: 'catalog:'
+        version: 12.1.4(rollup@4.46.2)(tslib@2.8.1)(typescript@5.8.3)
+      '@types/pluralize':
+        specifier: ^0.0.33
+        version: 0.0.33
       concurrently:
         specifier: 'catalog:'
         version: 9.2.0
@@ -2428,6 +2471,9 @@ packages:
   '@types/node@24.1.0':
     resolution: {integrity: sha512-ut5FthK5moxFKH2T1CUOC6ctR67rQRvvHdFLCD2Ql6KXmMuCrjsSsRI9UsLCm9M18BMwClv4pn327UvB7eeO1w==}
 
+  '@types/pluralize@0.0.33':
+    resolution: {integrity: sha512-JOqsl+ZoCpP4e8TDke9W79FDcSgPAR0l6pixx2JHkhnRjvShyYiAYw2LVsnA7K08Y6DeOnaU6ujmENO4os/cYg==}
+
   '@types/prompts@2.4.9':
     resolution: {integrity: sha512-qTxFi6Buiu8+50/+3DGIWLHM6QuWsEKugJnnP6iv2Mc4ncxE4A/OJkjuVOA+5X0X1S/nq5VJRa8Lu+nwcvbrKA==}
 
@@ -3334,6 +3380,10 @@ packages:
 
   graphemer@1.4.0:
     resolution: {integrity: sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==}
+
+  graphql@17.0.0-alpha.9:
+    resolution: {integrity: sha512-jVK1BsvX5pUIEpRDlEgeKJr80GAxl3B8ISsFDjXHtl2xAxMXVGTEFF4Q4R8NH0Gw7yMwcHDndkNjoNT5CbwHKA==}
+    engines: {node: ^16.19.0 || ^18.14.0 || >=19.7.0}
 
   h3@1.15.4:
     resolution: {integrity: sha512-z5cFQWDffyOe4vQ9xIqNfCZdV4p//vy6fBnr8Q1AWnVZ0teurKMG66rLj++TKwKPUP3u7iMUvrvKaEUiQw2QWQ==}
@@ -6978,6 +7028,8 @@ snapshots:
     dependencies:
       undici-types: 7.8.0
 
+  '@types/pluralize@0.0.33': {}
+
   '@types/prompts@2.4.9':
     dependencies:
       '@types/node': 24.1.0
@@ -8091,6 +8143,8 @@ snapshots:
   graceful-fs@4.2.11: {}
 
   graphemer@1.4.0: {}
+
+  graphql@17.0.0-alpha.9: {}
 
   h3@1.15.4:
     dependencies:

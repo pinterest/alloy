@@ -1,0 +1,59 @@
+import type { Children, Refkey } from "@alloy-js/core";
+import {
+  TypeContext,
+  createEnumTypeDefinition,
+  registerType,
+  useSchemaContext,
+  useTypeContext,
+} from "../schema.js";
+import { normalizeRefkeys } from "./utils.js";
+
+export interface EnumTypeProps {
+  name: string;
+  description?: string;
+  refkey?: Refkey | Refkey[];
+  children?: Children;
+}
+
+function EnsureEnumValues() {
+  const definition = useTypeContext();
+  if (definition.kind !== "enum") {
+    throw new Error("EnumType validation must be used within an EnumType.");
+  }
+  if (definition.values.length === 0) {
+    throw new Error(`Enum "${definition.name}" must define values.`);
+  }
+  return undefined;
+}
+
+/**
+ * Defines a GraphQL enum and registers it with the schema.
+ *
+ * @example
+ * ```tsx
+ * <EnumType name="Role">
+ *   <EnumValue name="ADMIN" />
+ *   <EnumValue name="USER" />
+ * </EnumType>
+ * ```
+ *
+ * @remarks
+ * An enum must define at least one `EnumValue`.
+ */
+export function EnumType(props: EnumTypeProps) {
+  const state = useSchemaContext();
+  const definition = createEnumTypeDefinition(
+    state,
+    props.name,
+    props.description,
+    normalizeRefkeys(props.refkey),
+  );
+  registerType(state, definition);
+
+  return (
+    <TypeContext.Provider value={{ definition }}>
+      {props.children}
+      <EnsureEnumValues />
+    </TypeContext.Provider>
+  );
+}

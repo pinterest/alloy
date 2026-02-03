@@ -1,0 +1,47 @@
+import type { Children } from "@alloy-js/core";
+import { ID } from "../builtins/graphql.js";
+import { Node } from "../builtins/node.js";
+import type { TypeReference } from "../schema.js";
+import { Argument } from "./Argument.js";
+import { Field } from "./Field.js";
+
+const DEFAULT_DESCRIPTIONS = {
+  id: "The ID of an object",
+  node: "Fetches an object given its ID",
+};
+
+export interface NodeFieldProps {
+  name?: string;
+  type?: TypeReference;
+  description?: string;
+  idDescription?: string;
+  children?: Children;
+}
+
+/**
+ * Adds a `node` field that resolves objects by ID.
+ *
+ * @example
+ * ```tsx
+ * <Query>
+ *   <NodeField />
+ * </Query>
+ * ```
+ */
+export function NodeField(props: NodeFieldProps) {
+  return (
+    <Field
+      name={props.name ?? "node"}
+      type={props.type ?? Node}
+      description={props.description ?? DEFAULT_DESCRIPTIONS.node}
+    >
+      <Argument
+        name="id"
+        type={ID}
+        nonNull
+        description={props.idDescription ?? DEFAULT_DESCRIPTIONS.id}
+      />
+      {props.children}
+    </Field>
+  );
+}
