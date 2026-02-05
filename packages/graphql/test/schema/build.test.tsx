@@ -206,9 +206,7 @@ describe("buildSchema validations", () => {
       throw new Error("Expected Query to be an object type.");
     }
 
-    expect(queryType.getFields().itemsConnection.type.toString()).toBe(
-      "ItemsRelay",
-    );
+    expect(queryType.getFields().items.type.toString()).toBe("ItemsRelay");
   });
 
   it("requires the Connection suffix for auto-generated connection types", () => {

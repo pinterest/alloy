@@ -62,7 +62,7 @@ const connectionFieldFor = (
 ) => {
   return (
     <Field name={name} type={nodeType}>
-      <Field.Connection fieldName={fieldName}>
+      <Field.Connection fieldName={fieldName ?? `${name}Connection`}>
         <Connection.Fields>
           {totalCountField}
           <Field

@@ -1,10 +1,4 @@
-import {
-  childrenArray,
-  isComponentCreator,
-  isKeyedChild,
-  type Children,
-  type Component,
-} from "@alloy-js/core";
+import { childrenArray, type Children, type Component } from "@alloy-js/core";
 import { DirectiveLocation } from "graphql";
 import {
   DirectiveTargetContext,
@@ -17,7 +11,11 @@ import {
   type NameInput,
   type TypeReference,
 } from "../schema.js";
-import { applyNonNullType } from "../schema/refs.js";
+import {
+  assertOnlyDirectiveAndListChildren,
+  filterListSlotChildren,
+  resolveListType,
+} from "../schema/children.js";
 import { Directive } from "./Directive.js";
 import { createListSlot } from "./ListSlot.js";
 
@@ -37,38 +35,10 @@ export interface InputFieldListProps {
 
 const inputFieldList = createListSlot<InputFieldListProps>({
   listName: "InputField.List",
+  ownerLabel: "InputField",
 });
 const InputFieldListSlot = inputFieldList.List;
 const inputFieldListTag = inputFieldList.tag;
-
-function assertOnlyDirectiveAndListChildren(
-  children: Children[],
-  ownerLabel: string,
-) {
-  const extraChildren = children.filter((child) => {
-    if (isComponentCreator(child, Directive)) {
-      return false;
-    }
-    if (isKeyedChild(child) && child.tag === inputFieldListTag) {
-      return false;
-    }
-    return true;
-  });
-  if (extraChildren.length > 0) {
-    throw new Error(
-      `${ownerLabel} only supports Directive and InputField.List children.`,
-    );
-  }
-}
-
-function resolveInputFieldType(
-  type: TypeReference,
-  itemNonNull: boolean | undefined,
-  listSlot: ReturnType<typeof inputFieldList.findListSlot>,
-): TypeReference {
-  const baseType = applyNonNullType(type, itemNonNull);
-  return inputFieldList.applyListType(baseType, listSlot);
-}
 
 function InputFieldBase(props: InputFieldProps) {
   const state = useSchemaContext();
@@ -78,9 +48,19 @@ function InputFieldBase(props: InputFieldProps) {
   }
 
   const children = childrenArray(() => props.children);
-  const listSlot = inputFieldList.findListSlot(children, "InputField");
-  assertOnlyDirectiveAndListChildren(children, "InputField");
-  const type = resolveInputFieldType(props.type, props.nonNull, listSlot);
+  const listSlot = inputFieldList.findListSlot(children);
+  assertOnlyDirectiveAndListChildren(children, {
+    ownerLabel: "InputField",
+    listName: "InputField.List",
+    listTag: inputFieldListTag,
+    directiveComponent: Directive,
+  });
+  const type = resolveListType(
+    props.type,
+    props.nonNull,
+    listSlot,
+    inputFieldList.applyListType,
+  );
   const field = createInputFieldDefinition(
     state,
     props.name,
@@ -98,12 +78,7 @@ function InputFieldBase(props: InputFieldProps) {
         target: field,
       }}
     >
-      {children.filter((child) => {
-        if (!isKeyedChild(child)) {
-          return true;
-        }
-        return child.tag !== inputFieldListTag;
-      })}
+      {filterListSlotChildren(children, inputFieldListTag)}
     </DirectiveTargetContext.Provider>
   );
 }

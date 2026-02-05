@@ -42,7 +42,7 @@ describe("Field.Connection", () => {
       throw new Error("Expected Query to be an object type.");
     }
 
-    const field = queryType.getFields().itemsConnection;
+    const field = queryType.getFields().items;
     expect(field.args.map((arg) => arg.name)).toEqual([
       "after",
       "first",
@@ -83,11 +83,11 @@ describe("Field.Connection", () => {
     }
 
     const fields = queryType.getFields();
-    expect(fields.itemsConnection.args.map((arg) => arg.name)).toEqual([
+    expect(fields.items.args.map((arg) => arg.name)).toEqual([
       "after",
       "first",
     ]);
-    expect(fields.archivedItemsConnection.args.map((arg) => arg.name)).toEqual([
+    expect(fields.archivedItems.args.map((arg) => arg.name)).toEqual([
       "before",
       "last",
     ]);
@@ -209,9 +209,13 @@ describe("Field.Connection", () => {
       throw new Error("Expected Query to be an object type.");
     }
 
-    expect(
-      queryType.getFields().itemsConnection.args.map((arg) => arg.name),
-    ).toEqual(["after", "first", "before", "last", "filter"]);
+    expect(queryType.getFields().items.args.map((arg) => arg.name)).toEqual([
+      "after",
+      "first",
+      "before",
+      "last",
+      "filter",
+    ]);
   });
 
   it("rejects Connection.Fields when the connection type already exists", () => {
@@ -260,7 +264,7 @@ describe("Field.Connection", () => {
       throw new Error("Expected Query to be an object type.");
     }
 
-    const field = queryType.getFields().itemsConnection;
+    const field = queryType.getFields().items;
     expect(field.args.map((arg) => arg.type.toString())).toEqual([
       "String",
       "Int",
@@ -305,7 +309,7 @@ describe("Field.Connection", () => {
       throw new Error("Expected Query to be an object type.");
     }
 
-    const field = queryType.getFields().itemsConnection;
+    const field = queryType.getFields().items;
     expect(field.args.map((arg) => arg.type.toString())).toEqual([
       "ID",
       "Int",
@@ -352,11 +356,11 @@ describe("Field.Connection", () => {
 
     const fields = queryType.getFields();
     expect(fields.allItems).toBeDefined();
-    expect(fields.itemsConnection).toBeUndefined();
+    expect(fields.items).toBeUndefined();
     expect(fields.allItems.type.toString()).toBe("ItemsConnection");
   });
 
-  it("propagates namekey options to the default connection field name", () => {
+  it("respects namekey options on the connection field name", () => {
     const fieldName = namekey("AllShips", { ignoreNamePolicy: true });
     const namePolicy = createGraphQLNamePolicy({
       format: { field: (name) => name.toLowerCase() },
@@ -383,8 +387,8 @@ describe("Field.Connection", () => {
     }
 
     const fields = queryType.getFields();
-    expect(fields.AllShipsConnection).toBeDefined();
-    expect(fields.allshipsconnection).toBeUndefined();
+    expect(fields.AllShips).toBeDefined();
+    expect(fields.allships).toBeUndefined();
   });
 
   it("requires at least one pagination direction", () => {

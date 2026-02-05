@@ -1,20 +1,20 @@
 import type { Children, Component, Refkey } from "@alloy-js/core";
 import {
   childrenArray,
-  findKeyedChild,
-  findKeyedChildren,
   findUnkeyedChildren,
   isNamekey,
   namekey,
   refkey,
-  taggedComponent,
 } from "@alloy-js/core";
 import { PageInfo } from "../builtins/page-info.js";
 import { useConnectionOptions } from "../connection-options.js";
 import { type NameInput, type TypeReference } from "../schema.js";
 import { Field } from "./Field.js";
 import { ObjectType } from "./ObjectType.js";
+import { createTaggedSlot } from "./TaggedSlot.js";
 import { normalizeRefkeys } from "./utils.js";
+
+export const CONNECTION_SUFFIX = "Connection";
 
 const DEFAULT_DESCRIPTIONS = {
   connection: "A connection to a list of items.",
@@ -55,24 +55,22 @@ interface ConnectionEdgeDefinitionProps {
   children?: Children;
 }
 
-const connectionEdgeTag = Symbol("Connection.Edge");
-const connectionFieldsTag = Symbol("Connection.Fields");
-const connectionPageInfoTag = Symbol("Connection.PageInfo");
+const connectionEdgeSlot = createTaggedSlot<ConnectionEdgeProps>({
+  slotName: "Connection.Edge",
+  ownerLabel: "Connection",
+});
+const connectionFieldsSlot = createTaggedSlot<ConnectionFieldsProps>({
+  slotName: "Connection.Fields",
+  ownerLabel: "Connection",
+});
+const connectionPageInfoSlot = createTaggedSlot<ConnectionPageInfoProps>({
+  slotName: "Connection.PageInfo",
+  ownerLabel: "Connection",
+});
 
-const ConnectionEdgeSlot = taggedComponent(
-  connectionEdgeTag,
-  (_props: ConnectionEdgeProps) => undefined,
-);
-
-const ConnectionFieldsSlot = taggedComponent(
-  connectionFieldsTag,
-  (_props: ConnectionFieldsProps) => undefined,
-);
-
-const ConnectionPageInfoSlot = taggedComponent(
-  connectionPageInfoTag,
-  (_props: ConnectionPageInfoProps) => undefined,
-);
+const ConnectionEdgeSlot = connectionEdgeSlot.Slot;
+const ConnectionFieldsSlot = connectionFieldsSlot.Slot;
+const ConnectionPageInfoSlot = connectionPageInfoSlot.Slot;
 
 function ConnectionEdge(props: ConnectionEdgeDefinitionProps) {
   return (
@@ -102,7 +100,7 @@ function ConnectionEdge(props: ConnectionEdgeDefinitionProps) {
 function ConnectionBase(props: ConnectionProps) {
   const pagination = useConnectionOptions();
   const baseName = unwrapNameInput(props.name);
-  const connectionName = deriveNameInput(props.name, "Connection");
+  const connectionName = deriveNameInput(props.name, CONNECTION_SUFFIX);
   const edgeName = deriveNameInput(props.name, "Edge");
   const connectionRefkeys = normalizeRefkeys(props.refkey);
   const edgeRefkeys = normalizeRefkeys(props.edgeRefkey);
@@ -115,22 +113,11 @@ function ConnectionBase(props: ConnectionProps) {
   const edgeTypeRef = edgeRefkeys[0] ?? refkey(edgeNameString);
   const edgeRefkey = edgeRefkeys.length > 0 ? edgeRefkeys : edgeTypeRef;
   const children = childrenArray(() => props.children);
-  const edgeSlot = findKeyedChild(children, connectionEdgeTag);
-  const edgeSlots = findKeyedChildren(children, connectionEdgeTag);
-  const fieldsSlots = findKeyedChildren(children, connectionFieldsTag);
-  const pageInfoSlot = findKeyedChild(children, connectionPageInfoTag);
-  const pageInfoSlots = findKeyedChildren(children, connectionPageInfoTag);
-  if (edgeSlots.length > 1) {
-    throw new Error("Connection only supports a single Connection.Edge child.");
-  }
-  if (pageInfoSlots.length > 1) {
-    throw new Error(
-      "Connection only supports a single Connection.PageInfo child.",
-    );
-  }
-  const fieldsChildren = fieldsSlots.flatMap((slot) =>
-    childrenArray(() => slot.props.children),
-  );
+  const edgeSlot = connectionEdgeSlot.findSlot(children);
+  const fieldsChildren = connectionFieldsSlot
+    .findSlots(children)
+    .flatMap((slot) => childrenArray(() => slot.props.children));
+  const pageInfoSlot = connectionPageInfoSlot.findSlot(children);
   const unkeyedChildren = findUnkeyedChildren(children);
   const extraFields = [...fieldsChildren, ...unkeyedChildren];
   const pageInfoProps = pageInfoSlot?.props;

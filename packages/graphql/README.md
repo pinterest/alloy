@@ -88,9 +88,9 @@ The JSX API includes Relay-friendly helpers like `Field.Connection`,
 `Connection.Edge`, and `Connection.PageInfo`. Relay-specific validation (connection
 shape, pagination arguments, single `input` mutation argument) is only enforced
 when `relayNamePolicy` is selected.
-`Field.Connection` derives its field name by appending `Connection` to the base
-field name. If the base field name is a `Namekey`, the derived name preserves
-its options (such as `ignoreNamePolicy`).
+`Field.Connection` keeps the field name as provided and only derives the
+connection _type_ name. Use the `fieldName` prop if you want to override the
+field name while still generating a connection type.
 
 ## Built-ins and refkeys
 

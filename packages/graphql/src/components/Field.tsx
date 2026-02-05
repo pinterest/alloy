@@ -1,16 +1,11 @@
 import {
   childrenArray,
   findKeyedChild,
-  findKeyedChildren,
-  isKeyedChild,
   isNamekey,
   isRefkeyable,
-  namekey,
-  taggedComponent,
   toRefkey,
   type Children,
   type Component,
-  type ComponentCreator,
   type Refkey,
 } from "@alloy-js/core";
 import { DirectiveLocation } from "graphql";
@@ -19,10 +14,10 @@ import { Int } from "../builtins/graphql.js";
 import { useConnectionOptions } from "../connection-options.js";
 import { isRelayNamePolicy } from "../name-policy.js";
 import {
-  ArgTargetContext,
-  DirectiveTargetContext,
   addFieldToType,
+  ArgTargetContext,
   createFieldDefinition,
+  DirectiveTargetContext,
   resolveDeprecationReason,
   useSchemaContext,
   useTypeContext,
@@ -30,15 +25,21 @@ import {
   type NameInput,
   type TypeReference,
 } from "../schema.js";
+import { filterTaggedChildren, isTaggedChild } from "../schema/children.js";
 import {
   applyNonNullType,
   extractNamedTypeName,
   isTypeRef,
 } from "../schema/refs.js";
-import type { SchemaState } from "../schema/types.js";
-import { Connection } from "./Connection.js";
+import type {
+  InterfaceTypeDefinition,
+  ObjectTypeDefinition,
+  SchemaState,
+} from "../schema/types.js";
+import { Connection, CONNECTION_SUFFIX } from "./Connection.js";
 import { InputValue } from "./InputValue.js";
 import { createListSlot } from "./ListSlot.js";
+import { createTaggedSlot } from "./TaggedSlot.js";
 
 export interface FieldProps extends DeprecatedProps {
   name: NameInput;
@@ -58,180 +59,51 @@ function FieldBase(props: FieldProps) {
   }
 
   const children = childrenArray(() => props.children);
-  const listSlot = fieldList.findListSlot(children, "Field");
-  const connectionSlot = findKeyedChild(
-    children,
-    fieldConnectionTag,
-  ) as ComponentCreator<FieldConnectionProps> | null;
-  const connectionSlots = findKeyedChildren(
-    children,
-    fieldConnectionTag,
-  ) as ComponentCreator<FieldConnectionProps>[];
-  if (connectionSlots.length > 1) {
-    throw new Error("Field only supports a single Field.Connection child.");
+
+  const listSlot = fieldList.findListSlot(children);
+  const connectionSlot = fieldConnectionSlot.findSlot(children);
+
+  if (connectionSlot && listSlot) {
+    throw new Error("Field.Connection cannot be combined with Field.List.");
   }
 
-  if (connectionSlot) {
-    const baseName = unwrapNameInput(props.name);
-    if (listSlot) {
-      throw new Error("Field.Connection cannot be combined with Field.List.");
-    }
-    const connectionChildren = childrenArray(
-      () => connectionSlot.props.children,
-    );
-    const edgeChildren = findKeyedChildren(
-      connectionChildren,
-      Connection.Edge.tag,
-    );
-    const pageInfoChildren = findKeyedChildren(
-      connectionChildren,
-      Connection.PageInfo.tag,
-    );
-    if (edgeChildren.length > 0 || pageInfoChildren.length > 0) {
-      throw new Error(
-        "Field.Connection only supports Connection.Fields. Define a Connection type to customize edges or pageInfo.",
-      );
-    }
-    const hasDisallowedConnectionChildren = connectionChildren.some((child) => {
-      if (!isKeyedChild(child)) {
-        return true;
-      }
-      return child.tag !== Connection.Fields.tag;
-    });
-    if (hasDisallowedConnectionChildren) {
-      throw new Error(
-        "Field.Connection only supports Connection.Fields children. Place field arguments on Field instead.",
-      );
-    }
+  const fieldNameInput =
+    connectionSlot ?
+      (connectionSlot.props.fieldName ?? props.name)
+    : props.name;
+  const baseFieldName = unwrapNameInput(props.name);
+  const connectionInfo =
+    connectionSlot ?
+      resolveConnectionTypeInfo(
+        state,
+        connectionSlot,
+        typeDefinition,
+        baseFieldName,
+      )
+    : undefined;
 
-    const pagination = useConnectionOptions();
-    const fieldName =
-      connectionSlot.props.fieldName ??
-      deriveNameInput(props.name, "Connection");
-    const rootTypeNames = resolveRootTypeNames(state);
-    const isRootType =
-      typeDefinition.kind === "object" &&
-      rootTypeNames.has(typeDefinition.name);
-    const defaultConnectionName = `${capitalize(
-      pluralize(baseName),
-    )}Connection`;
-    const connectionType =
-      connectionSlot.props.type ??
-      (isRootType ?
-        defaultConnectionName
-      : `${typeDefinition.name}${defaultConnectionName}`);
-    const fieldType = applyNonNullType(connectionType, props.nonNull);
-    const field = createFieldDefinition(
-      state,
-      fieldName,
-      fieldType,
-      props.description,
-      resolveDeprecationReason(props),
-    );
-    addFieldToType(typeDefinition, field);
-
-    let connectionDefinition: Children | null = null;
-    const connectionRefkeys = resolveConnectionRefkeys(
-      connectionSlot.props.type,
-    );
-    const connectionTypeName =
-      extractNamedTypeName(state, connectionType) ??
-      (typeof connectionType === "string" ? connectionType : undefined);
-    if (!connectionTypeName) {
-      if (connectionRefkeys.length > 0) {
-        throw new Error(
-          "Field.Connection cannot refkey auto-generated connection types. Define a Connection type instead.",
-        );
-      }
-      throw new Error(
-        "Field.Connection requires a named connection type to define connection types.",
-      );
-    }
-    const connectionSuffix = "Connection";
-    const hasConnectionSuffix = connectionTypeName
-      .toLowerCase()
-      .endsWith(connectionSuffix.toLowerCase());
-    if (state.types.has(connectionTypeName)) {
-      if (connectionChildren.length > 0) {
-        throw new Error(
-          "Field.Connection cannot add Connection.Fields when the connection type already exists. Define a Connection type instead.",
-        );
-      }
-      if (isRelayNamePolicy(state.namePolicy) && !hasConnectionSuffix) {
-        throw new Error(
-          `Connection type name "${connectionTypeName}" must end with "Connection".`,
-        );
-      }
-    } else {
-      if (!hasConnectionSuffix) {
-        throw new Error(
-          `Connection type name "${connectionTypeName}" must end with "Connection".`,
-        );
-      }
-      if (connectionRefkeys.length > 0) {
-        throw new Error(
-          "Field.Connection cannot refkey auto-generated connection types. Define a Connection type instead.",
-        );
-      }
-      const connectionName = connectionTypeName.slice(
-        0,
-        -connectionSuffix.length,
-      );
-      connectionDefinition = (
-        <Connection name={connectionName} type={props.type}>
-          {connectionChildren.length > 0 ? connectionChildren : null}
-        </Connection>
-      );
-    }
-
-    const fieldChildren = children.filter((child) => {
-      if (!isKeyedChild(child)) {
-        return true;
-      }
-      return child.tag !== fieldListTag && child.tag !== fieldConnectionTag;
-    });
-
-    return (
-      <DirectiveTargetContext.Provider
-        value={{
-          location: DirectiveLocation.FIELD_DEFINITION,
-          directives: field.directives,
-          target: field,
-        }}
-      >
-        <ArgTargetContext.Provider
-          value={{ args: field.args, argNames: field.argNames }}
-        >
-          {pagination.forward ?
-            <>
-              <InputValue name="after" type={pagination.cursorType} />
-              <InputValue name="first" type={Int} />
-            </>
-          : null}
-          {pagination.backward ?
-            <>
-              <InputValue name="before" type={pagination.cursorType} />
-              <InputValue name="last" type={Int} />
-            </>
-          : null}
-          {fieldChildren.length > 0 ? fieldChildren : null}
-        </ArgTargetContext.Provider>
-        {connectionDefinition}
-      </DirectiveTargetContext.Provider>
-    );
-  }
-
-  const type = resolveFieldType(props.type, props.nonNull, listSlot);
+  const fieldType =
+    connectionSlot ? connectionInfo!.connectionType : props.type;
+  const type = resolveFieldType(fieldType, props.nonNull, listSlot);
   const field = createFieldDefinition(
     state,
-    props.name,
+    fieldNameInput,
     type,
     props.description,
     resolveDeprecationReason(props),
   );
   addFieldToType(typeDefinition, field);
 
-  return (
+  const fieldChildren = filterTaggedChildren(children, [
+    fieldList.tag,
+    fieldConnectionSlot.tag,
+  ]);
+
+  if (connectionSlot) {
+    fieldChildren.unshift(...createPaginationArgs());
+  }
+
+  const result = [
     <DirectiveTargetContext.Provider
       value={{
         location: DirectiveLocation.FIELD_DEFINITION,
@@ -242,15 +114,18 @@ function FieldBase(props: FieldProps) {
       <ArgTargetContext.Provider
         value={{ args: field.args, argNames: field.argNames }}
       >
-        {children.filter((child) => {
-          if (!isKeyedChild(child)) {
-            return true;
-          }
-          return child.tag !== fieldListTag;
-        })}
+        {fieldChildren}
       </ArgTargetContext.Provider>
-    </DirectiveTargetContext.Provider>
-  );
+    </DirectiveTargetContext.Provider>,
+  ];
+
+  if (connectionSlot) {
+    result.push(
+      createConnectionDefinition(props, connectionSlot, state, connectionInfo!),
+    );
+  }
+
+  return [...result];
 }
 
 export interface FieldListProps {
@@ -266,14 +141,14 @@ export interface FieldConnectionProps {
 
 const fieldList = createListSlot<FieldListProps>({
   listName: "Field.List",
+  ownerLabel: "Field",
 });
-const fieldListTag = fieldList.tag;
 const FieldListSlot = fieldList.List;
-const fieldConnectionTag = Symbol("Field.Connection");
-const FieldConnectionSlot = taggedComponent(
-  fieldConnectionTag,
-  (_props: FieldConnectionProps) => undefined,
-);
+const fieldConnectionSlot = createTaggedSlot<FieldConnectionProps>({
+  slotName: "Field.Connection",
+  ownerLabel: "Field",
+});
+const FieldConnectionSlot = fieldConnectionSlot.Slot;
 
 export interface FieldComponent {
   (props: FieldProps): Children;
@@ -281,6 +156,134 @@ export interface FieldComponent {
     Required<Pick<Component<FieldListProps>, "tag">>;
   Connection: Component<FieldConnectionProps> &
     Required<Pick<Component<FieldConnectionProps>, "tag">>;
+}
+
+function createPaginationArgs() {
+  const pagination = useConnectionOptions();
+  const args: Children[] = [];
+  if (pagination.forward) {
+    args.push(<InputValue name="after" type={pagination.cursorType} />);
+    args.push(<InputValue name="first" type={Int} />);
+  }
+  if (pagination.backward) {
+    args.push(<InputValue name="before" type={pagination.cursorType} />);
+    args.push(<InputValue name="last" type={Int} />);
+  }
+  return args;
+}
+
+function validateConnectionChildren(connectionChildren: Children[]) {
+  if (
+    findKeyedChild(connectionChildren, Connection.Edge.tag) ||
+    findKeyedChild(connectionChildren, Connection.PageInfo.tag)
+  ) {
+    throw new Error(
+      "Field.Connection only supports Connection.Fields. Define a Connection type to customize edges or pageInfo.",
+    );
+  }
+
+  if (
+    !connectionChildren.every(isTaggedChild.bind(null, [Connection.Fields.tag]))
+  ) {
+    throw new Error(
+      "Field.Connection only supports Connection.Fields children. Place field arguments on Field instead.",
+    );
+  }
+}
+
+function validateConnectionName(
+  connectionTypeName: string,
+  state: SchemaState,
+) {
+  const hasConnectionSuffix = connectionTypeName
+    .toLowerCase()
+    .endsWith(CONNECTION_SUFFIX.toLowerCase());
+
+  if (hasConnectionSuffix) return;
+
+  if (
+    isRelayNamePolicy(state.namePolicy) ||
+    !state.types.has(connectionTypeName)
+  ) {
+    throw new Error(
+      `Connection type name "${connectionTypeName}" must end with "${CONNECTION_SUFFIX}".`,
+    );
+  }
+}
+
+interface ConnectionTypeInfo {
+  connectionType: TypeReference;
+  connectionTypeName?: string;
+  connectionRefkeys: Refkey[];
+}
+
+function resolveConnectionTypeInfo(
+  state: SchemaState,
+  connectionSlot: any,
+  typeDefinition: ObjectTypeDefinition | InterfaceTypeDefinition,
+  baseFieldName: string,
+): ConnectionTypeInfo {
+  const rootTypeNames = resolveRootTypeNames(state);
+  const isRootType =
+    typeDefinition.kind === "object" && rootTypeNames.has(typeDefinition.name);
+  const defaultConnectionName = `${capitalize(
+    pluralize(baseFieldName),
+  )}Connection`;
+  const connectionType =
+    connectionSlot.props.type ??
+    (isRootType ?
+      defaultConnectionName
+    : `${typeDefinition.name}${defaultConnectionName}`);
+
+  const connectionRefkeys = resolveConnectionRefkeys(connectionSlot.props.type);
+  const connectionTypeName = extractNamedTypeName(state, connectionType);
+
+  return { connectionType, connectionTypeName, connectionRefkeys };
+}
+
+function createConnectionDefinition(
+  props: FieldProps,
+  connectionSlot: any,
+  state: SchemaState,
+  connectionInfo: ConnectionTypeInfo,
+) {
+  const connectionChildren = childrenArray(() => connectionSlot.props.children);
+  validateConnectionChildren(connectionChildren);
+
+  const { connectionTypeName, connectionRefkeys } = connectionInfo;
+  if (connectionTypeName) {
+    validateConnectionName(connectionTypeName, state);
+  } else {
+    if (connectionRefkeys.length > 0) {
+      throw new Error(
+        "Field.Connection cannot refkey auto-generated connection types. Define a Connection type instead.",
+      );
+    }
+    throw new Error(
+      "Field.Connection requires a named connection type to define connection types.",
+    );
+  }
+
+  if (state.types.has(connectionTypeName)) {
+    if (connectionChildren.length > 0) {
+      throw new Error(
+        "Field.Connection cannot add Connection.Fields when the connection type already exists. Define a Connection type instead.",
+      );
+    }
+    return null;
+  } else {
+    if (connectionRefkeys.length > 0) {
+      throw new Error(
+        "Field.Connection cannot refkey auto-generated connection types. Define a Connection type instead.",
+      );
+    }
+  }
+  const connectionName = connectionTypeName.slice(0, -CONNECTION_SUFFIX.length);
+  return (
+    <Connection name={connectionName} type={props.type}>
+      {connectionChildren.length > 0 ? connectionChildren : null}
+    </Connection>
+  );
 }
 
 /**
@@ -342,17 +345,18 @@ Field.List = FieldListSlot;
  *
  * @remarks
  * Define connection arguments on `Field` and use `Connection.Fields` to add
- * additional fields to the generated connection type.
+ * additional fields to the generated connection type. `Field.Connection` does
+ * not rename the field unless you pass `fieldName`.
  */
 Field.Connection = FieldConnectionSlot;
 
 function resolveFieldType(
   type: TypeReference,
   itemNonNull: boolean | undefined,
-  listSlot: ReturnType<typeof fieldList.findListSlot>,
+  listSlot?: ReturnType<typeof fieldList.findListSlot>,
 ): TypeReference {
   const baseType = applyNonNullType(type, itemNonNull);
-  return fieldList.applyListType(baseType, listSlot);
+  return listSlot ? fieldList.applyListType(baseType, listSlot) : baseType;
 }
 
 function capitalize(value: string): string {
@@ -364,27 +368,18 @@ function capitalize(value: string): string {
 
 function resolveRootTypeNames(state: SchemaState): Set<string> {
   const rootNames = new Set<string>();
+  const addRootName = (typeRef?: TypeReference) => {
+    const name = typeRef ? extractNamedTypeName(state, typeRef) : undefined;
+    if (name) {
+      rootNames.add(name);
+    }
+  };
+
   const queryRef =
     state.schema.query ?? (state.types.has("Query") ? "Query" : undefined);
-  const queryName =
-    queryRef ? extractNamedTypeName(state, queryRef) : undefined;
-  if (queryName) {
-    rootNames.add(queryName);
-  }
-  const mutationName =
-    state.schema.mutation ?
-      extractNamedTypeName(state, state.schema.mutation)
-    : undefined;
-  if (mutationName) {
-    rootNames.add(mutationName);
-  }
-  const subscriptionName =
-    state.schema.subscription ?
-      extractNamedTypeName(state, state.schema.subscription)
-    : undefined;
-  if (subscriptionName) {
-    rootNames.add(subscriptionName);
-  }
+  addRootName(queryRef);
+  addRootName(state.schema.mutation);
+  addRootName(state.schema.subscription);
   return rootNames;
 }
 
@@ -407,11 +402,4 @@ function resolveConnectionRefkeys(connectionType?: TypeReference): Refkey[] {
 
 function unwrapNameInput(value: NameInput): string {
   return isNamekey(value) ? value.name : value;
-}
-
-function deriveNameInput(base: NameInput, suffix: string): NameInput {
-  if (isNamekey(base)) {
-    return namekey(`${base.name}${suffix}`, { ...base.options });
-  }
-  return `${base}${suffix}`;
 }

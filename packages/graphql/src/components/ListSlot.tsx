@@ -1,15 +1,16 @@
 import {
   childrenArray,
-  findKeyedChild,
-  findKeyedChildren,
-  isKeyedChild,
-  taggedComponent,
   type Children,
   type Component,
   type ComponentCreator,
 } from "@alloy-js/core";
 import type { TypeReference } from "../schema.js";
+import {
+  assertOnlyListChildren as assertOnlyListChildrenForTag,
+  filterTaggedChildren,
+} from "../schema/children.js";
 import { wrapListType, wrapNonNullType } from "../schema/refs.js";
+import { createTaggedSlot } from "./TaggedSlot.js";
 
 interface BaseListSlotProps {
   nonNull?: boolean;
@@ -18,6 +19,7 @@ interface BaseListSlotProps {
 
 interface ListSlotOptions {
   listName: string;
+  ownerLabel: string;
 }
 
 interface ListSlotFactory<TProps extends BaseListSlotProps> {
@@ -25,7 +27,7 @@ interface ListSlotFactory<TProps extends BaseListSlotProps> {
   List: Component<TProps> & Required<Pick<Component<TProps>, "tag">>;
   findListSlot: (
     children: Children[],
-    ownerLabel: string,
+    ownerLabelOverride?: string,
   ) => ComponentCreator<TProps> | null;
   assertOnlyListChildren: (children: Children[], ownerLabel: string) => void;
   applyListType: (
@@ -37,38 +39,23 @@ interface ListSlotFactory<TProps extends BaseListSlotProps> {
 export function createListSlot<TProps extends BaseListSlotProps>(
   options: ListSlotOptions,
 ): ListSlotFactory<TProps> {
-  const tag = Symbol(options.listName);
-  const List = taggedComponent(tag, (_props: TProps) => undefined);
+  const taggedList = createTaggedSlot<TProps>({
+    slotName: options.listName,
+    ownerLabel: options.ownerLabel,
+  });
+  const tag = taggedList.tag;
+  const List = taggedList.Slot;
 
-  function findListSlot(children: Children[], ownerLabel: string) {
-    const listSlot = findKeyedChild(
-      children,
-      tag,
-    ) as ComponentCreator<TProps> | null;
-    const listSlots = findKeyedChildren(
-      children,
-      tag,
-    ) as ComponentCreator<TProps>[];
-    if (listSlots.length > 1) {
-      throw new Error(
-        `${ownerLabel} only supports a single ${options.listName} child.`,
-      );
-    }
-    return listSlot;
+  function findListSlot(children: Children[], ownerLabelOverride?: string) {
+    return taggedList.findSlot(children, ownerLabelOverride);
   }
 
   function assertOnlyListChildren(children: Children[], ownerLabel: string) {
-    const extraChildren = children.filter((child) => {
-      if (!isKeyedChild(child)) {
-        return true;
-      }
-      return child.tag !== tag;
+    assertOnlyListChildrenForTag(children, {
+      ownerLabel,
+      listName: options.listName,
+      listTag: tag,
     });
-    if (extraChildren.length > 0) {
-      throw new Error(
-        `${ownerLabel} only supports ${options.listName} children.`,
-      );
-    }
   }
 
   function applyListType(
@@ -80,25 +67,8 @@ export function createListSlot<TProps extends BaseListSlotProps>(
     }
 
     const listChildren = childrenArray(() => listSlot.props.children);
-    const nestedListSlot = findKeyedChild(
-      listChildren,
-      tag,
-    ) as ComponentCreator<TProps> | null;
-    const nestedListSlots = findKeyedChildren(
-      listChildren,
-      tag,
-    ) as ComponentCreator<TProps>[];
-    if (nestedListSlots.length > 1) {
-      throw new Error(
-        `${options.listName} only supports a single ${options.listName} child.`,
-      );
-    }
-    const extraChildren = listChildren.filter((child) => {
-      if (!isKeyedChild(child)) {
-        return true;
-      }
-      return child.tag !== tag;
-    });
+    const nestedListSlot = findListSlot(listChildren, options.listName);
+    const extraChildren = filterTaggedChildren(listChildren, [tag]);
     if (extraChildren.length > 0) {
       throw new Error(
         `${options.listName} only supports ${options.listName} as a child.`,
