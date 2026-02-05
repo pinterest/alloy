@@ -1,9 +1,9 @@
 import type { Children } from "@alloy-js/core";
 import {
-  Argument,
   Boolean,
   Field,
   ID,
+  InputValue,
   Int,
   ObjectType,
   PageInfoType,
@@ -218,7 +218,7 @@ describe("relay rules", () => {
   it("requires pagination argument pairs", () => {
     expect(() =>
       renderRelaySchema({
-        queryFieldChildren: <Argument name="first" type={Int} />,
+        queryFieldChildren: <InputValue name="first" type={Int} />,
       }),
     ).toThrow(
       'Connection field "Query.widgets" must define both "first" and "after" arguments.',
@@ -230,8 +230,8 @@ describe("relay rules", () => {
       renderRelaySchema({
         queryFieldChildren: (
           <>
-            <Argument name="first" type={String} />
-            <Argument name="after" type={String} />
+            <InputValue name="first" type={String} />
+            <InputValue name="after" type={String} />
           </>
         ),
       }),
@@ -251,8 +251,8 @@ describe("relay rules", () => {
         ),
         queryFieldChildren: (
           <>
-            <Argument name="first" type={Int} />
-            <Argument name="after" type={String} />
+            <InputValue name="first" type={Int} />
+            <InputValue name="after" type={String} />
           </>
         ),
       }),
@@ -276,7 +276,7 @@ describe("relay rules", () => {
             <Field name="cursor" type="Widget" />
           </>
         ),
-        queryFieldChildren: <Argument name="first" type={String} />,
+        queryFieldChildren: <InputValue name="first" type={String} />,
       }),
     ).not.toThrow();
   });

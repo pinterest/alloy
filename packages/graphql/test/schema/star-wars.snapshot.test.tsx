@@ -1,10 +1,10 @@
 import { refkey } from "@alloy-js/core";
 import {
-  Argument,
   Connection,
   Field,
   Float,
   ID,
+  InputValue,
   Int,
   Node,
   NodeField,
@@ -258,33 +258,33 @@ describe("star wars schema", () => {
         <ObjectType name="Root" refkey={Root}>
           {connectionFieldFor("film", Film, "allFilms")}
           <Field name="film" type={Film}>
-            <Argument name="id" type={ID} />
-            <Argument name="filmID" type={ID} />
+            <InputValue name="id" type={ID} />
+            <InputValue name="filmID" type={ID} />
           </Field>
           {connectionFieldFor("person", Person, "allPeople")}
           <Field name="person" type={Person}>
-            <Argument name="id" type={ID} />
-            <Argument name="personID" type={ID} />
+            <InputValue name="id" type={ID} />
+            <InputValue name="personID" type={ID} />
           </Field>
           {connectionFieldFor("planet", Planet, "allPlanets")}
           <Field name="planet" type={Planet}>
-            <Argument name="id" type={ID} />
-            <Argument name="planetID" type={ID} />
+            <InputValue name="id" type={ID} />
+            <InputValue name="planetID" type={ID} />
           </Field>
           {connectionFieldFor("species", Species, "allSpecies")}
           <Field name="species" type={Species}>
-            <Argument name="id" type={ID} />
-            <Argument name="speciesID" type={ID} />
+            <InputValue name="id" type={ID} />
+            <InputValue name="speciesID" type={ID} />
           </Field>
           {connectionFieldFor("starship", Starship, "allStarships")}
           <Field name="starship" type={Starship}>
-            <Argument name="id" type={ID} />
-            <Argument name="starshipID" type={ID} />
+            <InputValue name="id" type={ID} />
+            <InputValue name="starshipID" type={ID} />
           </Field>
           {connectionFieldFor("vehicle", Vehicle, "allVehicles")}
           <Field name="vehicle" type={Vehicle}>
-            <Argument name="id" type={ID} />
-            <Argument name="vehicleID" type={ID} />
+            <InputValue name="id" type={ID} />
+            <InputValue name="vehicleID" type={ID} />
           </Field>
           <NodeField />
         </ObjectType>

@@ -11,12 +11,14 @@ import {
   type ComponentCreator,
   type Refkey,
 } from "@alloy-js/core";
+import { DirectiveLocation } from "graphql";
 import pluralize from "pluralize";
 import { Int } from "../builtins/graphql.js";
 import { useConnectionOptions } from "../connection-options.js";
 import { isRelayNamePolicy } from "../name-policy.js";
 import {
   ArgTargetContext,
+  DirectiveTargetContext,
   addFieldToType,
   createFieldDefinition,
   resolveDeprecationReason,
@@ -31,8 +33,8 @@ import {
   isTypeRef,
 } from "../schema/refs.js";
 import type { SchemaState } from "../schema/types.js";
-import { Argument } from "./Argument.js";
 import { Connection } from "./Connection.js";
+import { InputValue } from "./InputValue.js";
 import { createListSlot } from "./ListSlot.js";
 
 export interface FieldProps extends DeprecatedProps {
@@ -185,26 +187,32 @@ function FieldBase(props: FieldProps) {
     });
 
     return (
-      <>
+      <DirectiveTargetContext.Provider
+        value={{
+          location: DirectiveLocation.FIELD_DEFINITION,
+          directives: field.directives,
+          target: field,
+        }}
+      >
         <ArgTargetContext.Provider
           value={{ args: field.args, argNames: field.argNames }}
         >
           {pagination.forward ?
             <>
-              <Argument name="after" type={pagination.cursorType} />
-              <Argument name="first" type={Int} />
+              <InputValue name="after" type={pagination.cursorType} />
+              <InputValue name="first" type={Int} />
             </>
           : null}
           {pagination.backward ?
             <>
-              <Argument name="before" type={pagination.cursorType} />
-              <Argument name="last" type={Int} />
+              <InputValue name="before" type={pagination.cursorType} />
+              <InputValue name="last" type={Int} />
             </>
           : null}
           {fieldChildren.length > 0 ? fieldChildren : null}
         </ArgTargetContext.Provider>
         {connectionDefinition}
-      </>
+      </DirectiveTargetContext.Provider>
     );
   }
 
@@ -219,16 +227,24 @@ function FieldBase(props: FieldProps) {
   addFieldToType(typeDefinition, field);
 
   return (
-    <ArgTargetContext.Provider
-      value={{ args: field.args, argNames: field.argNames }}
+    <DirectiveTargetContext.Provider
+      value={{
+        location: DirectiveLocation.FIELD_DEFINITION,
+        directives: field.directives,
+        target: field,
+      }}
     >
-      {children.filter((child) => {
-        if (!isKeyedChild(child)) {
-          return true;
-        }
-        return child.tag !== fieldListTag;
-      })}
-    </ArgTargetContext.Provider>
+      <ArgTargetContext.Provider
+        value={{ args: field.args, argNames: field.argNames }}
+      >
+        {children.filter((child) => {
+          if (!isKeyedChild(child)) {
+            return true;
+          }
+          return child.tag !== fieldListTag;
+        })}
+      </ArgTargetContext.Provider>
+    </DirectiveTargetContext.Provider>
   );
 }
 

@@ -1,5 +1,7 @@
 import type { Children, Refkey } from "@alloy-js/core";
+import { DirectiveLocation } from "graphql";
 import {
+  DirectiveTargetContext,
   TypeContext,
   createInterfaceTypeDefinition,
   registerType,
@@ -39,7 +41,15 @@ export function InterfaceType(props: InterfaceTypeProps) {
 
   return (
     <TypeContext.Provider value={{ definition }}>
-      {props.children}
+      <DirectiveTargetContext.Provider
+        value={{
+          location: DirectiveLocation.INTERFACE,
+          directives: definition.directives,
+          target: definition,
+        }}
+      >
+        {props.children}
+      </DirectiveTargetContext.Provider>
     </TypeContext.Provider>
   );
 }

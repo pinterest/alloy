@@ -1,11 +1,11 @@
 import { refkey } from "@alloy-js/core";
 import {
-  Argument,
   Boolean,
   EnumType,
   EnumValue,
   Field,
   ID,
+  InputValue,
   Int,
   Mutation,
   ObjectType,
@@ -168,7 +168,7 @@ describe("snowtooth schema", () => {
             description="A list of all `Lift` objects"
           >
             <Field.List nonNull />
-            <Argument name="status" type={LiftStatus} />
+            <InputValue name="status" type={LiftStatus} />
           </Field>
           <Field
             name="allTrails"
@@ -177,7 +177,7 @@ describe("snowtooth schema", () => {
             description="A list of all `Trail` objects"
           >
             <Field.List nonNull />
-            <Argument name="status" type={TrailStatus} />
+            <InputValue name="status" type={TrailStatus} />
           </Field>
           <Field
             name="Lift"
@@ -185,7 +185,7 @@ describe("snowtooth schema", () => {
             nonNull
             description={'Returns a `Lift` by `id` (id: "panorama")'}
           >
-            <Argument name="id" type={ID} nonNull />
+            <InputValue name="id" type={ID} nonNull />
           </Field>
           <Field
             name="Trail"
@@ -193,7 +193,7 @@ describe("snowtooth schema", () => {
             nonNull
             description={'Returns a `Trail` by `id` (id: "old-witch")'}
           >
-            <Argument name="id" type={ID} nonNull />
+            <InputValue name="id" type={ID} nonNull />
           </Field>
           <Field
             name="liftCount"
@@ -201,7 +201,7 @@ describe("snowtooth schema", () => {
             nonNull
             description="Returns an `Int` of `Lift` objects with optional `LiftStatus` filter"
           >
-            <Argument name="status" type={LiftStatus} />
+            <InputValue name="status" type={LiftStatus} />
           </Field>
           <Field
             name="trailCount"
@@ -209,7 +209,7 @@ describe("snowtooth schema", () => {
             nonNull
             description="Returns an `Int` of `Trail` objects with optional `TrailStatus` filter"
           >
-            <Argument name="status" type={TrailStatus} />
+            <InputValue name="status" type={TrailStatus} />
           </Field>
           <Field
             name="search"
@@ -218,8 +218,8 @@ describe("snowtooth schema", () => {
             description="Returns a list of `SearchResult` objects based on `term` or `status`"
           >
             <Field.List nonNull />
-            <Argument name="term" type={String} />
-            <Argument name="status" type={LiftStatus} />
+            <InputValue name="term" type={String} />
+            <InputValue name="status" type={LiftStatus} />
           </Field>
         </Query>
         <Mutation>
@@ -229,8 +229,8 @@ describe("snowtooth schema", () => {
             nonNull
             description="Sets a `Lift` status by sending `id` and `status`"
           >
-            <Argument name="id" type={ID} nonNull />
-            <Argument name="status" type={LiftStatus} nonNull />
+            <InputValue name="id" type={ID} nonNull />
+            <InputValue name="status" type={LiftStatus} nonNull />
           </Field>
           <Field
             name="setTrailStatus"
@@ -238,8 +238,8 @@ describe("snowtooth schema", () => {
             nonNull
             description="Sets a `Trail` status by sending `id` and `status`"
           >
-            <Argument name="id" type={ID} nonNull />
-            <Argument name="status" type={TrailStatus} nonNull />
+            <InputValue name="id" type={ID} nonNull />
+            <InputValue name="status" type={TrailStatus} nonNull />
           </Field>
         </Mutation>
         <Subscription>

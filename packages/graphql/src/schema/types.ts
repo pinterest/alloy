@@ -87,7 +87,6 @@ export interface SchemaOptions {
    * - `null`: disable naming conventions; GraphQL hard naming rules still apply.
    */
   namePolicy?: NamePolicyInput;
-  includeSpecifiedDirectives?: boolean;
 }
 
 /**
@@ -109,6 +108,7 @@ interface BaseTypeDefinition {
   name: string;
   description?: string;
   refkeys: Refkey[];
+  directives: AppliedDirective[];
 }
 
 /**
@@ -180,6 +180,7 @@ export interface FieldDefinition {
   argNames: Set<string>;
   description?: string;
   deprecationReason?: string;
+  directives: AppliedDirective[];
 }
 
 /**
@@ -191,6 +192,7 @@ export interface ArgDefinition {
   description?: string;
   defaultValue?: unknown;
   deprecationReason?: string;
+  directives: AppliedDirective[];
 }
 
 /**
@@ -210,6 +212,7 @@ export interface InputFieldDefinition {
   description?: string;
   defaultValue?: unknown;
   deprecationReason?: string;
+  directives: AppliedDirective[];
 }
 
 /**
@@ -219,6 +222,7 @@ export interface EnumValueDefinition {
   name: string;
   description?: string;
   deprecationReason?: string;
+  directives: AppliedDirective[];
 }
 
 /**
@@ -238,6 +242,60 @@ export interface DirectiveDefinition {
   locations: DirectiveLocation[];
   args: ArgDefinition[];
   argNames: Set<string>;
+  directives: AppliedDirective[];
+}
+
+/**
+ * An applied directive with argument values.
+ */
+export interface AppliedDirective {
+  name: string;
+  args: AppliedDirectiveArgument[];
+  argNames: Set<string>;
+}
+
+/**
+ * A directive argument value.
+ */
+export interface AppliedDirectiveArgument {
+  name: string;
+  value: unknown;
+}
+
+/**
+ * Tracks directive applications for a target.
+ */
+export interface DirectiveTargetContextValue {
+  location: DirectiveLocation;
+  directives: AppliedDirective[];
+  target: DirectiveTarget;
+}
+
+/**
+ * Allowed directive application targets.
+ */
+export type DirectiveTarget =
+  | SchemaDirectiveTarget
+  | TypeDefinition
+  | FieldDefinition
+  | ArgDefinition
+  | InputFieldDefinition
+  | EnumValueDefinition
+  | DirectiveDefinition;
+
+/**
+ * Schema-level directive target marker.
+ */
+export interface SchemaDirectiveTarget {
+  kind: "schema";
+}
+
+/**
+ * Tracks directive arguments for a directive application.
+ */
+export interface DirectiveArgTargetContextValue {
+  args: AppliedDirectiveArgument[];
+  argNames: Set<string>;
 }
 
 /**
@@ -247,6 +305,7 @@ export interface SchemaState {
   types: Map<string, TypeDefinition>;
   directives: Map<string, DirectiveDefinition>;
   refkeyToName: Map<Refkey, string>;
+  schemaDirectives: AppliedDirective[];
   schema: {
     query?: TypeReference;
     mutation?: TypeReference;
@@ -254,7 +313,6 @@ export interface SchemaState {
   };
   description?: string;
   namePolicy: NamePolicy | null;
-  includeSpecifiedDirectives: boolean;
 }
 
 /**

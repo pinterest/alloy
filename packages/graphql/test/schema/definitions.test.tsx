@@ -1,10 +1,10 @@
 import {
-  Argument,
   createGraphQLNamePolicy,
-  Directive,
+  DirectiveDefinition,
   EnumType,
   EnumValue,
   Field,
+  InputValue,
   Query,
   renderSchema,
   String,
@@ -28,12 +28,12 @@ describe("schema definitions", () => {
       renderSchema(
         <Query>
           <Field name="search" type={String}>
-            <Argument name="term" type={String} />
-            <Argument name="term" type={String} />
+            <InputValue name="term" type={String} />
+            <InputValue name="term" type={String} />
           </Field>
         </Query>,
       ),
-    ).toThrow(/Argument "term" is already defined/);
+    ).toThrow(/InputValue "term" is already defined/);
   });
 
   it("rejects reserved enum values", () => {
@@ -56,7 +56,7 @@ describe("schema definitions", () => {
     expect(() =>
       renderSchema(
         <>
-          <Directive name="flag" locations={["FIELD", "FIELD"]} />
+          <DirectiveDefinition name="flag" locations={["FIELD", "FIELD"]} />
           <Query>
             <Field name="ping" type={String} />
           </Query>
@@ -69,7 +69,10 @@ describe("schema definitions", () => {
     expect(() =>
       renderSchema(
         <>
-          <Directive name="deprecated" locations={["FIELD_DEFINITION"]} />
+          <DirectiveDefinition
+            name="deprecated"
+            locations={["FIELD_DEFINITION"]}
+          />
           <Query>
             <Field name="ping" type={String} />
           </Query>
@@ -82,7 +85,7 @@ describe("schema definitions", () => {
     expect(() =>
       renderSchema(
         <>
-          <Directive name="flag" locations={["NOT_A_LOCATION"]} />
+          <DirectiveDefinition name="flag" locations={["NOT_A_LOCATION"]} />
           <Query>
             <Field name="ping" type={String} />
           </Query>
@@ -95,7 +98,7 @@ describe("schema definitions", () => {
     expect(() =>
       renderSchema(
         <>
-          <Directive name="flag" locations={[]} />
+          <DirectiveDefinition name="flag" locations={[]} />
           <Query>
             <Field name="ping" type={String} />
           </Query>
@@ -108,7 +111,10 @@ describe("schema definitions", () => {
     expect(() =>
       renderSchema(
         <>
-          <Directive name="__private" locations={["FIELD_DEFINITION"]} />
+          <DirectiveDefinition
+            name="__private"
+            locations={["FIELD_DEFINITION"]}
+          />
           <Query>
             <Field name="ping" type={String} />
           </Query>
@@ -117,20 +123,22 @@ describe("schema definitions", () => {
     ).toThrow('Name "__private" must not begin with "__".');
   });
 
-  it("allows excluding specified directives", () => {
-    const schema = renderSchema(
-      <>
-        <Directive name="flag" locations={["FIELD_DEFINITION"]} />
-        <Query>
-          <Field name="ping" type={String} />
-        </Query>
-      </>,
-      { includeSpecifiedDirectives: false },
+  it("rejects directive names that conflict with specified directives", () => {
+    expect(() =>
+      renderSchema(
+        <>
+          <DirectiveDefinition
+            name="deprecated"
+            locations={["FIELD_DEFINITION"]}
+          />
+          <Query>
+            <Field name="ping" type={String} />
+          </Query>
+        </>,
+      ),
+    ).toThrow(
+      'Directive name "deprecated" conflicts with a specified directive.',
     );
-
-    expect(schema.getDirectives().map((directive) => directive.name)).toEqual([
-      "flag",
-    ]);
   });
 
   it("enforces name policy overrides", () => {

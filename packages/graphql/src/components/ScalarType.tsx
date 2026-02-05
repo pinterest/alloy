@@ -1,6 +1,8 @@
-import type { Refkey } from "@alloy-js/core";
+import type { Children, Refkey } from "@alloy-js/core";
 import type { GraphQLScalarType } from "graphql";
+import { DirectiveLocation } from "graphql";
 import {
+  DirectiveTargetContext,
   createScalarTypeDefinition,
   registerType,
   useSchemaContext,
@@ -15,6 +17,7 @@ export interface ScalarTypeProps {
   parseValue?: GraphQLScalarType["parseValue"];
   parseLiteral?: GraphQLScalarType["parseLiteral"];
   refkey?: Refkey | Refkey[];
+  children?: Children;
 }
 
 /**
@@ -42,5 +45,15 @@ export function ScalarType(props: ScalarTypeProps) {
   definition.parseLiteral = props.parseLiteral;
   definition.specifiedByUrl = props.specifiedByUrl;
   registerType(state, definition);
-  return undefined;
+  return (
+    <DirectiveTargetContext.Provider
+      value={{
+        location: DirectiveLocation.SCALAR,
+        directives: definition.directives,
+        target: definition,
+      }}
+    >
+      {props.children}
+    </DirectiveTargetContext.Provider>
+  );
 }

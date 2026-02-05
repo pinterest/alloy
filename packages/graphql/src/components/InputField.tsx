@@ -1,5 +1,13 @@
-import { childrenArray, type Children, type Component } from "@alloy-js/core";
 import {
+  childrenArray,
+  isComponentCreator,
+  isKeyedChild,
+  type Children,
+  type Component,
+} from "@alloy-js/core";
+import { DirectiveLocation } from "graphql";
+import {
+  DirectiveTargetContext,
   addInputFieldToType,
   createInputFieldDefinition,
   resolveDeprecationReason,
@@ -9,6 +17,7 @@ import {
   type TypeReference,
 } from "../schema.js";
 import { applyNonNullType } from "../schema/refs.js";
+import { Directive } from "./Directive.js";
 import { createListSlot } from "./ListSlot.js";
 
 export interface InputFieldProps extends DeprecatedProps {
@@ -29,6 +38,27 @@ const inputFieldList = createListSlot<InputFieldListProps>({
   listName: "InputField.List",
 });
 const InputFieldListSlot = inputFieldList.List;
+const inputFieldListTag = inputFieldList.tag;
+
+function assertOnlyDirectiveAndListChildren(
+  children: Children[],
+  ownerLabel: string,
+) {
+  const extraChildren = children.filter((child) => {
+    if (isComponentCreator(child, Directive)) {
+      return false;
+    }
+    if (isKeyedChild(child) && child.tag === inputFieldListTag) {
+      return false;
+    }
+    return true;
+  });
+  if (extraChildren.length > 0) {
+    throw new Error(
+      `${ownerLabel} only supports Directive and InputField.List children.`,
+    );
+  }
+}
 
 function resolveInputFieldType(
   type: TypeReference,
@@ -48,7 +78,7 @@ function InputFieldBase(props: InputFieldProps) {
 
   const children = childrenArray(() => props.children);
   const listSlot = inputFieldList.findListSlot(children, "InputField");
-  inputFieldList.assertOnlyListChildren(children, "InputField");
+  assertOnlyDirectiveAndListChildren(children, "InputField");
   const type = resolveInputFieldType(props.type, props.nonNull, listSlot);
   const field = createInputFieldDefinition(
     state,
@@ -59,7 +89,22 @@ function InputFieldBase(props: InputFieldProps) {
     resolveDeprecationReason(props),
   );
   addInputFieldToType(typeDefinition, field);
-  return undefined;
+  return (
+    <DirectiveTargetContext.Provider
+      value={{
+        location: DirectiveLocation.INPUT_FIELD_DEFINITION,
+        directives: field.directives,
+        target: field,
+      }}
+    >
+      {children.filter((child) => {
+        if (!isKeyedChild(child)) {
+          return true;
+        }
+        return child.tag !== inputFieldListTag;
+      })}
+    </DirectiveTargetContext.Provider>
+  );
 }
 
 export interface InputFieldComponent {

@@ -1,5 +1,7 @@
 import type { Children, Refkey } from "@alloy-js/core";
+import { DirectiveLocation } from "graphql";
 import {
+  DirectiveTargetContext,
   TypeContext,
   createInputObjectTypeDefinition,
   registerType,
@@ -55,8 +57,16 @@ export function InputObjectType(props: InputObjectTypeProps) {
 
   return (
     <TypeContext.Provider value={{ definition }}>
-      {props.children}
-      <EnsureInputFields />
+      <DirectiveTargetContext.Provider
+        value={{
+          location: DirectiveLocation.INPUT_OBJECT,
+          directives: definition.directives,
+          target: definition,
+        }}
+      >
+        {props.children}
+        <EnsureInputFields />
+      </DirectiveTargetContext.Provider>
     </TypeContext.Provider>
   );
 }

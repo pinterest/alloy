@@ -2,8 +2,8 @@ import type { Children } from "@alloy-js/core";
 import { ID } from "../builtins/graphql.js";
 import { Node } from "../builtins/node.js";
 import type { TypeReference } from "../schema.js";
-import { Argument } from "./Argument.js";
 import { Field } from "./Field.js";
+import { InputValue } from "./InputValue.js";
 
 const DEFAULT_DESCRIPTIONS = {
   id: "The ID of an object",
@@ -35,7 +35,7 @@ export function NodeField(props: NodeFieldProps) {
       type={props.type ?? Node}
       description={props.description ?? DEFAULT_DESCRIPTIONS.node}
     >
-      <Argument
+      <InputValue
         name="id"
         type={ID}
         nonNull

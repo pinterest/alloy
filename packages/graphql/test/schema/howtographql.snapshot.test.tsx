@@ -1,12 +1,12 @@
 import { refkey } from "@alloy-js/core";
 import {
-  Argument,
   EnumType,
   EnumValue,
   Field,
   ID,
   InputField,
   InputObjectType,
+  InputValue,
   Int,
   InterfaceType,
   Mutation,
@@ -46,41 +46,41 @@ describe("howtographql schema", () => {
         <Query>
           <Field name="allLinks" type={Link} nonNull>
             <Field.List nonNull />
-            <Argument name="filter" type={LinkFilter} />
-            <Argument name="orderBy" type={LinkOrderBy} />
-            <Argument name="skip" type={Int} />
-            <Argument name="first" type={Int} />
+            <InputValue name="filter" type={LinkFilter} />
+            <InputValue name="orderBy" type={LinkOrderBy} />
+            <InputValue name="skip" type={Int} />
+            <InputValue name="first" type={Int} />
           </Field>
           <Field name="_allLinksMeta" type={QueryMeta} nonNull />
         </Query>
         <Mutation>
           <Field name="signinUser" type={SigninPayload} nonNull>
-            <Argument name="email" type={AuthProviderEmail} />
+            <InputValue name="email" type={AuthProviderEmail} />
           </Field>
           <Field name="createUser" type={User}>
-            <Argument name="name" type={String} nonNull />
-            <Argument
+            <InputValue name="name" type={String} nonNull />
+            <InputValue
               name="authProvider"
               type={AuthProviderSignupData}
               nonNull
             />
           </Field>
           <Field name="createLink" type={Link}>
-            <Argument name="description" type={String} nonNull />
-            <Argument name="url" type={String} nonNull />
-            <Argument name="postedById" type={ID} />
+            <InputValue name="description" type={String} nonNull />
+            <InputValue name="url" type={String} nonNull />
+            <InputValue name="postedById" type={ID} />
           </Field>
           <Field name="createVote" type={Vote}>
-            <Argument name="linkId" type={ID} />
-            <Argument name="userId" type={ID} />
+            <InputValue name="linkId" type={ID} />
+            <InputValue name="userId" type={ID} />
           </Field>
         </Mutation>
         <Subscription>
           <Field name="Link" type={LinkSubscriptionPayload}>
-            <Argument name="filter" type={LinkSubscriptionFilter} />
+            <InputValue name="filter" type={LinkSubscriptionFilter} />
           </Field>
           <Field name="Vote" type={VoteSubscriptionPayload}>
-            <Argument name="filter" type={VoteSubscriptionFilter} />
+            <InputValue name="filter" type={VoteSubscriptionFilter} />
           </Field>
         </Subscription>
         <InterfaceType name="Node" refkey={NodeRef}>

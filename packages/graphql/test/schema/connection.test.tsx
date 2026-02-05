@@ -1,8 +1,8 @@
 import { refkey } from "@alloy-js/core";
 import {
-  Argument,
   Connection,
   Field,
+  InputValue,
   Int,
   ObjectType,
   PageInfoType,
@@ -28,8 +28,8 @@ describe("Connection", () => {
         </Connection>
         <Query>
           <Field name="widgets" type="WidgetsConnection">
-            <Argument name="after" type={String} />
-            <Argument name="first" type={Int} />
+            <InputValue name="after" type={String} />
+            <InputValue name="first" type={Int} />
           </Field>
         </Query>
       </>,
@@ -89,8 +89,8 @@ describe("Connection", () => {
         </Connection>
         <Query>
           <Field name="widgets" type="WidgetsConnection">
-            <Argument name="after" type={String} />
-            <Argument name="first" type={Int} />
+            <InputValue name="after" type={String} />
+            <InputValue name="first" type={Int} />
           </Field>
         </Query>
       </>,

@@ -1,11 +1,11 @@
 import { refkey } from "@alloy-js/core";
 import {
-  Argument,
   Connection,
   ConnectionPagination,
   createGraphQLNamePolicy,
   Field,
   ID,
+  InputValue,
   Int,
   ObjectType,
   PageInfoType,
@@ -181,7 +181,7 @@ describe("Field.Connection", () => {
         <Query>
           <Field name="items" type={Item}>
             <Field.Connection type="ItemsConnection" />
-            <Argument name="filter" type={String} />
+            <InputValue name="filter" type={String} />
           </Field>
         </Query>
       </>,

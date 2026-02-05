@@ -1,11 +1,11 @@
 import { refkey } from "@alloy-js/core";
 import {
-  Argument,
   EnumType,
   Field,
   ID,
   InputField,
   InputObjectType,
+  InputValue,
   Node,
   NodeInterface,
   ObjectType,
@@ -30,7 +30,7 @@ describe("buildSchema validations", () => {
           </InputObjectType>
           <Query>
             <Field name="search" type={String}>
-              <Argument name="filter" type="Filter" />
+              <InputValue name="filter" type="Filter" />
             </Field>
           </Query>
         </>,
@@ -47,7 +47,7 @@ describe("buildSchema validations", () => {
           </InputObjectType>
           <Query>
             <Field name="search" type={String}>
-              <Argument name="filter" type="Filter" />
+              <InputValue name="filter" type="Filter" />
             </Field>
           </Query>
         </>,
@@ -79,12 +79,12 @@ describe("buildSchema validations", () => {
           </ObjectType>
           <Query>
             <Field name="user" type="User">
-              <Argument name="criteria" type="User" />
+              <InputValue name="criteria" type="User" />
             </Field>
           </Query>
         </>,
       ),
-    ).toThrow(/Argument "criteria" must be an input type/);
+    ).toThrow(/InputValue "criteria" must be an input type/);
   });
 
   it("rejects non-input input fields", () => {
@@ -99,7 +99,7 @@ describe("buildSchema validations", () => {
           </InputObjectType>
           <Query>
             <Field name="user" type="User">
-              <Argument name="filter" type="Filter" />
+              <InputValue name="filter" type="Filter" />
             </Field>
           </Query>
         </>,
@@ -116,7 +116,7 @@ describe("buildSchema validations", () => {
           </InputObjectType>
           <Query>
             <Field name="search" type={String}>
-              <Argument name="input" type="SelfInput" />
+              <InputValue name="input" type="SelfInput" />
             </Field>
           </Query>
         </>,

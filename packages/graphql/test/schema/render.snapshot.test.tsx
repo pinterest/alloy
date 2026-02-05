@@ -1,13 +1,13 @@
 import {
-  Argument,
   Boolean,
-  Directive,
+  DirectiveDefinition,
   EnumType,
   EnumValue,
   Field,
   ID,
   InputField,
   InputObjectType,
+  InputValue,
   Int,
   Mutation,
   Node,
@@ -28,10 +28,13 @@ describe("renderSchema snapshots", () => {
   it("prints a comprehensive schema snapshot", () => {
     const schema = renderSchema(
       <>
-        <Directive name="tag" locations={["OBJECT", "FIELD_DEFINITION"]}>
-          <Argument name="name" type={String} nonNull />
-          <Argument name="important" type={Boolean} defaultValue={false} />
-        </Directive>
+        <DirectiveDefinition
+          name="tag"
+          locations={["OBJECT", "FIELD_DEFINITION"]}
+        >
+          <InputValue name="name" type={String} nonNull />
+          <InputValue name="important" type={Boolean} defaultValue={false} />
+        </DirectiveDefinition>
         <ScalarType
           name="Url"
           specifiedByUrl="https://example.com/spec#url"
@@ -79,14 +82,14 @@ describe("renderSchema snapshots", () => {
           <Field name="me" type="User" />
           <Field name="search" type="SearchResult">
             <Field.List />
-            <Argument name="filter" type="SearchFilter" />
-            <Argument name="limit" type={Int} defaultValue={10} />
-            <Argument name="includeArchived" type={Boolean} deprecated />
+            <InputValue name="filter" type="SearchFilter" />
+            <InputValue name="limit" type={Int} defaultValue={10} />
+            <InputValue name="includeArchived" type={Boolean} deprecated />
           </Field>
         </Query>
         <Mutation>
           <Field name="updateProfile" type="Profile">
-            <Argument name="input" type="ProfileInput" nonNull />
+            <InputValue name="input" type="ProfileInput" nonNull />
           </Field>
         </Mutation>
         <Subscription>
@@ -101,12 +104,12 @@ describe("renderSchema snapshots", () => {
   it("prints a schema snapshot with custom roots", () => {
     const schema = renderSchema(
       <>
-        <Directive
+        <DirectiveDefinition
           name="cacheControl"
           locations={["OBJECT", "FIELD_DEFINITION"]}
         >
-          <Argument name="maxAge" type={Int} defaultValue={60} />
-        </Directive>
+          <InputValue name="maxAge" type={Int} defaultValue={60} />
+        </DirectiveDefinition>
         <ObjectType name="RootQuery">
           <Field name="ping" type={String} />
         </ObjectType>
@@ -117,7 +120,6 @@ describe("renderSchema snapshots", () => {
       {
         query: "RootQuery",
         mutation: "RootMutation",
-        includeSpecifiedDirectives: false,
       },
     );
 
@@ -127,19 +129,19 @@ describe("renderSchema snapshots", () => {
   it("prints a schema snapshot with descriptions", () => {
     const schema = renderSchema(
       <>
-        <Directive
+        <DirectiveDefinition
           name="auth"
           description="Authorization details"
           repeatable
           locations={["FIELD_DEFINITION"]}
         >
-          <Argument
+          <InputValue
             name="scope"
             type={String}
             description="Required scope"
             defaultValue="public"
           />
-        </Directive>
+        </DirectiveDefinition>
         <ScalarType
           name="Url"
           description="A URL scalar"
@@ -156,12 +158,12 @@ describe("renderSchema snapshots", () => {
         </InputObjectType>
         <ObjectType name="RootQuery" description="Query root">
           <Field name="user" type="User" description="Fetch a user">
-            <Argument name="id" type={ID} nonNull description="User id" />
+            <InputValue name="id" type={ID} nonNull description="User id" />
           </Field>
         </ObjectType>
         <ObjectType name="RootMutation" description="Mutation root">
           <Field name="createUser" type="User" description="Create a user">
-            <Argument
+            <InputValue
               name="input"
               type="UserInput"
               nonNull

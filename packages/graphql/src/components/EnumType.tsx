@@ -1,5 +1,7 @@
 import type { Children, Refkey } from "@alloy-js/core";
+import { DirectiveLocation } from "graphql";
 import {
+  DirectiveTargetContext,
   TypeContext,
   createEnumTypeDefinition,
   registerType,
@@ -52,8 +54,16 @@ export function EnumType(props: EnumTypeProps) {
 
   return (
     <TypeContext.Provider value={{ definition }}>
-      {props.children}
-      <EnsureEnumValues />
+      <DirectiveTargetContext.Provider
+        value={{
+          location: DirectiveLocation.ENUM,
+          directives: definition.directives,
+          target: definition,
+        }}
+      >
+        {props.children}
+        <EnsureEnumValues />
+      </DirectiveTargetContext.Provider>
     </TypeContext.Provider>
   );
 }

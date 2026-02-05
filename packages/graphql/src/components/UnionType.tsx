@@ -1,5 +1,7 @@
 import type { Children, Refkey } from "@alloy-js/core";
+import { DirectiveLocation } from "graphql";
 import {
+  DirectiveTargetContext,
   TypeContext,
   addUnionMemberToType,
   createUnionMemberDefinition,
@@ -71,8 +73,16 @@ export function UnionType(props: UnionTypeProps) {
 
   return (
     <TypeContext.Provider value={{ definition }}>
-      {props.children}
-      <EnsureUnionMembers />
+      <DirectiveTargetContext.Provider
+        value={{
+          location: DirectiveLocation.UNION,
+          directives: definition.directives,
+          target: definition,
+        }}
+      >
+        {props.children}
+        <EnsureUnionMembers />
+      </DirectiveTargetContext.Provider>
     </TypeContext.Provider>
   );
 }

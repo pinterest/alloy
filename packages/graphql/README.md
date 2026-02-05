@@ -87,6 +87,17 @@ canonical type names without re-declaring them.
 - `src/builtins/`: refkeys and built-in types
 - `src/components/stc/`: string-template helpers (`@alloy-js/graphql/stc`)
 
+## Binder model
+
+Most Alloy language packages rely on the core binder model (symbols, scopes,
+and refkey resolution) because they emit source code with imports and
+cross-file references. The GraphQL package does not use the binder because
+GraphQL schemas are a single, name-based graph with no import system and a
+natural two-phase flow (collect definitions, then build/validate). A dedicated
+schema state plus build-time validation maps more directly to the GraphQL
+specification and keeps the API focused on schema semantics rather than symbol
+resolution.
+
 ## Development
 
 From the repo root:

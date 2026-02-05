@@ -1,12 +1,12 @@
 import {
-  Argument,
   createGraphQLNamePolicy,
-  Directive,
+  DirectiveDefinition,
   EnumType,
   EnumValue,
   Field,
   InputField,
   InputObjectType,
+  InputValue,
   Int,
   Mutation,
   ObjectType,
@@ -84,7 +84,7 @@ describe("name policy", () => {
       renderSchema(
         <Query>
           <Field name="search" type={String}>
-            <Argument name="BadArg" type={String} />
+            <InputValue name="BadArg" type={String} />
           </Field>
         </Query>,
       ),
@@ -100,7 +100,7 @@ describe("name policy", () => {
           </InputObjectType>
           <Query>
             <Field name="search" type={String}>
-              <Argument name="input" type="SearchInput" />
+              <InputValue name="input" type="SearchInput" />
             </Field>
           </Query>
         </>,
@@ -112,7 +112,7 @@ describe("name policy", () => {
     expect(() =>
       renderSchema(
         <>
-          <Directive name="BadDirective" locations={["FIELD"]} />
+          <DirectiveDefinition name="BadDirective" locations={["FIELD"]} />
           <Query>
             <Field name="ping" type={String} />
           </Query>
@@ -186,7 +186,7 @@ describe("name policy", () => {
           </ObjectType>
           <Mutation>
             <Field name="updateWidget" type={String}>
-              <Argument name="payload" type={String} />
+              <InputValue name="payload" type={String} />
             </Field>
           </Mutation>
           <Query>
@@ -206,7 +206,7 @@ describe("name policy", () => {
           </ObjectType>
           <Mutation>
             <Field name="updateWidget" type={String}>
-              <Argument name="payload" type={String} />
+              <InputValue name="payload" type={String} />
             </Field>
           </Mutation>
           <Query>
@@ -229,8 +229,8 @@ describe("name policy", () => {
           </ObjectType>
           <Mutation>
             <Field name="updateWidget" type={String}>
-              <Argument name="payload" type={String} />
-              <Argument name="mode" type={String} />
+              <InputValue name="payload" type={String} />
+              <InputValue name="mode" type={String} />
             </Field>
           </Mutation>
           <Query>

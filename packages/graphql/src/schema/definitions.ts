@@ -59,15 +59,13 @@ export function registerDirective(
 ) {
   ensureNameValid(state, definition.name, "directive");
 
-  if (state.includeSpecifiedDirectives) {
-    const specifiedName = specifiedDirectives.find(
-      (directive: GraphQLDirective) => directive.name === definition.name,
+  const specifiedName = specifiedDirectives.find(
+    (directive: GraphQLDirective) => directive.name === definition.name,
+  );
+  if (specifiedName) {
+    throw new Error(
+      `Directive name "${definition.name}" conflicts with a specified directive.`,
     );
-    if (specifiedName) {
-      throw new Error(
-        `Directive name "${definition.name}" conflicts with a specified directive.`,
-      );
-    }
   }
 
   if (state.directives.has(definition.name)) {
@@ -98,6 +96,7 @@ export function createObjectTypeDefinition(
     name: normalizedName,
     description,
     refkeys,
+    directives: [],
     fields: [],
     fieldNames: new Set(),
     interfaces,
@@ -121,6 +120,7 @@ export function createInterfaceTypeDefinition(
     name: normalizedName,
     description,
     refkeys,
+    directives: [],
     fields: [],
     fieldNames: new Set(),
     interfaces,
@@ -145,6 +145,7 @@ export function createInputObjectTypeDefinition(
     description,
     refkeys,
     isOneOf,
+    directives: [],
     fields: [],
     fieldNames: new Set(),
   };
@@ -166,6 +167,7 @@ export function createEnumTypeDefinition(
     name: normalizedName,
     description,
     refkeys,
+    directives: [],
     values: [],
     valueNames: new Set(),
   };
@@ -187,6 +189,7 @@ export function createUnionTypeDefinition(
     name: normalizedName,
     description,
     refkeys,
+    directives: [],
     members: [],
     memberNames: new Set(),
   };
@@ -208,6 +211,7 @@ export function createScalarTypeDefinition(
     name: normalizedName,
     description,
     refkeys,
+    directives: [],
   };
 }
 
@@ -230,6 +234,7 @@ export function createFieldDefinition(
     argNames: new Set(),
     description,
     deprecationReason,
+    directives: [],
   };
 }
 
@@ -252,6 +257,7 @@ export function createArgDefinition(
     description,
     defaultValue,
     deprecationReason,
+    directives: [],
   };
 }
 
@@ -274,6 +280,7 @@ export function createInputFieldDefinition(
     description,
     defaultValue,
     deprecationReason,
+    directives: [],
   };
 }
 
@@ -288,7 +295,12 @@ export function createEnumValueDefinition(
 ): EnumValueDefinition {
   const normalizedName = applyNamePolicy(state, name, "enumValue");
   ensureNameValid(state, normalizedName, "enumValue");
-  return { name: normalizedName, description, deprecationReason };
+  return {
+    name: normalizedName,
+    description,
+    deprecationReason,
+    directives: [],
+  };
 }
 
 /**
@@ -319,6 +331,7 @@ export function createDirectiveDefinition(
     locations,
     args: [],
     argNames: new Set(),
+    directives: [],
   };
 }
 
@@ -411,14 +424,14 @@ export function addUnionMemberToType(
 }
 
 /**
- * Adds an argument to the current argument target.
+ * Adds an input value to the current input value target.
  */
 export function addArgToTarget(
   target: ArgTargetContextValue,
   arg: ArgDefinition,
 ) {
   if (target.argNames.has(arg.name)) {
-    throw new Error(`Argument "${arg.name}" is already defined.`);
+    throw new Error(`InputValue "${arg.name}" is already defined.`);
   }
   target.argNames.add(arg.name);
   target.args.push(arg);

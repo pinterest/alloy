@@ -1,5 +1,7 @@
 import type { Children, Refkey } from "@alloy-js/core";
+import { DirectiveLocation } from "graphql";
 import {
+  DirectiveTargetContext,
   TypeContext,
   createObjectTypeDefinition,
   registerType,
@@ -44,7 +46,15 @@ export function ObjectType(props: ObjectTypeProps) {
 
   return (
     <TypeContext.Provider value={{ definition }}>
-      {props.children}
+      <DirectiveTargetContext.Provider
+        value={{
+          location: DirectiveLocation.OBJECT,
+          directives: definition.directives,
+          target: definition,
+        }}
+      >
+        {props.children}
+      </DirectiveTargetContext.Provider>
     </TypeContext.Provider>
   );
 }

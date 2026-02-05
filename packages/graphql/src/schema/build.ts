@@ -1,5 +1,6 @@
 import { isRefkeyable, toRefkey } from "@alloy-js/core";
 import {
+  DirectiveLocation,
   GraphQLDirective,
   GraphQLEnumType,
   GraphQLInputObjectType,
@@ -10,13 +11,21 @@ import {
   GraphQLScalarType,
   GraphQLSchema,
   GraphQLUnionType,
+  Kind,
   assertValidSchema,
+  astFromValue,
   isInputType,
   isNamedType,
   isObjectType,
   isOutputType,
+  isRequiredArgument,
   isType,
   specifiedDirectives,
+  type ConstArgumentNode,
+  type ConstDirectiveNode,
+  type DirectiveDefinitionNode,
+  type EnumValueDefinitionNode,
+  type FieldDefinitionNode,
   type GraphQLArgumentConfig,
   type GraphQLField,
   type GraphQLFieldConfig,
@@ -25,14 +34,24 @@ import {
   type GraphQLNamedType,
   type GraphQLOutputType,
   type GraphQLType,
+  type InputValueDefinitionNode,
+  type NameNode,
+  type NamedTypeNode,
+  type OperationTypeDefinitionNode,
+  type SchemaDefinitionNode,
+  type TypeDefinitionNode,
+  type TypeNode,
 } from "graphql";
 import { isRelayNamePolicy } from "../name-policy.js";
 import { builtInScalars, builtInScalarsFallback } from "./constants.js";
 import { isTypeRef, normalizeTypeName } from "./refs.js";
 import { validateRelaySchema } from "./relay-validation.js";
 import type {
+  AppliedDirective,
   ArgDefinition,
+  DirectiveDefinition,
   EnumTypeDefinition,
+  EnumValueDefinition,
   FieldDefinition,
   InputObjectTypeDefinition,
   InterfaceTypeDefinition,
@@ -45,6 +64,7 @@ import type {
 
 interface BuildContext {
   namedTypes: Map<string, GraphQLNamedType>;
+  directiveMap?: Map<string, GraphQLDirective>;
 }
 
 /**
@@ -60,6 +80,9 @@ export function buildSchema(
   const context: BuildContext = {
     namedTypes: new Map<string, GraphQLNamedType>(),
   };
+
+  const directiveMap = buildDirectiveMap(state, context);
+  context.directiveMap = directiveMap;
 
   for (const [name] of state.types) {
     resolveNamedType(state, context, name);
@@ -107,15 +130,32 @@ export function buildSchema(
     rootNames.add(subscriptionType.name);
   }
 
-  const directives = buildDirectives(state, context);
+  attachDirectiveDefinitionAstNodes(state, context);
+  attachTypeDirectiveAstNodes(state, context);
+
+  const schemaDirectives = buildAppliedDirectiveNodes(
+    directiveMap,
+    state.schemaDirectives,
+    DirectiveLocation.SCHEMA,
+    "schema",
+  );
+  const schemaAstNode =
+    schemaDirectives && schemaDirectives.length > 0 ?
+      createSchemaDefinitionNode(schemaDirectives, {
+        query: queryType,
+        mutation: mutationType,
+        subscription: subscriptionType,
+      })
+    : undefined;
 
   const schema = new GraphQLSchema({
     query: queryType,
     mutation: mutationType as GraphQLObjectType | undefined,
     subscription: subscriptionType as GraphQLObjectType | undefined,
     types: Array.from(context.namedTypes.values()),
-    directives,
+    directives: Array.from(directiveMap.values()),
     description: state.description,
+    astNode: schemaAstNode,
   });
 
   if (validate) {
@@ -261,7 +301,7 @@ function createGraphQLType(
       return new GraphQLEnumType({
         name: definition.name,
         description: definition.description,
-        values: buildEnumValueMap(definition),
+        values: buildEnumValueMap(definition, context),
       });
     case "union":
       return new GraphQLUnionType({
@@ -391,12 +431,25 @@ function buildFieldConfigsFromDefinitions(
         `Field "${field.name}" on "${definition.name}" must be an output type.`,
       );
     }
-    const args = buildArgsMap(state, context, field.args);
+    const args = buildArgsMap(state, context, field.args, {
+      ownerLabel: `field "${definition.name}.${field.name}"`,
+    });
+    const directives = buildAppliedDirectiveNodes(
+      getDirectiveMap(context),
+      field.directives,
+      DirectiveLocation.FIELD_DEFINITION,
+      `field "${definition.name}.${field.name}"`,
+    );
+    const astNode =
+      directives && directives.length > 0 ?
+        createFieldDefinitionNode(field.name, type, directives)
+      : undefined;
     entries.set(field.name, {
       type: type as GraphQLOutputType,
       description: field.description,
       deprecationReason: field.deprecationReason,
       args,
+      astNode,
     });
   }
 
@@ -420,6 +473,7 @@ function buildFieldConfigsFromGraphQLInterface(
           description: arg.description,
           defaultValue: arg.defaultValue,
           deprecationReason: arg.deprecationReason,
+          astNode: arg.astNode ?? undefined,
         },
       ]),
     );
@@ -428,6 +482,7 @@ function buildFieldConfigsFromGraphQLInterface(
       description: field.description,
       deprecationReason: field.deprecationReason,
       args,
+      astNode: field.astNode ?? undefined,
     });
   }
 
@@ -447,6 +502,21 @@ function buildInputFieldMap(
         `Input field "${field.name}" on "${definition.name}" must be an input type.`,
       );
     }
+    const directives = buildAppliedDirectiveNodes(
+      getDirectiveMap(context),
+      field.directives,
+      DirectiveLocation.INPUT_FIELD_DEFINITION,
+      `input field "${definition.name}.${field.name}"`,
+    );
+    const astNode =
+      directives && directives.length > 0 ?
+        createInputValueDefinitionNode(
+          field.name,
+          type,
+          field.defaultValue,
+          directives,
+        )
+      : undefined;
     entries.push([
       field.name,
       {
@@ -454,6 +524,7 @@ function buildInputFieldMap(
         description: field.description,
         defaultValue: field.defaultValue,
         deprecationReason: field.deprecationReason,
+        astNode,
       },
     ]);
   }
@@ -463,14 +534,12 @@ function buildInputFieldMap(
 
 function buildEnumValueMap(
   definition: EnumTypeDefinition,
+  context: BuildContext,
 ): Record<string, { description?: string; deprecationReason?: string }> {
   return Object.fromEntries(
     definition.values.map((value) => [
       value.name,
-      {
-        description: value.description,
-        deprecationReason: value.deprecationReason,
-      },
+      buildEnumValueConfig(value, definition, context),
     ]),
   );
 }
@@ -492,17 +561,45 @@ function buildUnionMembers(
   });
 }
 
+interface ArgumentBuildOptions {
+  ownerLabel?: string;
+  directiveMap?: Map<string, GraphQLDirective> | null;
+}
+
 function buildArgsMap(
   state: SchemaState,
   context: BuildContext,
   args: ArgDefinition[],
+  options?: ArgumentBuildOptions,
 ): Record<string, GraphQLArgumentConfig> {
+  const directiveMap = options?.directiveMap ?? context.directiveMap;
   return Object.fromEntries(
     args.map((arg) => {
       const type = normalizeTypeRef(state, context, arg.type);
       if (!isInputType(type)) {
-        throw new Error(`Argument "${arg.name}" must be an input type.`);
+        throw new Error(`InputValue "${arg.name}" must be an input type.`);
       }
+
+      const directives =
+        directiveMap && arg.directives.length > 0 ?
+          buildAppliedDirectiveNodes(
+            directiveMap,
+            arg.directives,
+            DirectiveLocation.ARGUMENT_DEFINITION,
+            options?.ownerLabel ?
+              `argument "${arg.name}" on ${options.ownerLabel}`
+            : `argument "${arg.name}"`,
+          )
+        : undefined;
+      const astNode =
+        directives && directives.length > 0 ?
+          createInputValueDefinitionNode(
+            arg.name,
+            type,
+            arg.defaultValue,
+            directives,
+          )
+        : undefined;
 
       return [
         arg.name,
@@ -511,38 +608,398 @@ function buildArgsMap(
           description: arg.description,
           defaultValue: arg.defaultValue,
           deprecationReason: arg.deprecationReason,
+          astNode,
         },
       ];
     }),
   );
 }
 
-function buildDirectives(
+function buildDirectiveMap(
   state: SchemaState,
   context: BuildContext,
-): GraphQLDirective[] {
-  const customDirectives = Array.from(state.directives.values()).map(
-    (def) =>
-      new GraphQLDirective({
-        name: def.name,
-        description: def.description,
-        isRepeatable: def.repeatable,
-        locations: def.locations,
-        args: buildArgsMap(state, context, def.args),
-      }),
-  );
-
-  if (!state.includeSpecifiedDirectives) {
-    return customDirectives;
-  }
-
+): Map<string, GraphQLDirective> {
   const directiveMap = new Map<string, GraphQLDirective>();
+
   for (const directive of specifiedDirectives) {
     directiveMap.set(directive.name, directive);
   }
-  for (const directive of customDirectives) {
+
+  for (const def of state.directives.values()) {
+    const directive = new GraphQLDirective({
+      name: def.name,
+      description: def.description,
+      isRepeatable: def.repeatable,
+      locations: def.locations,
+      args: buildArgsMap(state, context, def.args, { directiveMap: null }),
+    });
     directiveMap.set(directive.name, directive);
   }
 
-  return Array.from(directiveMap.values());
+  return directiveMap;
+}
+
+function getDirectiveMap(context: BuildContext): Map<string, GraphQLDirective> {
+  if (!context.directiveMap) {
+    throw new Error("Directive map is not initialized.");
+  }
+  return context.directiveMap;
+}
+
+function attachDirectiveDefinitionAstNodes(
+  state: SchemaState,
+  context: BuildContext,
+) {
+  const directiveMap = getDirectiveMap(context);
+  for (const def of state.directives.values()) {
+    const directive = directiveMap.get(def.name);
+    if (!directive) {
+      throw new Error(`Directive "${def.name}" is not registered.`);
+    }
+
+    const argNodes = def.args.map((arg) =>
+      createInputValueDefinitionNode(
+        arg.name,
+        normalizeTypeRef(state, context, arg.type) as GraphQLInputType,
+        arg.defaultValue,
+        arg.directives.length > 0 ?
+          buildAppliedDirectiveNodes(
+            directiveMap,
+            arg.directives,
+            DirectiveLocation.ARGUMENT_DEFINITION,
+            `argument "${arg.name}" on directive "${def.name}"`,
+          )
+        : undefined,
+      ),
+    );
+
+    const argNodeMap = new Map(argNodes.map((node) => [node.name.value, node]));
+    for (const arg of directive.args) {
+      const node = argNodeMap.get(arg.name);
+      if (node) {
+        arg.astNode = node;
+      }
+    }
+
+    directive.astNode = createDirectiveDefinitionNode(def, argNodes);
+  }
+}
+
+function attachTypeDirectiveAstNodes(
+  state: SchemaState,
+  context: BuildContext,
+) {
+  const directiveMap = getDirectiveMap(context);
+  for (const definition of state.types.values()) {
+    if (definition.directives.length === 0) {
+      continue;
+    }
+
+    const directives = buildAppliedDirectiveNodes(
+      directiveMap,
+      definition.directives,
+      directiveLocationForType(definition.kind),
+      `${definition.kind} type "${definition.name}"`,
+    );
+    const gqlType = context.namedTypes.get(definition.name);
+    if (gqlType && directives.length > 0) {
+      gqlType.astNode = createTypeDefinitionNode(definition, directives);
+    }
+  }
+}
+
+function directiveLocationForType(
+  kind: TypeDefinition["kind"],
+): DirectiveLocation {
+  switch (kind) {
+    case "object":
+      return DirectiveLocation.OBJECT;
+    case "interface":
+      return DirectiveLocation.INTERFACE;
+    case "input":
+      return DirectiveLocation.INPUT_OBJECT;
+    case "enum":
+      return DirectiveLocation.ENUM;
+    case "union":
+      return DirectiveLocation.UNION;
+    case "scalar":
+      return DirectiveLocation.SCALAR;
+    default:
+      throw new Error("Unknown type definition.");
+  }
+}
+
+function buildEnumValueConfig(
+  value: EnumValueDefinition,
+  definition: EnumTypeDefinition,
+  context: BuildContext,
+): {
+  description?: string;
+  deprecationReason?: string;
+  astNode?: EnumValueDefinitionNode;
+} {
+  const directives =
+    value.directives.length > 0 ?
+      buildAppliedDirectiveNodes(
+        getDirectiveMap(context),
+        value.directives,
+        DirectiveLocation.ENUM_VALUE,
+        `enum value "${definition.name}.${value.name}"`,
+      )
+    : [];
+  const astNode =
+    directives.length > 0 ?
+      createEnumValueDefinitionNode(value.name, directives)
+    : undefined;
+  return {
+    description: value.description,
+    deprecationReason: value.deprecationReason,
+    astNode,
+  };
+}
+
+function buildAppliedDirectiveNodes(
+  directiveMap: Map<string, GraphQLDirective>,
+  applied: AppliedDirective[],
+  location: DirectiveLocation,
+  ownerLabel: string,
+): ConstDirectiveNode[] {
+  if (applied.length === 0) {
+    return [];
+  }
+
+  const nodes: ConstDirectiveNode[] = [];
+  const usageCounts = new Map<string, number>();
+  for (const application of applied) {
+    const directive = directiveMap.get(application.name);
+    if (!directive) {
+      throw new Error(
+        `Directive "@${application.name}" is not defined for ${ownerLabel}.`,
+      );
+    }
+
+    if (!directive.locations.includes(location)) {
+      throw new Error(
+        `Directive "@${application.name}" cannot be applied to ${ownerLabel}.`,
+      );
+    }
+
+    const count = (usageCounts.get(application.name) ?? 0) + 1;
+    usageCounts.set(application.name, count);
+    if (!directive.isRepeatable && count > 1) {
+      throw new Error(
+        `Directive "@${application.name}" cannot be repeated on ${ownerLabel}.`,
+      );
+    }
+
+    const argMap = new Map(directive.args.map((arg) => [arg.name, arg]));
+    const providedArgs = new Set<string>();
+    const argNodes = application.args.map((arg) => {
+      const argDef = argMap.get(arg.name);
+      if (!argDef) {
+        throw new Error(
+          `Unknown argument "${arg.name}" for directive "@${application.name}" on ${ownerLabel}.`,
+        );
+      }
+
+      providedArgs.add(arg.name);
+      const valueNode = astFromValue(arg.value, argDef.type);
+      if (!valueNode) {
+        throw new Error(
+          `Directive "@${application.name}" argument "${arg.name}" on ${ownerLabel} could not be coerced to ${String(
+            argDef.type,
+          )}.`,
+        );
+      }
+
+      return {
+        kind: Kind.ARGUMENT,
+        name: createNameNode(arg.name),
+        value: valueNode,
+      } satisfies ConstArgumentNode;
+    });
+
+    for (const arg of directive.args) {
+      if (isRequiredArgument(arg) && !providedArgs.has(arg.name)) {
+        throw new Error(
+          `Directive "@${application.name}" on ${ownerLabel} is missing required argument "${arg.name}".`,
+        );
+      }
+    }
+
+    nodes.push({
+      kind: Kind.DIRECTIVE,
+      name: createNameNode(application.name),
+      arguments: argNodes.length > 0 ? argNodes : undefined,
+    });
+  }
+
+  return nodes;
+}
+
+function createSchemaDefinitionNode(
+  directives: ConstDirectiveNode[],
+  roots: {
+    query: GraphQLObjectType;
+    mutation?: GraphQLObjectType | undefined;
+    subscription?: GraphQLObjectType | undefined;
+  },
+): SchemaDefinitionNode {
+  const operationTypes: OperationTypeDefinitionNode[] = [
+    {
+      kind: Kind.OPERATION_TYPE_DEFINITION,
+      operation: "query",
+      type: createNamedTypeNode(roots.query.name),
+    },
+  ];
+  if (roots.mutation) {
+    operationTypes.push({
+      kind: Kind.OPERATION_TYPE_DEFINITION,
+      operation: "mutation",
+      type: createNamedTypeNode(roots.mutation.name),
+    });
+  }
+  if (roots.subscription) {
+    operationTypes.push({
+      kind: Kind.OPERATION_TYPE_DEFINITION,
+      operation: "subscription",
+      type: createNamedTypeNode(roots.subscription.name),
+    });
+  }
+
+  return {
+    kind: Kind.SCHEMA_DEFINITION,
+    directives: directives.length > 0 ? directives : undefined,
+    operationTypes,
+  };
+}
+
+function createDirectiveDefinitionNode(
+  definition: DirectiveDefinition,
+  args: InputValueDefinitionNode[],
+): DirectiveDefinitionNode {
+  return {
+    kind: Kind.DIRECTIVE_DEFINITION,
+    name: createNameNode(definition.name),
+    repeatable: definition.repeatable,
+    locations: definition.locations.map((location) => createNameNode(location)),
+    arguments: args.length > 0 ? args : undefined,
+  };
+}
+
+function createFieldDefinitionNode(
+  name: string,
+  type: GraphQLOutputType,
+  directives: ConstDirectiveNode[],
+): FieldDefinitionNode {
+  return {
+    kind: Kind.FIELD_DEFINITION,
+    name: createNameNode(name),
+    type: createTypeNode(type),
+    directives: directives.length > 0 ? directives : undefined,
+  };
+}
+
+function createInputValueDefinitionNode(
+  name: string,
+  type: GraphQLInputType,
+  defaultValue: unknown | undefined,
+  directives: ConstDirectiveNode[] | undefined,
+): InputValueDefinitionNode {
+  const defaultValueNode =
+    defaultValue === undefined ? undefined : (
+      (astFromValue(defaultValue, type) ?? undefined)
+    );
+  if (defaultValue !== undefined && defaultValueNode === undefined) {
+    throw new Error(
+      `Default value for "${name}" could not be coerced to ${String(type)}.`,
+    );
+  }
+
+  return {
+    kind: Kind.INPUT_VALUE_DEFINITION,
+    name: createNameNode(name),
+    type: createTypeNode(type),
+    defaultValue: defaultValueNode,
+    directives: directives && directives.length > 0 ? directives : undefined,
+  };
+}
+
+function createEnumValueDefinitionNode(
+  name: string,
+  directives: ConstDirectiveNode[],
+): EnumValueDefinitionNode {
+  return {
+    kind: Kind.ENUM_VALUE_DEFINITION,
+    name: createNameNode(name),
+    directives: directives.length > 0 ? directives : undefined,
+  };
+}
+
+function createTypeDefinitionNode(
+  definition: TypeDefinition,
+  directives: ConstDirectiveNode[],
+): TypeDefinitionNode {
+  switch (definition.kind) {
+    case "object":
+      return {
+        kind: Kind.OBJECT_TYPE_DEFINITION,
+        name: createNameNode(definition.name),
+        directives: directives.length > 0 ? directives : undefined,
+      };
+    case "interface":
+      return {
+        kind: Kind.INTERFACE_TYPE_DEFINITION,
+        name: createNameNode(definition.name),
+        directives: directives.length > 0 ? directives : undefined,
+      };
+    case "input":
+      return {
+        kind: Kind.INPUT_OBJECT_TYPE_DEFINITION,
+        name: createNameNode(definition.name),
+        directives: directives.length > 0 ? directives : undefined,
+      };
+    case "enum":
+      return {
+        kind: Kind.ENUM_TYPE_DEFINITION,
+        name: createNameNode(definition.name),
+        directives: directives.length > 0 ? directives : undefined,
+      };
+    case "union":
+      return {
+        kind: Kind.UNION_TYPE_DEFINITION,
+        name: createNameNode(definition.name),
+        directives: directives.length > 0 ? directives : undefined,
+      };
+    case "scalar":
+      return {
+        kind: Kind.SCALAR_TYPE_DEFINITION,
+        name: createNameNode(definition.name),
+        directives: directives.length > 0 ? directives : undefined,
+      };
+    default:
+      throw new Error("Unknown type definition.");
+  }
+}
+
+function createNameNode(value: string): NameNode {
+  return { kind: Kind.NAME, value };
+}
+
+function createNamedTypeNode(name: string): NamedTypeNode {
+  return { kind: Kind.NAMED_TYPE, name: createNameNode(name) };
+}
+
+function createTypeNode(type: GraphQLType): TypeNode {
+  if (type instanceof GraphQLNonNull) {
+    const inner = createTypeNode(type.ofType);
+    if (inner.kind === Kind.NON_NULL_TYPE) {
+      throw new Error("Non-Null cannot wrap a Non-Null type.");
+    }
+    return { kind: Kind.NON_NULL_TYPE, type: inner };
+  }
+  if (type instanceof GraphQLList) {
+    return { kind: Kind.LIST_TYPE, type: createTypeNode(type.ofType) };
+  }
+  return { kind: Kind.NAMED_TYPE, name: createNameNode(type.name) };
 }

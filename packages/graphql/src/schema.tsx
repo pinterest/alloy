@@ -25,16 +25,24 @@ export {
 export { renderSchema } from "./schema/render.js";
 export {
   ArgTargetContext,
+  DirectiveArgTargetContext,
+  DirectiveTargetContext,
   Schema,
   SchemaContext,
   TypeContext,
   createSchemaState,
   useArgTargetContext,
+  useDirectiveArgTargetContext,
+  useDirectiveTargetContext,
   useSchemaContext,
   useTypeContext,
 } from "./schema/state.js";
 export type {
+  AppliedDirective,
+  AppliedDirectiveArgument,
   DeprecatedProps,
+  DirectiveArgTargetContextValue,
+  DirectiveTargetContextValue,
   ListTypeRef,
   NamePolicy,
   NamePolicyInput,

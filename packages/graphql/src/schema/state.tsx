@@ -1,4 +1,5 @@
 import { createContext, useContext } from "@alloy-js/core";
+import { DirectiveLocation } from "graphql";
 import { builtInScalarRefkeys } from "../builtins/graphql.js";
 import {
   createGraphQLNamePolicy,
@@ -7,6 +8,9 @@ import {
 } from "../name-policy.js";
 import type {
   ArgTargetContextValue,
+  DirectiveArgTargetContextValue,
+  DirectiveTargetContextValue,
+  SchemaDirectiveTarget,
   SchemaOptions,
   SchemaProps,
   SchemaState,
@@ -43,9 +47,19 @@ export function useSchemaContext(): SchemaState {
  */
 export const TypeContext = createContext<TypeContextValue>();
 /**
- * Context for the current argument target (field or directive).
+ * Context for the current input value target (field or directive definition).
  */
 export const ArgTargetContext = createContext<ArgTargetContextValue>();
+/**
+ * Context for the current directive target.
+ */
+export const DirectiveTargetContext =
+  createContext<DirectiveTargetContextValue>();
+/**
+ * Context for the current directive argument target.
+ */
+export const DirectiveArgTargetContext =
+  createContext<DirectiveArgTargetContextValue>();
 
 /**
  * Accesses the current type definition being built.
@@ -65,12 +79,42 @@ export function useTypeContext(): TypeDefinition {
  * Accesses the current argument target (field or directive).
  *
  * @remarks
- * Throws if used outside of a `Field` or `Directive`.
+ * Throws if used outside of a `Field` or `DirectiveDefinition`.
  */
 export function useArgTargetContext(): ArgTargetContextValue {
   const context = useContext(ArgTargetContext);
   if (!context) {
-    throw new Error("Argument must be used within a Field or Directive.");
+    throw new Error(
+      "InputValue must be used within a Field or DirectiveDefinition.",
+    );
+  }
+  return context;
+}
+
+/**
+ * Accesses the current directive target.
+ *
+ * @remarks
+ * Throws if used outside of a directive target.
+ */
+export function useDirectiveTargetContext(): DirectiveTargetContextValue {
+  const context = useContext(DirectiveTargetContext);
+  if (!context) {
+    throw new Error("Directive must be used within a directive target.");
+  }
+  return context;
+}
+
+/**
+ * Accesses the current directive argument target.
+ *
+ * @remarks
+ * Throws if used outside of a `Directive` component.
+ */
+export function useDirectiveArgTargetContext(): DirectiveArgTargetContextValue {
+  const context = useContext(DirectiveArgTargetContext);
+  if (!context) {
+    throw new Error("Argument must be used within a Directive.");
   }
   return context;
 }
@@ -84,6 +128,7 @@ export function createSchemaState(options?: SchemaOptions): SchemaState {
     types: new Map(),
     directives: new Map(),
     refkeyToName: new Map(),
+    schemaDirectives: [],
     schema: {
       query: options?.query,
       mutation: options?.mutation,
@@ -91,7 +136,6 @@ export function createSchemaState(options?: SchemaOptions): SchemaState {
     },
     description: options?.description,
     namePolicy,
-    includeSpecifiedDirectives: options?.includeSpecifiedDirectives ?? true,
   };
 
   for (const [refkey, name] of builtInScalarRefkeys) {
@@ -120,6 +164,7 @@ export function createSchemaState(options?: SchemaOptions): SchemaState {
 export function Schema(props: SchemaProps) {
   const internal = props as SchemaInternalProps;
   const state = internal._state ?? createSchemaState(props);
+  const directiveTarget: SchemaDirectiveTarget = { kind: "schema" };
 
   if (internal._state) {
     state.schema.query = props.query ?? state.schema.query;
@@ -129,14 +174,19 @@ export function Schema(props: SchemaProps) {
     if (props.namePolicy !== undefined) {
       state.namePolicy = normalizeNamePolicy(props.namePolicy);
     }
-    if (props.includeSpecifiedDirectives !== undefined) {
-      state.includeSpecifiedDirectives = props.includeSpecifiedDirectives;
-    }
   }
 
   return (
     <SchemaContext.Provider value={state}>
-      {props.children}
+      <DirectiveTargetContext.Provider
+        value={{
+          location: DirectiveLocation.SCHEMA,
+          directives: state.schemaDirectives,
+          target: directiveTarget,
+        }}
+      >
+        {props.children}
+      </DirectiveTargetContext.Provider>
     </SchemaContext.Provider>
   );
 }

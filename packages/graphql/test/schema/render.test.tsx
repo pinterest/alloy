@@ -1,11 +1,11 @@
 import {
-  Argument,
   EnumType,
   EnumValue,
   Field,
   ID,
   InputField,
   InputObjectType,
+  InputValue,
   Mutation,
   Node,
   NodeInterface,
@@ -122,8 +122,8 @@ describe("renderSchema", () => {
           <Field name="me" type="User" />
           <Field name="search" type="SearchResult">
             <Field.List />
-            <Argument name="term" type={String} nonNull />
-            <Argument name="filter" type="UserFilter" />
+            <InputValue name="term" type={String} nonNull />
+            <InputValue name="filter" type="UserFilter" />
           </Field>
           <Field name="website" type="Url" />
         </Query>
@@ -155,14 +155,14 @@ describe("renderSchema", () => {
             </Field.List>
           </Field>
           <Field name="matrixInput" type={String}>
-            <Argument name="input" type="MatrixInput" />
+            <InputValue name="input" type="MatrixInput" />
           </Field>
           <Field name="search" type={String}>
-            <Argument name="matrix" type={String}>
-              <Argument.List nonNull>
-                <Argument.List />
-              </Argument.List>
-            </Argument>
+            <InputValue name="matrix" type={String}>
+              <InputValue.List nonNull>
+                <InputValue.List />
+              </InputValue.List>
+            </InputValue>
           </Field>
         </Query>
       </>,
