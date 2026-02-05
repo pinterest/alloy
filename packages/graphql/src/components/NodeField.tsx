@@ -1,7 +1,7 @@
 import type { Children } from "@alloy-js/core";
 import { ID } from "../builtins/graphql.js";
 import { Node } from "../builtins/node.js";
-import type { TypeReference } from "../schema.js";
+import type { NameInput, TypeReference } from "../schema.js";
 import { Field } from "./Field.js";
 import { InputValue } from "./InputValue.js";
 
@@ -11,7 +11,7 @@ const DEFAULT_DESCRIPTIONS = {
 };
 
 export interface NodeFieldProps {
-  name?: string;
+  name?: NameInput;
   type?: TypeReference;
   description?: string;
   idDescription?: string;

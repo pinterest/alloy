@@ -6,11 +6,12 @@ import {
   createScalarTypeDefinition,
   registerType,
   useSchemaContext,
+  type NameInput,
 } from "../schema.js";
 import { normalizeRefkeys } from "./utils.js";
 
 export interface ScalarTypeProps {
-  name: string;
+  name: NameInput;
   description?: string;
   specifiedByUrl?: string;
   serialize?: GraphQLScalarType["serialize"];

@@ -1,4 +1,4 @@
-import { refkey } from "@alloy-js/core";
+import { namekey, refkey } from "@alloy-js/core";
 import {
   Connection,
   ConnectionPagination,
@@ -354,6 +354,37 @@ describe("Field.Connection", () => {
     expect(fields.allItems).toBeDefined();
     expect(fields.itemsConnection).toBeUndefined();
     expect(fields.allItems.type.toString()).toBe("ItemsConnection");
+  });
+
+  it("propagates namekey options to the default connection field name", () => {
+    const fieldName = namekey("AllShips", { ignoreNamePolicy: true });
+    const namePolicy = createGraphQLNamePolicy({
+      format: { field: (name) => name.toLowerCase() },
+    });
+    const schema = renderSchema(
+      <>
+        <ObjectType name="Item" refkey={Item}>
+          <Field name="id" type={ID} />
+        </ObjectType>
+        <PageInfoType />
+        <Connection name="Items" type={Item} />
+        <Query>
+          <Field name={fieldName} type={Item}>
+            <Field.Connection />
+          </Field>
+        </Query>
+      </>,
+      { namePolicy },
+    );
+
+    const queryType = schema.getType("Query");
+    if (!(queryType instanceof GraphQLObjectType)) {
+      throw new Error("Expected Query to be an object type.");
+    }
+
+    const fields = queryType.getFields();
+    expect(fields.AllShipsConnection).toBeDefined();
+    expect(fields.allshipsconnection).toBeUndefined();
   });
 
   it("requires at least one pagination direction", () => {

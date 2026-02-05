@@ -1,4 +1,4 @@
-import { refkey } from "@alloy-js/core";
+import { namekey } from "@alloy-js/core";
 import {
   Connection,
   Field,
@@ -21,13 +21,13 @@ import { describe, expect, it } from "vitest";
 
 // Star Wars schema source: https://github.com/graphql/swapi-graphql
 
-const Film = refkey("Film");
-const Person = refkey("Person");
-const Planet = refkey("Planet");
-const Root = refkey("Root");
-const Species = refkey("Species");
-const Starship = refkey("Starship");
-const Vehicle = refkey("Vehicle");
+const Film = namekey("Film");
+const Person = namekey("Person");
+const Planet = namekey("Planet");
+const Root = namekey("Root");
+const Species = namekey("Species");
+const Starship = namekey("Starship");
+const Vehicle = namekey("Vehicle");
 const connectionListDescription = `A list of all of the objects returned in the connection. This is a convenience
 field provided for quickly exploring the API; rather than querying for
 "{ edges { node } }" when no edge data is needed, this field can be be used
@@ -83,8 +83,7 @@ describe("star wars schema", () => {
     const schema = renderSchema(
       <>
         <ObjectType
-          name="Film"
-          refkey={Film}
+          name={Film}
           description={`A single film.`}
           interfaces={[Node]}
         >
@@ -134,8 +133,7 @@ describe("star wars schema", () => {
         />
         <PageInfoType />
         <ObjectType
-          name="Person"
-          refkey={Person}
+          name={Person}
           description={`An individual person or character within the Star Wars universe.`}
           interfaces={[Node]}
         >
@@ -196,8 +194,7 @@ describe("star wars schema", () => {
           {editedField}
         </ObjectType>
         <ObjectType
-          name="Planet"
-          refkey={Planet}
+          name={Planet}
           description={`A large mass, planet or planetoid in the Star Wars Universe, at the time of\n0 ABY.`}
           interfaces={[Node]}
         >
@@ -255,7 +252,7 @@ describe("star wars schema", () => {
           {createdField}
           {editedField}
         </ObjectType>
-        <ObjectType name="Root" refkey={Root}>
+        <ObjectType name={Root}>
           {connectionFieldFor("film", Film, "allFilms")}
           <Field name="film" type={Film}>
             <InputValue name="id" type={ID} />
@@ -289,8 +286,7 @@ describe("star wars schema", () => {
           <NodeField />
         </ObjectType>
         <ObjectType
-          name="Species"
-          refkey={Species}
+          name={Species}
           description={`A type of person or character within the Star Wars Universe.`}
           interfaces={[Node]}
         >
@@ -356,8 +352,7 @@ describe("star wars schema", () => {
           {editedField}
         </ObjectType>
         <ObjectType
-          name="Starship"
-          refkey={Starship}
+          name={Starship}
           description={`A single transport craft that has hyperdrive capability.`}
           interfaces={[Node]}
         >
@@ -434,8 +429,7 @@ describe("star wars schema", () => {
           {editedField}
         </ObjectType>
         <ObjectType
-          name="Vehicle"
-          refkey={Vehicle}
+          name={Vehicle}
           description={`A single transport craft that does not have hyperdrive capability`}
           interfaces={[Node]}
         >

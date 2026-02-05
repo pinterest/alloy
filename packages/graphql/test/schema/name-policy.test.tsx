@@ -1,3 +1,4 @@
+import { namekey } from "@alloy-js/core";
 import {
   createGraphQLNamePolicy,
   DirectiveDefinition,
@@ -134,6 +135,61 @@ describe("name policy", () => {
         </>,
       ),
     ).toThrow(/GraphQL naming rules/);
+  });
+
+  it("allows namekeys to bypass policy rules while preserving spec validation", () => {
+    const typeName = namekey("starship", { ignoreNamePolicy: true });
+    const argName = namekey("BadArg", { ignoreNamePolicy: true });
+    expect(() =>
+      renderSchema(
+        <>
+          <ObjectType name={typeName}>
+            <Field name="name" type={String} />
+          </ObjectType>
+          <Query>
+            <Field name="ship" type={typeName}>
+              <InputValue name={argName} type={String} />
+            </Field>
+          </Query>
+        </>,
+      ),
+    ).not.toThrow();
+  });
+
+  it("still rejects spec-invalid names when ignoreNamePolicy is set", () => {
+    const badName = namekey("Bad-Name", { ignoreNamePolicy: true });
+    expect(() =>
+      renderSchema(
+        <>
+          <ObjectType name={badName}>
+            <Field name="name" type={String} />
+          </ObjectType>
+          <Query>
+            <Field name="ship" type={badName} />
+          </Query>
+        </>,
+      ),
+    ).toThrow(/GraphQL naming rules/);
+  });
+
+  it("requires namekeys to reference ignoreNamePolicy types", () => {
+    const typeName = namekey("starship", { ignoreNamePolicy: true });
+    const namePolicy = createGraphQLNamePolicy({
+      format: { type: (name) => name.toUpperCase() },
+    });
+    expect(() =>
+      renderSchema(
+        <>
+          <ObjectType name={typeName}>
+            <Field name="name" type={String} />
+          </ObjectType>
+          <Query>
+            <Field name="ship" type="starship" />
+          </Query>
+        </>,
+        { namePolicy },
+      ),
+    ).toThrow(/Unknown GraphQL type/);
   });
 
   it("applies formatters before validation", () => {

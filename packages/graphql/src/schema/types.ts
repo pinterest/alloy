@@ -1,4 +1,4 @@
-import type { Children, Refkey, Refkeyable } from "@alloy-js/core";
+import type { Children, Namekey, Refkey, Refkeyable } from "@alloy-js/core";
 import type {
   DirectiveLocation,
   GraphQLNamedType,
@@ -17,6 +17,16 @@ export type TypeKind =
   | "enum"
   | "union"
   | "scalar";
+
+/**
+ * Accepted input values for a name.
+ */
+export type NameInput = string | Namekey;
+
+/**
+ * Accepted input values for directive references.
+ */
+export type DirectiveReference = string | Refkey | Refkeyable;
 
 /**
  * A reference to a GraphQL type (by name, refkey, or GraphQLJS type).
@@ -107,6 +117,7 @@ interface BaseTypeDefinition {
   kind: TypeKind;
   name: string;
   description?: string;
+  ignoreNamePolicy?: boolean;
   refkeys: Refkey[];
   directives: AppliedDirective[];
 }
@@ -238,6 +249,8 @@ export interface UnionMemberDefinition {
 export interface DirectiveDefinition {
   name: string;
   description?: string;
+  ignoreNamePolicy?: boolean;
+  refkey?: Refkey;
   repeatable: boolean;
   locations: DirectiveLocation[];
   args: ArgDefinition[];
@@ -249,7 +262,8 @@ export interface DirectiveDefinition {
  * An applied directive with argument values.
  */
 export interface AppliedDirective {
-  name: string;
+  name?: string;
+  refkey?: Refkey;
   args: AppliedDirectiveArgument[];
   argNames: Set<string>;
 }
@@ -305,6 +319,7 @@ export interface SchemaState {
   types: Map<string, TypeDefinition>;
   directives: Map<string, DirectiveDefinition>;
   refkeyToName: Map<Refkey, string>;
+  directiveRefkeyToName: Map<Refkey, string>;
   schemaDirectives: AppliedDirective[];
   schema: {
     query?: TypeReference;

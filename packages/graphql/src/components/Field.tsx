@@ -3,7 +3,9 @@ import {
   findKeyedChild,
   findKeyedChildren,
   isKeyedChild,
+  isNamekey,
   isRefkeyable,
+  namekey,
   taggedComponent,
   toRefkey,
   type Children,
@@ -25,6 +27,7 @@ import {
   useSchemaContext,
   useTypeContext,
   type DeprecatedProps,
+  type NameInput,
   type TypeReference,
 } from "../schema.js";
 import {
@@ -38,7 +41,7 @@ import { InputValue } from "./InputValue.js";
 import { createListSlot } from "./ListSlot.js";
 
 export interface FieldProps extends DeprecatedProps {
-  name: string;
+  name: NameInput;
   type: TypeReference;
   nonNull?: boolean;
   description?: string;
@@ -69,6 +72,7 @@ function FieldBase(props: FieldProps) {
   }
 
   if (connectionSlot) {
+    const baseName = unwrapNameInput(props.name);
     if (listSlot) {
       throw new Error("Field.Connection cannot be combined with Field.List.");
     }
@@ -102,13 +106,14 @@ function FieldBase(props: FieldProps) {
 
     const pagination = useConnectionOptions();
     const fieldName =
-      connectionSlot.props.fieldName ?? `${props.name}Connection`;
+      connectionSlot.props.fieldName ??
+      deriveNameInput(props.name, "Connection");
     const rootTypeNames = resolveRootTypeNames(state);
     const isRootType =
       typeDefinition.kind === "object" &&
       rootTypeNames.has(typeDefinition.name);
     const defaultConnectionName = `${capitalize(
-      pluralize(props.name),
+      pluralize(baseName),
     )}Connection`;
     const connectionType =
       connectionSlot.props.type ??
@@ -255,7 +260,7 @@ export interface FieldListProps {
 
 export interface FieldConnectionProps {
   type?: TypeReference;
-  fieldName?: string;
+  fieldName?: NameInput;
   children?: Children;
 }
 
@@ -398,4 +403,15 @@ function resolveConnectionRefkeys(connectionType?: TypeReference): Refkey[] {
     return [toRefkey(connectionType.name)];
   }
   return [];
+}
+
+function unwrapNameInput(value: NameInput): string {
+  return isNamekey(value) ? value.name : value;
+}
+
+function deriveNameInput(base: NameInput, suffix: string): NameInput {
+  if (isNamekey(base)) {
+    return namekey(`${base.name}${suffix}`, { ...base.options });
+  }
+  return `${base}${suffix}`;
 }

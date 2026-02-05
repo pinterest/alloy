@@ -9,7 +9,9 @@ export * from "./name-policy.js";
 export { Schema, renderSchema } from "./schema.js";
 export type {
   DeprecatedProps,
+  DirectiveReference,
   ListTypeRef,
+  NameInput,
   NamePolicy,
   NamePolicyInput,
   NamedTypeRef,

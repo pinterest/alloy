@@ -128,6 +128,7 @@ export function createSchemaState(options?: SchemaOptions): SchemaState {
     types: new Map(),
     directives: new Map(),
     refkeyToName: new Map(),
+    directiveRefkeyToName: new Map(),
     schemaDirectives: [],
     schema: {
       query: options?.query,

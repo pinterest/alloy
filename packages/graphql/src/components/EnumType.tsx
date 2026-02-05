@@ -7,11 +7,12 @@ import {
   registerType,
   useSchemaContext,
   useTypeContext,
+  type NameInput,
 } from "../schema.js";
 import { normalizeRefkeys } from "./utils.js";
 
 export interface EnumTypeProps {
-  name: string;
+  name: NameInput;
   description?: string;
   refkey?: Refkey | Refkey[];
   children?: Children;

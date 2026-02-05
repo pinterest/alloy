@@ -38,7 +38,22 @@ GraphQL hard naming requirements (the spec name regex, `__` reserved prefix,
 and enum value reserved words) are always enforced even when the policy is
 turned off.
 
-```ts
+You can bypass naming conventions on a per-name basis by using a `Namekey` with
+`ignoreNamePolicy`. GraphQL hard naming requirements still apply.
+String type references are still normalized by the active policy, so when you
+use `ignoreNamePolicy` you should reuse the same `Namekey` (or refkey) for any
+references to that type.
+
+```tsx
+import { namekey } from "@alloy-js/core";
+import { ObjectType } from "@alloy-js/graphql";
+
+const typeName = namekey("starship", { ignoreNamePolicy: true });
+
+<ObjectType name={typeName}>{/* ... */}</ObjectType>;
+```
+
+```tsx
 import { renderSchema, relayNamePolicy } from "@alloy-js/graphql";
 
 renderSchema(<Schema>{/* ... */}</Schema>, { namePolicy: relayNamePolicy });
@@ -73,12 +88,18 @@ The JSX API includes Relay-friendly helpers like `Field.Connection`,
 `Connection.Edge`, and `Connection.PageInfo`. Relay-specific validation (connection
 shape, pagination arguments, single `input` mutation argument) is only enforced
 when `relayNamePolicy` is selected.
+`Field.Connection` derives its field name by appending `Connection` to the base
+field name. If the base field name is a `Namekey`, the derived name preserves
+its options (such as `ignoreNamePolicy`).
 
 ## Built-ins and refkeys
 
 Built-in scalar refkeys and Relay types (`Node`, `PageInfo`) live under
 `src/builtins/`. These are exported so you can reference them by refkey or reuse
 canonical type names without re-declaring them.
+
+Directive applications accept refkeys (including `Namekey`), so you can apply a
+directive using the same refkey you used when defining it.
 
 ## Project layout
 

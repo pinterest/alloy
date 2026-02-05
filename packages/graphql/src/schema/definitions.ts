@@ -1,4 +1,4 @@
-import { inspectRefkey, type Refkey } from "@alloy-js/core";
+import { inspectRefkey, isNamekey, type Refkey } from "@alloy-js/core";
 import {
   DirectiveLocation,
   specifiedDirectives,
@@ -22,6 +22,7 @@ import type {
   InputFieldDefinition,
   InputObjectTypeDefinition,
   InterfaceTypeDefinition,
+  NameInput,
   ObjectTypeDefinition,
   ScalarTypeDefinition,
   SchemaState,
@@ -35,7 +36,9 @@ import type {
  * Registers a type definition and its refkeys in the schema state.
  */
 export function registerType(state: SchemaState, definition: TypeDefinition) {
-  ensureNameValid(state, definition.name, "type");
+  ensureNameValid(state, definition.name, "type", {
+    ignoreNamePolicy: definition.ignoreNamePolicy,
+  });
   ensureTypeNameAvailable(state, definition.name);
 
   state.types.set(definition.name, definition);
@@ -57,7 +60,9 @@ export function registerDirective(
   state: SchemaState,
   definition: DirectiveDefinition,
 ) {
-  ensureNameValid(state, definition.name, "directive");
+  ensureNameValid(state, definition.name, "directive", {
+    ignoreNamePolicy: definition.ignoreNamePolicy,
+  });
 
   const specifiedName = specifiedDirectives.find(
     (directive: GraphQLDirective) => directive.name === definition.name,
@@ -77,6 +82,16 @@ export function registerDirective(
   }
 
   state.directives.set(definition.name, definition);
+
+  if (definition.refkey) {
+    const existing = state.directiveRefkeyToName.get(definition.refkey);
+    if (existing && existing !== definition.name) {
+      throw new Error(
+        `Refkey ${inspectRefkey(definition.refkey)} is already bound to "${existing}".`,
+      );
+    }
+    state.directiveRefkeyToName.set(definition.refkey, definition.name);
+  }
 }
 
 /**
@@ -84,18 +99,18 @@ export function registerDirective(
  */
 export function createObjectTypeDefinition(
   state: SchemaState,
-  name: string,
+  name: NameInput,
   description?: string,
   interfaces: TypeReference[] = [],
   refkeys: Refkey[] = [],
 ): ObjectTypeDefinition {
-  const normalizedName = applyNamePolicy(state, name, "type");
-  ensureNameValid(state, normalizedName, "type");
+  const resolved = resolveNameInput(state, name, "type");
   return {
     kind: "object",
-    name: normalizedName,
+    name: resolved.name,
     description,
-    refkeys,
+    ignoreNamePolicy: resolved.ignoreNamePolicy,
+    refkeys: mergeRefkeys(refkeys, resolved.refkey),
     directives: [],
     fields: [],
     fieldNames: new Set(),
@@ -108,18 +123,18 @@ export function createObjectTypeDefinition(
  */
 export function createInterfaceTypeDefinition(
   state: SchemaState,
-  name: string,
+  name: NameInput,
   description?: string,
   interfaces: TypeReference[] = [],
   refkeys: Refkey[] = [],
 ): InterfaceTypeDefinition {
-  const normalizedName = applyNamePolicy(state, name, "type");
-  ensureNameValid(state, normalizedName, "type");
+  const resolved = resolveNameInput(state, name, "type");
   return {
     kind: "interface",
-    name: normalizedName,
+    name: resolved.name,
     description,
-    refkeys,
+    ignoreNamePolicy: resolved.ignoreNamePolicy,
+    refkeys: mergeRefkeys(refkeys, resolved.refkey),
     directives: [],
     fields: [],
     fieldNames: new Set(),
@@ -132,18 +147,18 @@ export function createInterfaceTypeDefinition(
  */
 export function createInputObjectTypeDefinition(
   state: SchemaState,
-  name: string,
+  name: NameInput,
   description?: string,
   isOneOf = false,
   refkeys: Refkey[] = [],
 ): InputObjectTypeDefinition {
-  const normalizedName = applyNamePolicy(state, name, "type");
-  ensureNameValid(state, normalizedName, "type");
+  const resolved = resolveNameInput(state, name, "type");
   return {
     kind: "input",
-    name: normalizedName,
+    name: resolved.name,
     description,
-    refkeys,
+    ignoreNamePolicy: resolved.ignoreNamePolicy,
+    refkeys: mergeRefkeys(refkeys, resolved.refkey),
     isOneOf,
     directives: [],
     fields: [],
@@ -156,17 +171,17 @@ export function createInputObjectTypeDefinition(
  */
 export function createEnumTypeDefinition(
   state: SchemaState,
-  name: string,
+  name: NameInput,
   description?: string,
   refkeys: Refkey[] = [],
 ): EnumTypeDefinition {
-  const normalizedName = applyNamePolicy(state, name, "type");
-  ensureNameValid(state, normalizedName, "type");
+  const resolved = resolveNameInput(state, name, "type");
   return {
     kind: "enum",
-    name: normalizedName,
+    name: resolved.name,
     description,
-    refkeys,
+    ignoreNamePolicy: resolved.ignoreNamePolicy,
+    refkeys: mergeRefkeys(refkeys, resolved.refkey),
     directives: [],
     values: [],
     valueNames: new Set(),
@@ -178,17 +193,17 @@ export function createEnumTypeDefinition(
  */
 export function createUnionTypeDefinition(
   state: SchemaState,
-  name: string,
+  name: NameInput,
   description?: string,
   refkeys: Refkey[] = [],
 ): UnionTypeDefinition {
-  const normalizedName = applyNamePolicy(state, name, "type");
-  ensureNameValid(state, normalizedName, "type");
+  const resolved = resolveNameInput(state, name, "type");
   return {
     kind: "union",
-    name: normalizedName,
+    name: resolved.name,
     description,
-    refkeys,
+    ignoreNamePolicy: resolved.ignoreNamePolicy,
+    refkeys: mergeRefkeys(refkeys, resolved.refkey),
     directives: [],
     members: [],
     memberNames: new Set(),
@@ -200,17 +215,17 @@ export function createUnionTypeDefinition(
  */
 export function createScalarTypeDefinition(
   state: SchemaState,
-  name: string,
+  name: NameInput,
   description?: string,
   refkeys: Refkey[] = [],
 ): ScalarTypeDefinition {
-  const normalizedName = applyNamePolicy(state, name, "type");
-  ensureNameValid(state, normalizedName, "type");
+  const resolved = resolveNameInput(state, name, "type");
   return {
     kind: "scalar",
-    name: normalizedName,
+    name: resolved.name,
     description,
-    refkeys,
+    ignoreNamePolicy: resolved.ignoreNamePolicy,
+    refkeys: mergeRefkeys(refkeys, resolved.refkey),
     directives: [],
   };
 }
@@ -220,15 +235,14 @@ export function createScalarTypeDefinition(
  */
 export function createFieldDefinition(
   state: SchemaState,
-  name: string,
+  name: NameInput,
   type: TypeReference,
   description?: string,
   deprecationReason?: string,
 ): FieldDefinition {
-  const normalizedName = applyNamePolicy(state, name, "field");
-  ensureNameValid(state, normalizedName, "field");
+  const resolved = resolveNameInput(state, name, "field");
   return {
-    name: normalizedName,
+    name: resolved.name,
     type,
     args: [],
     argNames: new Set(),
@@ -243,16 +257,15 @@ export function createFieldDefinition(
  */
 export function createArgDefinition(
   state: SchemaState,
-  name: string,
+  name: NameInput,
   type: TypeReference,
   description?: string,
   defaultValue?: unknown,
   deprecationReason?: string,
 ): ArgDefinition {
-  const normalizedName = applyNamePolicy(state, name, "argument");
-  ensureNameValid(state, normalizedName, "argument");
+  const resolved = resolveNameInput(state, name, "argument");
   return {
-    name: normalizedName,
+    name: resolved.name,
     type,
     description,
     defaultValue,
@@ -266,16 +279,15 @@ export function createArgDefinition(
  */
 export function createInputFieldDefinition(
   state: SchemaState,
-  name: string,
+  name: NameInput,
   type: TypeReference,
   description?: string,
   defaultValue?: unknown,
   deprecationReason?: string,
 ): InputFieldDefinition {
-  const normalizedName = applyNamePolicy(state, name, "inputField");
-  ensureNameValid(state, normalizedName, "inputField");
+  const resolved = resolveNameInput(state, name, "inputField");
   return {
-    name: normalizedName,
+    name: resolved.name,
     type,
     description,
     defaultValue,
@@ -289,14 +301,13 @@ export function createInputFieldDefinition(
  */
 export function createEnumValueDefinition(
   state: SchemaState,
-  name: string,
+  name: NameInput,
   description?: string,
   deprecationReason?: string,
 ): EnumValueDefinition {
-  const normalizedName = applyNamePolicy(state, name, "enumValue");
-  ensureNameValid(state, normalizedName, "enumValue");
+  const resolved = resolveNameInput(state, name, "enumValue");
   return {
-    name: normalizedName,
+    name: resolved.name,
     description,
     deprecationReason,
     directives: [],
@@ -317,16 +328,17 @@ export function createUnionMemberDefinition(
  */
 export function createDirectiveDefinition(
   state: SchemaState,
-  name: string,
+  name: NameInput,
   locations: DirectiveLocation[],
   repeatable = false,
   description?: string,
 ): DirectiveDefinition {
-  const normalizedName = applyNamePolicy(state, name, "directive");
-  ensureNameValid(state, normalizedName, "directive");
+  const resolved = resolveNameInput(state, name, "directive");
   return {
-    name: normalizedName,
+    name: resolved.name,
     description,
+    ignoreNamePolicy: resolved.ignoreNamePolicy,
+    refkey: resolved.refkey,
     repeatable,
     locations,
     args: [],
@@ -459,6 +471,7 @@ function ensureNameValid(
   state: SchemaState,
   name: string,
   kind: GraphQLNameElement,
+  options: { ignoreNamePolicy?: boolean } = {},
 ) {
   if (!GRAPHQL_NAME_REGEX.test(name)) {
     throw new Error(`Name "${name}" does not match GraphQL naming rules.`);
@@ -475,7 +488,7 @@ function ensureNameValid(
     );
   }
   const policy = state.namePolicy?.rules?.[kind];
-  if (policy && !policy.test(name)) {
+  if (policy && !options.ignoreNamePolicy && !policy.test(name)) {
     throw new Error(`Name "${name}" does not match the ${kind} naming policy.`);
   }
 }
@@ -489,6 +502,34 @@ function applyNamePolicy(
     return name;
   }
   return state.namePolicy.getName(name, kind);
+}
+
+function resolveNameInput(
+  state: SchemaState,
+  name: NameInput,
+  kind: GraphQLNameElement,
+): { name: string; refkey?: Refkey; ignoreNamePolicy?: boolean } {
+  if (isNamekey(name)) {
+    const ignoreNamePolicy = name.options.ignoreNamePolicy ?? false;
+    const normalizedName =
+      ignoreNamePolicy ? name.name : applyNamePolicy(state, name.name, kind);
+    ensureNameValid(state, normalizedName, kind, { ignoreNamePolicy });
+    return { name: normalizedName, refkey: name, ignoreNamePolicy };
+  }
+
+  const normalizedName = applyNamePolicy(state, name, kind);
+  ensureNameValid(state, normalizedName, kind);
+  return { name: normalizedName };
+}
+
+function mergeRefkeys(refkeys: Refkey[], refkey?: Refkey): Refkey[] {
+  if (!refkey) {
+    return refkeys;
+  }
+  if (refkeys.includes(refkey)) {
+    return refkeys;
+  }
+  return [...refkeys, refkey];
 }
 
 function ensureTypeNameAvailable(state: SchemaState, name: string) {
@@ -530,7 +571,7 @@ function normalizeDirectiveLocations(
  */
 export function normalizeDirectiveDefinition(
   state: SchemaState,
-  name: string,
+  name: NameInput,
   locations: (DirectiveLocation | string)[],
   repeatable = false,
   description?: string,

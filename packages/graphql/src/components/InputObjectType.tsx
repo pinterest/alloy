@@ -7,11 +7,12 @@ import {
   registerType,
   useSchemaContext,
   useTypeContext,
+  type NameInput,
 } from "../schema.js";
 import { normalizeRefkeys } from "./utils.js";
 
 export interface InputObjectTypeProps {
-  name: string;
+  name: NameInput;
   description?: string;
   oneOf?: boolean;
   refkey?: Refkey | Refkey[];

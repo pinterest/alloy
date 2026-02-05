@@ -5,10 +5,11 @@ import {
   normalizeDirectiveDefinition,
   registerDirective,
   useSchemaContext,
+  type NameInput,
 } from "../schema.js";
 
 export interface DirectiveDefinitionProps {
-  name: string;
+  name: NameInput;
   locations: (DirectiveLocation | string)[];
   repeatable?: boolean;
   description?: string;

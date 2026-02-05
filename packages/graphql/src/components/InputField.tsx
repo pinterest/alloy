@@ -14,6 +14,7 @@ import {
   useSchemaContext,
   useTypeContext,
   type DeprecatedProps,
+  type NameInput,
   type TypeReference,
 } from "../schema.js";
 import { applyNonNullType } from "../schema/refs.js";
@@ -21,7 +22,7 @@ import { Directive } from "./Directive.js";
 import { createListSlot } from "./ListSlot.js";
 
 export interface InputFieldProps extends DeprecatedProps {
-  name: string;
+  name: NameInput;
   type: TypeReference;
   nonNull?: boolean;
   description?: string;

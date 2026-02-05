@@ -1,4 +1,4 @@
-import { refkey } from "@alloy-js/core";
+import { namekey } from "@alloy-js/core";
 import {
   EnumType,
   EnumValue,
@@ -22,22 +22,22 @@ import { describe, expect, it } from "vitest";
 
 // howtographql schema source: https://github.com/howtographql/howtographql
 
-const AuthProviderSignupData = refkey("AuthProviderSignupData");
-const AuthProviderEmail = refkey("AUTH_PROVIDER_EMAIL");
-const DateTime = refkey("DateTime");
-const Link = refkey("Link");
-const LinkFilter = refkey("LinkFilter");
-const LinkOrderBy = refkey("LinkOrderBy");
-const LinkSubscriptionFilter = refkey("LinkSubscriptionFilter");
-const LinkSubscriptionPayload = refkey("LinkSubscriptionPayload");
-const ModelMutationType = refkey("_ModelMutationType");
-const NodeRef = refkey("Node");
-const QueryMeta = refkey("_QueryMeta");
-const SigninPayload = refkey("SigninPayload");
-const User = refkey("User");
-const Vote = refkey("Vote");
-const VoteSubscriptionFilter = refkey("VoteSubscriptionFilter");
-const VoteSubscriptionPayload = refkey("VoteSubscriptionPayload");
+const AuthProviderSignupData = namekey("AuthProviderSignupData");
+const AuthProviderEmail = namekey("AUTH_PROVIDER_EMAIL");
+const DateTime = namekey("DateTime");
+const Link = namekey("Link");
+const LinkFilter = namekey("LinkFilter");
+const LinkOrderBy = namekey("LinkOrderBy");
+const LinkSubscriptionFilter = namekey("LinkSubscriptionFilter");
+const LinkSubscriptionPayload = namekey("LinkSubscriptionPayload");
+const ModelMutationType = namekey("_ModelMutationType");
+const NodeRef = namekey("Node");
+const QueryMeta = namekey("_QueryMeta");
+const SigninPayload = namekey("SigninPayload");
+const User = namekey("User");
+const Vote = namekey("Vote");
+const VoteSubscriptionFilter = namekey("VoteSubscriptionFilter");
+const VoteSubscriptionPayload = namekey("VoteSubscriptionPayload");
 
 describe("howtographql schema", () => {
   it("matches snapshot", () => {
@@ -83,10 +83,10 @@ describe("howtographql schema", () => {
             <InputValue name="filter" type={VoteSubscriptionFilter} />
           </Field>
         </Subscription>
-        <InterfaceType name="Node" refkey={NodeRef}>
+        <InterfaceType name={NodeRef}>
           <Field name="id" type={ID} nonNull />
         </InterfaceType>
-        <ObjectType name="User" refkey={User} interfaces={[NodeRef]}>
+        <ObjectType name={User} interfaces={[NodeRef]}>
           <Field name="id" type={ID} nonNull />
           <Field name="createdAt" type={DateTime} nonNull />
           <Field name="name" type={String} nonNull />
@@ -99,7 +99,7 @@ describe("howtographql schema", () => {
           <Field name="email" type={String} />
           <Field name="password" type={String} />
         </ObjectType>
-        <ObjectType name="Link" refkey={Link} interfaces={[NodeRef]}>
+        <ObjectType name={Link} interfaces={[NodeRef]}>
           <Field name="id" type={ID} nonNull />
           <Field name="createdAt" type={DateTime} nonNull />
           <Field name="url" type={String} nonNull />
@@ -109,82 +109,67 @@ describe("howtographql schema", () => {
             <Field.List nonNull />
           </Field>
         </ObjectType>
-        <ObjectType name="Vote" refkey={Vote} interfaces={[NodeRef]}>
+        <ObjectType name={Vote} interfaces={[NodeRef]}>
           <Field name="id" type={ID} nonNull />
           <Field name="createdAt" type={DateTime} nonNull />
           <Field name="user" type={User} nonNull />
           <Field name="link" type={Link} nonNull />
         </ObjectType>
-        <InputObjectType
-          name="AuthProviderSignupData"
-          refkey={AuthProviderSignupData}
-        >
+        <InputObjectType name={AuthProviderSignupData}>
           <InputField name="email" type={AuthProviderEmail} />
         </InputObjectType>
-        <InputObjectType name="AUTH_PROVIDER_EMAIL" refkey={AuthProviderEmail}>
+        <InputObjectType name={AuthProviderEmail}>
           <InputField name="email" type={String} nonNull />
           <InputField name="password" type={String} nonNull />
         </InputObjectType>
-        <InputObjectType
-          name="LinkSubscriptionFilter"
-          refkey={LinkSubscriptionFilter}
-        >
+        <InputObjectType name={LinkSubscriptionFilter}>
           <InputField name="mutation_in" type={ModelMutationType} nonNull>
             <InputField.List />
           </InputField>
         </InputObjectType>
-        <InputObjectType
-          name="VoteSubscriptionFilter"
-          refkey={VoteSubscriptionFilter}
-        >
+        <InputObjectType name={VoteSubscriptionFilter}>
           <InputField name="mutation_in" type={ModelMutationType} nonNull>
             <InputField.List />
           </InputField>
         </InputObjectType>
-        <InputObjectType name="LinkFilter" refkey={LinkFilter}>
+        <InputObjectType name={LinkFilter}>
           <InputField name="OR" type={LinkFilter} nonNull>
             <InputField.List />
           </InputField>
           <InputField name="description_contains" type={String} />
           <InputField name="url_contains" type={String} />
         </InputObjectType>
-        <ObjectType name="SigninPayload" refkey={SigninPayload}>
+        <ObjectType name={SigninPayload}>
           <Field name="token" type={String} />
           <Field name="user" type={User} />
         </ObjectType>
-        <ObjectType
-          name="LinkSubscriptionPayload"
-          refkey={LinkSubscriptionPayload}
-        >
+        <ObjectType name={LinkSubscriptionPayload}>
           <Field name="mutation" type={ModelMutationType} nonNull />
           <Field name="node" type={Link} />
           <Field name="updatedFields" type={String} nonNull>
             <Field.List />
           </Field>
         </ObjectType>
-        <ObjectType
-          name="VoteSubscriptionPayload"
-          refkey={VoteSubscriptionPayload}
-        >
+        <ObjectType name={VoteSubscriptionPayload}>
           <Field name="mutation" type={ModelMutationType} nonNull />
           <Field name="node" type={Vote} />
           <Field name="updatedFields" type={String} nonNull>
             <Field.List />
           </Field>
         </ObjectType>
-        <EnumType name="LinkOrderBy" refkey={LinkOrderBy}>
+        <EnumType name={LinkOrderBy}>
           <EnumValue name="createdAt_ASC" />
           <EnumValue name="createdAt_DESC" />
         </EnumType>
-        <EnumType name="_ModelMutationType" refkey={ModelMutationType}>
+        <EnumType name={ModelMutationType}>
           <EnumValue name="CREATED" />
           <EnumValue name="UPDATED" />
           <EnumValue name="DELETED" />
         </EnumType>
-        <ObjectType name="_QueryMeta" refkey={QueryMeta}>
+        <ObjectType name={QueryMeta}>
           <Field name="count" type={Int} nonNull />
         </ObjectType>
-        <ScalarType name="DateTime" refkey={DateTime} />
+        <ScalarType name={DateTime} />
       </>,
       { namePolicy: null },
     );

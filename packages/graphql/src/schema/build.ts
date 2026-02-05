@@ -1,4 +1,4 @@
-import { isRefkeyable, toRefkey } from "@alloy-js/core";
+import { inspectRefkey, isRefkeyable, toRefkey } from "@alloy-js/core";
 import {
   DirectiveLocation,
   GraphQLDirective,
@@ -134,6 +134,7 @@ export function buildSchema(
   attachTypeDirectiveAstNodes(state, context);
 
   const schemaDirectives = buildAppliedDirectiveNodes(
+    state,
     directiveMap,
     state.schemaDirectives,
     DirectiveLocation.SCHEMA,
@@ -301,7 +302,7 @@ function createGraphQLType(
       return new GraphQLEnumType({
         name: definition.name,
         description: definition.description,
-        values: buildEnumValueMap(definition, context),
+        values: buildEnumValueMap(state, definition, context),
       });
     case "union":
       return new GraphQLUnionType({
@@ -435,6 +436,7 @@ function buildFieldConfigsFromDefinitions(
       ownerLabel: `field "${definition.name}.${field.name}"`,
     });
     const directives = buildAppliedDirectiveNodes(
+      state,
       getDirectiveMap(context),
       field.directives,
       DirectiveLocation.FIELD_DEFINITION,
@@ -503,6 +505,7 @@ function buildInputFieldMap(
       );
     }
     const directives = buildAppliedDirectiveNodes(
+      state,
       getDirectiveMap(context),
       field.directives,
       DirectiveLocation.INPUT_FIELD_DEFINITION,
@@ -533,13 +536,14 @@ function buildInputFieldMap(
 }
 
 function buildEnumValueMap(
+  state: SchemaState,
   definition: EnumTypeDefinition,
   context: BuildContext,
 ): Record<string, { description?: string; deprecationReason?: string }> {
   return Object.fromEntries(
     definition.values.map((value) => [
       value.name,
-      buildEnumValueConfig(value, definition, context),
+      buildEnumValueConfig(state, value, definition, context),
     ]),
   );
 }
@@ -583,6 +587,7 @@ function buildArgsMap(
       const directives =
         directiveMap && arg.directives.length > 0 ?
           buildAppliedDirectiveNodes(
+            state,
             directiveMap,
             arg.directives,
             DirectiveLocation.ARGUMENT_DEFINITION,
@@ -664,6 +669,7 @@ function attachDirectiveDefinitionAstNodes(
         arg.defaultValue,
         arg.directives.length > 0 ?
           buildAppliedDirectiveNodes(
+            state,
             directiveMap,
             arg.directives,
             DirectiveLocation.ARGUMENT_DEFINITION,
@@ -696,6 +702,7 @@ function attachTypeDirectiveAstNodes(
     }
 
     const directives = buildAppliedDirectiveNodes(
+      state,
       directiveMap,
       definition.directives,
       directiveLocationForType(definition.kind),
@@ -730,6 +737,7 @@ function directiveLocationForType(
 }
 
 function buildEnumValueConfig(
+  state: SchemaState,
   value: EnumValueDefinition,
   definition: EnumTypeDefinition,
   context: BuildContext,
@@ -741,6 +749,7 @@ function buildEnumValueConfig(
   const directives =
     value.directives.length > 0 ?
       buildAppliedDirectiveNodes(
+        state,
         getDirectiveMap(context),
         value.directives,
         DirectiveLocation.ENUM_VALUE,
@@ -759,6 +768,7 @@ function buildEnumValueConfig(
 }
 
 function buildAppliedDirectiveNodes(
+  state: SchemaState,
   directiveMap: Map<string, GraphQLDirective>,
   applied: AppliedDirective[],
   location: DirectiveLocation,
@@ -771,24 +781,29 @@ function buildAppliedDirectiveNodes(
   const nodes: ConstDirectiveNode[] = [];
   const usageCounts = new Map<string, number>();
   for (const application of applied) {
-    const directive = directiveMap.get(application.name);
+    const directiveName = resolveAppliedDirectiveName(
+      state,
+      application,
+      ownerLabel,
+    );
+    const directive = directiveMap.get(directiveName);
     if (!directive) {
       throw new Error(
-        `Directive "@${application.name}" is not defined for ${ownerLabel}.`,
+        `Directive "@${directiveName}" is not defined for ${ownerLabel}.`,
       );
     }
 
     if (!directive.locations.includes(location)) {
       throw new Error(
-        `Directive "@${application.name}" cannot be applied to ${ownerLabel}.`,
+        `Directive "@${directiveName}" cannot be applied to ${ownerLabel}.`,
       );
     }
 
-    const count = (usageCounts.get(application.name) ?? 0) + 1;
-    usageCounts.set(application.name, count);
+    const count = (usageCounts.get(directiveName) ?? 0) + 1;
+    usageCounts.set(directiveName, count);
     if (!directive.isRepeatable && count > 1) {
       throw new Error(
-        `Directive "@${application.name}" cannot be repeated on ${ownerLabel}.`,
+        `Directive "@${directiveName}" cannot be repeated on ${ownerLabel}.`,
       );
     }
 
@@ -798,7 +813,7 @@ function buildAppliedDirectiveNodes(
       const argDef = argMap.get(arg.name);
       if (!argDef) {
         throw new Error(
-          `Unknown argument "${arg.name}" for directive "@${application.name}" on ${ownerLabel}.`,
+          `Unknown argument "${arg.name}" for directive "@${directiveName}" on ${ownerLabel}.`,
         );
       }
 
@@ -806,7 +821,7 @@ function buildAppliedDirectiveNodes(
       const valueNode = astFromValue(arg.value, argDef.type);
       if (!valueNode) {
         throw new Error(
-          `Directive "@${application.name}" argument "${arg.name}" on ${ownerLabel} could not be coerced to ${String(
+          `Directive "@${directiveName}" argument "${arg.name}" on ${ownerLabel} could not be coerced to ${String(
             argDef.type,
           )}.`,
         );
@@ -822,19 +837,39 @@ function buildAppliedDirectiveNodes(
     for (const arg of directive.args) {
       if (isRequiredArgument(arg) && !providedArgs.has(arg.name)) {
         throw new Error(
-          `Directive "@${application.name}" on ${ownerLabel} is missing required argument "${arg.name}".`,
+          `Directive "@${directiveName}" on ${ownerLabel} is missing required argument "${arg.name}".`,
         );
       }
     }
 
     nodes.push({
       kind: Kind.DIRECTIVE,
-      name: createNameNode(application.name),
+      name: createNameNode(directiveName),
       arguments: argNodes.length > 0 ? argNodes : undefined,
     });
   }
 
   return nodes;
+}
+
+function resolveAppliedDirectiveName(
+  state: SchemaState,
+  application: AppliedDirective,
+  ownerLabel: string,
+): string {
+  if (application.name) {
+    return application.name;
+  }
+  if (application.refkey) {
+    const name = state.directiveRefkeyToName.get(application.refkey);
+    if (!name) {
+      throw new Error(
+        `Directive ${inspectRefkey(application.refkey)} is not defined for ${ownerLabel}.`,
+      );
+    }
+    return name;
+  }
+  throw new Error(`Directive application on ${ownerLabel} is missing a name.`);
 }
 
 function createSchemaDefinitionNode(

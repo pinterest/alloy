@@ -9,12 +9,13 @@ import {
   registerType,
   useSchemaContext,
   useTypeContext,
+  type NameInput,
   type TypeReference,
 } from "../schema.js";
 import { normalizeRefkeys } from "./utils.js";
 
 export interface UnionTypeProps {
-  name: string;
+  name: NameInput;
   description?: string;
   members?: TypeReference[];
   refkey?: Refkey | Refkey[];

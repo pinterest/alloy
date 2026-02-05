@@ -4,12 +4,14 @@ import {
   findKeyedChild,
   findKeyedChildren,
   findUnkeyedChildren,
+  isNamekey,
+  namekey,
   refkey,
   taggedComponent,
 } from "@alloy-js/core";
 import { PageInfo } from "../builtins/page-info.js";
 import { useConnectionOptions } from "../connection-options.js";
-import { type TypeReference } from "../schema.js";
+import { type NameInput, type TypeReference } from "../schema.js";
 import { Field } from "./Field.js";
 import { ObjectType } from "./ObjectType.js";
 import { normalizeRefkeys } from "./utils.js";
@@ -24,7 +26,7 @@ const DEFAULT_DESCRIPTIONS = {
 };
 
 export interface ConnectionProps {
-  name: string;
+  name: NameInput;
   type: TypeReference;
   refkey?: Refkey | Refkey[];
   edgeRefkey?: Refkey | Refkey[];
@@ -45,7 +47,7 @@ export interface ConnectionPageInfoProps {
 }
 
 interface ConnectionEdgeDefinitionProps {
-  name: string;
+  name: NameInput;
   nodeType: TypeReference;
   cursorType: TypeReference;
   refkey: Refkey | Refkey[];
@@ -99,13 +101,18 @@ function ConnectionEdge(props: ConnectionEdgeDefinitionProps) {
 
 function ConnectionBase(props: ConnectionProps) {
   const pagination = useConnectionOptions();
-  const connectionName = `${props.name}Connection`;
-  const edgeName = `${props.name}Edge`;
+  const baseName = unwrapNameInput(props.name);
+  const connectionName = deriveNameInput(props.name, "Connection");
+  const edgeName = deriveNameInput(props.name, "Edge");
   const connectionRefkeys = normalizeRefkeys(props.refkey);
   const edgeRefkeys = normalizeRefkeys(props.edgeRefkey);
+  const connectionNameString = `${baseName}Connection`;
+  const edgeNameString = `${baseName}Edge`;
   const connectionRefkey =
-    connectionRefkeys.length > 0 ? connectionRefkeys : refkey(connectionName);
-  const edgeTypeRef = edgeRefkeys[0] ?? refkey(edgeName);
+    connectionRefkeys.length > 0 ?
+      connectionRefkeys
+    : refkey(connectionNameString);
+  const edgeTypeRef = edgeRefkeys[0] ?? refkey(edgeNameString);
   const edgeRefkey = edgeRefkeys.length > 0 ? edgeRefkeys : edgeTypeRef;
   const children = childrenArray(() => props.children);
   const edgeSlot = findKeyedChild(children, connectionEdgeTag);
@@ -235,3 +242,14 @@ Connection.Fields = ConnectionFieldsSlot;
  * field description.
  */
 Connection.PageInfo = ConnectionPageInfoSlot;
+
+function unwrapNameInput(value: NameInput): string {
+  return isNamekey(value) ? value.name : value;
+}
+
+function deriveNameInput(base: NameInput, suffix: string): NameInput {
+  if (isNamekey(base)) {
+    return namekey(`${base.name}${suffix}`, { ...base.options });
+  }
+  return `${base}${suffix}`;
+}

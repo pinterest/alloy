@@ -1,3 +1,4 @@
+import { namekey } from "@alloy-js/core";
 import {
   Argument,
   Directive,
@@ -111,6 +112,23 @@ describe("directive applications", () => {
     expect(
       roleType.getValue("ADMIN")?.astNode?.directives?.[0].name.value,
     ).toBe("tag");
+  });
+
+  it("resolves directive refkeys", () => {
+    const tag = namekey("tag");
+    const schema = renderSchema(
+      <>
+        <DirectiveDefinition name={tag} locations={["FIELD_DEFINITION"]} />
+        <Query>
+          <Field name="ping" type={String}>
+            <Directive name={tag} />
+          </Field>
+        </Query>
+      </>,
+    );
+
+    const field = schema.getQueryType()?.getFields().ping;
+    expect(field?.astNode?.directives?.[0].name.value).toBe("tag");
   });
 
   it("rejects duplicate directive arguments", () => {

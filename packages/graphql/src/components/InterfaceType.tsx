@@ -6,12 +6,13 @@ import {
   createInterfaceTypeDefinition,
   registerType,
   useSchemaContext,
+  type NameInput,
   type TypeReference,
 } from "../schema.js";
 import { normalizeRefkeys } from "./utils.js";
 
 export interface InterfaceTypeProps {
-  name: string;
+  name: NameInput;
   description?: string;
   interfaces?: TypeReference[];
   refkey?: Refkey | Refkey[];

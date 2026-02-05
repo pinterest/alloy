@@ -8,10 +8,11 @@ import {
   useSchemaContext,
   useTypeContext,
   type DeprecatedProps,
+  type NameInput,
 } from "../schema.js";
 
 export interface EnumValueProps extends DeprecatedProps {
-  name: string;
+  name: NameInput;
   description?: string;
   children?: Children;
 }

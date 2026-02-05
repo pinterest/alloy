@@ -1,4 +1,4 @@
-import { refkey } from "@alloy-js/core";
+import { namekey } from "@alloy-js/core";
 import {
   Boolean,
   EnumType,
@@ -21,19 +21,18 @@ import { describe, expect, it } from "vitest";
 
 // snowtooth schema source: https://github.com/MoonHighway/snowtooth
 
-const Lift = refkey("Lift");
-const LiftStatus = refkey("LiftStatus");
-const SearchResult = refkey("SearchResult");
-const Trail = refkey("Trail");
-const TrailStatus = refkey("TrailStatus");
+const Lift = namekey("Lift");
+const LiftStatus = namekey("LiftStatus");
+const SearchResult = namekey("SearchResult");
+const Trail = namekey("Trail");
+const TrailStatus = namekey("TrailStatus");
 
 describe("snowtooth schema", () => {
   it("matches snapshot", () => {
     const schema = renderSchema(
       <>
         <ObjectType
-          name="Lift"
-          refkey={Lift}
+          name={Lift}
           description="A `Lift` is a chairlift, gondola, tram, funicular, pulley, rope tow, or other means of ascending a mountain."
         >
           <Field
@@ -81,8 +80,7 @@ describe("snowtooth schema", () => {
           </Field>
         </ObjectType>
         <ObjectType
-          name="Trail"
-          refkey={Trail}
+          name={Trail}
           description="A `Trail` is a run at a ski resort"
         >
           <Field
@@ -136,8 +134,7 @@ describe("snowtooth schema", () => {
           </Field>
         </ObjectType>
         <EnumType
-          name="LiftStatus"
-          refkey={LiftStatus}
+          name={LiftStatus}
           description="An enum describing the options for `LiftStatus`: `OPEN`, `CLOSED`, `HOLD`"
         >
           <EnumValue name="OPEN" />
@@ -145,16 +142,14 @@ describe("snowtooth schema", () => {
           <EnumValue name="HOLD" />
         </EnumType>
         <EnumType
-          name="TrailStatus"
-          refkey={TrailStatus}
+          name={TrailStatus}
           description="An enum describing the options for `TrailStatus`: `OPEN`, `CLOSED`"
         >
           <EnumValue name="OPEN" />
           <EnumValue name="CLOSED" />
         </EnumType>
         <UnionType
-          name="SearchResult"
-          refkey={SearchResult}
+          name={SearchResult}
           description="This union type returns one of two types: a `Lift` or a `Trail`. When we search for a letter, we'll return a list of either `Lift` or `Trail` objects."
         >
           <UnionMember type={Lift} />
