@@ -1,5 +1,6 @@
 import { isRefkeyable, toRefkey } from "@alloy-js/core";
 import { GraphQLNonNull, isNamedType, isType } from "graphql";
+import { builtInScalars, builtInScalarsFallback } from "./constants.js";
 import type { SchemaState, TypeRef, TypeReference } from "./types.js";
 
 export function extractNamedTypeName(
@@ -36,6 +37,9 @@ export function extractNamedTypeName(
 }
 
 export function normalizeTypeName(state: SchemaState, name: string): string {
+  if (builtInScalars.has(name) || builtInScalarsFallback.has(name)) {
+    return name;
+  }
   if (!state.namePolicy) {
     return name;
   }

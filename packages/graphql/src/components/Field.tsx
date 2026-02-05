@@ -346,7 +346,8 @@ Field.List = FieldListSlot;
  * @remarks
  * Define connection arguments on `Field` and use `Connection.Fields` to add
  * additional fields to the generated connection type. `Field.Connection` does
- * not rename the field unless you pass `fieldName`.
+ * not rename the field unless you pass `fieldName`. The connection type name is
+ * still derived from the parent `Field` name.
  */
 Field.Connection = FieldConnectionSlot;
 
