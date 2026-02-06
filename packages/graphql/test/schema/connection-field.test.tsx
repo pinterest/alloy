@@ -333,6 +333,44 @@ describe("Field.Connection", () => {
     expect(pageInfoType.getFields().endCursor.type.toString()).toBe("ID");
   });
 
+  it("merges nested pagination defaults", () => {
+    const schema = renderSchema(
+      <ConnectionPagination forward={false} backward cursorType={ID}>
+        <ObjectType name={Item}>
+          <Field name="id" type={ID} />
+        </ObjectType>
+        <ConnectionPagination forward cursorType={String}>
+          <PageInfoType />
+          <Query>
+            <Field name="items" type={Item}>
+              <Field.Connection />
+            </Field>
+          </Query>
+        </ConnectionPagination>
+      </ConnectionPagination>,
+    );
+
+    const queryType = schema.getType("Query");
+    if (!(queryType instanceof GraphQLObjectType)) {
+      throw new Error("Expected Query to be an object type.");
+    }
+
+    const field = queryType.getFields().items;
+    expect(field.args.map((arg) => arg.type.toString())).toEqual([
+      "String",
+      "Int",
+      "String",
+      "Int",
+    ]);
+
+    const edgeType = schema.getType("ItemsEdge");
+    if (!(edgeType instanceof GraphQLObjectType)) {
+      throw new Error("Expected ItemsEdge to be an object type.");
+    }
+
+    expect(edgeType.getFields().cursor.type.toString()).toBe("String!");
+  });
+
   it("allows overriding the field name", () => {
     const schema = renderSchema(
       <>
@@ -358,6 +396,32 @@ describe("Field.Connection", () => {
     expect(fields.allItems).toBeDefined();
     expect(fields.items).toBeUndefined();
     expect(fields.allItems.type.toString()).toBe("ItemsConnection");
+  });
+
+  it("prefixes connection types for non-root fields", () => {
+    const schema = renderSchema(
+      <>
+        <ObjectType name="User">
+          <Field name="friends" type="User">
+            <Field.Connection />
+          </Field>
+        </ObjectType>
+        <PageInfoType />
+        <Query>
+          <Field name="user" type="User" />
+        </Query>
+      </>,
+    );
+
+    const userType = schema.getType("User");
+    if (!(userType instanceof GraphQLObjectType)) {
+      throw new Error("Expected User to be an object type.");
+    }
+
+    expect(userType.getFields().friends.type.toString()).toBe(
+      "UserFriendsConnection",
+    );
+    expect(schema.getType("UserFriendsConnection")).toBeDefined();
   });
 
   it("respects namekey options on the connection field name", () => {

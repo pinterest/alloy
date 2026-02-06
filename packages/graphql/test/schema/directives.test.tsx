@@ -194,6 +194,34 @@ describe("directive applications", () => {
     ).toThrow(/cannot be repeated/);
   });
 
+  it("allows repeatable directives", () => {
+    const schema = renderSchema(
+      <>
+        <DirectiveDefinition
+          name="tag"
+          repeatable
+          locations={["FIELD_DEFINITION"]}
+        >
+          <InputValue name="label" type={String} />
+        </DirectiveDefinition>
+        <Query>
+          <Field name="ping" type={String}>
+            <Directive name="tag">
+              <Argument name="label" value="first" />
+            </Directive>
+            <Directive name="tag">
+              <Argument name="label" value="second" />
+            </Directive>
+          </Field>
+        </Query>
+      </>,
+    );
+
+    const field = schema.getQueryType()?.getFields().ping;
+    expect(field?.astNode?.directives?.map((directive) => directive.name.value))
+      .toEqual(["tag", "tag"]);
+  });
+
   it("validates directive arguments", () => {
     expect(() =>
       renderSchema(

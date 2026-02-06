@@ -1,3 +1,4 @@
+import { namekey, renderTree, type Children } from "@alloy-js/core";
 import {
   EnumType,
   EnumValue,
@@ -23,7 +24,19 @@ import {
   GraphQLObjectType,
   GraphQLString,
 } from "graphql";
+import { buildSchema } from "../../src/schema/build.js";
+import { createSchemaState, Schema } from "../../src/schema/state.js";
+import type {
+  SchemaProps,
+  SchemaState,
+  TypeReference,
+} from "../../src/schema/types.js";
 import { describe, expect, it } from "vitest";
+
+type SchemaInternalProps = SchemaProps & { _state: SchemaState };
+const SchemaWithState = Schema as unknown as (
+  props: SchemaInternalProps,
+) => Children;
 
 describe("renderSchema", () => {
   it("builds a basic schema", () => {
@@ -250,5 +263,74 @@ describe("renderSchema", () => {
     expect(schema.getQueryType()?.getFields().name.type.toString()).toBe(
       "String",
     );
+  });
+
+  it("resolves structured type references", () => {
+    const User = namekey("User");
+    const schema = renderSchema(
+      <>
+        <ObjectType name={User}>
+          <Field name="id" type={ID} />
+        </ObjectType>
+        <Query>
+          <Field
+            name="users"
+            type={
+              {
+                kind: "nonNull",
+                ofType: {
+                  kind: "list",
+                  ofType: {
+                    kind: "nonNull",
+                    ofType: { kind: "named", name: User },
+                  },
+                },
+              } satisfies TypeReference
+            }
+          />
+          <Field
+            name="title"
+            type={
+              {
+                kind: "named",
+                name: GraphQLString,
+              } satisfies TypeReference
+            }
+          />
+        </Query>
+      </>,
+    );
+
+    const queryType = schema.getType("Query");
+    if (!(queryType instanceof GraphQLObjectType)) {
+      throw new Error("Expected Query to be an object type.");
+    }
+
+    expect(queryType.getFields().users.type.toString()).toBe("[User!]!");
+    expect(queryType.getFields().title.type.toString()).toBe("String");
+  });
+
+  it("supports rendering Schema with an existing state", () => {
+    const state = createSchemaState({
+      query: "InitialQuery",
+      description: "Initial",
+    });
+
+    renderTree(
+      <SchemaWithState
+        _state={state}
+        query="RootQuery"
+        description="Updated"
+      >
+        <ObjectType name="RootQuery">
+          <Field name="ping" type={String} />
+        </ObjectType>
+      </SchemaWithState>,
+    );
+
+    const schema = buildSchema(state, true);
+    expect(state.schema.query).toBe("RootQuery");
+    expect(schema.getQueryType()?.name).toBe("RootQuery");
+    expect(schema.description).toBe("Updated");
   });
 });
