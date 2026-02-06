@@ -1,3 +1,4 @@
+import { namekey } from "@alloy-js/core";
 import {
   createGraphQLNamePolicy,
   DirectiveDefinition,
@@ -5,10 +6,12 @@ import {
   EnumValue,
   Field,
   InputValue,
+  ObjectType,
   Query,
   renderSchema,
   String,
 } from "@alloy-js/graphql";
+import { isObjectType } from "graphql";
 import { describe, expect, it } from "vitest";
 
 describe("schema definitions", () => {
@@ -21,6 +24,32 @@ describe("schema definitions", () => {
         </Query>,
       ),
     ).toThrow(/Field "hello" is already defined/);
+  });
+
+  it("allows reusing a field Namekey across types", () => {
+    const id = namekey("id");
+    const schema = renderSchema(
+      <>
+        <ObjectType name="User">
+          <Field name={id} type={String} />
+        </ObjectType>
+        <ObjectType name="Book">
+          <Field name={id} type={String} />
+        </ObjectType>
+        <Query>
+          <Field name="user" type="User" />
+          <Field name="book" type="Book" />
+        </Query>
+      </>,
+    );
+
+    const userType = schema.getType("User");
+    const bookType = schema.getType("Book");
+    if (!isObjectType(userType) || !isObjectType(bookType)) {
+      throw new Error("Expected User and Book to be object types.");
+    }
+    expect(userType.getFields()).toHaveProperty("id");
+    expect(bookType.getFields()).toHaveProperty("id");
   });
 
   it("rejects duplicate argument names", () => {
