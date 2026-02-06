@@ -23,10 +23,7 @@ import {
   type TypeReference,
 } from "../schema.js";
 import { filterTaggedChildren, isTaggedChild } from "../schema/children.js";
-import {
-  applyNonNullType,
-  extractNamedTypeName,
-} from "../schema/refs.js";
+import { applyNonNullType, extractNamedTypeName } from "../schema/refs.js";
 import type {
   InterfaceTypeDefinition,
   ObjectTypeDefinition,
@@ -139,12 +136,10 @@ const fieldList = createListSlot<FieldListProps>({
   listName: "Field.List",
   ownerLabel: "Field",
 });
-const FieldListSlot = fieldList.List;
 const fieldConnectionSlot = createTaggedSlot<FieldConnectionProps>({
   slotName: "Field.Connection",
   ownerLabel: "Field",
 });
-const FieldConnectionSlot = fieldConnectionSlot.Slot;
 
 export interface FieldComponent {
   (props: FieldProps): Children;
@@ -314,7 +309,7 @@ export function Field(props: FieldProps) {
  * </Field>
  * ```
  */
-Field.List = FieldListSlot;
+Field.List = fieldList.List;
 /**
  * Declares a connection field and optionally defines the connection type.
  *
@@ -331,7 +326,7 @@ Field.List = FieldListSlot;
  * not rename the field unless you pass `fieldName`. The connection type name is
  * still derived from the parent `Field` name.
  */
-Field.Connection = FieldConnectionSlot;
+Field.Connection = fieldConnectionSlot.Slot;
 
 function resolveFieldType(
   type: TypeReference,

@@ -183,7 +183,6 @@ function validateRelayArguments(
     }
   >,
 ) {
-  const connectionNames = new Set(connections.keys());
   const typeMap = schema.getTypeMap();
   for (const [name, type] of Object.entries(typeMap)) {
     if (
@@ -203,7 +202,7 @@ function validateRelayArguments(
       const namedReturnType = unwrapNamedType(field.type);
       if (
         !(namedReturnType instanceof GraphQLObjectType) ||
-        !connectionNames.has(namedReturnType.name)
+        !connections.has(namedReturnType.name)
       ) {
         continue;
       }

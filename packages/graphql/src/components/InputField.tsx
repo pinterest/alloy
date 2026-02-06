@@ -37,7 +37,6 @@ const inputFieldList = createListSlot<InputFieldListProps>({
   listName: "InputField.List",
   ownerLabel: "InputField",
 });
-const InputFieldListSlot = inputFieldList.List;
 const inputFieldListTag = inputFieldList.tag;
 
 function InputFieldBase(props: InputFieldProps) {
@@ -117,4 +116,4 @@ export function InputField(props: InputFieldProps) {
  * </InputField>
  * ```
  */
-InputField.List = InputFieldListSlot;
+InputField.List = inputFieldList.List;

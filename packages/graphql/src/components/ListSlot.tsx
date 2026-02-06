@@ -68,8 +68,7 @@ export function createListSlot<TProps extends BaseListSlotProps>(
 
     const listChildren = childrenArray(() => listSlot.props.children);
     const nestedListSlot = findListSlot(listChildren, options.listName);
-    const extraChildren = filterTaggedChildren(listChildren, [tag]);
-    if (extraChildren.length > 0) {
+    if (filterTaggedChildren(listChildren, [tag]).length > 0) {
       throw new Error(
         `${options.listName} only supports ${options.listName} as a child.`,
       );

@@ -101,8 +101,7 @@ export function resolveNamedType(
   }
 
   if (!context.namedTypes.has(name)) {
-    const gqlType = createGraphQLType(state, context, definition);
-    context.namedTypes.set(name, gqlType);
+    context.namedTypes.set(name, createGraphQLType(state, context, definition));
   }
 
   return context.namedTypes.get(name)!;

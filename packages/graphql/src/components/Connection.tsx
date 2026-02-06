@@ -63,10 +63,6 @@ const connectionPageInfoSlot = createTaggedSlot<ConnectionPageInfoProps>({
   ownerLabel: "Connection",
 });
 
-const ConnectionEdgeSlot = connectionEdgeSlot.Slot;
-const ConnectionFieldsSlot = connectionFieldsSlot.Slot;
-const ConnectionPageInfoSlot = connectionPageInfoSlot.Slot;
-
 function ConnectionEdge(props: ConnectionEdgeDefinitionProps) {
   return (
     <ObjectType
@@ -95,7 +91,6 @@ function ConnectionBase(props: ConnectionProps) {
   const pagination = useConnectionOptions();
   const connectionName = deriveNameInput(props.name, CONNECTION_SUFFIX);
   const edgeName = deriveNameInput(props.name, "Edge");
-  const edgeTypeRef = edgeName;
   const children = childrenArray(() => props.children);
   const edgeSlot = connectionEdgeSlot.findSlot(children);
   const fieldsChildren = connectionFieldsSlot
@@ -104,13 +99,14 @@ function ConnectionBase(props: ConnectionProps) {
   const pageInfoSlot = connectionPageInfoSlot.findSlot(children);
   const unkeyedChildren = findUnkeyedChildren(children);
   const extraFields = [...fieldsChildren, ...unkeyedChildren];
-  const pageInfoProps = pageInfoSlot?.props;
   const pageInfoField = (
     <Field
       name="pageInfo"
       type={PageInfo}
       nonNull
-      description={pageInfoProps?.description ?? DEFAULT_DESCRIPTIONS.pageInfo}
+      description={
+        pageInfoSlot?.props.description ?? DEFAULT_DESCRIPTIONS.pageInfo
+      }
     />
   );
   return (
@@ -122,7 +118,7 @@ function ConnectionBase(props: ConnectionProps) {
         {pageInfoField}
         <Field
           name="edges"
-          type={edgeTypeRef}
+          type={edgeName}
           description={DEFAULT_DESCRIPTIONS.edges}
         >
           <Field.List />
@@ -184,7 +180,7 @@ export function Connection(props: ConnectionProps) {
  * </Connection>
  * ```
  */
-Connection.Edge = ConnectionEdgeSlot;
+Connection.Edge = connectionEdgeSlot.Slot;
 /**
  * Adds fields to the generated connection type.
  *
@@ -197,7 +193,7 @@ Connection.Edge = ConnectionEdgeSlot;
  * </Connection>
  * ```
  */
-Connection.Fields = ConnectionFieldsSlot;
+Connection.Fields = connectionFieldsSlot.Slot;
 /**
  * Overrides the `pageInfo` field on the generated connection type.
  *
@@ -212,7 +208,7 @@ Connection.Fields = ConnectionFieldsSlot;
  * Relay requires `pageInfo: PageInfo!`, so this slot only customizes the
  * field description.
  */
-Connection.PageInfo = ConnectionPageInfoSlot;
+Connection.PageInfo = connectionPageInfoSlot.Slot;
 
 function deriveNameInput(base: NameInput, suffix: string): NameInput {
   if (isNamekey(base)) {

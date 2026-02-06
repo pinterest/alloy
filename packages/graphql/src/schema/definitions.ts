@@ -534,11 +534,10 @@ export function normalizeDirectiveDefinition(
   repeatable = false,
   description?: string,
 ): DirectiveDefinition {
-  const normalizedLocations = normalizeDirectiveLocations(locations);
   return createDirectiveDefinition(
     state,
     name,
-    normalizedLocations,
+    normalizeDirectiveLocations(locations),
     repeatable,
     description,
   );

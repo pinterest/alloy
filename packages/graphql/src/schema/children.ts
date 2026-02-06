@@ -79,6 +79,5 @@ export function resolveListType<TListSlot>(
   listSlot: TListSlot,
   applyListType: (type: TypeReference, listSlot: TListSlot) => TypeReference,
 ): TypeReference {
-  const baseType = applyNonNullType(type, itemNonNull);
-  return applyListType(baseType, listSlot);
+  return applyListType(applyNonNullType(type, itemNonNull), listSlot);
 }

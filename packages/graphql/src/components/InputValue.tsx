@@ -37,7 +37,6 @@ const inputValueList = createListSlot<InputValueListProps>({
   listName: "InputValue.List",
   ownerLabel: "InputValue",
 });
-const InputValueListSlot = inputValueList.List;
 const inputValueListTag = inputValueList.tag;
 
 function InputValueBase(props: InputValueProps) {
@@ -112,4 +111,4 @@ export function InputValue(props: InputValueProps) {
  * </InputValue>
  * ```
  */
-InputValue.List = InputValueListSlot;
+InputValue.List = inputValueList.List;
