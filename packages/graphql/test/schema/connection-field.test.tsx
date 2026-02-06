@@ -1,4 +1,4 @@
-import { namekey, refkey } from "@alloy-js/core";
+import { namekey } from "@alloy-js/core";
 import {
   Connection,
   ConnectionPagination,
@@ -16,13 +16,13 @@ import {
 import { GraphQLList, GraphQLObjectType, GraphQLString } from "graphql";
 import { describe, expect, it } from "vitest";
 
-const Item = refkey("Item");
+const Item = namekey("Item");
 
 describe("Field.Connection", () => {
   it("adds standard connection args in order", () => {
     const schema = renderSchema(
       <>
-        <ObjectType name="Item" refkey={Item}>
+        <ObjectType name={Item}>
           <Field name="id" type={ID} />
         </ObjectType>
         <PageInfoType />
@@ -54,7 +54,7 @@ describe("Field.Connection", () => {
   it("respects pagination context toggles", () => {
     const schema = renderSchema(
       <>
-        <ObjectType name="Item" refkey={Item}>
+        <ObjectType name={Item}>
           <Field name="id" type={ID} />
         </ObjectType>
         <PageInfoType />
@@ -96,7 +96,7 @@ describe("Field.Connection", () => {
   it("allows Connection.Fields under Field.Connection", () => {
     const schema = renderSchema(
       <>
-        <ObjectType name="Item" refkey={Item}>
+        <ObjectType name={Item}>
           <Field name="id" type={ID} />
         </ObjectType>
         <PageInfoType />
@@ -124,7 +124,7 @@ describe("Field.Connection", () => {
     expect(() =>
       renderSchema(
         <>
-          <ObjectType name="Item" refkey={Item}>
+          <ObjectType name={Item}>
             <Field name="id" type={ID} />
           </ObjectType>
           <PageInfoType />
@@ -144,7 +144,7 @@ describe("Field.Connection", () => {
     expect(() =>
       renderSchema(
         <>
-          <ObjectType name="Item" refkey={Item}>
+          <ObjectType name={Item}>
             <Field name="id" type={ID} />
           </ObjectType>
           <Query>
@@ -166,7 +166,7 @@ describe("Field.Connection", () => {
   it("passes through field arguments", () => {
     const schema = renderSchema(
       <>
-        <ObjectType name="Item" refkey={Item}>
+        <ObjectType name={Item}>
           <Field name="id" type={ID} />
         </ObjectType>
         <PageInfoType />
@@ -222,7 +222,7 @@ describe("Field.Connection", () => {
     expect(() =>
       renderSchema(
         <>
-          <ObjectType name="Item" refkey={Item}>
+          <ObjectType name={Item}>
             <Field name="id" type={ID} />
           </ObjectType>
           <PageInfoType />
@@ -246,7 +246,7 @@ describe("Field.Connection", () => {
   it("uses standard cursor types for args and edges", () => {
     const schema = renderSchema(
       <>
-        <ObjectType name="Item" refkey={Item}>
+        <ObjectType name={Item}>
           <Field name="id" type={ID} />
         </ObjectType>
         <PageInfoType />
@@ -291,7 +291,7 @@ describe("Field.Connection", () => {
   it("allows customizing cursor types with pagination context", () => {
     const schema = renderSchema(
       <ConnectionPagination cursorType={ID}>
-        <ObjectType name="Item" refkey={Item}>
+        <ObjectType name={Item}>
           <Field name="id" type={ID} />
         </ObjectType>
         <PageInfoType />
@@ -336,7 +336,7 @@ describe("Field.Connection", () => {
   it("allows overriding the field name", () => {
     const schema = renderSchema(
       <>
-        <ObjectType name="Item" refkey={Item}>
+        <ObjectType name={Item}>
           <Field name="id" type={ID} />
         </ObjectType>
         <PageInfoType />
@@ -367,7 +367,7 @@ describe("Field.Connection", () => {
     });
     const schema = renderSchema(
       <>
-        <ObjectType name="Item" refkey={Item}>
+        <ObjectType name={Item}>
           <Field name="id" type={ID} />
         </ObjectType>
         <PageInfoType />
@@ -448,7 +448,7 @@ describe("Field.Connection", () => {
     });
     const schema = renderSchema(
       <>
-        <ObjectType name="Item" refkey={Item}>
+        <ObjectType name={Item}>
           <Field name="id" type={ID} />
         </ObjectType>
         <PageInfoType />

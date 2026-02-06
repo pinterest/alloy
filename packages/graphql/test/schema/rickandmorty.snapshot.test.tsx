@@ -20,7 +20,6 @@ import { describe, expect, it } from "vitest";
 
 // rick and morty schema source: https://github.com/afuh/rick-and-morty-api
 
-const cacheControl = namekey("cacheControl");
 const Character = namekey("Character");
 const Location = namekey("Location");
 const Episode = namekey("Episode");
@@ -39,7 +38,7 @@ describe("rick and morty schema", () => {
     const schema = renderSchema(
       <>
         <DirectiveDefinition
-          name={cacheControl}
+          name={namekey("cacheControl")}
           locations={["FIELD_DEFINITION", "OBJECT", "INTERFACE"]}
         >
           <InputValue name="maxAge" type={Int} />

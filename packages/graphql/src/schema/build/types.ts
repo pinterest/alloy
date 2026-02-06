@@ -1,4 +1,4 @@
-import { inspectRefkey, isRefkeyable, toRefkey } from "@alloy-js/core";
+import { isNamekey } from "@alloy-js/core";
 import {
   DirectiveLocation,
   GraphQLEnumType,
@@ -78,7 +78,7 @@ export function normalizeTypeRef(
     }
   }
 
-  if (typeof type === "string" || isRefkeyable(type)) {
+  if (typeof type === "string" || isNamekey(type)) {
     return normalizeNamedType(state, context, type);
   }
 
@@ -125,7 +125,6 @@ export function buildArgsMap(
       const directives =
         directiveMap && arg.directives.length > 0 ?
           buildAppliedDirectiveNodes(
-            state,
             directiveMap,
             arg.directives,
             DirectiveLocation.ARGUMENT_DEFINITION,
@@ -171,14 +170,11 @@ function normalizeNamedType(
     return resolveNamedType(state, context, normalizeTypeName(state, type));
   }
 
-  if (isRefkeyable(type)) {
-    const refkey = toRefkey(type);
-    const name = state.refkeyToName.get(refkey);
-    if (!name) {
-      throw new Error(
-        `Unknown refkey for GraphQL type ${inspectRefkey(refkey)}.`,
-      );
-    }
+  if (isNamekey(type)) {
+    const name =
+      type.options.ignoreNamePolicy ?
+        type.name
+      : normalizeTypeName(state, type.name);
     return resolveNamedType(state, context, name);
   }
 
@@ -372,7 +368,6 @@ function buildFieldConfigsFromDefinitions(
       ownerLabel: `field "${definition.name}.${field.name}"`,
     });
     const directives = buildAppliedDirectiveNodes(
-      state,
       getDirectiveMap(context),
       field.directives,
       DirectiveLocation.FIELD_DEFINITION,
@@ -441,7 +436,6 @@ function buildInputFieldMap(
       );
     }
     const directives = buildAppliedDirectiveNodes(
-      state,
       getDirectiveMap(context),
       field.directives,
       DirectiveLocation.INPUT_FIELD_DEFINITION,
@@ -514,7 +508,6 @@ function buildEnumValueConfig(
   const directives =
     value.directives.length > 0 ?
       buildAppliedDirectiveNodes(
-        state,
         getDirectiveMap(context),
         value.directives,
         DirectiveLocation.ENUM_VALUE,

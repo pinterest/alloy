@@ -56,7 +56,6 @@ export function attachDirectiveDefinitionAstNodes(
         arg.defaultValue,
         arg.directives.length > 0 ?
           buildAppliedDirectiveNodes(
-            state,
             directiveMap,
             arg.directives,
             DirectiveLocation.ARGUMENT_DEFINITION,
@@ -89,7 +88,6 @@ export function attachTypeDirectiveAstNodes(
     }
 
     const directives = buildAppliedDirectiveNodes(
-      state,
       directiveMap,
       definition.directives,
       directiveLocationForType(definition.kind),

@@ -41,7 +41,7 @@ turned off.
 You can bypass naming conventions on a per-name basis by using a `Namekey` with
 `ignoreNamePolicy`. GraphQL hard naming requirements still apply.
 String type references are still normalized by the active policy, so when you
-use `ignoreNamePolicy` you should reuse the same `Namekey` (or refkey) for any
+use `ignoreNamePolicy` you should reuse the same `Namekey` for any
 references to that type.
 
 ```tsx
@@ -82,6 +82,15 @@ const policy = createGraphQLNamePolicy({
 renderSchema(<Schema>{/* ... */}</Schema>, { namePolicy: policy });
 ```
 
+## Naming and identity
+
+In GraphQL, name is identity. The GraphQL bindings treat `name`/`namekey` as the
+only identity, and they do not track changes over time. A string means "this is
+the final name." A `Namekey` means "use this name once, apply the name policy,
+and reuse the same handle everywhere else." Renames are breaking and should
+require explicit edits.
+Refkeys are not supported in the GraphQL API; use names or `Namekey` values.
+
 ## Relay connections
 
 The JSX API includes Relay-friendly helpers like `Field.Connection`,
@@ -92,30 +101,32 @@ when `relayNamePolicy` is selected.
 connection _type_ name. Use the `fieldName` prop if you want to override the
 field name while still generating a connection type.
 
-## Built-ins and refkeys
+## Built-ins and names
 
-Built-in scalar refkeys and Relay types (`Node`, `PageInfo`) live under
-`src/builtins/`. These are exported so you can reference them by refkey or reuse
-canonical type names without re-declaring them.
+Built-in scalar names and Relay types (`Node`, `PageInfo`) live under
+`src/builtins/`. These are exported so you can reuse canonical names/namekeys
+without re-declaring them.
 
-Directive applications accept refkeys (including `Namekey`), so you can apply a
-directive using the same refkey you used when defining it.
+Directive applications accept names or `Namekey`, so you can apply a directive
+using the same identity you used when defining it.
 
 ## Project layout
 
 - `src/components/`: JSX API surface
 - `src/schema/`: state, definitions, and schema build/validation
-- `src/builtins/`: refkeys and built-in types
+- `src/builtins/`: names/namekeys and built-in types
 - `src/components/stc/`: string-template helpers (`@alloy-js/graphql/stc`)
 
 ## Binder model
 
 Most Alloy language packages rely on the core binder model (symbols, scopes,
-and refkey resolution) because they emit source code with imports and
+and reference resolution) because they emit source code with imports and
 cross-file references. The GraphQL package does not use the binder because
 GraphQL schemas are a single, name-based graph with no import system and a
-natural two-phase flow (collect definitions, then build/validate). A dedicated
-schema state plus build-time validation maps more directly to the GraphQL
+natural two-phase flow (collect definitions, then build/validate). Because name
+is identity, the package avoids extra identity indirection and keeps the API
+grounded in explicit names. A dedicated schema state plus build-time validation
+maps more directly to the GraphQL
 specification and keeps the API focused on schema semantics rather than symbol
 resolution.
 

@@ -1,9 +1,8 @@
-import type { Children, Refkey } from "@alloy-js/core";
+import type { Children } from "@alloy-js/core";
 import { useSchemaContext } from "../schema.js";
 
 export interface RootTypeProps {
   description?: string;
-  refkey?: Refkey | Refkey[];
   children?: Children;
 }
 

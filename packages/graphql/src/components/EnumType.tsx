@@ -1,4 +1,4 @@
-import type { Children, Refkey } from "@alloy-js/core";
+import type { Children } from "@alloy-js/core";
 import { DirectiveLocation } from "graphql";
 import {
   DirectiveTargetContext,
@@ -9,12 +9,10 @@ import {
   useTypeContext,
   type NameInput,
 } from "../schema.js";
-import { normalizeRefkeys } from "./utils.js";
 
 export interface EnumTypeProps {
   name: NameInput;
   description?: string;
-  refkey?: Refkey | Refkey[];
   children?: Children;
 }
 
@@ -49,7 +47,6 @@ export function EnumType(props: EnumTypeProps) {
     state,
     props.name,
     props.description,
-    normalizeRefkeys(props.refkey),
   );
   registerType(state, definition);
 

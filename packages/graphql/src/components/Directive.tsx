@@ -1,4 +1,4 @@
-import { isRefkeyable, toRefkey, type Children } from "@alloy-js/core";
+import { isNamekey, type Children } from "@alloy-js/core";
 import {
   DirectiveArgTargetContext,
   useDirectiveTargetContext,
@@ -16,18 +16,12 @@ export interface DirectiveProps {
   children?: Children;
 }
 
-function createAppliedDirective(name: DirectiveReference): AppliedDirective {
-  if (typeof name === "string") {
-    return {
-      name,
-      args: [],
-      argNames: new Set(),
-    };
-  }
-
-  const refkey = isRefkeyable(name) ? toRefkey(name) : name;
+function createAppliedDirective(
+  state: SchemaState,
+  name: DirectiveReference,
+): AppliedDirective {
   return {
-    refkey,
+    name: normalizeDirectiveName(state, name),
     args: [],
     argNames: new Set(),
   };
@@ -42,16 +36,18 @@ function createAppliedDirective(name: DirectiveReference): AppliedDirective {
  *   <Argument name="role" value="admin" />
  * </Directive>
  * ```
+ *
+ * @remarks
+ * Directive names are identity in GraphQL. Prefer using the same name or
+ * `Namekey` for both definition and application.
  */
 export function Directive(props: DirectiveProps) {
   const state = useSchemaContext();
   const target = useDirectiveTargetContext();
-  const resolvedName = resolveDirectiveName(state, props.name);
-  if (resolvedName) {
-    assertNoBuiltInDirectiveConflict(target.target, resolvedName);
-  }
+  const resolvedName = normalizeDirectiveName(state, props.name);
+  assertNoBuiltInDirectiveConflict(target.target, resolvedName);
 
-  const applied = createAppliedDirective(props.name);
+  const applied = createAppliedDirective(state, props.name);
   target.directives.push(applied);
 
   return (
@@ -93,17 +89,17 @@ function assertNoBuiltInDirectiveConflict(
   }
 }
 
-function resolveDirectiveName(
+function normalizeDirectiveName(
   state: SchemaState,
   name: DirectiveReference,
-): string | undefined {
-  if (typeof name === "string") {
-    return name;
+): string {
+  if (isNamekey(name)) {
+    if (name.options.ignoreNamePolicy) {
+      return name.name;
+    }
+    return state.namePolicy?.getName(name.name, "directive") ?? name.name;
   }
-  if (isRefkeyable(name)) {
-    return state.directiveRefkeyToName.get(toRefkey(name));
-  }
-  return undefined;
+  return state.namePolicy?.getName(name, "directive") ?? name;
 }
 
 function describeTarget(target: DirectiveTarget): string {

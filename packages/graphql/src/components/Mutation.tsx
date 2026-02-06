@@ -1,8 +1,5 @@
-import { refkey } from "@alloy-js/core";
 import { ObjectType } from "./ObjectType.js";
 import { type RootTypeProps, useRootType } from "./root-type.js";
-
-const mutationRef = refkey("Mutation");
 
 /**
  * Declares the `Mutation` root type.
@@ -17,11 +14,7 @@ const mutationRef = refkey("Mutation");
 export function Mutation(props: RootTypeProps) {
   useRootType("mutation", "Mutation");
   return (
-    <ObjectType
-      name="Mutation"
-      description={props.description}
-      refkey={props.refkey ?? mutationRef}
-    >
+    <ObjectType name="Mutation" description={props.description}>
       {props.children}
     </ObjectType>
   );

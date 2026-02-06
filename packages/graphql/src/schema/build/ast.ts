@@ -1,4 +1,3 @@
-import { inspectRefkey } from "@alloy-js/core";
 import {
   GraphQLList,
   GraphQLNonNull,
@@ -26,12 +25,10 @@ import {
 import type {
   AppliedDirective,
   DirectiveDefinition,
-  SchemaState,
   TypeDefinition,
 } from "../types.js";
 
 export function buildAppliedDirectiveNodes(
-  state: SchemaState,
   directiveMap: Map<string, GraphQLDirective>,
   applied: AppliedDirective[],
   location: DirectiveLocation,
@@ -44,11 +41,7 @@ export function buildAppliedDirectiveNodes(
   const nodes: ConstDirectiveNode[] = [];
   const usageCounts = new Map<string, number>();
   for (const application of applied) {
-    const directiveName = resolveAppliedDirectiveName(
-      state,
-      application,
-      ownerLabel,
-    );
+    const directiveName = application.name;
     const directive = directiveMap.get(directiveName);
     if (!directive) {
       throw new Error(
@@ -258,26 +251,6 @@ export function createTypeDefinitionNode(
     default:
       throw new Error("Unknown type definition.");
   }
-}
-
-function resolveAppliedDirectiveName(
-  state: SchemaState,
-  application: AppliedDirective,
-  ownerLabel: string,
-): string {
-  if (application.name) {
-    return application.name;
-  }
-  if (application.refkey) {
-    const name = state.directiveRefkeyToName.get(application.refkey);
-    if (!name) {
-      throw new Error(
-        `Directive ${inspectRefkey(application.refkey)} is not defined for ${ownerLabel}.`,
-      );
-    }
-    return name;
-  }
-  throw new Error(`Directive application on ${ownerLabel} is missing a name.`);
 }
 
 function createNameNode(value: string): NameNode {

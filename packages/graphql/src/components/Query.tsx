@@ -1,8 +1,5 @@
-import { refkey } from "@alloy-js/core";
 import { ObjectType } from "./ObjectType.js";
 import { type RootTypeProps, useRootType } from "./root-type.js";
-
-const queryRef = refkey("Query");
 
 /**
  * Declares the `Query` root type.
@@ -17,11 +14,7 @@ const queryRef = refkey("Query");
 export function Query(props: RootTypeProps) {
   useRootType("query", "Query");
   return (
-    <ObjectType
-      name="Query"
-      description={props.description}
-      refkey={props.refkey ?? queryRef}
-    >
+    <ObjectType name="Query" description={props.description}>
       {props.children}
     </ObjectType>
   );

@@ -1,4 +1,4 @@
-import type { Children, Refkey } from "@alloy-js/core";
+import type { Children } from "@alloy-js/core";
 import { DirectiveLocation } from "graphql";
 import {
   DirectiveTargetContext,
@@ -9,13 +9,11 @@ import {
   type NameInput,
   type TypeReference,
 } from "../schema.js";
-import { normalizeRefkeys } from "./utils.js";
 
 export interface ObjectTypeProps {
   name: NameInput;
   description?: string;
   interfaces?: TypeReference[];
-  refkey?: Refkey | Refkey[];
   children?: Children;
 }
 
@@ -41,7 +39,6 @@ export function ObjectType(props: ObjectTypeProps) {
     props.name,
     props.description,
     props.interfaces ?? [],
-    normalizeRefkeys(props.refkey),
   );
   registerType(state, definition);
 

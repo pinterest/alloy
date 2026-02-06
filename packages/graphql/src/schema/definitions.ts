@@ -1,4 +1,4 @@
-import { inspectRefkey, isNamekey, type Refkey } from "@alloy-js/core";
+import { isNamekey } from "@alloy-js/core";
 import {
   DirectiveLocation,
   specifiedDirectives,
@@ -33,7 +33,7 @@ import type {
 } from "./types.js";
 
 /**
- * Registers a type definition and its refkeys in the schema state.
+ * Registers a type definition in the schema state.
  */
 export function registerType(state: SchemaState, definition: TypeDefinition) {
   ensureNameValid(state, definition.name, "type", {
@@ -42,15 +42,6 @@ export function registerType(state: SchemaState, definition: TypeDefinition) {
   ensureTypeNameAvailable(state, definition.name);
 
   state.types.set(definition.name, definition);
-  for (const refkey of definition.refkeys) {
-    const existing = state.refkeyToName.get(refkey);
-    if (existing && existing !== definition.name) {
-      throw new Error(
-        `Refkey ${inspectRefkey(refkey)} is already bound to "${existing}".`,
-      );
-    }
-    state.refkeyToName.set(refkey, definition.name);
-  }
 }
 
 /**
@@ -82,16 +73,6 @@ export function registerDirective(
   }
 
   state.directives.set(definition.name, definition);
-
-  if (definition.refkey) {
-    const existing = state.directiveRefkeyToName.get(definition.refkey);
-    if (existing && existing !== definition.name) {
-      throw new Error(
-        `Refkey ${inspectRefkey(definition.refkey)} is already bound to "${existing}".`,
-      );
-    }
-    state.directiveRefkeyToName.set(definition.refkey, definition.name);
-  }
 }
 
 /**
@@ -102,7 +83,6 @@ export function createObjectTypeDefinition(
   name: NameInput,
   description?: string,
   interfaces: TypeReference[] = [],
-  refkeys: Refkey[] = [],
 ): ObjectTypeDefinition {
   const resolved = resolveNameInput(state, name, "type");
   return {
@@ -110,7 +90,6 @@ export function createObjectTypeDefinition(
     name: resolved.name,
     description,
     ignoreNamePolicy: resolved.ignoreNamePolicy,
-    refkeys: mergeRefkeys(refkeys, resolved.refkey),
     directives: [],
     fields: [],
     fieldNames: new Set(),
@@ -126,7 +105,6 @@ export function createInterfaceTypeDefinition(
   name: NameInput,
   description?: string,
   interfaces: TypeReference[] = [],
-  refkeys: Refkey[] = [],
 ): InterfaceTypeDefinition {
   const resolved = resolveNameInput(state, name, "type");
   return {
@@ -134,7 +112,6 @@ export function createInterfaceTypeDefinition(
     name: resolved.name,
     description,
     ignoreNamePolicy: resolved.ignoreNamePolicy,
-    refkeys: mergeRefkeys(refkeys, resolved.refkey),
     directives: [],
     fields: [],
     fieldNames: new Set(),
@@ -150,7 +127,6 @@ export function createInputObjectTypeDefinition(
   name: NameInput,
   description?: string,
   isOneOf = false,
-  refkeys: Refkey[] = [],
 ): InputObjectTypeDefinition {
   const resolved = resolveNameInput(state, name, "type");
   return {
@@ -158,7 +134,6 @@ export function createInputObjectTypeDefinition(
     name: resolved.name,
     description,
     ignoreNamePolicy: resolved.ignoreNamePolicy,
-    refkeys: mergeRefkeys(refkeys, resolved.refkey),
     isOneOf,
     directives: [],
     fields: [],
@@ -173,7 +148,6 @@ export function createEnumTypeDefinition(
   state: SchemaState,
   name: NameInput,
   description?: string,
-  refkeys: Refkey[] = [],
 ): EnumTypeDefinition {
   const resolved = resolveNameInput(state, name, "type");
   return {
@@ -181,7 +155,6 @@ export function createEnumTypeDefinition(
     name: resolved.name,
     description,
     ignoreNamePolicy: resolved.ignoreNamePolicy,
-    refkeys: mergeRefkeys(refkeys, resolved.refkey),
     directives: [],
     values: [],
     valueNames: new Set(),
@@ -195,7 +168,6 @@ export function createUnionTypeDefinition(
   state: SchemaState,
   name: NameInput,
   description?: string,
-  refkeys: Refkey[] = [],
 ): UnionTypeDefinition {
   const resolved = resolveNameInput(state, name, "type");
   return {
@@ -203,7 +175,6 @@ export function createUnionTypeDefinition(
     name: resolved.name,
     description,
     ignoreNamePolicy: resolved.ignoreNamePolicy,
-    refkeys: mergeRefkeys(refkeys, resolved.refkey),
     directives: [],
     members: [],
     memberNames: new Set(),
@@ -217,7 +188,6 @@ export function createScalarTypeDefinition(
   state: SchemaState,
   name: NameInput,
   description?: string,
-  refkeys: Refkey[] = [],
 ): ScalarTypeDefinition {
   const resolved = resolveNameInput(state, name, "type");
   return {
@@ -225,7 +195,6 @@ export function createScalarTypeDefinition(
     name: resolved.name,
     description,
     ignoreNamePolicy: resolved.ignoreNamePolicy,
-    refkeys: mergeRefkeys(refkeys, resolved.refkey),
     directives: [],
   };
 }
@@ -338,7 +307,6 @@ export function createDirectiveDefinition(
     name: resolved.name,
     description,
     ignoreNamePolicy: resolved.ignoreNamePolicy,
-    refkey: resolved.refkey,
     repeatable,
     locations,
     args: [],
@@ -508,28 +476,18 @@ function resolveNameInput(
   state: SchemaState,
   name: NameInput,
   kind: GraphQLNameElement,
-): { name: string; refkey?: Refkey; ignoreNamePolicy?: boolean } {
+): { name: string; ignoreNamePolicy?: boolean } {
   if (isNamekey(name)) {
     const ignoreNamePolicy = name.options.ignoreNamePolicy ?? false;
     const normalizedName =
       ignoreNamePolicy ? name.name : applyNamePolicy(state, name.name, kind);
     ensureNameValid(state, normalizedName, kind, { ignoreNamePolicy });
-    return { name: normalizedName, refkey: name, ignoreNamePolicy };
+    return { name: normalizedName, ignoreNamePolicy };
   }
 
   const normalizedName = applyNamePolicy(state, name, kind);
   ensureNameValid(state, normalizedName, kind);
   return { name: normalizedName };
-}
-
-function mergeRefkeys(refkeys: Refkey[], refkey?: Refkey): Refkey[] {
-  if (!refkey) {
-    return refkeys;
-  }
-  if (refkeys.includes(refkey)) {
-    return refkeys;
-  }
-  return [...refkeys, refkey];
 }
 
 function ensureTypeNameAvailable(state: SchemaState, name: string) {

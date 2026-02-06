@@ -114,7 +114,7 @@ describe("directive applications", () => {
     ).toBe("tag");
   });
 
-  it("resolves directive refkeys", () => {
+  it("resolves directive namekeys", () => {
     const tag = namekey("tag");
     const schema = renderSchema(
       <>

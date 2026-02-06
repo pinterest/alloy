@@ -1,4 +1,4 @@
-import type { Children, Refkey } from "@alloy-js/core";
+import type { Children } from "@alloy-js/core";
 import { ID } from "../builtins/graphql.js";
 import { Node } from "../builtins/node.js";
 import { Field } from "./Field.js";
@@ -17,7 +17,6 @@ function NodeId(props: NodeIdProps) {
 export interface NodeInterfaceProps {
   description?: string;
   idDescription?: string;
-  refkey?: Refkey | Refkey[];
   children?: Children;
 }
 
@@ -33,11 +32,7 @@ export interface NodeInterfaceProps {
  */
 export function NodeInterface(props: NodeInterfaceProps) {
   return (
-    <InterfaceType
-      name="Node"
-      description={props.description}
-      refkey={props.refkey ?? Node}
-    >
+    <InterfaceType name={Node} description={props.description}>
       <NodeId description={props.idDescription ?? DEFAULT_ID_DESCRIPTION} />
       {props.children}
     </InterfaceType>

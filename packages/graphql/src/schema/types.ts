@@ -1,4 +1,4 @@
-import type { Children, Namekey, Refkey, Refkeyable } from "@alloy-js/core";
+import type { Children, Namekey } from "@alloy-js/core";
 import type {
   DirectiveLocation,
   GraphQLNamedType,
@@ -20,30 +20,35 @@ export type TypeKind =
 
 /**
  * Accepted input values for a name.
+ *
+ * @remarks
+ * In GraphQL, name is identity. Strings assert the final name; `Namekey` lets
+ * you apply naming policy once and reuse the same handle for references.
  */
 export type NameInput = string | Namekey;
 
 /**
  * Accepted input values for directive references.
+ *
+ * @remarks
+ * Prefer names/namekeys; name is identity in GraphQL.
  */
-export type DirectiveReference = string | Refkey | Refkeyable;
+export type DirectiveReference = string | Namekey;
 
 /**
- * A reference to a GraphQL type (by name, refkey, or GraphQLJS type).
+ * A reference to a GraphQL type (by name or GraphQLJS type).
+ *
+ * @remarks
+ * Name is identity; prefer strings/namekeys when building schemas.
  */
-export type TypeReference =
-  | string
-  | Refkey
-  | Refkeyable
-  | GraphQLType
-  | TypeRef;
+export type TypeReference = string | Namekey | GraphQLType | TypeRef;
 
 /**
  * A named type reference.
  */
 export interface NamedTypeRef {
   kind: "named";
-  name: string | Refkey | Refkeyable | GraphQLNamedType;
+  name: string | Namekey | GraphQLNamedType;
 }
 
 /**
@@ -118,7 +123,6 @@ interface BaseTypeDefinition {
   name: string;
   description?: string;
   ignoreNamePolicy?: boolean;
-  refkeys: Refkey[];
   directives: AppliedDirective[];
 }
 
@@ -250,7 +254,6 @@ export interface DirectiveDefinition {
   name: string;
   description?: string;
   ignoreNamePolicy?: boolean;
-  refkey?: Refkey;
   repeatable: boolean;
   locations: DirectiveLocation[];
   args: ArgDefinition[];
@@ -262,8 +265,7 @@ export interface DirectiveDefinition {
  * An applied directive with argument values.
  */
 export interface AppliedDirective {
-  name?: string;
-  refkey?: Refkey;
+  name: string;
   args: AppliedDirectiveArgument[];
   argNames: Set<string>;
 }
@@ -318,8 +320,6 @@ export interface DirectiveArgTargetContextValue {
 export interface SchemaState {
   types: Map<string, TypeDefinition>;
   directives: Map<string, DirectiveDefinition>;
-  refkeyToName: Map<Refkey, string>;
-  directiveRefkeyToName: Map<Refkey, string>;
   schemaDirectives: AppliedDirective[];
   schema: {
     query?: TypeReference;

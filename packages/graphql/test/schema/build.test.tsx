@@ -1,4 +1,3 @@
-import { refkey } from "@alloy-js/core";
 import {
   EnumType,
   Field,
@@ -245,25 +244,5 @@ describe("buildSchema validations", () => {
         { namePolicy: relayNamePolicy, validate: false },
       ),
     ).toThrow('Connection type name "ItemsRelay" must end with "Connection".');
-  });
-
-  it("rejects refkeys for auto-generated connection types", () => {
-    const connectionRef = refkey("ItemsConnection");
-    expect(() =>
-      renderSchema(
-        <>
-          <ObjectType name="Item">
-            <Field name="id" type={ID} />
-          </ObjectType>
-          <Query>
-            <Field name="items" type="Item">
-              <Field.Connection type={connectionRef} />
-            </Field>
-          </Query>
-        </>,
-      ),
-    ).toThrow(
-      "Field.Connection cannot refkey auto-generated connection types. Define a Connection type instead.",
-    );
   });
 });

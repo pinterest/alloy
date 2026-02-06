@@ -1,4 +1,4 @@
-import { refkey } from "@alloy-js/core";
+import { namekey } from "@alloy-js/core";
 import {
   Connection,
   Field,
@@ -13,13 +13,13 @@ import {
 import { GraphQLObjectType } from "graphql";
 import { describe, expect, it } from "vitest";
 
-const Widget = refkey("Widget");
+const Widget = namekey("Widget");
 
 describe("Connection", () => {
   it("creates connection and edge types with default fields and descriptions", () => {
     const schema = renderSchema(
       <>
-        <ObjectType name="Widget" refkey={Widget}>
+        <ObjectType name={Widget}>
           <Field name="id" type={String} />
         </ObjectType>
         <PageInfoType />
@@ -74,7 +74,7 @@ describe("Connection", () => {
   it("supports tagged children for edge, fields, and pageInfo", () => {
     const schema = renderSchema(
       <>
-        <ObjectType name="Widget" refkey={Widget}>
+        <ObjectType name={Widget}>
           <Field name="id" type={String} />
         </ObjectType>
         <PageInfoType />
@@ -123,7 +123,7 @@ describe("Connection", () => {
     expect(() =>
       renderSchema(
         <>
-          <ObjectType name="Widget" refkey={Widget}>
+          <ObjectType name={Widget}>
             <Field name="id" type={String} />
           </ObjectType>
           <PageInfoType />
@@ -143,7 +143,7 @@ describe("Connection", () => {
     expect(() =>
       renderSchema(
         <>
-          <ObjectType name="Widget" refkey={Widget}>
+          <ObjectType name={Widget}>
             <Field name="id" type={String} />
           </ObjectType>
           <PageInfoType />

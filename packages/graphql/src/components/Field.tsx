@@ -2,11 +2,8 @@ import {
   childrenArray,
   findKeyedChild,
   isNamekey,
-  isRefkeyable,
-  toRefkey,
   type Children,
   type Component,
-  type Refkey,
 } from "@alloy-js/core";
 import { DirectiveLocation } from "graphql";
 import pluralize from "pluralize";
@@ -29,7 +26,6 @@ import { filterTaggedChildren, isTaggedChild } from "../schema/children.js";
 import {
   applyNonNullType,
   extractNamedTypeName,
-  isTypeRef,
 } from "../schema/refs.js";
 import type {
   InterfaceTypeDefinition,
@@ -214,7 +210,6 @@ function validateConnectionName(
 interface ConnectionTypeInfo {
   connectionType: TypeReference;
   connectionTypeName?: string;
-  connectionRefkeys: Refkey[];
 }
 
 function resolveConnectionTypeInfo(
@@ -235,10 +230,9 @@ function resolveConnectionTypeInfo(
       defaultConnectionName
     : `${typeDefinition.name}${defaultConnectionName}`);
 
-  const connectionRefkeys = resolveConnectionRefkeys(connectionSlot.props.type);
   const connectionTypeName = extractNamedTypeName(state, connectionType);
 
-  return { connectionType, connectionTypeName, connectionRefkeys };
+  return { connectionType, connectionTypeName };
 }
 
 function createConnectionDefinition(
@@ -250,19 +244,13 @@ function createConnectionDefinition(
   const connectionChildren = childrenArray(() => connectionSlot.props.children);
   validateConnectionChildren(connectionChildren);
 
-  const { connectionTypeName, connectionRefkeys } = connectionInfo;
-  if (connectionTypeName) {
-    validateConnectionName(connectionTypeName, state);
-  } else {
-    if (connectionRefkeys.length > 0) {
-      throw new Error(
-        "Field.Connection cannot refkey auto-generated connection types. Define a Connection type instead.",
-      );
-    }
+  const { connectionTypeName } = connectionInfo;
+  if (!connectionTypeName) {
     throw new Error(
       "Field.Connection requires a named connection type to define connection types.",
     );
   }
+  validateConnectionName(connectionTypeName, state);
 
   if (state.types.has(connectionTypeName)) {
     if (connectionChildren.length > 0) {
@@ -271,12 +259,6 @@ function createConnectionDefinition(
       );
     }
     return null;
-  } else {
-    if (connectionRefkeys.length > 0) {
-      throw new Error(
-        "Field.Connection cannot refkey auto-generated connection types. Define a Connection type instead.",
-      );
-    }
   }
   const connectionName = connectionTypeName.slice(0, -CONNECTION_SUFFIX.length);
   return (
@@ -382,23 +364,6 @@ function resolveRootTypeNames(state: SchemaState): Set<string> {
   addRootName(state.schema.mutation);
   addRootName(state.schema.subscription);
   return rootNames;
-}
-
-function resolveConnectionRefkeys(connectionType?: TypeReference): Refkey[] {
-  if (!connectionType) {
-    return [];
-  }
-  if (isRefkeyable(connectionType)) {
-    return [toRefkey(connectionType)];
-  }
-  if (
-    isTypeRef(connectionType) &&
-    connectionType.kind === "named" &&
-    isRefkeyable(connectionType.name)
-  ) {
-    return [toRefkey(connectionType.name)];
-  }
-  return [];
 }
 
 function unwrapNameInput(value: NameInput): string {

@@ -1,4 +1,3 @@
-import type { Refkey } from "@alloy-js/core";
 import { Boolean } from "../builtins/graphql.js";
 import { PageInfo } from "../builtins/page-info.js";
 import { useConnectionOptions } from "../connection-options.js";
@@ -19,7 +18,6 @@ export interface PageInfoTypeProps {
   hasPreviousPageDescription?: string;
   startCursorDescription?: string;
   endCursorDescription?: string;
-  refkey?: Refkey | Refkey[];
 }
 
 /**
@@ -38,8 +36,7 @@ export function PageInfoType(props: PageInfoTypeProps) {
   const pagination = useConnectionOptions();
   return (
     <ObjectType
-      name="PageInfo"
-      refkey={props.refkey ?? PageInfo}
+      name={PageInfo}
       description={props.description ?? DEFAULT_DESCRIPTIONS.pageInfo}
     >
       <Field

@@ -1,8 +1,5 @@
-import { refkey } from "@alloy-js/core";
 import { ObjectType } from "./ObjectType.js";
 import { type RootTypeProps, useRootType } from "./root-type.js";
-
-const subscriptionRef = refkey("Subscription");
 
 /**
  * Declares the `Subscription` root type.
@@ -17,11 +14,7 @@ const subscriptionRef = refkey("Subscription");
 export function Subscription(props: RootTypeProps) {
   useRootType("subscription", "Subscription");
   return (
-    <ObjectType
-      name="Subscription"
-      description={props.description}
-      refkey={props.refkey ?? subscriptionRef}
-    >
+    <ObjectType name="Subscription" description={props.description}>
       {props.children}
     </ObjectType>
   );

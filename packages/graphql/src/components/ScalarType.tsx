@@ -1,4 +1,4 @@
-import type { Children, Refkey } from "@alloy-js/core";
+import type { Children } from "@alloy-js/core";
 import type { GraphQLScalarType } from "graphql";
 import { DirectiveLocation } from "graphql";
 import {
@@ -8,7 +8,6 @@ import {
   useSchemaContext,
   type NameInput,
 } from "../schema.js";
-import { normalizeRefkeys } from "./utils.js";
 
 export interface ScalarTypeProps {
   name: NameInput;
@@ -17,7 +16,6 @@ export interface ScalarTypeProps {
   serialize?: GraphQLScalarType["serialize"];
   parseValue?: GraphQLScalarType["parseValue"];
   parseLiteral?: GraphQLScalarType["parseLiteral"];
-  refkey?: Refkey | Refkey[];
   children?: Children;
 }
 
@@ -39,7 +37,6 @@ export function ScalarType(props: ScalarTypeProps) {
     state,
     props.name,
     props.description,
-    normalizeRefkeys(props.refkey),
   );
   definition.serialize = props.serialize;
   definition.parseValue = props.parseValue;

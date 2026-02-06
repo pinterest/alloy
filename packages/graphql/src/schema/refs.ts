@@ -1,4 +1,4 @@
-import { isRefkeyable, toRefkey } from "@alloy-js/core";
+import { isNamekey, type Namekey } from "@alloy-js/core";
 import { GraphQLNonNull, isNamedType, isType } from "graphql";
 import { builtInScalars, builtInScalarsFallback } from "./constants.js";
 import type { SchemaState, TypeRef, TypeReference } from "./types.js";
@@ -10,21 +10,16 @@ export function extractNamedTypeName(
   if (typeof type === "string") {
     return normalizeTypeName(state, type);
   }
-  if (isRefkeyable(type)) {
-    const refkey = toRefkey(type);
-    return state.refkeyToName.get(refkey);
+  if (isNamekey(type)) {
+    return normalizeTypeNameInput(state, type);
   }
   if (isType(type) && isNamedType(type)) {
     return type.name;
   }
   if (isTypeRef(type)) {
     if (type.kind === "named") {
-      if (typeof type.name === "string") {
-        return normalizeTypeName(state, type.name);
-      }
-      if (isRefkeyable(type.name)) {
-        const refkey = toRefkey(type.name);
-        return state.refkeyToName.get(refkey);
+      if (typeof type.name === "string" || isNamekey(type.name)) {
+        return normalizeTypeNameInput(state, type.name);
       }
       if (isType(type.name) && isNamedType(type.name)) {
         return type.name.name;
@@ -44,6 +39,19 @@ export function normalizeTypeName(state: SchemaState, name: string): string {
     return name;
   }
   return state.namePolicy.getName(name, "type");
+}
+
+function normalizeTypeNameInput(
+  state: SchemaState,
+  name: string | Namekey,
+): string {
+  if (isNamekey(name)) {
+    if (name.options.ignoreNamePolicy) {
+      return name.name;
+    }
+    return normalizeTypeName(state, name.name);
+  }
+  return normalizeTypeName(state, name);
 }
 
 export function isTypeRef(value: TypeReference): value is TypeRef {

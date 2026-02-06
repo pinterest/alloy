@@ -1,6 +1,5 @@
 import { createContext, useContext } from "@alloy-js/core";
 import { DirectiveLocation } from "graphql";
-import { builtInScalarRefkeys } from "../builtins/graphql.js";
 import {
   createGraphQLNamePolicy,
   defaultNamePolicy,
@@ -127,8 +126,6 @@ export function createSchemaState(options?: SchemaOptions): SchemaState {
   const state: SchemaState = {
     types: new Map(),
     directives: new Map(),
-    refkeyToName: new Map(),
-    directiveRefkeyToName: new Map(),
     schemaDirectives: [],
     schema: {
       query: options?.query,
@@ -138,10 +135,6 @@ export function createSchemaState(options?: SchemaOptions): SchemaState {
     description: options?.description,
     namePolicy,
   };
-
-  for (const [refkey, name] of builtInScalarRefkeys) {
-    state.refkeyToName.set(refkey, name);
-  }
 
   return state;
 }

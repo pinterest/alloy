@@ -86,7 +86,6 @@ export function buildSchema(
   attachTypeDirectiveAstNodes(state, context);
 
   const schemaDirectives = buildAppliedDirectiveNodes(
-    state,
     directiveMap,
     state.schemaDirectives,
     DirectiveLocation.SCHEMA,

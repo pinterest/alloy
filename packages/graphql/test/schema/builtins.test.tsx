@@ -75,7 +75,7 @@ describe("builtins and helpers", () => {
     );
   });
 
-  it("resolves built-in scalar refkeys", () => {
+  it("resolves built-in scalar names", () => {
     const schema = renderSchema(
       <Query>
         <Field name="name" type={String} />

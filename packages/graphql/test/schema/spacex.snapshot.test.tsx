@@ -33,7 +33,6 @@ const Capsule = namekey("Capsule");
 const CapsuleMission = namekey("CapsuleMission");
 const CapsulesFind = namekey("CapsulesFind");
 const Core = namekey("Core");
-const CoreMission = namekey("CoreMission");
 const CoresFind = namekey("CoresFind");
 const Date = namekey("Date");
 const Distance = namekey("Distance");
@@ -68,7 +67,6 @@ const Mass = namekey("Mass");
 const Mission = namekey("Mission");
 const MissionResult = namekey("MissionResult");
 const MissionsFind = namekey("MissionsFind");
-const ObjectID = namekey("ObjectID");
 const Payload = namekey("Payload");
 const PayloadOrbitParams = namekey("PayloadOrbitParams");
 const PayloadsFind = namekey("PayloadsFind");
@@ -92,15 +90,12 @@ const ShipsFind = namekey("ShipsFind");
 const ShipsResult = namekey("ShipsResult");
 const String_comparison_exp = namekey("String_comparison_exp");
 const Volume = namekey("Volume");
-const conflict_action = namekey("conflict_action");
 const order_by = namekey("order_by");
 const timestamptz = namekey("timestamptz");
 const timestamptz_comparison_exp = namekey("timestamptz_comparison_exp");
 const users = namekey("users");
 const users_aggregate = namekey("users_aggregate");
 const users_aggregate_fields = namekey("users_aggregate_fields");
-const users_aggregate_order_by = namekey("users_aggregate_order_by");
-const users_arr_rel_insert_input = namekey("users_arr_rel_insert_input");
 const users_bool_exp = namekey("users_bool_exp");
 const users_constraint = namekey("users_constraint");
 const users_insert_input = namekey("users_insert_input");
@@ -109,7 +104,6 @@ const users_max_order_by = namekey("users_max_order_by");
 const users_min_fields = namekey("users_min_fields");
 const users_min_order_by = namekey("users_min_order_by");
 const users_mutation_response = namekey("users_mutation_response");
-const users_obj_rel_insert_input = namekey("users_obj_rel_insert_input");
 const users_on_conflict = namekey("users_on_conflict");
 const users_order_by = namekey("users_order_by");
 const users_select_column = namekey("users_select_column");
@@ -219,7 +213,7 @@ describe("spacex schema", () => {
           <Field name="status" type={String} />
           <Field name="water_landing" type={Boolean} />
         </ObjectType>
-        <ObjectType name={CoreMission}>
+        <ObjectType name={namekey("CoreMission")}>
           <Field name="flight" type={Int} />
           <Field name="name" type={String} />
         </ObjectType>
@@ -610,7 +604,7 @@ describe("spacex schema", () => {
             />
           </Field>
         </Mutation>
-        <ScalarType name={ObjectID} />
+        <ScalarType name={namekey("ObjectID")} />
         <ObjectType name={Payload}>
           <Field name="customers" type={String}>
             <Field.List />
@@ -1260,7 +1254,10 @@ describe("spacex schema", () => {
           <Field name="cubic_feet" type={Int} />
           <Field name="cubic_meters" type={Int} />
         </ObjectType>
-        <EnumType name={conflict_action} description={"conflict action"}>
+        <EnumType
+          name={namekey("conflict_action")}
+          description={"conflict action"}
+        >
           <EnumValue
             name="ignore"
             description={"ignore the insert on this row"}
@@ -1350,7 +1347,7 @@ describe("spacex schema", () => {
           <Field name="min" type={users_min_fields} />
         </ObjectType>
         <InputObjectType
-          name={users_aggregate_order_by}
+          name={namekey("users_aggregate_order_by")}
           description={'order by aggregate values of table "users"'}
         >
           <InputField name="count" type={order_by} />
@@ -1358,7 +1355,7 @@ describe("spacex schema", () => {
           <InputField name="min" type={users_min_order_by} />
         </InputObjectType>
         <InputObjectType
-          name={users_arr_rel_insert_input}
+          name={namekey("users_arr_rel_insert_input")}
           description={
             'input type for inserting array relation for remote table "users"'
           }
@@ -1464,7 +1461,7 @@ describe("spacex schema", () => {
           </Field>
         </ObjectType>
         <InputObjectType
-          name={users_obj_rel_insert_input}
+          name={namekey("users_obj_rel_insert_input")}
           description={
             'input type for inserting object relation for remote table "users"'
           }
