@@ -16,9 +16,16 @@ export interface ConnectionPaginationProps {
 /**
  * Configures default pagination options for `Field.Connection` and `Connection`.
  *
- * @example
+ * @example Forward pagination defaults
  * ```tsx
  * <ConnectionPagination forward>
+ *   <Schema>{children}</Schema>
+ * </ConnectionPagination>
+ * ```
+ *
+ * @example Custom cursor type
+ * ```tsx
+ * <ConnectionPagination forward backward cursorType={ID}>
  *   <Schema>{children}</Schema>
  * </ConnectionPagination>
  * ```

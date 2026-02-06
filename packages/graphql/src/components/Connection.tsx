@@ -149,7 +149,12 @@ export interface ConnectionComponent {
 /**
  * Creates a Relay-style connection and edge type.
  *
- * @example
+ * @example Basic connection
+ * ```tsx
+ * <Connection name="User" type={User} />
+ * ```
+ *
+ * @example Connection with extra fields
  * ```tsx
  * <Connection name="User" type={User}>
  *   <Connection.Fields>
@@ -171,7 +176,7 @@ export function Connection(props: ConnectionProps) {
 /**
  * Adds fields to the generated edge type.
  *
- * @example
+ * @example Custom edge fields
  * ```tsx
  * <Connection name="User" type={User}>
  *   <Connection.Edge>
@@ -184,7 +189,7 @@ Connection.Edge = connectionEdgeSlot.Slot;
 /**
  * Adds fields to the generated connection type.
  *
- * @example
+ * @example Custom connection fields
  * ```tsx
  * <Connection name="User" type={User}>
  *   <Connection.Fields>
@@ -197,7 +202,7 @@ Connection.Fields = connectionFieldsSlot.Slot;
 /**
  * Overrides the `pageInfo` field on the generated connection type.
  *
- * @example
+ * @example Custom pageInfo description
  * ```tsx
  * <Connection name="User" type={User}>
  *   <Connection.PageInfo description="Pagination information." />

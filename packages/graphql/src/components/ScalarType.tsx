@@ -22,9 +22,23 @@ export interface ScalarTypeProps {
 /**
  * Defines a custom GraphQL scalar type.
  *
- * @example
+ * @example Specified by URL
  * ```tsx
  * <ScalarType name="DateTime" specifiedByUrl="https://example.com" />
+ * ```
+ *
+ * @example Scalar with custom parsing
+ * ```tsx
+ * <ScalarType
+ *   name="DateTime"
+ *   serialize={(value) =>
+ *     value instanceof Date ? value.toISOString() : value
+ *   }
+ *   parseValue={(value) => new Date(value as string)}
+ *   parseLiteral={(ast) =>
+ *     ast.kind === "StringValue" ? new Date(ast.value) : null
+ *   }
+ * />
  * ```
  *
  * @remarks

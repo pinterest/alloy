@@ -33,10 +33,18 @@ function EnsureInputFields() {
 /**
  * Defines a GraphQL input object type.
  *
- * @example
+ * @example Basic input object
  * ```tsx
  * <InputObjectType name="UserFilter">
  *   <InputField name="name" type={String} />
+ * </InputObjectType>
+ * ```
+ *
+ * @example OneOf input object
+ * ```tsx
+ * <InputObjectType name="SearchFilter" oneOf>
+ *   <InputField name="byName" type={String} />
+ *   <InputField name="byId" type={ID} />
  * </InputObjectType>
  * ```
  *

@@ -34,7 +34,7 @@ function EnsureUnionMembers() {
 /**
  * Defines a GraphQL union type.
  *
- * @example
+ * @example Members array
  * ```tsx
  * <UnionType name="SearchResult" members={[User, Post]} />
  * ```

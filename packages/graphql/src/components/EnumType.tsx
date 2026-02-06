@@ -30,7 +30,7 @@ function EnsureEnumValues() {
 /**
  * Defines a GraphQL enum and registers it with the schema.
  *
- * @example
+ * @example Basic enum type
  * ```tsx
  * <EnumType name="Role">
  *   <EnumValue name="ADMIN" />

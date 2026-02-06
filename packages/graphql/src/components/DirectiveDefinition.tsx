@@ -19,10 +19,21 @@ export interface DirectiveDefinitionProps {
 /**
  * Defines a directive and its arguments.
  *
- * @example
+ * @example Directive with arguments
  * ```tsx
  * <DirectiveDefinition name="auth" locations={["FIELD_DEFINITION"]}>
  *   <InputValue name="role" type={String} />
+ * </DirectiveDefinition>
+ * ```
+ *
+ * @example Repeatable directive
+ * ```tsx
+ * <DirectiveDefinition
+ *   name="tag"
+ *   repeatable
+ *   locations={["FIELD_DEFINITION", "OBJECT"]}
+ * >
+ *   <InputValue name="name" type={String} nonNull />
  * </DirectiveDefinition>
  * ```
  */

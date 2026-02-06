@@ -23,9 +23,16 @@ export interface PageInfoTypeProps {
 /**
  * Declares the `PageInfo` type used by Relay-style connections.
  *
- * @example
+ * @example Default PageInfo type
  * ```tsx
  * <PageInfoType />
+ * ```
+ *
+ * @example Custom cursor type
+ * ```tsx
+ * <ConnectionPagination forward cursorType={ID}>
+ *   <PageInfoType />
+ * </ConnectionPagination>
  * ```
  *
  * @remarks

@@ -13,7 +13,7 @@ export interface UnionMemberProps {
 /**
  * Registers a union member on the nearest `UnionType`.
  *
- * @example
+ * @example Explicit union member
  * ```tsx
  * <UnionType name="SearchResult">
  *   <UnionMember type={User} />

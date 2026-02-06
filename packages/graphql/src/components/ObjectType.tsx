@@ -20,11 +20,18 @@ export interface ObjectTypeProps {
 /**
  * Defines a GraphQL object type.
  *
- * @example
+ * @example Basic object type
  * ```tsx
  * <ObjectType name="User">
  *   <Field name="id" type={ID} nonNull />
  *   <Field name="name" type={String} />
+ * </ObjectType>
+ * ```
+ *
+ * @example Object type implementing interfaces
+ * ```tsx
+ * <ObjectType name="User" interfaces={["Node"]}>
+ *   <Field name="id" type={ID} nonNull />
  * </ObjectType>
  * ```
  *

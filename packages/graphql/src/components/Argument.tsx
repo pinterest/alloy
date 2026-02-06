@@ -9,7 +9,7 @@ export interface ArgumentProps {
 /**
  * Adds an argument to the nearest `Directive` application.
  *
- * @example
+ * @example Directive argument
  * ```tsx
  * <Directive name="auth">
  *   <Argument name="role" value="admin" />

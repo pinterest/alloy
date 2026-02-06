@@ -30,10 +30,25 @@ function createAppliedDirective(
 /**
  * Applies a directive to the current schema element.
  *
- * @example
+ * @example Directive with arguments
  * ```tsx
  * <Directive name="auth">
  *   <Argument name="role" value="admin" />
+ * </Directive>
+ * ```
+ *
+ * @example Directive with no arguments
+ * ```tsx
+ * <Directive name="cache" />
+ * ```
+ *
+ * @example Repeatable directive
+ * ```tsx
+ * <Directive name="tag">
+ *   <Argument name="name" value="public" />
+ * </Directive>
+ * <Directive name="tag">
+ *   <Argument name="name" value="internal" />
  * </Directive>
  * ```
  *

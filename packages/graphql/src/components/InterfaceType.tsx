@@ -20,9 +20,16 @@ export interface InterfaceTypeProps {
 /**
  * Defines a GraphQL interface type.
  *
- * @example
+ * @example Basic interface type
  * ```tsx
  * <InterfaceType name="Node">
+ *   <Field name="id" type={ID} nonNull />
+ * </InterfaceType>
+ * ```
+ *
+ * @example Interface implementing other interfaces
+ * ```tsx
+ * <InterfaceType name="Resource" interfaces={["Node"]}>
  *   <Field name="id" type={ID} nonNull />
  * </InterfaceType>
  * ```

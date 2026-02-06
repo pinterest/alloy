@@ -266,11 +266,20 @@ function createConnectionDefinition(
 /**
  * Adds a field to the nearest `ObjectType` or `InterfaceType`.
  *
- * @example
+ * @example Basic field
  * ```tsx
  * <ObjectType name="User">
  *   <Field name="id" type={ID} nonNull />
  *   <Field name="name" type={String} />
+ * </ObjectType>
+ * ```
+ *
+ * @example Field with arguments
+ * ```tsx
+ * <ObjectType name="Query">
+ *   <Field name="user" type={User}>
+ *     <InputValue name="id" type={ID} nonNull />
+ *   </Field>
  * </ObjectType>
  * ```
  *
@@ -302,7 +311,7 @@ export function Field(props: FieldProps) {
 /**
  * Marks the field type as a list.
  *
- * @example
+ * @example List field wrapper
  * ```tsx
  * <Field name="items" type={Item}>
  *   <Field.List />
@@ -313,7 +322,7 @@ Field.List = fieldList.List;
 /**
  * Declares a connection field and optionally defines the connection type.
  *
- * @example
+ * @example Connection field slot
  * ```tsx
  * <Field name="users" type={User}>
  *   <Field.Connection />

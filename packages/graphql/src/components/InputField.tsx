@@ -91,10 +91,17 @@ export interface InputFieldComponent {
 /**
  * Adds an input field to the nearest `InputObjectType`.
  *
- * @example
+ * @example Basic input field
  * ```tsx
  * <InputObjectType name="UserFilter">
  *   <InputField name="name" type={String} />
+ * </InputObjectType>
+ * ```
+ *
+ * @example Default value
+ * ```tsx
+ * <InputObjectType name="Paging">
+ *   <InputField name="limit" type={Int} defaultValue={20} />
  * </InputObjectType>
  * ```
  *
@@ -109,10 +116,19 @@ export function InputField(props: InputFieldProps) {
 /**
  * Marks the input field type as a list.
  *
- * @example
+ * @example List input field
  * ```tsx
  * <InputField name="tags" type={String}>
  *   <InputField.List />
+ * </InputField>
+ * ```
+ *
+ * @example Nested list
+ * ```tsx
+ * <InputField name="matrix" type={Int}>
+ *   <InputField.List>
+ *     <InputField.List />
+ *   </InputField.List>
  * </InputField>
  * ```
  */

@@ -4,7 +4,7 @@ import { type RootTypeProps, useRootType } from "./root-type.js";
 /**
  * Declares the `Query` root type.
  *
- * @example
+ * @example Basic query root
  * ```tsx
  * <Query>
  *   <Field name="user" type={User} />

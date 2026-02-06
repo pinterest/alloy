@@ -21,10 +21,17 @@ export interface NodeFieldProps {
 /**
  * Adds a `node` field that resolves objects by ID.
  *
- * @example
+ * @example Default node field
  * ```tsx
  * <Query>
  *   <NodeField />
+ * </Query>
+ * ```
+ *
+ * @example Custom node field
+ * ```tsx
+ * <Query>
+ *   <NodeField name="userById" type={User} />
  * </Query>
  * ```
  */

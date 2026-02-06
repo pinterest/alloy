@@ -23,10 +23,15 @@ export interface NodeInterfaceProps {
 /**
  * Declares the canonical `Node` interface.
  *
- * @example
+ * @example Default Node interface
  * ```tsx
- * <NodeInterface>
- *   <Field name="id" type={ID} nonNull />
+ * <NodeInterface />
+ * ```
+ *
+ * @example Node interface with extra fields
+ * ```tsx
+ * <NodeInterface idDescription="Database ID">
+ *   <Field name="createdAt" type={DateTime} />
  * </NodeInterface>
  * ```
  */

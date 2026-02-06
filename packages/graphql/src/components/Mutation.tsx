@@ -4,7 +4,7 @@ import { type RootTypeProps, useRootType } from "./root-type.js";
 /**
  * Declares the `Mutation` root type.
  *
- * @example
+ * @example Basic mutation root
  * ```tsx
  * <Mutation>
  *   <Field name="updateUser" type={User} />

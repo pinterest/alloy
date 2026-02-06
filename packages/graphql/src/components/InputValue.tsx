@@ -87,10 +87,17 @@ export interface InputValueComponent {
 /**
  * Adds an input value to the nearest Field or DirectiveDefinition.
  *
- * @example
+ * @example Field argument
  * ```tsx
  * <Field name="user" type={User}>
  *   <InputValue name="id" type={ID} nonNull />
+ * </Field>
+ * ```
+ *
+ * @example Default value
+ * ```tsx
+ * <Field name="search" type={String}>
+ *   <InputValue name="limit" type={Int} defaultValue={20} />
  * </Field>
  * ```
  *
@@ -104,10 +111,19 @@ export function InputValue(props: InputValueProps) {
 /**
  * Marks the input value type as a list.
  *
- * @example
+ * @example List input value
  * ```tsx
  * <InputValue name="ids" type={ID}>
  *   <InputValue.List />
+ * </InputValue>
+ * ```
+ *
+ * @example Nested list
+ * ```tsx
+ * <InputValue name="matrix" type={Int}>
+ *   <InputValue.List>
+ *     <InputValue.List />
+ *   </InputValue.List>
  * </InputValue>
  * ```
  */

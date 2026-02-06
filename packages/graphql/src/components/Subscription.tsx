@@ -4,7 +4,7 @@ import { type RootTypeProps, useRootType } from "./root-type.js";
 /**
  * Declares the `Subscription` root type.
  *
- * @example
+ * @example Basic subscription root
  * ```tsx
  * <Subscription>
  *   <Field name="userChanged" type={User} />

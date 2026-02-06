@@ -20,10 +20,20 @@ export interface EnumValueProps extends DeprecatedProps {
 /**
  * Adds a value to the nearest `EnumType`.
  *
- * @example
+ * @example Enum value
  * ```tsx
  * <EnumType name="Role">
  *   <EnumValue name="ADMIN" />
+ * </EnumType>
+ * ```
+ *
+ * @example Deprecated enum value
+ * ```tsx
+ * <EnumType name="Role">
+ *   <EnumValue
+ *     name="LEGACY"
+ *     deprecationReason="Use MEMBER instead."
+ *   />
  * </EnumType>
  * ```
  *
