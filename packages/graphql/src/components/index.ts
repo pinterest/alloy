@@ -18,6 +18,7 @@ export * from "./PageInfoType.js";
 export * from "./Query.js";
 export type { RootTypeProps } from "./root-type.js";
 export * from "./ScalarType.js";
+export * from "./Schema.js";
 export * from "./Subscription.js";
 export * from "./UnionMember.js";
 export * from "./UnionType.js";

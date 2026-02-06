@@ -19,6 +19,7 @@ export const NodeInterface = core.stc(base.NodeInterface);
 export const ObjectType = core.stc(base.ObjectType);
 export const PageInfoType = core.stc(base.PageInfoType);
 export const Query = core.stc(base.Query);
+export const Schema = core.stc(base.Schema);
 export const ScalarType = core.stc(base.ScalarType);
 export const Subscription = core.stc(base.Subscription);
 export const UnionMember = core.stc(base.UnionMember);

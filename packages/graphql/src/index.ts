@@ -6,7 +6,7 @@ export {
 } from "./connection-options.js";
 export type { ConnectionPaginationOptions } from "./connection-options.js";
 export * from "./name-policy.js";
-export { Schema, renderSchema } from "./schema.js";
+export { renderSchema } from "./schema.js";
 export type {
   DeprecatedProps,
   DirectiveReference,
