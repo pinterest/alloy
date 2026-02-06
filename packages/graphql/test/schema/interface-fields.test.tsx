@@ -32,6 +32,53 @@ describe("interface field inheritance", () => {
     expect(fields.name).toBeDefined();
   });
 
+  it("adds transitive interfaces to implementing objects", () => {
+    const schema = renderSchema(
+      <>
+        <InterfaceType name="Node">
+          <Field name="id" type={ID} />
+        </InterfaceType>
+        <InterfaceType name="Resource" interfaces={["Node"]}>
+          <Field name="url" type={String} />
+        </InterfaceType>
+        <ObjectType name="User" interfaces={["Resource"]}>
+          <Field name="name" type={String} />
+        </ObjectType>
+        <Query>
+          <Field name="user" type="User" />
+        </Query>
+      </>,
+    );
+
+    const userType = schema.getType("User") as GraphQLObjectType;
+    expect(userType.getInterfaces().map((iface) => iface.name)).toEqual([
+      "Resource",
+      "Node",
+    ]);
+  });
+
+  it("inherits fields through empty interfaces", () => {
+    const schema = renderSchema(
+      <>
+        <InterfaceType name="Node">
+          <Field name="id" type={ID} />
+        </InterfaceType>
+        <InterfaceType name="Resource" interfaces={["Node"]} />
+        <ObjectType name="User" interfaces={["Resource"]}>
+          <Field name="name" type={String} />
+        </ObjectType>
+        <Query>
+          <Field name="user" type="User" />
+        </Query>
+      </>,
+    );
+
+    const userType = schema.getType("User") as GraphQLObjectType;
+    const fields = userType.getFields();
+    expect(fields.id).toBeDefined();
+    expect(fields.name).toBeDefined();
+  });
+
   it("inherits fields from interface hierarchies", () => {
     const schema = renderSchema(
       <>

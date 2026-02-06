@@ -184,6 +184,43 @@ function normalizeNamedType(
   throw new Error("Expected a named GraphQL type.");
 }
 
+function resolveInterfaces(
+  state: SchemaState,
+  context: BuildContext,
+  ownerName: string,
+  interfaces: TypeReference[],
+): GraphQLInterfaceType[] {
+  const resolvedInterfaces: GraphQLInterfaceType[] = [];
+  const seen = new Set<string>();
+
+  const addInterface = (typeRef: TypeReference) => {
+    const resolved = normalizeNamedType(state, context, typeRef);
+    if (!(resolved instanceof GraphQLInterfaceType)) {
+      throw new Error(
+        `Interface "${ownerName}" references non-interface type "${resolved.name}".`,
+      );
+    }
+    if (seen.has(resolved.name)) {
+      return;
+    }
+    seen.add(resolved.name);
+    resolvedInterfaces.push(resolved);
+
+    const definition = state.types.get(resolved.name);
+    if (definition?.kind === "interface") {
+      for (const iface of definition.interfaces) {
+        addInterface(iface);
+      }
+    }
+  };
+
+  for (const iface of interfaces) {
+    addInterface(iface);
+  }
+
+  return resolvedInterfaces;
+}
+
 function createGraphQLType(
   state: SchemaState,
   context: BuildContext,
@@ -196,15 +233,12 @@ function createGraphQLType(
         description: definition.description,
         fields: () => buildFieldMap(state, context, definition),
         interfaces: () =>
-          definition.interfaces.map((iface) => {
-            const resolved = normalizeNamedType(state, context, iface);
-            if (!(resolved instanceof GraphQLInterfaceType)) {
-              throw new Error(
-                `Interface "${definition.name}" references non-interface type "${resolved.name}".`,
-              );
-            }
-            return resolved;
-          }),
+          resolveInterfaces(
+            state,
+            context,
+            definition.name,
+            definition.interfaces,
+          ),
       });
     case "interface":
       return new GraphQLInterfaceType({
@@ -212,15 +246,12 @@ function createGraphQLType(
         description: definition.description,
         fields: () => buildFieldMap(state, context, definition),
         interfaces: () =>
-          definition.interfaces.map((iface) => {
-            const resolved = normalizeNamedType(state, context, iface);
-            if (!(resolved instanceof GraphQLInterfaceType)) {
-              throw new Error(
-                `Interface "${definition.name}" references non-interface type "${resolved.name}".`,
-              );
-            }
-            return resolved;
-          }),
+          resolveInterfaces(
+            state,
+            context,
+            definition.name,
+            definition.interfaces,
+          ),
       });
     case "input":
       return new GraphQLInputObjectType({

@@ -35,9 +35,23 @@ export interface ObjectTypeProps {
  * </ObjectType>
  * ```
  *
+ * @example Transitive interface implementation
+ * ```tsx
+ * <>
+ *   <InterfaceType name="Node">
+ *     <Field name="id" type={ID} nonNull />
+ *   </InterfaceType>
+ *   <InterfaceType name="Resource" interfaces={["Node"]} />
+ *   <ObjectType name="User" interfaces={["Resource"]}>
+ *     <Field name="name" type={String} />
+ *   </ObjectType>
+ * </>
+ * ```
+ *
  * @remarks
  * When you pass `interfaces`, the interface fields are applied to the object
- * type automatically.
+ * type automatically. Interfaces are applied transitively, so implementing
+ * `Resource` also implements `Node`.
  */
 export function ObjectType(props: ObjectTypeProps) {
   const state = useSchemaContext();
