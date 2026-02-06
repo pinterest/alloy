@@ -12,18 +12,19 @@ import {
   NodeInterface,
   ObjectType,
   Query,
+  renderSchema,
   ScalarType,
   String,
   Subscription,
   UnionMember,
   UnionType,
-  renderSchema,
 } from "@alloy-js/graphql";
 import {
   GraphQLInputObjectType,
   GraphQLObjectType,
   GraphQLString,
 } from "graphql";
+import { describe, expect, it } from "vitest";
 import { buildSchema } from "../../src/schema/build.js";
 import { createSchemaState, Schema } from "../../src/schema/state.js";
 import type {
@@ -31,7 +32,6 @@ import type {
   SchemaState,
   TypeReference,
 } from "../../src/schema/types.js";
-import { describe, expect, it } from "vitest";
 
 type SchemaInternalProps = SchemaProps & { _state: SchemaState };
 const SchemaWithState = Schema as unknown as (
@@ -317,11 +317,7 @@ describe("renderSchema", () => {
     });
 
     renderTree(
-      <SchemaWithState
-        _state={state}
-        query="RootQuery"
-        description="Updated"
-      >
+      <SchemaWithState _state={state} query="RootQuery" description="Updated">
         <ObjectType name="RootQuery">
           <Field name="ping" type={String} />
         </ObjectType>

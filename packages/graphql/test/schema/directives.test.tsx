@@ -218,8 +218,9 @@ describe("directive applications", () => {
     );
 
     const field = schema.getQueryType()?.getFields().ping;
-    expect(field?.astNode?.directives?.map((directive) => directive.name.value))
-      .toEqual(["tag", "tag"]);
+    expect(
+      field?.astNode?.directives?.map((directive) => directive.name.value),
+    ).toEqual(["tag", "tag"]);
   });
 
   it("validates directive arguments", () => {
