@@ -1,6 +1,7 @@
 import {
   childrenArray,
   ComponentContext,
+  computed,
   SourceFile as CoreSourceFile,
   createNamedContext,
   isComponentCreator,
@@ -13,8 +14,9 @@ import {
 } from "@alloy-js/core";
 import { join } from "pathe";
 import { PythonModuleScope } from "../symbols/index.js";
-import { ImportStatements } from "./ImportStatement.js";
+import { hasImports, ImportStatements } from "./ImportStatement.js";
 import { SimpleCommentBlock } from "./PyDoc.js";
+import { PythonBlock } from "./PythonBlock.js";
 import { Reference } from "./Reference.js";
 
 // Non top-level definitions
@@ -98,7 +100,7 @@ export interface SourceFileProps {
   /**
    * __future__ imports to render after the docstring but before regular imports.
    */
-  futureImports?: Children;
+  futureImports?: Children[];
 }
 
 /**
@@ -166,6 +168,17 @@ export function SourceFile(props: SourceFileProps) {
     props.doc !== undefined ||
     props.futureImports !== undefined;
 
+  const hasTypeOnlyImports = computed(() => hasImports(scope.importedModules, true));
+
+  // When there are type-only imports, add the TYPE_CHECKING import to regular imports
+  // and capture the symbol for use in the if block opener
+  const typeImportSymbol = computed(() => {
+    if (hasTypeOnlyImports.value) {
+      return scope.addTypeImport();
+    }
+    return undefined;
+  });
+
   return (
     <CoreSourceFile
       path={props.path}
@@ -215,12 +228,43 @@ export function SourceFile(props: SourceFileProps) {
           <hbr />
         </Show>
       </Show>
-      <Show when={scope.importedModules.size > 0}>
-        <ImportStatements records={scope.importedModules} />
-        <Show when={hasChildren}>
-          <hbr />
+      {/* typing imports - They come first per PEP 8 (stdlib before third-party) */}
+      <Show when={hasTypeOnlyImports.value}>
+        <ImportStatements
+          records={scope.importedModules}
+          typeAnnotationOnly={false}
+          typingStdlib={true}
+        />
+        <hbr />
+      </Show>
+      {/* Regular (non-type-only) imports, excluding typing module */}
+      <Show when={hasImports(scope.importedModules, false, false)}>
+        {/* Blank line between stdlib (typing) and other imports */}
+        <Show when={hasTypeOnlyImports.value}>
           <hbr />
         </Show>
+        <ImportStatements
+          records={scope.importedModules}
+          typeAnnotationOnly={false}
+          typingStdlib={false}
+        />
+        <hbr />
+      </Show>
+      {/* TYPE_CHECKING block with type-only imports */}
+      <Show when={hasTypeOnlyImports.value}>
+        <hbr />
+        <PythonBlock opener={`if ${typeImportSymbol.value!.name}:`}>
+          <ImportStatements records={scope.importedModules} typeAnnotationOnly={true} />
+        </PythonBlock>
+      </Show>
+      {/* Spacing after imports */}
+      <Show
+        when={
+          hasChildren &&
+          (hasImports(scope.importedModules, false) || hasTypeOnlyImports.value)
+        }
+      >
+        <hbr />
       </Show>
       {/* Extra blank line before top-level definitions */}
       <Show
@@ -240,3 +284,4 @@ export function SourceFile(props: SourceFileProps) {
     </CoreSourceFile>
   );
 }
+

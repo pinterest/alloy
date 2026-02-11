@@ -6,6 +6,7 @@ import {
   createSymbolSlot,
   memo,
 } from "@alloy-js/core";
+import { TypeRefContext } from "./TypeRefContext.jsx";
 import { createPythonSymbol } from "../symbol-creation.js";
 import { Atom } from "./Atom.jsx";
 import { BaseDeclarationProps } from "./Declaration.jsx";
@@ -93,7 +94,10 @@ export function VariableDeclaration(props: VariableDeclarationProps) {
     if (!props.type || props.callStatementVar) return undefined;
     return (
       <>
-        : <TypeSymbolSlot>{props.type}</TypeSymbolSlot>
+        :{" "}
+        <TypeRefContext>
+          <TypeSymbolSlot>{props.type}</TypeSymbolSlot>
+        </TypeRefContext>
       </>
     );
   });

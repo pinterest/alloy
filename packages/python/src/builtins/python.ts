@@ -25,6 +25,13 @@ export const enumModule = createModule({
   },
 });
 
+export const typingModule = createModule({
+  name: "typing",
+  descriptor: {
+    ".": ["TYPE_CHECKING"],
+  },
+});
+
 export const requestsModule = createModule({
   name: "requests",
   descriptor: {

@@ -90,9 +90,13 @@ it("uses import from external library in multiple functions", () => {
     externals: [py.requestsModule],
   });
   const expected = d`
+    from typing import TYPE_CHECKING
+
     from requests import get
     from requests import post
-    from requests.models import Response
+
+    if TYPE_CHECKING:
+        from requests.models import Response
 
 
     def get_user(user_id: int) -> Response:
@@ -167,9 +171,13 @@ it("uses import from external library in multiple class methods", () => {
     externals: [py.requestsModule],
   });
   const expected = d`
+    from typing import TYPE_CHECKING
+
     from requests import get
     from requests import post
-    from requests.models import Response
+
+    if TYPE_CHECKING:
+        from requests.models import Response
 
 
     class UserClient:

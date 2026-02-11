@@ -6,6 +6,7 @@ import {
   Show,
   SymbolSlot,
 } from "@alloy-js/core";
+import { TypeRefContext } from "./TypeRefContext.jsx";
 import {
   isParameterDescriptor,
   ParameterDescriptor,
@@ -75,7 +76,9 @@ function parameter(param: DeclaredParameterDescriptor) {
     <group>
       {param.symbol.name}
       <Show when={!!param.type}>
-        : <TypeSlot>{param.type}</TypeSlot>
+        : <TypeRefContext>
+          <TypeSlot>{param.type}</TypeSlot>
+        </TypeRefContext>
       </Show>
       <Show when={param.default !== undefined}>
         <Show when={!param.type}>=</Show>
@@ -184,7 +187,9 @@ export function CallSignature(props: CallSignatureProps) {
     props.returnType ?
       <>
         {" -> "}
-        {props.returnType}
+        <TypeRefContext>
+          {props.returnType}
+        </TypeRefContext>
       </>
     : undefined;
 

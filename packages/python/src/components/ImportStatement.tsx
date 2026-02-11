@@ -1,9 +1,112 @@
 import { computed, mapJoin, memo } from "@alloy-js/core";
-import { ImportedSymbol, ImportRecords } from "../symbols/index.js";
+import {
+  ImportedSymbol,
+  ImportRecords,
+  PythonModuleScope,
+} from "../symbols/index.js";
+
+/**
+ * Check if a module is from the typing standard library.
+ */
+function isTypingModule(module: PythonModuleScope): boolean {
+  return module.name === "typing";
+}
 
 export interface ImportStatementsProps {
   records: ImportRecords;
   joinImportsFromSameModule?: boolean;
+  /**
+   * Filter imports by type-only status.
+   * - `true`: only include type-only imports
+   * - `false`: only include non-type-only imports
+   * - `undefined`: include all imports (default)
+   */
+  typeAnnotationOnly?: boolean;
+  /**
+   * Filter for the typing standard library module.
+   * - `true`: only include typing module imports
+   * - `false`: exclude typing module imports
+   * - `undefined`: include all (default)
+   */
+  typingStdlib?: boolean;
+}
+
+interface FilterOptions {
+  typeAnnotationOnly?: boolean;
+  /**
+   * Filter for the typing standard library module.
+   * - `true`: only include typing module
+   * - `false`: exclude typing module
+   * - `undefined`: include all
+   */
+  typingStdlib?: boolean;
+}
+
+/**
+ * Filter import records based on typeAnnotationOnly flag and typing stdlib filter.
+ * Returns a new ImportRecords with only the matching symbols.
+ */
+function filterImportRecords(
+  records: ImportRecords,
+  options: FilterOptions = {},
+): ImportRecords {
+  const { typeAnnotationOnly, typingStdlib } = options;
+
+  if (typeAnnotationOnly === undefined && typingStdlib === undefined) {
+    return records;
+  }
+
+  const filtered = new Map() as ImportRecords;
+
+  for (const [module, properties] of records) {
+    const isTyping = isTypingModule(module);
+
+    // Filter by typing stdlib if specified
+    if (typingStdlib !== undefined) {
+      if (typingStdlib && !isTyping) continue; // only typing, skip non-typing
+      if (!typingStdlib && isTyping) continue; // exclude typing, skip typing
+    }
+
+    if (typeAnnotationOnly === undefined) {
+      // No type filtering, just module filtering
+      filtered.set(module, properties);
+      continue;
+    }
+
+    if (!properties.symbols || properties.symbols.size === 0) {
+      // Module-level imports without symbols - include only if not filtering for type-only
+      if (!typeAnnotationOnly) {
+        filtered.set(module, properties);
+      }
+      continue;
+    }
+
+    const matchingSymbols = new Set<ImportedSymbol>();
+    for (const sym of properties.symbols) {
+      const isTypeOnly = sym.local.isTypeOnly;
+      if (typeAnnotationOnly === isTypeOnly) {
+        matchingSymbols.add(sym);
+      }
+    }
+
+    if (matchingSymbols.size > 0) {
+      filtered.set(module, { symbols: matchingSymbols });
+    }
+  }
+
+  return filtered;
+}
+
+/**
+ * Check if there are any imports matching the filter options.
+ */
+export function hasImports(
+  records: ImportRecords,
+  typeAnnotationOnly?: boolean,
+  typingStdlib?: boolean,
+): boolean {
+  const filtered = filterImportRecords(records, { typeAnnotationOnly, typingStdlib });
+  return filtered.size > 0;
 }
 
 /**
@@ -13,14 +116,23 @@ export interface ImportStatementsProps {
  * This component will render import statements for each module and its symbols.
  * If `joinImportsFromSameModule` is true, it will group imports from the same module
  * into a single statement.
+ *
+ * Use `typeAnnotationOnly` to filter:
+ * - `typeAnnotationOnly={true}`: only render type-only imports (for TYPE_CHECKING block)
+ * - `typeAnnotationOnly={false}`: only render regular imports
+ * - `typeAnnotationOnly={undefined}`: render all imports
  */
 export function ImportStatements(props: ImportStatementsProps) {
-  // Sort the import records by module name
-  const imports = computed(() =>
-    [...props.records].sort(([a], [b]) => {
+  // Filter and sort the import records by module name
+  const imports = computed(() => {
+    const filtered = filterImportRecords(props.records, {
+      typeAnnotationOnly: props.typeAnnotationOnly,
+      typingStdlib: props.typingStdlib,
+    });
+    return [...filtered].sort(([a], [b]) => {
       return a.name.localeCompare(b.name);
-    }),
-  );
+    });
+  });
 
   return mapJoin(
     () => imports.value,

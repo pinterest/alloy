@@ -1,6 +1,28 @@
 import { reactive, shallowReactive } from "@alloy-js/core";
 import { PythonLexicalScope } from "./python-lexical-scope.js";
-import { PythonOutputSymbol } from "./python-output-symbol.js";
+import {
+  PythonOutputSymbol,
+  PythonSymbolFlags,
+} from "./python-output-symbol.js";
+
+// Lazy-initialized typing module scope for TYPE_CHECKING imports
+let typingModuleScope: PythonModuleScope | undefined;
+let typeCheckingSymbol: PythonOutputSymbol | undefined;
+
+function getTypingModuleScope(): PythonModuleScope {
+  if (!typingModuleScope) {
+    typingModuleScope = new PythonModuleScope("typing", undefined);
+  }
+  return typingModuleScope;
+}
+
+function getTypeCheckingSymbol(): PythonOutputSymbol {
+  if (!typeCheckingSymbol) {
+    const scope = getTypingModuleScope();
+    typeCheckingSymbol = new PythonOutputSymbol("TYPE_CHECKING", scope.symbols, {});
+  }
+  return typeCheckingSymbol;
+}
 
 export class ImportedSymbol {
   local: PythonOutputSymbol;
@@ -22,6 +44,14 @@ export interface ImportRecordProps {
 
 export class ImportRecords extends Map<PythonModuleScope, ImportRecordProps> {}
 
+export interface AddImportOptions {
+  /**
+   * If true, this import is only used in type annotation contexts.
+   * Such imports will be guarded with `if TYPE_CHECKING:`.
+   */
+  type?: boolean;
+}
+
 export class PythonModuleScope extends PythonLexicalScope {
   #importedSymbols: Map<PythonOutputSymbol, PythonOutputSymbol> =
     shallowReactive(new Map());
@@ -34,9 +64,17 @@ export class PythonModuleScope extends PythonLexicalScope {
     return this.#importedModules;
   }
 
-  addImport(targetSymbol: PythonOutputSymbol, targetModule: PythonModuleScope) {
+  addImport(
+    targetSymbol: PythonOutputSymbol,
+    targetModule: PythonModuleScope,
+    options?: AddImportOptions,
+  ) {
     const existing = this.importedSymbols.get(targetSymbol);
     if (existing) {
+      // If existing is type-only but now used as value, upgrade it
+      if (!options?.type && existing.isTypeOnly) {
+        existing.markAsValue();
+      }
       return existing;
     }
 
@@ -46,10 +84,15 @@ export class PythonModuleScope extends PythonLexicalScope {
       });
     }
 
+    const flags =
+      options?.type ?
+        PythonSymbolFlags.LocalImportSymbol | PythonSymbolFlags.TypeOnly
+      : PythonSymbolFlags.LocalImportSymbol;
+
     const localSymbol = new PythonOutputSymbol(
       targetSymbol.name,
       this.symbols,
-      { binder: this.binder, aliasTarget: targetSymbol },
+      { binder: this.binder, aliasTarget: targetSymbol, flags },
     );
 
     this.importedSymbols.set(targetSymbol, localSymbol);
@@ -59,5 +102,15 @@ export class PythonModuleScope extends PythonLexicalScope {
     });
 
     return localSymbol;
+  }
+
+  /**
+   * Add the type only import from the typing module.
+   * This is used when there are type-only imports that need to be guarded.
+   */
+  addTypeImport() {
+    return this.addImport(getTypeCheckingSymbol(), getTypingModuleScope(), {
+      type: false,
+    });
   }
 }
