@@ -1,6 +1,6 @@
 import { Children, Refkey, Show } from "@alloy-js/core";
-import { ensureTypeRefContext } from "./TypeRefContext.js";
 import { TypeArguments } from "./TypeArguments.js";
+import { ensureTypeRefContext } from "./TypeRefContext.js";
 
 export interface TypeReferenceProps {
   /** A refkey to a declared symbol. */

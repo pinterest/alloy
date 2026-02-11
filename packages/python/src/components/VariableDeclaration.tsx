@@ -6,11 +6,11 @@ import {
   createSymbolSlot,
   memo,
 } from "@alloy-js/core";
-import { TypeRefContext } from "./TypeRefContext.jsx";
 import { createPythonSymbol } from "../symbol-creation.js";
 import { Atom } from "./Atom.jsx";
 import { BaseDeclarationProps } from "./Declaration.jsx";
 import { SimpleCommentBlock } from "./PyDoc.jsx";
+import { TypeRefContext } from "./TypeRefContext.jsx";
 
 export interface VariableDeclarationProps extends BaseDeclarationProps {
   /**

@@ -6,7 +6,6 @@ import {
   Show,
   SymbolSlot,
 } from "@alloy-js/core";
-import { TypeRefContext } from "./TypeRefContext.jsx";
 import {
   isParameterDescriptor,
   ParameterDescriptor,
@@ -14,6 +13,7 @@ import {
 import { createPythonSymbol } from "../symbol-creation.js";
 import { PythonOutputSymbol } from "../symbols/index.js";
 import { Atom } from "./Atom.jsx";
+import { TypeRefContext } from "./TypeRefContext.jsx";
 
 export type ParameterMarker = "*" | "/";
 
@@ -76,7 +76,8 @@ function parameter(param: DeclaredParameterDescriptor) {
     <group>
       {param.symbol.name}
       <Show when={!!param.type}>
-        : <TypeRefContext>
+        :{" "}
+        <TypeRefContext>
           <TypeSlot>{param.type}</TypeSlot>
         </TypeRefContext>
       </Show>
@@ -187,9 +188,7 @@ export function CallSignature(props: CallSignatureProps) {
     props.returnType ?
       <>
         {" -> "}
-        <TypeRefContext>
-          {props.returnType}
-        </TypeRefContext>
+        <TypeRefContext>{props.returnType}</TypeRefContext>
       </>
     : undefined;
 

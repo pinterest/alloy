@@ -169,7 +169,9 @@ export function SourceFile(props: SourceFileProps) {
     props.doc !== undefined ||
     props.futureImports !== undefined;
 
-  const hasTypeOnlyImports = computed(() => hasImports(scope.importedModules, true));
+  const hasTypeOnlyImports = computed(() =>
+    hasImports(scope.importedModules, true),
+  );
 
   // When there are type-only imports, add the TYPE_CHECKING import to regular imports
   // and capture the symbol for use in the if block opener
@@ -255,7 +257,10 @@ export function SourceFile(props: SourceFileProps) {
       <Show when={hasTypeOnlyImports.value}>
         <hbr />
         <PythonBlock opener={`if ${typeImportSymbol.value!.name}:`}>
-          <ImportStatements records={scope.importedModules} typeAnnotationOnly={true} />
+          <ImportStatements
+            records={scope.importedModules}
+            typeAnnotationOnly={true}
+          />
         </PythonBlock>
       </Show>
       {/* Spacing after imports */}
@@ -285,4 +290,3 @@ export function SourceFile(props: SourceFileProps) {
     </CoreSourceFile>
   );
 }
-

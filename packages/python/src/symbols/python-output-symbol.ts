@@ -1,9 +1,9 @@
 import {
+  createSymbol,
   Namekey,
   OutputSpace,
   OutputSymbol,
   OutputSymbolOptions,
-  createSymbol,
   track,
   TrackOpTypes,
   trigger,

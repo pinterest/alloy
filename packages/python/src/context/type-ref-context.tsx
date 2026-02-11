@@ -14,4 +14,3 @@ export const TypeRefContextDef: ComponentContext<true> = createContext<true>();
 export function isTypeRefContext(): boolean {
   return useContext(TypeRefContextDef) === true;
 }
-

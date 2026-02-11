@@ -1,7 +1,7 @@
 import { refkey } from "@alloy-js/core";
-import { describe, expect, it } from "vitest";
-import * as py from "../src/index.js";
+import { describe, it } from "vitest";
 import { createModule } from "../src/create-module.js";
+import * as py from "../src/index.js";
 import { assertFileContents, toSourceTextMultiple } from "./utils.jsx";
 
 describe("TYPE_CHECKING imports", () => {
@@ -52,7 +52,10 @@ describe("TYPE_CHECKING imports", () => {
       </py.SourceFile>,
       <py.SourceFile path="service.py">
         <py.FunctionDeclaration name="create_user" returnType="None">
-          <py.VariableDeclaration name="user" initializer={<py.ClassInstantiation target={userClassRef} />} />
+          <py.VariableDeclaration
+            name="user"
+            initializer={<py.ClassInstantiation target={userClassRef} />}
+          />
         </py.FunctionDeclaration>
       </py.SourceFile>,
     ]);
@@ -88,14 +91,17 @@ describe("TYPE_CHECKING imports", () => {
           returnType={userClassRef}
         >
           <py.StatementList>
-            <py.VariableDeclaration name="user" initializer={<py.ClassInstantiation target={userClassRef} />} />
+            <py.VariableDeclaration
+              name="user"
+              initializer={<py.ClassInstantiation target={userClassRef} />}
+            />
             <>return user</>
           </py.StatementList>
         </py.FunctionDeclaration>
       </py.SourceFile>,
     ]);
 
-    // Since User is used both as a type (parameter type, return type) and 
+    // Since User is used both as a type (parameter type, return type) and
     // as a value (ClassInstantiation), it should be a regular import
     assertFileContents(result, {
       "models.py": `
@@ -172,10 +178,7 @@ describe("TYPE_CHECKING imports", () => {
         <py.ClassDeclaration name="Result" refkey={resultTypeRef} />
       </py.SourceFile>,
       <py.SourceFile path="main.py">
-        <py.FunctionDeclaration
-          name="get_result"
-          returnType={resultTypeRef}
-        >
+        <py.FunctionDeclaration name="get_result" returnType={resultTypeRef}>
           pass
         </py.FunctionDeclaration>
       </py.SourceFile>,

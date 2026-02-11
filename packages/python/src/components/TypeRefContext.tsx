@@ -34,9 +34,7 @@ export interface TypeRefContextProps {
  */
 export const TypeRefContext = ({ children }: TypeRefContextProps) => {
   return (
-    <TypeRefContextDef.Provider value>
-      {children}
-    </TypeRefContextDef.Provider>
+    <TypeRefContextDef.Provider value>{children}</TypeRefContextDef.Provider>
   );
 };
 
@@ -71,4 +69,3 @@ export function ensureTypeRefContext<TProps>(
     return <Comp {...props} />;
   };
 }
-

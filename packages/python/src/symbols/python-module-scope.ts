@@ -19,7 +19,11 @@ function getTypingModuleScope(): PythonModuleScope {
 function getTypeCheckingSymbol(): PythonOutputSymbol {
   if (!typeCheckingSymbol) {
     const scope = getTypingModuleScope();
-    typeCheckingSymbol = new PythonOutputSymbol("TYPE_CHECKING", scope.symbols, {});
+    typeCheckingSymbol = new PythonOutputSymbol(
+      "TYPE_CHECKING",
+      scope.symbols,
+      {},
+    );
   }
   return typeCheckingSymbol;
 }

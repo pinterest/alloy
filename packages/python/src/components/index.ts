@@ -27,7 +27,7 @@ export * from "./SourceFile.js";
 export * from "./StatementList.js";
 export * from "./StaticMethodDeclaration.js";
 export * from "./TypeArguments.js";
-export * from "./TypeReference.js";
 export * from "./TypeRefContext.js";
+export * from "./TypeReference.js";
 export * from "./UnionTypeExpression.js";
 export * from "./VariableDeclaration.js";

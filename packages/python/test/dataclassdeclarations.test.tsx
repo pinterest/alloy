@@ -628,7 +628,10 @@ describe("DataclassDeclaration", () => {
               name="user"
               type={userRefkey}
               initializer={
-                <py.ClassInstantiation target={userRefkey} args={["1", '"Alice"']} />
+                <py.ClassInstantiation
+                  target={userRefkey}
+                  args={["1", '"Alice"']}
+                />
               }
             />
             <hbr />

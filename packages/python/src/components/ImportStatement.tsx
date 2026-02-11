@@ -105,7 +105,10 @@ export function hasImports(
   typeAnnotationOnly?: boolean,
   typingStdlib?: boolean,
 ): boolean {
-  const filtered = filterImportRecords(records, { typeAnnotationOnly, typingStdlib });
+  const filtered = filterImportRecords(records, {
+    typeAnnotationOnly,
+    typingStdlib,
+  });
   return filtered.size > 0;
 }
 
