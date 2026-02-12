@@ -231,25 +231,11 @@ export function SourceFile(props: SourceFileProps) {
           <hbr />
         </Show>
       </Show>
-      {/* typing imports - They come first per PEP 8 (stdlib before third-party) */}
-      <Show when={hasTypeOnlyImports.value}>
+      {/* Regular (non-type-only) imports */}
+      <Show when={hasImports(scope.importedModules, false)}>
         <ImportStatements
           records={scope.importedModules}
           typeAnnotationOnly={false}
-          typingStdlib={true}
-        />
-        <hbr />
-      </Show>
-      {/* Regular (non-type-only) imports, excluding typing module */}
-      <Show when={hasImports(scope.importedModules, false, false)}>
-        {/* Blank line between stdlib (typing) and other imports */}
-        <Show when={hasTypeOnlyImports.value}>
-          <hbr />
-        </Show>
-        <ImportStatements
-          records={scope.importedModules}
-          typeAnnotationOnly={false}
-          typingStdlib={false}
         />
         <hbr />
       </Show>

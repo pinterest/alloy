@@ -89,9 +89,7 @@ export class PythonModuleScope extends PythonLexicalScope {
     }
 
     const flags =
-      options?.type ?
-        PythonSymbolFlags.LocalImportSymbol | PythonSymbolFlags.TypeOnly
-      : PythonSymbolFlags.LocalImportSymbol;
+      options?.type ? PythonSymbolFlags.TypeOnly : PythonSymbolFlags.None;
 
     const localSymbol = createSymbol(
       PythonOutputSymbol,

@@ -72,9 +72,8 @@ describe("DataclassDeclaration", () => {
 
     expect(res).toRenderTo(
       d`
-        from typing import TYPE_CHECKING
-
         from dataclasses import dataclass
+        from typing import TYPE_CHECKING
 
         if TYPE_CHECKING:
             from dataclasses import KW_ONLY

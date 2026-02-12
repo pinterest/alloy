@@ -155,9 +155,8 @@ describe("TYPE_CHECKING imports", () => {
 
         `,
       "service.py": `
-        from typing import TYPE_CHECKING
-
         from models import helper
+        from typing import TYPE_CHECKING
 
         if TYPE_CHECKING:
             from models import User
@@ -297,7 +296,7 @@ describe("TYPE_CHECKING imports", () => {
     });
   });
 
-  it("groups multiple typing module imports together", () => {
+  it("renders regular imports before TYPE_CHECKING block", () => {
     // Create a typing module with multiple exports
     const typingModule = createModule({
       name: "typing",
@@ -338,8 +337,7 @@ describe("TYPE_CHECKING imports", () => {
       { externals: [typingModule, requestsModule] },
     );
 
-    // typing imports should come first (stdlib), then third-party imports,
-    // then the TYPE_CHECKING block
+    // Regular imports first (sorted alphabetically), then TYPE_CHECKING block
     assertFileContents(result, {
       "models.py": `
         class User:
@@ -347,10 +345,9 @@ describe("TYPE_CHECKING imports", () => {
 
         `,
       "service.py": `
+        from requests import get
         from typing import cast
         from typing import TYPE_CHECKING
-
-        from requests import get
 
         if TYPE_CHECKING:
             from models import User

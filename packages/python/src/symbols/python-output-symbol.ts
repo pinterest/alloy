@@ -12,9 +12,8 @@ import {
 
 // prettier-ignore
 export enum PythonSymbolFlags {
-  None               = 0,
-  LocalImportSymbol  = 1 << 0,
-  TypeOnly           = 1 << 1,  // Only used in type annotation contexts
+  None     = 0,
+  TypeOnly = 1 << 0,  // Only used in type annotation contexts
 }
 
 export interface PythonOutputSymbolOptions extends OutputSymbolOptions {
@@ -72,13 +71,6 @@ export class PythonOutputSymbol extends OutputSymbol {
    */
   get isTypeOnly() {
     return !!(this.flags & PythonSymbolFlags.TypeOnly);
-  }
-
-  /**
-   * Returns true if this symbol is a local import symbol.
-   */
-  get isLocalImportSymbol() {
-    return !!(this.flags & PythonSymbolFlags.LocalImportSymbol);
   }
 
   /**

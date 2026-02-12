@@ -90,10 +90,9 @@ it("uses import from external library in multiple functions", () => {
     externals: [py.requestsModule],
   });
   const expected = d`
-    from typing import TYPE_CHECKING
-
     from requests import get
     from requests import post
+    from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
         from requests.models import Response
@@ -171,10 +170,9 @@ it("uses import from external library in multiple class methods", () => {
     externals: [py.requestsModule],
   });
   const expected = d`
-    from typing import TYPE_CHECKING
-
     from requests import get
     from requests import post
+    from typing import TYPE_CHECKING
 
     if TYPE_CHECKING:
         from requests.models import Response
