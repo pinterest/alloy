@@ -4,69 +4,53 @@ import { ImportedSymbol, ImportRecords } from "../symbols/index.js";
 export interface ImportStatementsProps {
   records: ImportRecords;
   joinImportsFromSameModule?: boolean;
-  /**
-   * Filter imports by type-only status.
-   * - `true`: only include type-only imports
-   * - `false`: only include non-type-only imports
-   * - `undefined`: include all imports (default)
-   */
-  typeAnnotationOnly?: boolean;
 }
 
-interface FilterOptions {
-  typeAnnotationOnly?: boolean;
+export interface CategorizedImports {
+  /** Imports used only in type annotation contexts (for TYPE_CHECKING block) */
+  typeImports: ImportRecords;
+  /** Regular imports used at runtime */
+  valueImports: ImportRecords;
 }
 
 /**
- * Filter import records based on typeAnnotationOnly flag.
- * Returns a new ImportRecords with only the matching symbols.
+ * Categorize import records into type-only and value imports.
+ * Type-only imports are those used only in type annotation contexts.
+ * Value imports are regular imports used at runtime.
  */
-function filterImportRecords(
+export function categorizeImportRecords(
   records: ImportRecords,
-  options: FilterOptions = {},
-): ImportRecords {
-  const { typeAnnotationOnly } = options;
-
-  if (typeAnnotationOnly === undefined) {
-    return records;
-  }
-
-  const filtered = new Map() as ImportRecords;
+): CategorizedImports {
+  const typeImports = new Map() as ImportRecords;
+  const valueImports = new Map() as ImportRecords;
 
   for (const [module, properties] of records) {
     if (!properties.symbols || properties.symbols.size === 0) {
-      // Module-level imports without symbols - include only if not filtering for type-only
-      if (!typeAnnotationOnly) {
-        filtered.set(module, properties);
-      }
+      // Module-level imports without symbols go to value imports
+      valueImports.set(module, properties);
       continue;
     }
 
-    const matchingSymbols = new Set<ImportedSymbol>();
+    const typeSymbols = new Set<ImportedSymbol>();
+    const valueSymbols = new Set<ImportedSymbol>();
+
     for (const sym of properties.symbols) {
-      const isTypeOnly = sym.local.isTypeOnly;
-      if (typeAnnotationOnly === isTypeOnly) {
-        matchingSymbols.add(sym);
+      if (sym.local.isTypeOnly) {
+        typeSymbols.add(sym);
+      } else {
+        valueSymbols.add(sym);
       }
     }
 
-    if (matchingSymbols.size > 0) {
-      filtered.set(module, { symbols: matchingSymbols });
+    if (typeSymbols.size > 0) {
+      typeImports.set(module, { symbols: typeSymbols });
+    }
+    if (valueSymbols.size > 0) {
+      valueImports.set(module, { symbols: valueSymbols });
     }
   }
 
-  return filtered;
-}
-
-/**
- * Check if there are any imports matching the filter options.
- */
-export function hasImports(
-  records: ImportRecords,
-  typeAnnotationOnly?: boolean,
-): boolean {
-  const filtered = filterImportRecords(records, { typeAnnotationOnly });
-  return filtered.size > 0;
+  return { typeImports, valueImports };
 }
 
 /**
@@ -76,19 +60,11 @@ export function hasImports(
  * This component will render import statements for each module and its symbols.
  * If `joinImportsFromSameModule` is true, it will group imports from the same module
  * into a single statement.
- *
- * Use `typeAnnotationOnly` to filter:
- * - `typeAnnotationOnly={true}`: only render type-only imports (for TYPE_CHECKING block)
- * - `typeAnnotationOnly={false}`: only render regular imports
- * - `typeAnnotationOnly={undefined}`: render all imports
  */
 export function ImportStatements(props: ImportStatementsProps) {
-  // Filter and sort the import records by module name
+  // Sort the import records by module name
   const imports = computed(() => {
-    const filtered = filterImportRecords(props.records, {
-      typeAnnotationOnly: props.typeAnnotationOnly,
-    });
-    return [...filtered].sort(([a], [b]) => {
+    return [...props.records].sort(([a], [b]) => {
       return a.name.localeCompare(b.name);
     });
   });

@@ -15,7 +15,10 @@ import {
 } from "@alloy-js/core";
 import { join } from "pathe";
 import { PythonModuleScope } from "../symbols/index.js";
-import { hasImports, ImportStatements } from "./ImportStatement.js";
+import {
+  categorizeImportRecords,
+  ImportStatements,
+} from "./ImportStatement.js";
 import { SimpleCommentBlock } from "./PyDoc.js";
 import { PythonBlock } from "./PythonBlock.js";
 import { Reference } from "./Reference.js";
@@ -169,17 +172,27 @@ export function SourceFile(props: SourceFileProps) {
     props.doc !== undefined ||
     props.futureImports !== undefined;
 
-  const hasTypeOnlyImports = computed(() =>
-    hasImports(scope.importedModules, true),
-  );
+  const imports = computed(() => {
+    // First pass to check for type imports
+    const preliminary = categorizeImportRecords(scope.importedModules);
+    const hasTypeImports = preliminary.typeImports.size > 0;
 
-  // When there are type-only imports, add the TYPE_CHECKING import to regular imports
-  // and capture the symbol for use in the if block opener
-  const typeImportSymbol = computed(() => {
-    if (hasTypeOnlyImports.value) {
-      return scope.addTypeImport();
-    }
-    return undefined;
+    // Add TYPE_CHECKING import if there are type imports
+    const typeImportSymbol = hasTypeImports ? scope.addTypeImport() : undefined;
+
+    // Re-categorize to include TYPE_CHECKING in value imports
+    const { valueImports, typeImports } =
+      hasTypeImports ?
+        categorizeImportRecords(scope.importedModules)
+      : preliminary;
+
+    return {
+      valueImports,
+      typeImports,
+      hasValueImports: valueImports.size > 0,
+      hasTypeImports,
+      typeImportSymbol,
+    };
   });
 
   return (
@@ -232,28 +245,22 @@ export function SourceFile(props: SourceFileProps) {
         </Show>
       </Show>
       {/* Regular (non-type-only) imports */}
-      <Show when={hasImports(scope.importedModules, false)}>
-        <ImportStatements
-          records={scope.importedModules}
-          typeAnnotationOnly={false}
-        />
+      <Show when={imports.value.hasValueImports}>
+        <ImportStatements records={imports.value.valueImports} />
         <hbr />
       </Show>
       {/* TYPE_CHECKING block with type-only imports */}
-      <Show when={hasTypeOnlyImports.value}>
+      <Show when={imports.value.hasTypeImports}>
         <hbr />
-        <PythonBlock opener={`if ${typeImportSymbol.value!.name}:`}>
-          <ImportStatements
-            records={scope.importedModules}
-            typeAnnotationOnly={true}
-          />
+        <PythonBlock opener={`if ${imports.value.typeImportSymbol!.name}:`}>
+          <ImportStatements records={imports.value.typeImports} />
         </PythonBlock>
       </Show>
       {/* Spacing after imports */}
       <Show
         when={
           hasChildren &&
-          (hasImports(scope.importedModules, false) || hasTypeOnlyImports.value)
+          (imports.value.hasValueImports || imports.value.hasTypeImports)
         }
       >
         <hbr />
@@ -261,7 +268,10 @@ export function SourceFile(props: SourceFileProps) {
       {/* Extra blank line before top-level definitions */}
       <Show
         when={
-          needsExtraSpacing && (hasPreamble || scope.importedModules.size > 0)
+          needsExtraSpacing &&
+          (hasPreamble ||
+            imports.value.hasValueImports ||
+            imports.value.hasTypeImports)
         }
       >
         <hbr />

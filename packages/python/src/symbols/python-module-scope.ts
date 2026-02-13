@@ -1,31 +1,29 @@
 import { createSymbol, reactive, shallowReactive } from "@alloy-js/core";
 import { PythonLexicalScope } from "./python-lexical-scope.js";
-import {
-  PythonOutputSymbol,
-  PythonSymbolFlags,
-} from "./python-output-symbol.js";
+import { PythonOutputSymbol } from "./python-output-symbol.js";
 
-// Lazy-initialized typing module scope for TYPE_CHECKING imports
-let typingModuleScope: PythonModuleScope | undefined;
-let typeCheckingSymbol: PythonOutputSymbol | undefined;
+// Internal typing module for TYPE_CHECKING imports
+let _typingModuleScope: PythonModuleScope | undefined;
+let _typeCheckingSymbol: PythonOutputSymbol | undefined;
 
-function getTypingModuleScope(): PythonModuleScope {
-  if (!typingModuleScope) {
-    typingModuleScope = new PythonModuleScope("typing", undefined);
-  }
-  return typingModuleScope;
-}
-
-function getTypeCheckingSymbol(): PythonOutputSymbol {
-  if (!typeCheckingSymbol) {
-    const scope = getTypingModuleScope();
-    typeCheckingSymbol = new PythonOutputSymbol(
+/**
+ * Get the internal typing module scope and TYPE_CHECKING symbol.
+ * Used by addTypeImport() to add TYPE_CHECKING imports without
+ * going through the binder's refkey resolution.
+ */
+function getTypingModuleInternal(): {
+  scope: PythonModuleScope;
+  TYPE_CHECKING: PythonOutputSymbol;
+} {
+  if (!_typingModuleScope) {
+    _typingModuleScope = new PythonModuleScope("typing", undefined);
+    _typeCheckingSymbol = new PythonOutputSymbol(
       "TYPE_CHECKING",
-      scope.symbols,
+      _typingModuleScope.symbols,
       {},
     );
   }
-  return typeCheckingSymbol;
+  return { scope: _typingModuleScope, TYPE_CHECKING: _typeCheckingSymbol! };
 }
 
 export class ImportedSymbol {
@@ -88,14 +86,15 @@ export class PythonModuleScope extends PythonLexicalScope {
       });
     }
 
-    const flags =
-      options?.type ? PythonSymbolFlags.TypeOnly : PythonSymbolFlags.None;
-
     const localSymbol = createSymbol(
       PythonOutputSymbol,
       targetSymbol.name,
       this.symbols,
-      { binder: this.binder, aliasTarget: targetSymbol, flags },
+      {
+        binder: this.binder,
+        aliasTarget: targetSymbol,
+        typeOnly: options?.type,
+      },
     );
 
     this.importedSymbols.set(targetSymbol, localSymbol);
@@ -108,13 +107,12 @@ export class PythonModuleScope extends PythonLexicalScope {
   }
 
   /**
-   * Add the type only import from the typing module.
-   * This is used when there are type-only imports that need to be guarded.
+   * Add TYPE_CHECKING import from the typing module.
+   * Returns the local symbol for use in the if block opener.
    */
-  addTypeImport() {
-    return this.addImport(getTypeCheckingSymbol(), getTypingModuleScope(), {
-      type: false,
-    });
+  addTypeImport(): PythonOutputSymbol {
+    const typing = getTypingModuleInternal();
+    return this.addImport(typing.TYPE_CHECKING, typing.scope);
   }
 
   override get debugInfo(): Record<string, unknown> {
