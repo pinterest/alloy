@@ -92,10 +92,7 @@ it("uses import from external library in multiple functions", () => {
   const expected = d`
     from requests import get
     from requests import post
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:
-        from requests.models import Response
+    from requests.models import Response
 
 
     def get_user(user_id: int) -> Response:
@@ -172,10 +169,7 @@ it("uses import from external library in multiple class methods", () => {
   const expected = d`
     from requests import get
     from requests import post
-    from typing import TYPE_CHECKING
-
-    if TYPE_CHECKING:
-        from requests.models import Response
+    from requests.models import Response
 
 
     class UserClient:

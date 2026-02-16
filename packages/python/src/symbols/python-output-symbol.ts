@@ -1,19 +1,13 @@
 import {
-  createSymbol,
   Namekey,
   OutputSpace,
   OutputSymbol,
   OutputSymbolOptions,
-  track,
-  TrackOpTypes,
-  trigger,
-  TriggerOpTypes,
+  createSymbol,
 } from "@alloy-js/core";
 
 export interface PythonOutputSymbolOptions extends OutputSymbolOptions {
   module?: string;
-  /** Whether this symbol is only used in type annotation contexts */
-  typeOnly?: boolean;
 }
 
 export interface CreatePythonSymbolFunctionOptions
@@ -34,7 +28,6 @@ export class PythonOutputSymbol extends OutputSymbol {
   ) {
     super(name, spaces, options);
     this.#module = options.module ?? undefined;
-    this.#typeOnly = options.typeOnly ?? false;
   }
 
   // The module in which the symbol is defined
@@ -42,29 +35,6 @@ export class PythonOutputSymbol extends OutputSymbol {
 
   get module() {
     return this.#module;
-  }
-
-  #typeOnly: boolean;
-
-  /**
-   * Returns true if this symbol is only used in type annotation contexts.
-   * Such symbols can be imported inside a TYPE_CHECKING block.
-   */
-  get isTypeOnly() {
-    track(this, TrackOpTypes.GET, "typeOnly");
-    return this.#typeOnly;
-  }
-
-  /**
-   * Mark this symbol as also being used as a value (not just a type).
-   */
-  markAsValue() {
-    if (!this.#typeOnly) {
-      return;
-    }
-    const oldValue = this.#typeOnly;
-    this.#typeOnly = false;
-    trigger(this, TriggerOpTypes.SET, "typeOnly", false, oldValue);
   }
 
   get staticMembers() {
@@ -99,7 +69,6 @@ export class PythonOutputSymbol extends OutputSymbol {
       aliasTarget: this.aliasTarget,
       module: this.module,
       metadata: this.metadata,
-      typeOnly: this.isTypeOnly,
     });
 
     this.initializeCopy(copy);

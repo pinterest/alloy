@@ -183,10 +183,7 @@ describe("Python Variable", () => {
 
       `,
       "usage.py": `
-        from typing import TYPE_CHECKING
-
-        if TYPE_CHECKING:
-            from classes import MyClass
+        from classes import MyClass
 
         my_var: MyClass = None
       `,
