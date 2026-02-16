@@ -10,7 +10,6 @@ import { createPythonSymbol } from "../symbol-creation.js";
 import { Atom } from "./Atom.jsx";
 import { BaseDeclarationProps } from "./Declaration.jsx";
 import { SimpleCommentBlock } from "./PyDoc.jsx";
-import { TypeRefContext } from "./TypeRefContext.jsx";
 
 export interface VariableDeclarationProps extends BaseDeclarationProps {
   /**
@@ -94,10 +93,7 @@ export function VariableDeclaration(props: VariableDeclarationProps) {
     if (!props.type || props.callStatementVar) return undefined;
     return (
       <>
-        :{" "}
-        <TypeRefContext>
-          <TypeSymbolSlot>{props.type}</TypeSymbolSlot>
-        </TypeRefContext>
+        : <TypeSymbolSlot>{props.type}</TypeSymbolSlot>
       </>
     );
   });

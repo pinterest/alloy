@@ -139,10 +139,7 @@ describe("UnionTypeExpression", () => {
 
       `,
       "use.py": `
-        from typing import TYPE_CHECKING
-
-        if TYPE_CHECKING:
-            from defs import Bar
+        from defs import Bar
 
         v: Bar[T] = None
       `,

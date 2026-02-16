@@ -73,10 +73,7 @@ describe("DataclassDeclaration", () => {
     expect(res).toRenderTo(
       d`
         from dataclasses import dataclass
-        from typing import TYPE_CHECKING
-
-        if TYPE_CHECKING:
-            from dataclasses import KW_ONLY
+        from dataclasses import KW_ONLY
 
 
         @dataclass
@@ -627,10 +624,7 @@ describe("DataclassDeclaration", () => {
               name="user"
               type={userRefkey}
               initializer={
-                <py.ClassInstantiation
-                  target={userRefkey}
-                  args={["1", '"Alice"']}
-                />
+                <py.ClassInstantiation target="User" args={["1", '"Alice"']} />
               }
             />
             <hbr />
