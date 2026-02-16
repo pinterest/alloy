@@ -12,9 +12,6 @@ export interface ReferenceProps {
  * @remarks
  * This component is used to render references to symbols in Python code.
  * It takes a `refkey` prop which is the key of the symbol to reference.
- *
- * When used inside a type annotation context, the import will be placed
- * inside a `if TYPE_CHECKING:` block.
  */
 export function Reference({ refkey }: ReferenceProps) {
   const inTypeRef = isTypeRefContext();

@@ -173,24 +173,23 @@ export function SourceFile(props: SourceFileProps) {
     props.futureImports !== undefined;
 
   const imports = computed(() => {
-    // First pass to check for type imports
-    const preliminary = categorizeImportRecords(scope.importedModules);
-    const hasTypeImports = preliminary.typeImports.size > 0;
+    // Quick scan for any type-only imports
+    const hasTypeImports = [...scope.importedModules.values()].some(
+      (props) =>
+        props.symbols && [...props.symbols].some((s) => s.local.isTypeOnly),
+    );
 
-    // Add TYPE_CHECKING import if there are type imports
+    // Add TYPE_CHECKING before categorizing so it's naturally included
     const typeImportSymbol = hasTypeImports ? scope.addTypeImport() : undefined;
 
-    // Re-categorize to include TYPE_CHECKING in value imports
-    const { valueImports, typeImports } =
-      hasTypeImports ?
-        categorizeImportRecords(scope.importedModules)
-      : preliminary;
+    // Single categorize - TYPE_CHECKING is already in scope.importedModules
+    const { valueImports, typeImports } = categorizeImportRecords(
+      scope.importedModules,
+    );
 
     return {
       valueImports,
       typeImports,
-      hasValueImports: valueImports.size > 0,
-      hasTypeImports,
       typeImportSymbol,
     };
   });
@@ -245,33 +244,25 @@ export function SourceFile(props: SourceFileProps) {
         </Show>
       </Show>
       {/* Regular (non-type-only) imports */}
-      <Show when={imports.value.hasValueImports}>
+      <Show when={imports.value.valueImports.size > 0}>
         <ImportStatements records={imports.value.valueImports} />
         <hbr />
       </Show>
       {/* TYPE_CHECKING block with type-only imports */}
-      <Show when={imports.value.hasTypeImports}>
+      <Show when={imports.value.typeImports.size > 0}>
         <hbr />
         <PythonBlock opener={`if ${imports.value.typeImportSymbol!.name}:`}>
           <ImportStatements records={imports.value.typeImports} />
         </PythonBlock>
       </Show>
       {/* Spacing after imports */}
-      <Show
-        when={
-          hasChildren &&
-          (imports.value.hasValueImports || imports.value.hasTypeImports)
-        }
-      >
+      <Show when={hasChildren && scope.importedModules.size > 0}>
         <hbr />
       </Show>
       {/* Extra blank line before top-level definitions */}
       <Show
         when={
-          needsExtraSpacing &&
-          (hasPreamble ||
-            imports.value.hasValueImports ||
-            imports.value.hasTypeImports)
+          needsExtraSpacing && (hasPreamble || scope.importedModules.size > 0)
         }
       >
         <hbr />
