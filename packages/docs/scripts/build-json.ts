@@ -47,6 +47,7 @@ const apiPackages = {
   json: apiModel.loadPackage(apiPath(resolve(packagesPath, "json"))),
   python: apiModel.loadPackage(apiPath(resolve(packagesPath, "python"))),
   go: apiModel.loadPackage(apiPath(resolve(packagesPath, "go"))),
+  thrift: apiModel.loadPackage(apiPath(resolve(packagesPath, "thrift"))),
 };
 
 function apiPath(packagePath: string) {
