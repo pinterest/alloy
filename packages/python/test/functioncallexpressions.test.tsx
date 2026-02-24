@@ -85,27 +85,15 @@ describe("FunctionCallExpression", () => {
     expect(result).toRenderTo(expected);
   });
 
-  it("Method call without a reference and with call statement vars", () => {
+  it("Method call without a reference and with keyword arguments", () => {
     const result = toSourceText([
       <py.StatementList>
         <py.FunctionCallExpression
           target={"example_method"}
           args={[
-            <py.VariableDeclaration
-              name="name"
-              initializer={"A name"}
-              callStatementVar
-            />,
-            <py.VariableDeclaration
-              name="number"
-              initializer={42}
-              callStatementVar
-            />,
-            <py.VariableDeclaration
-              name="flag"
-              initializer={true}
-              callStatementVar
-            />,
+            <py.KeywordArgument name="name" value={"A name"} />,
+            <py.KeywordArgument name="number" value={42} />,
+            <py.KeywordArgument name="flag" value={true} />,
           ]}
         />
       </py.StatementList>,
@@ -116,23 +104,15 @@ describe("FunctionCallExpression", () => {
     expect(result).toRenderTo(expected);
   });
 
-  it("Method call without a reference mixing unnamed and named vars", () => {
+  it("Method call without a reference mixing unnamed and keyword arguments", () => {
     const result = toSourceText([
       <py.StatementList>
         <py.FunctionCallExpression
           target={"example_method"}
           args={[
             <py.Atom jsValue={"A name"} />,
-            <py.VariableDeclaration
-              name="number"
-              initializer={42}
-              callStatementVar
-            />,
-            <py.VariableDeclaration
-              name="flag"
-              initializer={true}
-              callStatementVar
-            />,
+            <py.KeywordArgument name="number" value={42} />,
+            <py.KeywordArgument name="flag" value={true} />,
           ]}
         />
       </py.StatementList>,
@@ -162,21 +142,12 @@ describe("FunctionCallExpression", () => {
               args={[
                 "obj",
                 "info",
-                <py.VariableDeclaration
+                <py.KeywordArgument
                   name="operation"
-                  initializer={<>Operation.QUERY</>}
-                  callStatementVar
+                  value={<>Operation.QUERY</>}
                 />,
-                <py.VariableDeclaration
-                  name="data"
-                  initializer={kwargsKey}
-                  callStatementVar
-                />,
-                <py.VariableDeclaration
-                  name="is_v5"
-                  initializer={true}
-                  callStatementVar
-                />,
+                <py.KeywordArgument name="data" value={kwargsKey} />,
+                <py.KeywordArgument name="is_v5" value={true} />,
               ]}
             />
           }

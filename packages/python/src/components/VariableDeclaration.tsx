@@ -6,7 +6,6 @@ import {
   createSymbolSlot,
   memo,
 } from "@alloy-js/core";
-import { usePythonNamePolicy } from "../name-policy.js";
 import { createPythonSymbol } from "../symbol-creation.js";
 import { Atom } from "./Atom.jsx";
 import { BaseDeclarationProps } from "./Declaration.jsx";
@@ -25,11 +24,6 @@ export interface VariableDeclarationProps extends BaseDeclarationProps {
    * Indicates if we should omit the None assignment. Optional.
    */
   omitNone?: boolean;
-  /**
-   * Indicates if this is a call statement variable. Optional.
-   * This is used to handle cases where the variable is part of a call statement.
-   */
-  callStatementVar?: boolean;
   /**
    * Indicates if this variable is an instance variable. Optional.
    * This is used to handle cases where the variable is part of a class instance.
@@ -52,50 +46,34 @@ export interface VariableDeclarationProps extends BaseDeclarationProps {
  *   type="str"
  *   omitNone={true}
  * />
- * <VariableDeclaration
- *   name="myCallStmtVar"
- *   callStatementVar={true}
- *   initializer={12}
- * />
- * VariableDeclaration
- *   name=""
- *   callStatementVar={true}
- *   initializer={12}
- * />
  * ```
  * renders to
  * ```py
  * myVar: int = 42
  * myOtherVar: str
- * myCallStmtVar=12
- * 12
  * ```
  */
 export function VariableDeclaration(props: VariableDeclarationProps) {
   const TypeSymbolSlot = createSymbolSlot();
   const ValueTypeSymbolSlot = createSymbolSlot();
 
-  // For callStatementVar, don't create a symbol (keyword arguments aren't variables)
-  const sym =
-    props.callStatementVar ? undefined : (
-      createPythonSymbol(
-        props.name,
-        {
-          instance: props.instanceVariable,
-          refkeys: props.refkey,
-          type: props.type ? TypeSymbolSlot.firstSymbol : undefined,
-        },
-        "variable",
-      )
-    );
+  const sym = createPythonSymbol(
+    props.name,
+    {
+      instance: props.instanceVariable,
+      refkeys: props.refkey,
+      type: props.type ? TypeSymbolSlot.firstSymbol : undefined,
+    },
+    "variable",
+  );
 
-  if (!props.type && sym) {
+  if (!props.type) {
     ValueTypeSymbolSlot.moveMembersTo(sym);
   }
 
   // Handle optional type annotation
   const type = memo(() => {
-    if (!props.type || props.callStatementVar) return undefined;
+    if (!props.type) return undefined;
     return (
       <>
         : <TypeSymbolSlot>{props.type}</TypeSymbolSlot>
@@ -108,54 +86,16 @@ export function VariableDeclaration(props: VariableDeclarationProps) {
     typeof props.initializer === "object" ?
       memo(() => props.initializer)
     : props.initializer;
-  const assignmentOperator = props.callStatementVar ? "=" : " = ";
-  const getRightSide = () => {
-    // Early return for omitNone case
-    if (props.omitNone && props.initializer === undefined) {
-      return [false, ""];
-    }
 
-    // Handle null/undefined values
-    if (value === null || value === undefined) {
-      return [true, <>None</>];
-    }
+  const omitAssignment = props.omitNone && props.initializer === undefined;
 
-    let renderRightSideOperator = true;
-    // Call statement with no name
-    if (
-      props.callStatementVar &&
-      (props.name === undefined || props.name === "")
-    ) {
-      renderRightSideOperator = false;
-    }
-
-    // Standard assignment
-    return [
-      renderRightSideOperator,
-      <ValueTypeSymbolSlot>
+  const rightSide = memo(() =>
+    value === null || value === undefined ?
+      <>None</>
+    : <ValueTypeSymbolSlot>
         <Atom jsValue={value} />
       </ValueTypeSymbolSlot>,
-    ];
-  };
-  const [renderRightSideOperator, rightSide] = getRightSide();
-
-  // For callStatementVar, render without symbol registration
-  // We need to manually apply the name policy to the name
-  // since that is normally handled by the symbol creation.
-  if (props.callStatementVar) {
-    const namePolicy = usePythonNamePolicy();
-    const name =
-      typeof props.name === "string" && props.name ?
-        namePolicy.getName(props.name, "variable")
-      : "";
-    return (
-      <>
-        {name}
-        {renderRightSideOperator && assignmentOperator}
-        {rightSide}
-      </>
-    );
-  }
+  );
 
   return (
     <>
@@ -163,11 +103,13 @@ export function VariableDeclaration(props: VariableDeclarationProps) {
         <SimpleCommentBlock children={props.doc} />
         <hbr />
       </Show>
-      <CoreDeclaration symbol={sym!}>
-        {<Name />}
+      <CoreDeclaration symbol={sym}>
+        <Name />
         {type}
-        {renderRightSideOperator && assignmentOperator}
-        {rightSide}
+        <Show when={!omitAssignment}>
+          {" = "}
+          {rightSide}
+        </Show>
       </CoreDeclaration>
     </>
   );
