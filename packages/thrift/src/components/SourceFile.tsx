@@ -26,6 +26,7 @@ import { Reference } from "./Reference.js";
 export interface SourceFileProps {
   path: string;
   children?: Children;
+  header?: Children;
   headerComment?: Children;
   includes?: Children;
   namespaces?: Children;
@@ -43,7 +44,7 @@ export interface SourceFileProps {
  * ```tsx
  * <SourceFile path="user.thrift">
  *   <Struct name="User">
- *     <Field id={1} type="i64" name="id" />
+ *     <Field id={1} type={i64} name="id" />
  *   </Struct>
  * </SourceFile>
  * ```
@@ -69,6 +70,9 @@ export function SourceFile(props: SourceFileProps) {
   const namespaceChildren = computed(() =>
     childrenArray(() => props.namespaces, { preserveFragments: true }),
   );
+  const headerChildren = computed(() =>
+    childrenArray(() => props.header, { preserveFragments: true }),
+  );
   const declarationChildren = computed(() =>
     childrenArray(() => props.children, { preserveFragments: true }),
   );
@@ -79,6 +83,7 @@ export function SourceFile(props: SourceFileProps) {
 
   const hasIncludes = computed(() => includeRecords.value.length > 0);
   const hasNamespaces = computed(() => namespaceChildren.value.length > 0);
+  const hasHeader = computed(() => headerChildren.value.length > 0);
   const hasDeclarations = computed(() => declarationChildren.value.length > 0);
 
   return (
@@ -93,6 +98,20 @@ export function SourceFile(props: SourceFileProps) {
             registerInclude,
           }}
         >
+          <Show when={hasHeader.value}>
+            <List hardline>{headerChildren.value}</List>
+            <Show
+              when={
+                props.headerComment !== undefined ||
+                hasIncludes.value ||
+                hasNamespaces.value ||
+                hasDeclarations.value
+              }
+            >
+              <hbr />
+              <hbr />
+            </Show>
+          </Show>
           {props.includes}
           <Show when={props.headerComment !== undefined}>
             <DocComment>{props.headerComment}</DocComment>
@@ -109,7 +128,7 @@ export function SourceFile(props: SourceFileProps) {
           </Show>
           <Show when={hasIncludes.value}>
             <For each={includeRecords} hardline>
-              {(record) => `include \"${record.path}\"`}
+              {(record) => `include "${record.path}"`}
             </For>
             <Show when={hasNamespaces.value || hasDeclarations.value}>
               <hbr />

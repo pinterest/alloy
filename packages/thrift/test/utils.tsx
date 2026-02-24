@@ -9,12 +9,12 @@ import {
 } from "@alloy-js/core";
 import { dedent } from "@alloy-js/core/testing";
 import { expect } from "vitest";
-import * as thrift from "../src/index.js";
+import { SourceFile, defaultThriftNamePolicy } from "../src/index.js";
 
 export function toSourceText(c: Children, options?: PrintTreeOptions): string {
   const res = render(
-    <Output namePolicy={thrift.defaultThriftNamePolicy}>
-      <thrift.SourceFile path="test.thrift">{c}</thrift.SourceFile>
+    <Output namePolicy={defaultThriftNamePolicy}>
+      <SourceFile path="test.thrift">{c}</SourceFile>
     </Output>,
     { insertFinalNewLine: false, ...options },
   );

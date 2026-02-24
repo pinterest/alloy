@@ -3,8 +3,11 @@ import { Reference } from "./components/Reference.js";
 import type {
   AnnotationMap,
   AnnotationValue,
+  ConstRef,
   ConstValue,
   MapTypeRef,
+  RawAnnotationValue,
+  RawConstValue,
   SetTypeRef,
   TypeRef,
 } from "./types.js";
@@ -13,6 +16,10 @@ import { isBuiltinType } from "./types.js";
 export function renderTypeRef(type: TypeRef): Children {
   if (isRefkey(type)) {
     return <Reference refkey={type} />;
+  }
+
+  if (isBuiltinType(type)) {
+    return typeof type === "string" ? type : type.name;
   }
 
   if (typeof type === "string") {
@@ -69,13 +76,16 @@ export function renderAnnotations(annotations?: AnnotationMap): string {
     a.localeCompare(b),
   );
   const rendered = entries
-    .map(([key, value]) => `${key}=${formatAnnotationValue(value)}`)
+    .map(([key, value]) => `${key} = ${formatAnnotationValue(value)}`)
     .join(", ");
 
   return `(${rendered})`;
 }
 
 function formatAnnotationValue(value: AnnotationValue): string {
+  if (isRawAnnotationValue(value)) {
+    return value.value;
+  }
   if (typeof value === "string") {
     return `"${escapeString(value)}"`;
   }
@@ -86,6 +96,12 @@ function formatAnnotationValue(value: AnnotationValue): string {
 }
 
 function formatConstValue(value: ConstValue): string {
+  if (isConstRef(value)) {
+    return value.name;
+  }
+  if (isRawConstValue(value)) {
+    return value.value;
+  }
   if (typeof value === "string") {
     return `"${escapeString(value)}"`;
   }
@@ -95,28 +111,54 @@ function formatConstValue(value: ConstValue): string {
   if (Array.isArray(value)) {
     if (isConstMapEntries(value)) {
       const entries = value
-        .map(([k, v]) => `${formatConstValue(k)}: ${formatConstValue(v)}`)
-        .join(", ");
+        .map(([k, v]) => `${formatConstValue(k)} : ${formatConstValue(v)}`)
+        .join(" , ");
       return `{ ${entries} }`;
     }
 
-    const items = value.map((item) => formatConstValue(item)).join(", ");
+    const items = value.map((item) => formatConstValue(item)).join(" , ");
     return `[ ${items} ]`;
   }
   if (value instanceof Map) {
     const entries = Array.from(value.entries())
-      .map(([k, v]) => `${formatConstValue(k)}: ${formatConstValue(v)}`)
-      .join(", ");
+      .map(([k, v]) => `${formatConstValue(k)} : ${formatConstValue(v)}`)
+      .join(" , ");
     return `{ ${entries} }`;
   }
   if (typeof value === "object" && value) {
     const entries = Object.entries(value)
-      .map(([k, v]) => `${formatConstValue(k)}: ${formatConstValue(v)}`)
-      .join(", ");
+      .map(([k, v]) => `${formatConstValue(k)} : ${formatConstValue(v)}`)
+      .join(" , ");
     return `{ ${entries} }`;
   }
 
   return String(value);
+}
+
+function isConstRef(value: ConstValue): value is ConstRef {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    (value as ConstRef).kind === "const-ref"
+  );
+}
+
+function isRawAnnotationValue(
+  value: AnnotationValue,
+): value is RawAnnotationValue {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    (value as RawAnnotationValue).kind === "raw"
+  );
+}
+
+function isRawConstValue(value: ConstValue): value is RawConstValue {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    (value as RawConstValue).kind === "raw-const"
+  );
 }
 
 function isConstMapEntries(
@@ -131,7 +173,7 @@ function isConstMapEntries(
 }
 
 function escapeString(value: string): string {
-  return value.replace(/\\/g, "\\\\").replace(/\"/g, '\\"');
+  return value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 }
 
 export function isContainerType(

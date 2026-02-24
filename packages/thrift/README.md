@@ -7,21 +7,30 @@ renderer handle formatting, includes, and symbol references.
 
 ```tsx
 import { Output, render } from "@alloy-js/core";
-import * as thrift from "@alloy-js/thrift";
+import {
+  Enum,
+  EnumValue,
+  Field,
+  SourceFile,
+  Struct,
+  defaultThriftNamePolicy,
+  i64,
+  string,
+} from "@alloy-js/thrift";
 
 const res = render(
-  <Output namePolicy={thrift.defaultThriftNamePolicy}>
-    <thrift.SourceFile path="user.thrift">
-      <thrift.Enum name="Role">
-        <thrift.EnumValue name="ADMIN" value={1} />
-        <thrift.EnumValue name="USER" value={2} />
-      </thrift.Enum>
-      <thrift.Struct name="User">
-        <thrift.Field id={1} required type="i64" name="id" />
-        <thrift.Field id={2} type="string" name="name" />
-        <thrift.Field id={3} type="Role" name="role" />
-      </thrift.Struct>
-    </thrift.SourceFile>
+  <Output namePolicy={defaultThriftNamePolicy}>
+    <SourceFile path="user.thrift">
+      <Enum name="Role">
+        <EnumValue name="ADMIN" value={1} />
+        <EnumValue name="USER" value={2} />
+      </Enum>
+      <Struct name="User">
+        <Field id={1} required type={i64} name="id" />
+        <Field id={2} type={string} name="name" />
+        <Field id={3} type="Role" name="role" />
+      </Struct>
+    </SourceFile>
   </Output>,
 );
 ```
@@ -30,24 +39,33 @@ const res = render(
 
 ```tsx
 import { Output, refkey, render } from "@alloy-js/core";
-import * as thrift from "@alloy-js/thrift";
+import {
+  Field,
+  Service,
+  ServiceFunction,
+  SourceFile,
+  Struct,
+  defaultThriftNamePolicy,
+  i64,
+  string,
+} from "@alloy-js/thrift";
 
 const userRef = refkey();
 
 const res = render(
-  <Output namePolicy={thrift.defaultThriftNamePolicy}>
-    <thrift.SourceFile path="user.thrift">
-      <thrift.Struct name="User" refkey={userRef}>
-        <thrift.Field id={1} type="string" name="name" />
-      </thrift.Struct>
-    </thrift.SourceFile>
-    <thrift.SourceFile path="service.thrift">
-      <thrift.Service name="UserService">
-        <thrift.ServiceFunction name="getUser" returnType={userRef}>
-          <thrift.Field id={1} type="i64" name="id" />
-        </thrift.ServiceFunction>
-      </thrift.Service>
-    </thrift.SourceFile>
+  <Output namePolicy={defaultThriftNamePolicy}>
+    <SourceFile path="user.thrift">
+      <Struct name="User" refkey={userRef}>
+        <Field id={1} type={string} name="name" />
+      </Struct>
+    </SourceFile>
+    <SourceFile path="service.thrift">
+      <Service name="UserService">
+        <ServiceFunction name="getUser" returnType={userRef}>
+          <Field id={1} type={i64} name="id" />
+        </ServiceFunction>
+      </Service>
+    </SourceFile>
   </Output>,
 );
 ```
@@ -60,17 +78,24 @@ include alias.
 
 ```tsx
 import { Output, render } from "@alloy-js/core";
-import * as thrift from "@alloy-js/thrift";
+import {
+  Include,
+  Namespace,
+  SourceFile,
+  Typedef,
+  defaultThriftNamePolicy,
+  i64,
+} from "@alloy-js/thrift";
 
 const res = render(
-  <Output namePolicy={thrift.defaultThriftNamePolicy}>
-    <thrift.SourceFile
+  <Output namePolicy={defaultThriftNamePolicy}>
+    <SourceFile
       path="api.thrift"
-      includes={<thrift.Include path="shared.thrift" />}
-      namespaces={<thrift.Namespace lang="js" value="example.api" />}
+      includes={<Include path="shared.thrift" />}
+      namespaces={<Namespace lang="js" value="example.api" />}
     >
-      <thrift.Typedef name="UserId" type="i64" />
-    </thrift.SourceFile>
+      <Typedef name="UserId" type={i64} />
+    </SourceFile>
   </Output>,
 );
 ```

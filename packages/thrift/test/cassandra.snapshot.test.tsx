@@ -1,3 +1,4 @@
+import { refkey } from "@alloy-js/core";
 import { describe, expect, it } from "vitest";
 import {
   Const,
@@ -11,17 +12,69 @@ import {
   SourceFile,
   Struct,
   Throws,
+  binary,
+  bool,
+  double,
+  i32,
+  i64,
   listOf,
   mapOf,
+  string,
 } from "../src/index.js";
 import {
   SnapshotFile,
   loadFixture,
   permissiveNamePolicy,
   renderThriftFiles,
+  updateFixture,
 } from "./snapshot-utils.jsx";
 
-const files: SnapshotFile[] = [
+const consistencyLevel = refkey();
+const indexOperator = refkey();
+const indexType = refkey();
+const compression = refkey();
+const cqlResultType = refkey();
+const column = refkey();
+const superColumn = refkey();
+const counterColumn = refkey();
+const counterSuperColumn = refkey();
+const columnOrSuperColumn = refkey();
+const columnParent = refkey();
+const columnPath = refkey();
+const sliceRange = refkey();
+const slicePredicate = refkey();
+const indexExpression = refkey();
+const indexClause = refkey();
+const keyRange = refkey();
+const keySlice = refkey();
+const keyCount = refkey();
+const deletion = refkey();
+const mutation = refkey();
+const endpointDetails = refkey();
+const casResult = refkey();
+const columnDef = refkey();
+const triggerDef = refkey();
+const cfDef = refkey();
+const tokenRange = refkey();
+const cfSplit = refkey();
+const cqlMetadata = refkey();
+const cqlPreparedResult = refkey();
+const cqlResult = refkey();
+const cqlRow = refkey();
+const authenticationRequest = refkey();
+const authenticationException = refkey();
+const authorizationException = refkey();
+const invalidRequestException = refkey();
+const notFoundException = refkey();
+const unavailableException = refkey();
+const timedOutException = refkey();
+const schemaDisagreementException = refkey();
+const multiSliceRequest = refkey();
+const ksDef = refkey();
+const columnSlice = refkey();
+const cassandraService = refkey();
+
+export const files: SnapshotFile[] = [
   {
     path: "cassandra.thrift",
     file: (
@@ -38,7 +91,7 @@ const files: SnapshotFile[] = [
           <Namespace lang="rb" value="CassandraThrift" />,
         ]}
       >
-        <Enum name="ConsistencyLevel">
+        <Enum name="ConsistencyLevel" refkey={consistencyLevel}>
           <EnumValue name="ONE" value={1} />
           <EnumValue name="QUORUM" value={2} />
           <EnumValue name="LOCAL_QUORUM" value={3} />
@@ -51,1088 +104,940 @@ const files: SnapshotFile[] = [
           <EnumValue name="LOCAL_SERIAL" value={10} />
           <EnumValue name="LOCAL_ONE" value={11} />
         </Enum>
-        <Enum name="IndexOperator">
+        <Enum name="IndexOperator" refkey={indexOperator}>
           <EnumValue name="EQ" />
           <EnumValue name="GTE" />
           <EnumValue name="GT" />
           <EnumValue name="LTE" />
           <EnumValue name="LT" />
         </Enum>
-        <Enum name="IndexType">
+        <Enum name="IndexType" refkey={indexType}>
           <EnumValue name="KEYS" />
           <EnumValue name="CUSTOM" />
           <EnumValue name="COMPOSITES" />
         </Enum>
-        <Enum name="Compression">
+        <Enum name="Compression" refkey={compression}>
           <EnumValue name="GZIP" value={1} />
           <EnumValue name="NONE" value={2} />
         </Enum>
-        <Enum name="CqlResultType">
+        <Enum name="CqlResultType" refkey={cqlResultType}>
           <EnumValue name="ROWS" value={1} />
           <EnumValue name="VOID" value={2} />
           <EnumValue name="INT" value={3} />
         </Enum>
-        <Const name="VERSION" type="string" value={"20.1.0"} />
-        <Struct name="Column">
-          <Field id={1} required type="binary" name="name" />
-          <Field id={2} required={false} type="binary" name="value" />
-          <Field id={3} required={false} type="i64" name="timestamp" />
-          <Field id={4} required={false} type="i32" name="ttl" />
+        <Const name="VERSION" type={string} value={"20.1.0"} />
+        <Struct name="Column" refkey={column}>
+          <Field id={1} required type={binary} name="name" />
+          <Field id={2} optional type={binary} name="value" />
+          <Field id={3} optional type={i64} name="timestamp" />
+          <Field id={4} optional type={i32} name="ttl" />
         </Struct>
-        <Struct name="SuperColumn">
-          <Field id={1} required type="binary" name="name" />
-          <Field id={2} required type={listOf("Column")} name="columns" />
+        <Struct name="SuperColumn" refkey={superColumn}>
+          <Field id={1} required type={binary} name="name" />
+          <Field id={2} required type={listOf(column)} name="columns" />
         </Struct>
-        <Struct name="CounterColumn">
-          <Field id={1} required type="binary" name="name" />
-          <Field id={2} required type="i64" name="value" />
+        <Struct name="CounterColumn" refkey={counterColumn}>
+          <Field id={1} required type={binary} name="name" />
+          <Field id={2} required type={i64} name="value" />
         </Struct>
-        <Struct name="CounterSuperColumn">
-          <Field id={1} required type="binary" name="name" />
-          <Field
-            id={2}
-            required
-            type={listOf("CounterColumn")}
-            name="columns"
-          />
+        <Struct name="CounterSuperColumn" refkey={counterSuperColumn}>
+          <Field id={1} required type={binary} name="name" />
+          <Field id={2} required type={listOf(counterColumn)} name="columns" />
         </Struct>
-        <Struct name="ColumnOrSuperColumn">
-          <Field id={1} required={false} type="Column" name="column" />
-          <Field
-            id={2}
-            required={false}
-            type="SuperColumn"
-            name="super_column"
-          />
-          <Field
-            id={3}
-            required={false}
-            type="CounterColumn"
-            name="counter_column"
-          />
+        <Struct name="ColumnOrSuperColumn" refkey={columnOrSuperColumn}>
+          <Field id={1} optional type={column} name="column" />
+          <Field id={2} optional type={superColumn} name="super_column" />
+          <Field id={3} optional type={counterColumn} name="counter_column" />
           <Field
             id={4}
-            required={false}
-            type="CounterSuperColumn"
+            optional
+            type={counterSuperColumn}
             name="counter_super_column"
           />
         </Struct>
-        <Struct name="ColumnParent">
-          <Field id={3} required type="string" name="column_family" />
-          <Field id={4} required={false} type="binary" name="super_column" />
+        <Struct name="ColumnParent" refkey={columnParent}>
+          <Field id={3} required type={string} name="column_family" />
+          <Field id={4} optional type={binary} name="super_column" />
         </Struct>
-        <Struct name="ColumnPath">
-          <Field id={3} required type="string" name="column_family" />
-          <Field id={4} required={false} type="binary" name="super_column" />
-          <Field id={5} required={false} type="binary" name="column" />
+        <Struct name="ColumnPath" refkey={columnPath}>
+          <Field id={3} required type={string} name="column_family" />
+          <Field id={4} optional type={binary} name="super_column" />
+          <Field id={5} optional type={binary} name="column" />
         </Struct>
-        <Struct name="SliceRange">
-          <Field id={1} required type="binary" name="start" />
-          <Field id={2} required type="binary" name="finish" />
-          <Field id={3} required type="bool" name="reversed" default={0} />
-          <Field id={4} required type="i32" name="count" default={100} />
+        <Struct name="SliceRange" refkey={sliceRange}>
+          <Field id={1} required type={binary} name="start" />
+          <Field id={2} required type={binary} name="finish" />
+          <Field id={3} required type={bool} name="reversed" default={0} />
+          <Field id={4} required type={i32} name="count" default={100} />
         </Struct>
-        <Struct name="SlicePredicate">
-          <Field
-            id={1}
-            required={false}
-            type={listOf("binary")}
-            name="column_names"
-          />
-          <Field id={2} required={false} type="SliceRange" name="slice_range" />
+        <Struct name="SlicePredicate" refkey={slicePredicate}>
+          <Field id={1} optional type={listOf(binary)} name="column_names" />
+          <Field id={2} optional type={sliceRange} name="slice_range" />
         </Struct>
-        <Struct name="IndexExpression">
-          <Field id={1} required type="binary" name="column_name" />
-          <Field id={2} required type="IndexOperator" name="op" />
-          <Field id={3} required type="binary" name="value" />
+        <Struct name="IndexExpression" refkey={indexExpression}>
+          <Field id={1} required type={binary} name="column_name" />
+          <Field id={2} required type={indexOperator} name="op" />
+          <Field id={3} required type={binary} name="value" />
         </Struct>
-        <Struct name="IndexClause">
+        <Struct name="IndexClause" refkey={indexClause}>
           <Field
             id={1}
             required
-            type={listOf("IndexExpression")}
+            type={listOf(indexExpression)}
             name="expressions"
           />
-          <Field id={2} required type="binary" name="start_key" />
-          <Field id={3} required type="i32" name="count" default={100} />
+          <Field id={2} required type={binary} name="start_key" />
+          <Field id={3} required type={i32} name="count" default={100} />
         </Struct>
-        <Struct name="KeyRange">
-          <Field id={1} required={false} type="binary" name="start_key" />
-          <Field id={2} required={false} type="binary" name="end_key" />
-          <Field id={3} required={false} type="string" name="start_token" />
-          <Field id={4} required={false} type="string" name="end_token" />
+        <Struct name="KeyRange" refkey={keyRange}>
+          <Field id={1} optional type={binary} name="start_key" />
+          <Field id={2} optional type={binary} name="end_key" />
+          <Field id={3} optional type={string} name="start_token" />
+          <Field id={4} optional type={string} name="end_token" />
           <Field
             id={6}
-            required={false}
-            type={listOf("IndexExpression")}
+            optional
+            type={listOf(indexExpression)}
             name="row_filter"
           />
-          <Field id={5} required type="i32" name="count" default={100} />
+          <Field id={5} required type={i32} name="count" default={100} />
         </Struct>
-        <Struct name="KeySlice">
-          <Field id={1} required type="binary" name="key" />
+        <Struct name="KeySlice" refkey={keySlice}>
+          <Field id={1} required type={binary} name="key" />
           <Field
             id={2}
             required
-            type={listOf("ColumnOrSuperColumn")}
+            type={listOf(columnOrSuperColumn)}
             name="columns"
           />
         </Struct>
-        <Struct name="KeyCount">
-          <Field id={1} required type="binary" name="key" />
-          <Field id={2} required type="i32" name="count" />
+        <Struct name="KeyCount" refkey={keyCount}>
+          <Field id={1} required type={binary} name="key" />
+          <Field id={2} required type={i32} name="count" />
         </Struct>
-        <Struct name="Deletion">
-          <Field id={1} required={false} type="i64" name="timestamp" />
-          <Field id={2} required={false} type="binary" name="super_column" />
-          <Field
-            id={3}
-            required={false}
-            type="SlicePredicate"
-            name="predicate"
-          />
+        <Struct name="Deletion" refkey={deletion}>
+          <Field id={1} optional type={i64} name="timestamp" />
+          <Field id={2} optional type={binary} name="super_column" />
+          <Field id={3} optional type={slicePredicate} name="predicate" />
         </Struct>
-        <Struct name="Mutation">
+        <Struct name="Mutation" refkey={mutation}>
           <Field
             id={1}
-            required={false}
-            type="ColumnOrSuperColumn"
+            optional
+            type={columnOrSuperColumn}
             name="column_or_supercolumn"
           />
-          <Field id={2} required={false} type="Deletion" name="deletion" />
+          <Field id={2} optional type={deletion} name="deletion" />
         </Struct>
-        <Struct name="EndpointDetails">
-          <Field id={1} type="string" name="host" />
-          <Field id={2} type="string" name="datacenter" />
-          <Field id={3} required={false} type="string" name="rack" />
+        <Struct name="EndpointDetails" refkey={endpointDetails}>
+          <Field id={1} type={string} name="host" />
+          <Field id={2} type={string} name="datacenter" />
+          <Field id={3} optional type={string} name="rack" />
         </Struct>
-        <Struct name="CASResult">
-          <Field id={1} required type="bool" name="success" />
-          <Field
-            id={2}
-            required={false}
-            type={listOf("Column")}
-            name="current_values"
-          />
+        <Struct name="CASResult" refkey={casResult}>
+          <Field id={1} required type={bool} name="success" />
+          <Field id={2} optional type={listOf(column)} name="current_values" />
         </Struct>
-        <Struct name="TokenRange">
-          <Field id={1} required type="string" name="start_token" />
-          <Field id={2} required type="string" name="end_token" />
-          <Field id={3} required type={listOf("string")} name="endpoints" />
-          <Field
-            id={4}
-            required={false}
-            type={listOf("string")}
-            name="rpc_endpoints"
-          />
+        <Struct name="TokenRange" refkey={tokenRange}>
+          <Field id={1} required type={string} name="start_token" />
+          <Field id={2} required type={string} name="end_token" />
+          <Field id={3} required type={listOf(string)} name="endpoints" />
+          <Field id={4} optional type={listOf(string)} name="rpc_endpoints" />
           <Field
             id={5}
-            required={false}
-            type={listOf("EndpointDetails")}
+            optional
+            type={listOf(endpointDetails)}
             name="endpoint_details"
           />
         </Struct>
-        <Struct name="AuthenticationRequest">
+        <Struct name="AuthenticationRequest" refkey={authenticationRequest}>
           <Field
             id={1}
             required
-            type={mapOf("string", "string")}
+            type={mapOf(string, string)}
             name="credentials"
           />
         </Struct>
-        <Struct name="ColumnDef">
-          <Field id={1} required type="binary" name="name" />
-          <Field id={2} required type="string" name="validation_class" />
-          <Field id={3} required={false} type="IndexType" name="index_type" />
-          <Field id={4} required={false} type="string" name="index_name" />
+        <Struct name="ColumnDef" refkey={columnDef}>
+          <Field id={1} required type={binary} name="name" />
+          <Field id={2} required type={string} name="validation_class" />
+          <Field id={3} optional type={indexType} name="index_type" />
+          <Field id={4} optional type={string} name="index_name" />
           <Field
             id={5}
-            required={false}
-            type={mapOf("string", "string")}
+            optional
+            type={mapOf(string, string)}
             name="index_options"
           />
         </Struct>
-        <Struct name="TriggerDef">
-          <Field id={1} required type="string" name="name" />
-          <Field
-            id={2}
-            required
-            type={mapOf("string", "string")}
-            name="options"
-          />
+        <Struct name="TriggerDef" refkey={triggerDef}>
+          <Field id={1} required type={string} name="name" />
+          <Field id={2} required type={mapOf(string, string)} name="options" />
         </Struct>
-        <Struct name="CfDef">
-          <Field id={1} required type="string" name="keyspace" />
-          <Field id={2} required type="string" name="name" />
+        <Struct name="CfDef" refkey={cfDef}>
+          <Field id={1} required type={string} name="keyspace" />
+          <Field id={2} required type={string} name="name" />
           <Field
             id={3}
-            required={false}
-            type="string"
+            optional
+            type={string}
             name="column_type"
             default={"Standard"}
           />
           <Field
             id={5}
-            required={false}
-            type="string"
+            optional
+            type={string}
             name="comparator_type"
             default={"BytesType"}
           />
-          <Field
-            id={6}
-            required={false}
-            type="string"
-            name="subcomparator_type"
-          />
-          <Field id={8} required={false} type="string" name="comment" />
-          <Field
-            id={12}
-            required={false}
-            type="double"
-            name="read_repair_chance"
-          />
+          <Field id={6} optional type={string} name="subcomparator_type" />
+          <Field id={8} optional type={string} name="comment" />
+          <Field id={12} optional type={double} name="read_repair_chance" />
           <Field
             id={13}
-            required={false}
-            type={listOf("ColumnDef")}
+            optional
+            type={listOf(columnDef)}
             name="column_metadata"
           />
-          <Field id={14} required={false} type="i32" name="gc_grace_seconds" />
+          <Field id={14} optional type={i32} name="gc_grace_seconds" />
           <Field
             id={15}
-            required={false}
-            type="string"
+            optional
+            type={string}
             name="default_validation_class"
           />
-          <Field id={16} required={false} type="i32" name="id" />
-          <Field
-            id={17}
-            required={false}
-            type="i32"
-            name="min_compaction_threshold"
-          />
-          <Field
-            id={18}
-            required={false}
-            type="i32"
-            name="max_compaction_threshold"
-          />
-          <Field
-            id={26}
-            required={false}
-            type="string"
-            name="key_validation_class"
-          />
-          <Field id={28} required={false} type="binary" name="key_alias" />
-          <Field
-            id={29}
-            required={false}
-            type="string"
-            name="compaction_strategy"
-          />
+          <Field id={16} optional type={i32} name="id" />
+          <Field id={17} optional type={i32} name="min_compaction_threshold" />
+          <Field id={18} optional type={i32} name="max_compaction_threshold" />
+          <Field id={26} optional type={string} name="key_validation_class" />
+          <Field id={28} optional type={binary} name="key_alias" />
+          <Field id={29} optional type={string} name="compaction_strategy" />
           <Field
             id={30}
-            required={false}
-            type={mapOf("string", "string")}
+            optional
+            type={mapOf(string, string)}
             name="compaction_strategy_options"
           />
           <Field
             id={32}
-            required={false}
-            type={mapOf("string", "string")}
+            optional
+            type={mapOf(string, string)}
             name="compression_options"
           />
-          <Field
-            id={33}
-            required={false}
-            type="double"
-            name="bloom_filter_fp_chance"
-          />
+          <Field id={33} optional type={double} name="bloom_filter_fp_chance" />
           <Field
             id={34}
-            required={false}
-            type="string"
+            optional
+            type={string}
             name="caching"
             default={"keys_only"}
           />
           <Field
             id={37}
-            required={false}
-            type="double"
+            optional
+            type={double}
             name="dclocal_read_repair_chance"
             default={0}
           />
           <Field
             id={39}
-            required={false}
-            type="i32"
+            optional
+            type={i32}
             name="memtable_flush_period_in_ms"
           />
-          <Field
-            id={40}
-            required={false}
-            type="i32"
-            name="default_time_to_live"
-          />
+          <Field id={40} optional type={i32} name="default_time_to_live" />
           <Field
             id={42}
-            required={false}
-            type="string"
+            optional
+            type={string}
             name="speculative_retry"
             default={"NONE"}
           />
-          <Field
-            id={43}
-            required={false}
-            type={listOf("TriggerDef")}
-            name="triggers"
-          />
+          <Field id={43} optional type={listOf(triggerDef)} name="triggers" />
           <Field
             id={44}
-            required={false}
-            type="string"
+            optional
+            type={string}
             name="cells_per_row_to_cache"
             default={"100"}
           />
-          <Field
-            id={45}
-            required={false}
-            type="i32"
-            name="min_index_interval"
-          />
-          <Field
-            id={46}
-            required={false}
-            type="i32"
-            name="max_index_interval"
-          />
-          <Field id={9} required={false} type="double" name="row_cache_size" />
-          <Field id={11} required={false} type="double" name="key_cache_size" />
+          <Field id={45} optional type={i32} name="min_index_interval" />
+          <Field id={46} optional type={i32} name="max_index_interval" />
+          <Field id={9} optional type={double} name="row_cache_size" />
+          <Field id={11} optional type={double} name="key_cache_size" />
           <Field
             id={19}
-            required={false}
-            type="i32"
+            optional
+            type={i32}
             name="row_cache_save_period_in_seconds"
           />
           <Field
             id={20}
-            required={false}
-            type="i32"
+            optional
+            type={i32}
             name="key_cache_save_period_in_seconds"
           />
-          <Field
-            id={21}
-            required={false}
-            type="i32"
-            name="memtable_flush_after_mins"
-          />
-          <Field
-            id={22}
-            required={false}
-            type="i32"
-            name="memtable_throughput_in_mb"
-          />
+          <Field id={21} optional type={i32} name="memtable_flush_after_mins" />
+          <Field id={22} optional type={i32} name="memtable_throughput_in_mb" />
           <Field
             id={23}
-            required={false}
-            type="double"
+            optional
+            type={double}
             name="memtable_operations_in_millions"
           />
-          <Field
-            id={24}
-            required={false}
-            type="bool"
-            name="replicate_on_write"
-          />
-          <Field
-            id={25}
-            required={false}
-            type="double"
-            name="merge_shards_chance"
-          />
-          <Field
-            id={27}
-            required={false}
-            type="string"
-            name="row_cache_provider"
-          />
-          <Field
-            id={31}
-            required={false}
-            type="i32"
-            name="row_cache_keys_to_save"
-          />
+          <Field id={24} optional type={bool} name="replicate_on_write" />
+          <Field id={25} optional type={double} name="merge_shards_chance" />
+          <Field id={27} optional type={string} name="row_cache_provider" />
+          <Field id={31} optional type={i32} name="row_cache_keys_to_save" />
           <Field
             id={38}
-            required={false}
-            type="bool"
+            optional
+            type={bool}
             name="populate_io_cache_on_flush"
           />
-          <Field id={41} required={false} type="i32" name="index_interval" />
+          <Field id={41} optional type={i32} name="index_interval" />
         </Struct>
-        <Struct name="KsDef">
-          <Field id={1} required type="string" name="name" />
-          <Field id={2} required type="string" name="strategy_class" />
+        <Struct name="KsDef" refkey={ksDef}>
+          <Field id={1} required type={string} name="name" />
+          <Field id={2} required type={string} name="strategy_class" />
           <Field
             id={3}
-            required={false}
-            type={mapOf("string", "string")}
+            optional
+            type={mapOf(string, string)}
             name="strategy_options"
           />
-          <Field id={4} required={false} type="i32" name="replication_factor" />
-          <Field id={5} required type={listOf("CfDef")} name="cf_defs" />
+          <Field id={4} optional type={i32} name="replication_factor" />
+          <Field id={5} required type={listOf(cfDef)} name="cf_defs" />
           <Field
             id={6}
-            required={false}
-            type="bool"
+            optional
+            type={bool}
             name="durable_writes"
             default={1}
           />
         </Struct>
-        <Struct name="CqlRow">
-          <Field id={1} required type="binary" name="key" />
-          <Field id={2} required type={listOf("Column")} name="columns" />
+        <Struct name="CqlRow" refkey={cqlRow}>
+          <Field id={1} required type={binary} name="key" />
+          <Field id={2} required type={listOf(column)} name="columns" />
         </Struct>
-        <Struct name="CqlMetadata">
+        <Struct name="CqlMetadata" refkey={cqlMetadata}>
           <Field
             id={1}
             required
-            type={mapOf("binary", "string")}
+            type={mapOf(binary, string)}
             name="name_types"
           />
           <Field
             id={2}
             required
-            type={mapOf("binary", "string")}
+            type={mapOf(binary, string)}
             name="value_types"
           />
-          <Field id={3} required type="string" name="default_name_type" />
-          <Field id={4} required type="string" name="default_value_type" />
+          <Field id={3} required type={string} name="default_name_type" />
+          <Field id={4} required type={string} name="default_value_type" />
         </Struct>
-        <Struct name="CqlResult">
-          <Field id={1} required type="CqlResultType" name="type" />
-          <Field id={2} required={false} type={listOf("CqlRow")} name="rows" />
-          <Field id={3} required={false} type="i32" name="num" />
-          <Field id={4} required={false} type="CqlMetadata" name="schema" />
+        <Struct name="CqlResult" refkey={cqlResult}>
+          <Field id={1} required type={cqlResultType} name="type" />
+          <Field id={2} optional type={listOf(cqlRow)} name="rows" />
+          <Field id={3} optional type={i32} name="num" />
+          <Field id={4} optional type={cqlMetadata} name="schema" />
         </Struct>
-        <Struct name="CqlPreparedResult">
-          <Field id={1} required type="i32" name="itemId" />
-          <Field id={2} required type="i32" name="count" />
+        <Struct name="CqlPreparedResult" refkey={cqlPreparedResult}>
+          <Field id={1} required type={i32} name="itemId" />
+          <Field id={2} required type={i32} name="count" />
+          <Field id={3} optional type={listOf(string)} name="variable_types" />
+          <Field id={4} optional type={listOf(string)} name="variable_names" />
+        </Struct>
+        <Struct name="CfSplit" refkey={cfSplit}>
+          <Field id={1} required type={string} name="start_token" />
+          <Field id={2} required type={string} name="end_token" />
+          <Field id={3} required type={i64} name="row_count" />
+        </Struct>
+        <Struct name="ColumnSlice" refkey={columnSlice}>
+          <Field id={1} optional type={binary} name="start" />
+          <Field id={2} optional type={binary} name="finish" />
+        </Struct>
+        <Struct name="MultiSliceRequest" refkey={multiSliceRequest}>
+          <Field id={1} optional type={binary} name="key" />
+          <Field id={2} optional type={columnParent} name="column_parent" />
           <Field
             id={3}
-            required={false}
-            type={listOf("string")}
-            name="variable_types"
-          />
-          <Field
-            id={4}
-            required={false}
-            type={listOf("string")}
-            name="variable_names"
-          />
-        </Struct>
-        <Struct name="CfSplit">
-          <Field id={1} required type="string" name="start_token" />
-          <Field id={2} required type="string" name="end_token" />
-          <Field id={3} required type="i64" name="row_count" />
-        </Struct>
-        <Struct name="ColumnSlice">
-          <Field id={1} required={false} type="binary" name="start" />
-          <Field id={2} required={false} type="binary" name="finish" />
-        </Struct>
-        <Struct name="MultiSliceRequest">
-          <Field id={1} required={false} type="binary" name="key" />
-          <Field
-            id={2}
-            required={false}
-            type="ColumnParent"
-            name="column_parent"
-          />
-          <Field
-            id={3}
-            required={false}
-            type={listOf("ColumnSlice")}
+            optional
+            type={listOf(columnSlice)}
             name="column_slices"
           />
-          <Field
-            id={4}
-            required={false}
-            type="bool"
-            name="reversed"
-            default={false}
-          />
-          <Field
-            id={5}
-            required={false}
-            type="i32"
-            name="count"
-            default={1000}
-          />
+          <Field id={4} optional type={bool} name="reversed" default={false} />
+          <Field id={5} optional type={i32} name="count" default={1000} />
           <Field
             id={6}
-            required={false}
-            type="ConsistencyLevel"
+            optional
+            type={consistencyLevel}
             name="consistency_level"
             default={1}
           />
         </Struct>
-        <Exception name="NotFoundException"></Exception>
-        <Exception name="InvalidRequestException">
-          <Field id={1} required type="string" name="why" />
+        <Exception
+          name="NotFoundException"
+          refkey={notFoundException}
+        ></Exception>
+        <Exception
+          name="InvalidRequestException"
+          refkey={invalidRequestException}
+        >
+          <Field id={1} required type={string} name="why" />
         </Exception>
-        <Exception name="UnavailableException"></Exception>
-        <Exception name="TimedOutException">
-          <Field id={1} required={false} type="i32" name="acknowledged_by" />
-          <Field
-            id={2}
-            required={false}
-            type="bool"
-            name="acknowledged_by_batchlog"
-          />
-          <Field id={3} required={false} type="bool" name="paxos_in_progress" />
+        <Exception
+          name="UnavailableException"
+          refkey={unavailableException}
+        ></Exception>
+        <Exception name="TimedOutException" refkey={timedOutException}>
+          <Field id={1} optional type={i32} name="acknowledged_by" />
+          <Field id={2} optional type={bool} name="acknowledged_by_batchlog" />
+          <Field id={3} optional type={bool} name="paxos_in_progress" />
         </Exception>
-        <Exception name="AuthenticationException">
-          <Field id={1} required type="string" name="why" />
+        <Exception
+          name="AuthenticationException"
+          refkey={authenticationException}
+        >
+          <Field id={1} required type={string} name="why" />
         </Exception>
-        <Exception name="AuthorizationException">
-          <Field id={1} required type="string" name="why" />
+        <Exception
+          name="AuthorizationException"
+          refkey={authorizationException}
+        >
+          <Field id={1} required type={string} name="why" />
         </Exception>
-        <Exception name="SchemaDisagreementException"></Exception>
-        <Service name="Cassandra">
+        <Exception
+          name="SchemaDisagreementException"
+          refkey={schemaDisagreementException}
+        ></Exception>
+        <Service name="Cassandra" refkey={cassandraService}>
           <ServiceFunction name="login">
             <Field
               id={1}
               required
-              type="AuthenticationRequest"
+              type={authenticationRequest}
               name="auth_request"
             />
             <Throws>
-              <Field id={1} type="AuthenticationException" name="authnx" />
-              <Field id={2} type="AuthorizationException" name="authzx" />
+              <Field id={1} type={authenticationException} name="authnx" />
+              <Field id={2} type={authorizationException} name="authzx" />
             </Throws>
           </ServiceFunction>
           <ServiceFunction name="set_keyspace">
-            <Field id={1} required type="string" name="keyspace" />
+            <Field id={1} required type={string} name="keyspace" />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
+              <Field id={1} type={invalidRequestException} name="ire" />
             </Throws>
           </ServiceFunction>
-          <ServiceFunction name="get" returnType="ColumnOrSuperColumn">
-            <Field id={1} required type="binary" name="key" />
-            <Field id={2} required type="ColumnPath" name="column_path" />
+          <ServiceFunction name="get" returnType={columnOrSuperColumn}>
+            <Field id={1} required type={binary} name="key" />
+            <Field id={2} required type={columnPath} name="column_path" />
             <Field
               id={3}
               required
-              type="ConsistencyLevel"
+              type={consistencyLevel}
               name="consistency_level"
               default={1}
             />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
-              <Field id={2} type="NotFoundException" name="nfe" />
-              <Field id={3} type="UnavailableException" name="ue" />
-              <Field id={4} type="TimedOutException" name="te" />
+              <Field id={1} type={invalidRequestException} name="ire" />
+              <Field id={2} type={notFoundException} name="nfe" />
+              <Field id={3} type={unavailableException} name="ue" />
+              <Field id={4} type={timedOutException} name="te" />
             </Throws>
           </ServiceFunction>
           <ServiceFunction
             name="get_slice"
-            returnType={listOf("ColumnOrSuperColumn")}
+            returnType={listOf(columnOrSuperColumn)}
           >
-            <Field id={1} required type="binary" name="key" />
-            <Field id={2} required type="ColumnParent" name="column_parent" />
-            <Field id={3} required type="SlicePredicate" name="predicate" />
+            <Field id={1} required type={binary} name="key" />
+            <Field id={2} required type={columnParent} name="column_parent" />
+            <Field id={3} required type={slicePredicate} name="predicate" />
             <Field
               id={4}
               required
-              type="ConsistencyLevel"
+              type={consistencyLevel}
               name="consistency_level"
               default={1}
             />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
-              <Field id={2} type="UnavailableException" name="ue" />
-              <Field id={3} type="TimedOutException" name="te" />
+              <Field id={1} type={invalidRequestException} name="ire" />
+              <Field id={2} type={unavailableException} name="ue" />
+              <Field id={3} type={timedOutException} name="te" />
             </Throws>
           </ServiceFunction>
-          <ServiceFunction name="get_count" returnType="i32">
-            <Field id={1} required type="binary" name="key" />
-            <Field id={2} required type="ColumnParent" name="column_parent" />
-            <Field id={3} required type="SlicePredicate" name="predicate" />
+          <ServiceFunction name="get_count" returnType={i32}>
+            <Field id={1} required type={binary} name="key" />
+            <Field id={2} required type={columnParent} name="column_parent" />
+            <Field id={3} required type={slicePredicate} name="predicate" />
             <Field
               id={4}
               required
-              type="ConsistencyLevel"
+              type={consistencyLevel}
               name="consistency_level"
               default={1}
             />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
-              <Field id={2} type="UnavailableException" name="ue" />
-              <Field id={3} type="TimedOutException" name="te" />
+              <Field id={1} type={invalidRequestException} name="ire" />
+              <Field id={2} type={unavailableException} name="ue" />
+              <Field id={3} type={timedOutException} name="te" />
             </Throws>
           </ServiceFunction>
           <ServiceFunction
             name="multiget_slice"
-            returnType={mapOf("binary", listOf("ColumnOrSuperColumn"))}
+            returnType={mapOf(binary, listOf(columnOrSuperColumn))}
           >
-            <Field id={1} required type={listOf("binary")} name="keys" />
-            <Field id={2} required type="ColumnParent" name="column_parent" />
-            <Field id={3} required type="SlicePredicate" name="predicate" />
+            <Field id={1} required type={listOf(binary)} name="keys" />
+            <Field id={2} required type={columnParent} name="column_parent" />
+            <Field id={3} required type={slicePredicate} name="predicate" />
             <Field
               id={4}
               required
-              type="ConsistencyLevel"
+              type={consistencyLevel}
               name="consistency_level"
               default={1}
             />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
-              <Field id={2} type="UnavailableException" name="ue" />
-              <Field id={3} type="TimedOutException" name="te" />
+              <Field id={1} type={invalidRequestException} name="ire" />
+              <Field id={2} type={unavailableException} name="ue" />
+              <Field id={3} type={timedOutException} name="te" />
             </Throws>
           </ServiceFunction>
           <ServiceFunction
             name="multiget_count"
-            returnType={mapOf("binary", "i32")}
+            returnType={mapOf(binary, i32)}
           >
-            <Field id={1} required type={listOf("binary")} name="keys" />
-            <Field id={2} required type="ColumnParent" name="column_parent" />
-            <Field id={3} required type="SlicePredicate" name="predicate" />
+            <Field id={1} required type={listOf(binary)} name="keys" />
+            <Field id={2} required type={columnParent} name="column_parent" />
+            <Field id={3} required type={slicePredicate} name="predicate" />
             <Field
               id={4}
               required
-              type="ConsistencyLevel"
+              type={consistencyLevel}
               name="consistency_level"
               default={1}
             />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
-              <Field id={2} type="UnavailableException" name="ue" />
-              <Field id={3} type="TimedOutException" name="te" />
+              <Field id={1} type={invalidRequestException} name="ire" />
+              <Field id={2} type={unavailableException} name="ue" />
+              <Field id={3} type={timedOutException} name="te" />
             </Throws>
           </ServiceFunction>
           <ServiceFunction
             name="get_range_slices"
-            returnType={listOf("KeySlice")}
+            returnType={listOf(keySlice)}
           >
-            <Field id={1} required type="ColumnParent" name="column_parent" />
-            <Field id={2} required type="SlicePredicate" name="predicate" />
-            <Field id={3} required type="KeyRange" name="range" />
+            <Field id={1} required type={columnParent} name="column_parent" />
+            <Field id={2} required type={slicePredicate} name="predicate" />
+            <Field id={3} required type={keyRange} name="range" />
             <Field
               id={4}
               required
-              type="ConsistencyLevel"
+              type={consistencyLevel}
               name="consistency_level"
               default={1}
             />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
-              <Field id={2} type="UnavailableException" name="ue" />
-              <Field id={3} type="TimedOutException" name="te" />
+              <Field id={1} type={invalidRequestException} name="ire" />
+              <Field id={2} type={unavailableException} name="ue" />
+              <Field id={3} type={timedOutException} name="te" />
             </Throws>
           </ServiceFunction>
-          <ServiceFunction
-            name="get_paged_slice"
-            returnType={listOf("KeySlice")}
-          >
-            <Field id={1} required type="string" name="column_family" />
-            <Field id={2} required type="KeyRange" name="range" />
-            <Field id={3} required type="binary" name="start_column" />
+          <ServiceFunction name="get_paged_slice" returnType={listOf(keySlice)}>
+            <Field id={1} required type={string} name="column_family" />
+            <Field id={2} required type={keyRange} name="range" />
+            <Field id={3} required type={binary} name="start_column" />
             <Field
               id={4}
               required
-              type="ConsistencyLevel"
+              type={consistencyLevel}
               name="consistency_level"
               default={1}
             />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
-              <Field id={2} type="UnavailableException" name="ue" />
-              <Field id={3} type="TimedOutException" name="te" />
+              <Field id={1} type={invalidRequestException} name="ire" />
+              <Field id={2} type={unavailableException} name="ue" />
+              <Field id={3} type={timedOutException} name="te" />
             </Throws>
           </ServiceFunction>
           <ServiceFunction
             name="get_indexed_slices"
-            returnType={listOf("KeySlice")}
+            returnType={listOf(keySlice)}
           >
-            <Field id={1} required type="ColumnParent" name="column_parent" />
-            <Field id={2} required type="IndexClause" name="index_clause" />
+            <Field id={1} required type={columnParent} name="column_parent" />
+            <Field id={2} required type={indexClause} name="index_clause" />
             <Field
               id={3}
               required
-              type="SlicePredicate"
+              type={slicePredicate}
               name="column_predicate"
             />
             <Field
               id={4}
               required
-              type="ConsistencyLevel"
+              type={consistencyLevel}
               name="consistency_level"
               default={1}
             />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
-              <Field id={2} type="UnavailableException" name="ue" />
-              <Field id={3} type="TimedOutException" name="te" />
+              <Field id={1} type={invalidRequestException} name="ire" />
+              <Field id={2} type={unavailableException} name="ue" />
+              <Field id={3} type={timedOutException} name="te" />
             </Throws>
           </ServiceFunction>
           <ServiceFunction name="insert">
-            <Field id={1} required type="binary" name="key" />
-            <Field id={2} required type="ColumnParent" name="column_parent" />
-            <Field id={3} required type="Column" name="column" />
+            <Field id={1} required type={binary} name="key" />
+            <Field id={2} required type={columnParent} name="column_parent" />
+            <Field id={3} required type={column} name="column" />
             <Field
               id={4}
               required
-              type="ConsistencyLevel"
+              type={consistencyLevel}
               name="consistency_level"
               default={1}
             />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
-              <Field id={2} type="UnavailableException" name="ue" />
-              <Field id={3} type="TimedOutException" name="te" />
+              <Field id={1} type={invalidRequestException} name="ire" />
+              <Field id={2} type={unavailableException} name="ue" />
+              <Field id={3} type={timedOutException} name="te" />
             </Throws>
           </ServiceFunction>
           <ServiceFunction name="add">
-            <Field id={1} required type="binary" name="key" />
-            <Field id={2} required type="ColumnParent" name="column_parent" />
-            <Field id={3} required type="CounterColumn" name="column" />
+            <Field id={1} required type={binary} name="key" />
+            <Field id={2} required type={columnParent} name="column_parent" />
+            <Field id={3} required type={counterColumn} name="column" />
             <Field
               id={4}
               required
-              type="ConsistencyLevel"
+              type={consistencyLevel}
               name="consistency_level"
               default={1}
             />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
-              <Field id={2} type="UnavailableException" name="ue" />
-              <Field id={3} type="TimedOutException" name="te" />
+              <Field id={1} type={invalidRequestException} name="ire" />
+              <Field id={2} type={unavailableException} name="ue" />
+              <Field id={3} type={timedOutException} name="te" />
             </Throws>
           </ServiceFunction>
-          <ServiceFunction name="cas" returnType="CASResult">
-            <Field id={1} required type="binary" name="key" />
-            <Field id={2} required type="string" name="column_family" />
-            <Field id={3} type={listOf("Column")} name="expected" />
-            <Field id={4} type={listOf("Column")} name="updates" />
+          <ServiceFunction name="cas" returnType={casResult}>
+            <Field id={1} required type={binary} name="key" />
+            <Field id={2} required type={string} name="column_family" />
+            <Field id={3} type={listOf(column)} name="expected" />
+            <Field id={4} type={listOf(column)} name="updates" />
             <Field
               id={5}
               required
-              type="ConsistencyLevel"
+              type={consistencyLevel}
               name="serial_consistency_level"
               default={9}
             />
             <Field
               id={6}
               required
-              type="ConsistencyLevel"
+              type={consistencyLevel}
               name="commit_consistency_level"
               default={2}
             />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
-              <Field id={2} type="UnavailableException" name="ue" />
-              <Field id={3} type="TimedOutException" name="te" />
+              <Field id={1} type={invalidRequestException} name="ire" />
+              <Field id={2} type={unavailableException} name="ue" />
+              <Field id={3} type={timedOutException} name="te" />
             </Throws>
           </ServiceFunction>
           <ServiceFunction name="remove">
-            <Field id={1} required type="binary" name="key" />
-            <Field id={2} required type="ColumnPath" name="column_path" />
-            <Field id={3} required type="i64" name="timestamp" />
+            <Field id={1} required type={binary} name="key" />
+            <Field id={2} required type={columnPath} name="column_path" />
+            <Field id={3} required type={i64} name="timestamp" />
             <Field
               id={4}
-              type="ConsistencyLevel"
+              type={consistencyLevel}
               name="consistency_level"
               default={1}
             />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
-              <Field id={2} type="UnavailableException" name="ue" />
-              <Field id={3} type="TimedOutException" name="te" />
+              <Field id={1} type={invalidRequestException} name="ire" />
+              <Field id={2} type={unavailableException} name="ue" />
+              <Field id={3} type={timedOutException} name="te" />
             </Throws>
           </ServiceFunction>
           <ServiceFunction name="remove_counter">
-            <Field id={1} required type="binary" name="key" />
-            <Field id={2} required type="ColumnPath" name="path" />
+            <Field id={1} required type={binary} name="key" />
+            <Field id={2} required type={columnPath} name="path" />
             <Field
               id={3}
               required
-              type="ConsistencyLevel"
+              type={consistencyLevel}
               name="consistency_level"
               default={1}
             />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
-              <Field id={2} type="UnavailableException" name="ue" />
-              <Field id={3} type="TimedOutException" name="te" />
+              <Field id={1} type={invalidRequestException} name="ire" />
+              <Field id={2} type={unavailableException} name="ue" />
+              <Field id={3} type={timedOutException} name="te" />
             </Throws>
           </ServiceFunction>
           <ServiceFunction name="batch_mutate">
             <Field
               id={1}
               required
-              type={mapOf("binary", mapOf("string", listOf("Mutation")))}
+              type={mapOf(binary, mapOf(string, listOf(mutation)))}
               name="mutation_map"
             />
             <Field
               id={2}
               required
-              type="ConsistencyLevel"
+              type={consistencyLevel}
               name="consistency_level"
               default={1}
             />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
-              <Field id={2} type="UnavailableException" name="ue" />
-              <Field id={3} type="TimedOutException" name="te" />
+              <Field id={1} type={invalidRequestException} name="ire" />
+              <Field id={2} type={unavailableException} name="ue" />
+              <Field id={3} type={timedOutException} name="te" />
             </Throws>
           </ServiceFunction>
           <ServiceFunction name="atomic_batch_mutate">
             <Field
               id={1}
               required
-              type={mapOf("binary", mapOf("string", listOf("Mutation")))}
+              type={mapOf(binary, mapOf(string, listOf(mutation)))}
               name="mutation_map"
             />
             <Field
               id={2}
               required
-              type="ConsistencyLevel"
+              type={consistencyLevel}
               name="consistency_level"
               default={1}
             />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
-              <Field id={2} type="UnavailableException" name="ue" />
-              <Field id={3} type="TimedOutException" name="te" />
+              <Field id={1} type={invalidRequestException} name="ire" />
+              <Field id={2} type={unavailableException} name="ue" />
+              <Field id={3} type={timedOutException} name="te" />
             </Throws>
           </ServiceFunction>
           <ServiceFunction name="truncate">
-            <Field id={1} required type="string" name="cfname" />
+            <Field id={1} required type={string} name="cfname" />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
-              <Field id={2} type="UnavailableException" name="ue" />
-              <Field id={3} type="TimedOutException" name="te" />
+              <Field id={1} type={invalidRequestException} name="ire" />
+              <Field id={2} type={unavailableException} name="ue" />
+              <Field id={3} type={timedOutException} name="te" />
             </Throws>
           </ServiceFunction>
           <ServiceFunction
             name="get_multi_slice"
-            returnType={listOf("ColumnOrSuperColumn")}
+            returnType={listOf(columnOrSuperColumn)}
           >
-            <Field id={1} required type="MultiSliceRequest" name="request" />
+            <Field id={1} required type={multiSliceRequest} name="request" />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
-              <Field id={2} type="UnavailableException" name="ue" />
-              <Field id={3} type="TimedOutException" name="te" />
+              <Field id={1} type={invalidRequestException} name="ire" />
+              <Field id={2} type={unavailableException} name="ue" />
+              <Field id={3} type={timedOutException} name="te" />
             </Throws>
           </ServiceFunction>
           <ServiceFunction
             name="describe_schema_versions"
-            returnType={mapOf("string", listOf("string"))}
+            returnType={mapOf(string, listOf(string))}
           >
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
+              <Field id={1} type={invalidRequestException} name="ire" />
             </Throws>
           </ServiceFunction>
-          <ServiceFunction
-            name="describe_keyspaces"
-            returnType={listOf("KsDef")}
-          >
+          <ServiceFunction name="describe_keyspaces" returnType={listOf(ksDef)}>
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
+              <Field id={1} type={invalidRequestException} name="ire" />
             </Throws>
           </ServiceFunction>
           <ServiceFunction
             name="describe_cluster_name"
-            returnType="string"
+            returnType={string}
           ></ServiceFunction>
           <ServiceFunction
             name="describe_version"
-            returnType="string"
+            returnType={string}
           ></ServiceFunction>
-          <ServiceFunction
-            name="describe_ring"
-            returnType={listOf("TokenRange")}
-          >
-            <Field id={1} required type="string" name="keyspace" />
+          <ServiceFunction name="describe_ring" returnType={listOf(tokenRange)}>
+            <Field id={1} required type={string} name="keyspace" />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
+              <Field id={1} type={invalidRequestException} name="ire" />
             </Throws>
           </ServiceFunction>
           <ServiceFunction
             name="describe_local_ring"
-            returnType={listOf("TokenRange")}
+            returnType={listOf(tokenRange)}
           >
-            <Field id={1} required type="string" name="keyspace" />
+            <Field id={1} required type={string} name="keyspace" />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
+              <Field id={1} type={invalidRequestException} name="ire" />
             </Throws>
           </ServiceFunction>
           <ServiceFunction
             name="describe_token_map"
-            returnType={mapOf("string", "string")}
+            returnType={mapOf(string, string)}
           >
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
+              <Field id={1} type={invalidRequestException} name="ire" />
             </Throws>
           </ServiceFunction>
           <ServiceFunction
             name="describe_partitioner"
-            returnType="string"
+            returnType={string}
           ></ServiceFunction>
           <ServiceFunction
             name="describe_snitch"
-            returnType="string"
+            returnType={string}
           ></ServiceFunction>
-          <ServiceFunction name="describe_keyspace" returnType="KsDef">
-            <Field id={1} required type="string" name="keyspace" />
+          <ServiceFunction name="describe_keyspace" returnType={ksDef}>
+            <Field id={1} required type={string} name="keyspace" />
             <Throws>
-              <Field id={1} type="NotFoundException" name="nfe" />
-              <Field id={2} type="InvalidRequestException" name="ire" />
+              <Field id={1} type={notFoundException} name="nfe" />
+              <Field id={2} type={invalidRequestException} name="ire" />
             </Throws>
           </ServiceFunction>
-          <ServiceFunction name="describe_splits" returnType={listOf("string")}>
-            <Field id={1} required type="string" name="cfName" />
-            <Field id={2} required type="string" name="start_token" />
-            <Field id={3} required type="string" name="end_token" />
-            <Field id={4} required type="i32" name="keys_per_split" />
+          <ServiceFunction name="describe_splits" returnType={listOf(string)}>
+            <Field id={1} required type={string} name="cfName" />
+            <Field id={2} required type={string} name="start_token" />
+            <Field id={3} required type={string} name="end_token" />
+            <Field id={4} required type={i32} name="keys_per_split" />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
+              <Field id={1} type={invalidRequestException} name="ire" />
             </Throws>
           </ServiceFunction>
           <ServiceFunction
             name="trace_next_query"
-            returnType="binary"
+            returnType={binary}
           ></ServiceFunction>
           <ServiceFunction
             name="describe_splits_ex"
-            returnType={listOf("CfSplit")}
+            returnType={listOf(cfSplit)}
           >
-            <Field id={1} required type="string" name="cfName" />
-            <Field id={2} required type="string" name="start_token" />
-            <Field id={3} required type="string" name="end_token" />
-            <Field id={4} required type="i32" name="keys_per_split" />
+            <Field id={1} required type={string} name="cfName" />
+            <Field id={2} required type={string} name="start_token" />
+            <Field id={3} required type={string} name="end_token" />
+            <Field id={4} required type={i32} name="keys_per_split" />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
+              <Field id={1} type={invalidRequestException} name="ire" />
             </Throws>
           </ServiceFunction>
-          <ServiceFunction name="system_add_column_family" returnType="string">
-            <Field id={1} required type="CfDef" name="cf_def" />
+          <ServiceFunction name="system_add_column_family" returnType={string}>
+            <Field id={1} required type={cfDef} name="cf_def" />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
-              <Field id={2} type="SchemaDisagreementException" name="sde" />
+              <Field id={1} type={invalidRequestException} name="ire" />
+              <Field id={2} type={schemaDisagreementException} name="sde" />
             </Throws>
           </ServiceFunction>
-          <ServiceFunction name="system_drop_column_family" returnType="string">
-            <Field id={1} required type="string" name="column_family" />
+          <ServiceFunction name="system_drop_column_family" returnType={string}>
+            <Field id={1} required type={string} name="column_family" />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
-              <Field id={2} type="SchemaDisagreementException" name="sde" />
+              <Field id={1} type={invalidRequestException} name="ire" />
+              <Field id={2} type={schemaDisagreementException} name="sde" />
             </Throws>
           </ServiceFunction>
-          <ServiceFunction name="system_add_keyspace" returnType="string">
-            <Field id={1} required type="KsDef" name="ks_def" />
+          <ServiceFunction name="system_add_keyspace" returnType={string}>
+            <Field id={1} required type={ksDef} name="ks_def" />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
-              <Field id={2} type="SchemaDisagreementException" name="sde" />
+              <Field id={1} type={invalidRequestException} name="ire" />
+              <Field id={2} type={schemaDisagreementException} name="sde" />
             </Throws>
           </ServiceFunction>
-          <ServiceFunction name="system_drop_keyspace" returnType="string">
-            <Field id={1} required type="string" name="keyspace" />
+          <ServiceFunction name="system_drop_keyspace" returnType={string}>
+            <Field id={1} required type={string} name="keyspace" />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
-              <Field id={2} type="SchemaDisagreementException" name="sde" />
+              <Field id={1} type={invalidRequestException} name="ire" />
+              <Field id={2} type={schemaDisagreementException} name="sde" />
             </Throws>
           </ServiceFunction>
-          <ServiceFunction name="system_update_keyspace" returnType="string">
-            <Field id={1} required type="KsDef" name="ks_def" />
+          <ServiceFunction name="system_update_keyspace" returnType={string}>
+            <Field id={1} required type={ksDef} name="ks_def" />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
-              <Field id={2} type="SchemaDisagreementException" name="sde" />
+              <Field id={1} type={invalidRequestException} name="ire" />
+              <Field id={2} type={schemaDisagreementException} name="sde" />
             </Throws>
           </ServiceFunction>
           <ServiceFunction
             name="system_update_column_family"
-            returnType="string"
+            returnType={string}
           >
-            <Field id={1} required type="CfDef" name="cf_def" />
+            <Field id={1} required type={cfDef} name="cf_def" />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
-              <Field id={2} type="SchemaDisagreementException" name="sde" />
+              <Field id={1} type={invalidRequestException} name="ire" />
+              <Field id={2} type={schemaDisagreementException} name="sde" />
             </Throws>
           </ServiceFunction>
-          <ServiceFunction name="execute_cql_query" returnType="CqlResult">
-            <Field id={1} required type="binary" name="query" />
-            <Field id={2} required type="Compression" name="compression" />
+          <ServiceFunction name="execute_cql_query" returnType={cqlResult}>
+            <Field id={1} required type={binary} name="query" />
+            <Field id={2} required type={compression} name="compression" />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
-              <Field id={2} type="UnavailableException" name="ue" />
-              <Field id={3} type="TimedOutException" name="te" />
-              <Field id={4} type="SchemaDisagreementException" name="sde" />
+              <Field id={1} type={invalidRequestException} name="ire" />
+              <Field id={2} type={unavailableException} name="ue" />
+              <Field id={3} type={timedOutException} name="te" />
+              <Field id={4} type={schemaDisagreementException} name="sde" />
             </Throws>
           </ServiceFunction>
-          <ServiceFunction name="execute_cql3_query" returnType="CqlResult">
-            <Field id={1} required type="binary" name="query" />
-            <Field id={2} required type="Compression" name="compression" />
-            <Field id={3} required type="ConsistencyLevel" name="consistency" />
+          <ServiceFunction name="execute_cql3_query" returnType={cqlResult}>
+            <Field id={1} required type={binary} name="query" />
+            <Field id={2} required type={compression} name="compression" />
+            <Field id={3} required type={consistencyLevel} name="consistency" />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
-              <Field id={2} type="UnavailableException" name="ue" />
-              <Field id={3} type="TimedOutException" name="te" />
-              <Field id={4} type="SchemaDisagreementException" name="sde" />
+              <Field id={1} type={invalidRequestException} name="ire" />
+              <Field id={2} type={unavailableException} name="ue" />
+              <Field id={3} type={timedOutException} name="te" />
+              <Field id={4} type={schemaDisagreementException} name="sde" />
             </Throws>
           </ServiceFunction>
           <ServiceFunction
             name="prepare_cql_query"
-            returnType="CqlPreparedResult"
+            returnType={cqlPreparedResult}
           >
-            <Field id={1} required type="binary" name="query" />
-            <Field id={2} required type="Compression" name="compression" />
+            <Field id={1} required type={binary} name="query" />
+            <Field id={2} required type={compression} name="compression" />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
+              <Field id={1} type={invalidRequestException} name="ire" />
             </Throws>
           </ServiceFunction>
           <ServiceFunction
             name="prepare_cql3_query"
-            returnType="CqlPreparedResult"
+            returnType={cqlPreparedResult}
           >
-            <Field id={1} required type="binary" name="query" />
-            <Field id={2} required type="Compression" name="compression" />
+            <Field id={1} required type={binary} name="query" />
+            <Field id={2} required type={compression} name="compression" />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
+              <Field id={1} type={invalidRequestException} name="ire" />
             </Throws>
           </ServiceFunction>
           <ServiceFunction
             name="execute_prepared_cql_query"
-            returnType="CqlResult"
+            returnType={cqlResult}
           >
-            <Field id={1} required type="i32" name="itemId" />
-            <Field id={2} required type={listOf("binary")} name="values" />
+            <Field id={1} required type={i32} name="itemId" />
+            <Field id={2} required type={listOf(binary)} name="values" />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
-              <Field id={2} type="UnavailableException" name="ue" />
-              <Field id={3} type="TimedOutException" name="te" />
-              <Field id={4} type="SchemaDisagreementException" name="sde" />
+              <Field id={1} type={invalidRequestException} name="ire" />
+              <Field id={2} type={unavailableException} name="ue" />
+              <Field id={3} type={timedOutException} name="te" />
+              <Field id={4} type={schemaDisagreementException} name="sde" />
             </Throws>
           </ServiceFunction>
           <ServiceFunction
             name="execute_prepared_cql3_query"
-            returnType="CqlResult"
+            returnType={cqlResult}
           >
-            <Field id={1} required type="i32" name="itemId" />
-            <Field id={2} required type={listOf("binary")} name="values" />
-            <Field id={3} required type="ConsistencyLevel" name="consistency" />
+            <Field id={1} required type={i32} name="itemId" />
+            <Field id={2} required type={listOf(binary)} name="values" />
+            <Field id={3} required type={consistencyLevel} name="consistency" />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
-              <Field id={2} type="UnavailableException" name="ue" />
-              <Field id={3} type="TimedOutException" name="te" />
-              <Field id={4} type="SchemaDisagreementException" name="sde" />
+              <Field id={1} type={invalidRequestException} name="ire" />
+              <Field id={2} type={unavailableException} name="ue" />
+              <Field id={3} type={timedOutException} name="te" />
+              <Field id={4} type={schemaDisagreementException} name="sde" />
             </Throws>
           </ServiceFunction>
           <ServiceFunction name="set_cql_version">
-            <Field id={1} required type="string" name="version" />
+            <Field id={1} required type={string} name="version" />
             <Throws>
-              <Field id={1} type="InvalidRequestException" name="ire" />
+              <Field id={1} type={invalidRequestException} name="ire" />
             </Throws>
           </ServiceFunction>
         </Service>
@@ -1144,6 +1049,7 @@ const files: SnapshotFile[] = [
 describe("Thrift snapshots", () => {
   it("renders cassandra.thrift", () => {
     const output = renderThriftFiles(files);
+    updateFixture("cassandra.thrift", output["cassandra.thrift"]);
 
     expect(output).toEqual({
       "cassandra.thrift": loadFixture("cassandra.thrift"),

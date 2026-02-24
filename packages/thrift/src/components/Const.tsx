@@ -26,7 +26,7 @@ export interface ConstProps {
  *
  * @example Constant value
  * ```tsx
- * <Const name="DefaultPageSize" type="i32" value={50} />
+ * <Const name="DefaultPageSize" type={i32} value={50} />
  * ```
  */
 export function Const(props: ConstProps) {

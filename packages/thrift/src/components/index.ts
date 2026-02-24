@@ -7,8 +7,18 @@ export type { IncludeProps } from "./Include.js";
 export { Namespace } from "./Namespace.js";
 export type { NamespaceProps } from "./Namespace.js";
 
-export { DocComment, DocWhen } from "./DocComment.js";
-export type { DocCommentProps, DocWhenProps } from "./DocComment.js";
+export {
+  BlockComment,
+  DocComment,
+  DocWhen,
+  LineComment,
+} from "./DocComment.js";
+export type {
+  BlockCommentProps,
+  DocCommentProps,
+  DocWhenProps,
+  LineCommentProps,
+} from "./DocComment.js";
 
 export { Exception, Struct, Union } from "./Struct.js";
 export type {

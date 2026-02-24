@@ -1,24 +1,31 @@
 import { assertFileContents } from "#test/utils.jsx";
 import { Output, refkey, render } from "@alloy-js/core";
 import { describe, it } from "vitest";
-import * as thrift from "../index.js";
+import {
+  Field,
+  Include,
+  SourceFile,
+  Struct,
+  defaultThriftNamePolicy,
+  string,
+} from "../index.js";
 
 describe("Include", () => {
   it("adds include statements for cross-file references", () => {
     const userRef = refkey();
 
     const res = render(
-      <Output namePolicy={thrift.defaultThriftNamePolicy}>
-        <thrift.SourceFile path="main.thrift">
-          <thrift.Struct name="Request">
-            <thrift.Field id={1} type={userRef} name="user" />
-          </thrift.Struct>
-        </thrift.SourceFile>
-        <thrift.SourceFile path="shared.thrift">
-          <thrift.Struct name="User" refkey={userRef}>
-            <thrift.Field id={1} type="string" name="name" />
-          </thrift.Struct>
-        </thrift.SourceFile>
+      <Output namePolicy={defaultThriftNamePolicy}>
+        <SourceFile path="main.thrift">
+          <Struct name="Request">
+            <Field id={1} type={userRef} name="user" />
+          </Struct>
+        </SourceFile>
+        <SourceFile path="shared.thrift">
+          <Struct name="User" refkey={userRef}>
+            <Field id={1} type={string} name="name" />
+          </Struct>
+        </SourceFile>
       </Output>,
       { insertFinalNewLine: false },
     );
@@ -28,12 +35,12 @@ describe("Include", () => {
         include "shared.thrift"
 
         struct Request {
-          1: shared.User user;
+          1: shared.User user,
         }
       `,
       "shared.thrift": `
         struct User {
-          1: string name;
+          1: string name,
         }
       `,
     });
@@ -43,20 +50,20 @@ describe("Include", () => {
     const userRef = refkey();
 
     const res = render(
-      <Output namePolicy={thrift.defaultThriftNamePolicy}>
-        <thrift.SourceFile
+      <Output namePolicy={defaultThriftNamePolicy}>
+        <SourceFile
           path="main.thrift"
-          includes={<thrift.Include path="shared.thrift" alias="common" />}
+          includes={<Include path="shared.thrift" alias="common" />}
         >
-          <thrift.Struct name="Request">
-            <thrift.Field id={1} type={userRef} name="user" />
-          </thrift.Struct>
-        </thrift.SourceFile>
-        <thrift.SourceFile path="shared.thrift">
-          <thrift.Struct name="User" refkey={userRef}>
-            <thrift.Field id={1} type="string" name="name" />
-          </thrift.Struct>
-        </thrift.SourceFile>
+          <Struct name="Request">
+            <Field id={1} type={userRef} name="user" />
+          </Struct>
+        </SourceFile>
+        <SourceFile path="shared.thrift">
+          <Struct name="User" refkey={userRef}>
+            <Field id={1} type={string} name="name" />
+          </Struct>
+        </SourceFile>
       </Output>,
       { insertFinalNewLine: false },
     );
@@ -66,12 +73,12 @@ describe("Include", () => {
         include "shared.thrift"
 
         struct Request {
-          1: common.User user;
+          1: common.User user,
         }
       `,
       "shared.thrift": `
         struct User {
-          1: string name;
+          1: string name,
         }
       `,
     });

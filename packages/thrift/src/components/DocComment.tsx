@@ -1,7 +1,60 @@
-import { Children, List } from "@alloy-js/core";
+import { Children, For, List, childrenArray } from "@alloy-js/core";
+
+function splitLines(value: string): string[] {
+  const lines = value.split(/\r?\n/);
+  if (lines.length > 0 && lines[lines.length - 1] === "") {
+    lines.pop();
+  }
+  return lines;
+}
+
+function normalizeCommentChildren(children: Children): Children {
+  if (typeof children === "string") {
+    return splitLines(children);
+  }
+  if (Array.isArray(children)) {
+    return children.reduce<Children[]>(
+      (normalized, child) =>
+        normalized.concat(
+          ...(typeof child === "string" ? splitLines(child) : [child]),
+        ),
+      [],
+    );
+  }
+  return children;
+}
 
 export interface DocCommentProps {
   children: Children;
+}
+
+function renderDocComment(props: {
+  children: Children;
+  linePrefix: string;
+  closingLine: string;
+  alignWidth?: number;
+}) {
+  const content = normalizeCommentChildren(props.children);
+  const body = (
+    <>
+      {props.linePrefix}
+      <align string={props.linePrefix}>
+        <List>{content}</List>
+      </align>
+      <hbr />
+      {props.closingLine}
+    </>
+  );
+
+  return (
+    <>
+      {"/**"}
+      <hbr />
+      {props.alignWidth !== undefined ?
+        <align width={props.alignWidth}>{body}</align>
+      : body}
+    </>
+  );
 }
 
 /**
@@ -16,18 +69,11 @@ export interface DocCommentProps {
  * ```
  */
 export function DocComment(props: DocCommentProps) {
-  return (
-    <>
-      {"/**"}
-      <hbr />
-      {" * "}
-      <align string=" * ">
-        <List>{props.children}</List>
-      </align>
-      <hbr />
-      {" */"}
-    </>
-  );
+  return renderDocComment({
+    children: props.children,
+    linePrefix: " * ",
+    closingLine: " */",
+  });
 }
 
 export interface DocWhenProps {
@@ -55,5 +101,64 @@ export function DocWhen(props: DocWhenProps) {
         </>
       : null}
     </>
+  );
+}
+
+export interface BlockCommentProps {
+  children: Children;
+}
+
+/**
+ * Render a Thrift-style block comment (`/* ... *\/`).
+ *
+ * @example Block comment
+ * ```tsx
+ * <BlockComment>License header</BlockComment>
+ * ```
+ */
+export function BlockComment(props: BlockCommentProps) {
+  const content = normalizeCommentChildren(props.children);
+  return (
+    <>
+      {"/*"}
+      <hbr />
+      {" * "}
+      <align string=" * ">
+        <List>{content}</List>
+      </align>
+      <hbr />
+      {" */"}
+    </>
+  );
+}
+
+export interface LineCommentProps {
+  children: Children;
+  prefix?: string;
+}
+
+/**
+ * Render a Thrift line comment (`//` or `#`).
+ *
+ * @example Line comment
+ * ```tsx
+ * <LineComment>TODO: add docs</LineComment>
+ * ```
+ */
+export function LineComment(props: LineCommentProps) {
+  const prefix = props.prefix ?? "//";
+  const lines = childrenArray(() => normalizeCommentChildren(props.children), {
+    preserveFragments: true,
+  });
+  return (
+    <For each={lines} hardline>
+      {(line) => (
+        <>
+          {prefix}
+          {line === "" ? "" : " "}
+          {line}
+        </>
+      )}
+    </For>
   );
 }

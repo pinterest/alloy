@@ -4,6 +4,7 @@ export type BuiltinType =
   | "void"
   | "bool"
   | "byte"
+  | "i8"
   | "i16"
   | "i32"
   | "i64"
@@ -11,7 +12,17 @@ export type BuiltinType =
   | "string"
   | "binary";
 
-export type AnnotationValue = string | number | boolean;
+export interface BuiltinTypeRef {
+  kind: "builtin";
+  name: BuiltinType;
+}
+
+export interface RawAnnotationValue {
+  kind: "raw";
+  value: string;
+}
+
+export type AnnotationValue = string | number | boolean | RawAnnotationValue;
 export type AnnotationMap = Record<string, AnnotationValue>;
 
 export interface ListTypeRef {
@@ -35,6 +46,7 @@ export interface MapTypeRef {
 
 export type TypeRef =
   | BuiltinType
+  | BuiltinTypeRef
   | Refkey
   | string
   | ListTypeRef
@@ -42,6 +54,8 @@ export type TypeRef =
   | MapTypeRef;
 
 export type ConstValue =
+  | RawConstValue
+  | ConstRef
   | string
   | number
   | boolean
@@ -50,10 +64,33 @@ export type ConstValue =
   | Array<[ConstValue, ConstValue]>
   | { [key: string]: ConstValue };
 
+export interface ConstRef {
+  kind: "const-ref";
+  name: string;
+}
+
+export interface RawConstValue {
+  kind: "raw-const";
+  value: string;
+}
+
+export function constRef(name: string): ConstRef {
+  return { kind: "const-ref", name };
+}
+
+export function rawConst(value: string): RawConstValue {
+  return { kind: "raw-const", value };
+}
+
+export function rawAnnotation(value: string): RawAnnotationValue {
+  return { kind: "raw", value };
+}
+
 const BUILTIN_TYPES = new Set<BuiltinType>([
   "void",
   "bool",
   "byte",
+  "i8",
   "i16",
   "i32",
   "i64",
@@ -62,8 +99,19 @@ const BUILTIN_TYPES = new Set<BuiltinType>([
   "binary",
 ]);
 
-export function isBuiltinType(value: unknown): value is BuiltinType {
-  return typeof value === "string" && BUILTIN_TYPES.has(value as BuiltinType);
+export function isBuiltinType(
+  value: unknown,
+): value is BuiltinType | BuiltinTypeRef {
+  if (typeof value === "string") {
+    return BUILTIN_TYPES.has(value as BuiltinType);
+  }
+  if (typeof value === "object" && value) {
+    if ((value as BuiltinTypeRef).kind !== "builtin") {
+      return false;
+    }
+    return BUILTIN_TYPES.has((value as BuiltinTypeRef).name);
+  }
+  return false;
 }
 
 export function listOf(

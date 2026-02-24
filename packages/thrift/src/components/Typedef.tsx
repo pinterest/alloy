@@ -20,7 +20,7 @@ export interface TypedefProps {
  *
  * @example Typedef
  * ```tsx
- * <Typedef name="UserId" type="i64" />
+ * <Typedef name="UserId" type={i64} />
  * ```
  */
 export function Typedef(props: TypedefProps) {

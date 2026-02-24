@@ -6,7 +6,9 @@ import {
   Name,
   Refkey,
 } from "@alloy-js/core";
+import { renderAnnotations } from "../render.js";
 import { createTypeSymbol } from "../symbols/factories.js";
+import type { AnnotationMap } from "../types.js";
 import { DocWhen } from "./DocComment.js";
 import { FieldContext, createFieldRegistry } from "./Field.js";
 
@@ -15,6 +17,7 @@ export interface StructLikeProps {
   refkey?: Refkey;
   children?: Children;
   doc?: Children;
+  annotations?: AnnotationMap;
 }
 
 function StructLike(
@@ -24,7 +27,10 @@ function StructLike(
   const registry = createFieldRegistry({
     allowRequired: props.allowRequired,
     owner: props.keyword,
+    terminator: ",",
   });
+  const annotations = renderAnnotations(props.annotations);
+  const annotationText = annotations ? ` ${annotations}` : "";
 
   return (
     <>
@@ -36,6 +42,7 @@ function StructLike(
             <List hardline>{props.children}</List>
           </Block>
         </FieldContext.Provider>
+        {annotationText}
       </Declaration>
     </>
   );
@@ -54,8 +61,8 @@ export interface ExceptionProps extends StructLikeProps {}
  * @example Struct
  * ```tsx
  * <Struct name="User">
- *   <Field id={1} type="i64" name="id" />
- *   <Field id={2} type="string" name="name" />
+ *   <Field id={1} type={i64} name="id" />
+ *   <Field id={2} type={string} name="name" />
  * </Struct>
  * ```
  */
@@ -67,7 +74,7 @@ export function Struct(props: StructProps) {
  * Define a Thrift union.
  *
  * @remarks
- * Union fields cannot be `required`.
+ * Union fields are typically optional; some IDLs still mark them as `required`.
  *
  * @example Union
  * ```tsx
@@ -90,7 +97,7 @@ export function Union(props: UnionProps) {
  * @example Exception
  * ```tsx
  * <Exception name="NotFound">
- *   <Field id={1} type="string" name="message" />
+ *   <Field id={1} type={string} name="message" />
  * </Exception>
  * ```
  */

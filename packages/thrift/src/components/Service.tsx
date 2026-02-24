@@ -56,15 +56,18 @@ export function Service(props: ServiceProps) {
   const symbol = createServiceSymbol(props.name, props.refkey);
   const annotations = renderAnnotations(props.annotations);
   const annotationText = annotations ? ` ${annotations}` : "";
-  const extendsText =
-    props.extends ? ` extends ${renderTypeRef(props.extends)}` : "";
 
   return (
     <>
       <DocWhen doc={props.doc} />
       <Declaration symbol={symbol}>
         service <Name />
-        {extendsText}
+        {props.extends ?
+          <>
+            {" extends "}
+            {renderTypeRef(props.extends)}
+          </>
+        : ""}
         {annotationText}{" "}
         <Block>
           <List hardline>{props.children}</List>
@@ -84,7 +87,7 @@ export function Service(props: ServiceProps) {
  * @example Function with parameters and throws
  * ```tsx
  * <ServiceFunction name="getUser" returnType="User">
- *   <Field id={1} type="i64" name="id" />
+ *   <Field id={1} type={i64} name="id" />
  *   <Throws>
  *     <Field id={1} type="NotFound" name="notFound" />
  *   </Throws>
@@ -133,7 +136,7 @@ export function ServiceFunction(props: ServiceFunctionProps) {
           <Throws>{throws}</Throws>
         </FieldContext.Provider>
       : null}
-      {annotationText};
+      {annotationText},
     </>
   );
 }
@@ -154,7 +157,7 @@ export function ServiceFunction(props: ServiceFunctionProps) {
 export function Throws(props: ThrowsProps) {
   return (
     <>
-      throws (
+      throws(
       <List comma line>
         {props.children}
       </List>

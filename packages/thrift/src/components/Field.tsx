@@ -10,16 +10,18 @@ import { DocWhen } from "./DocComment.js";
 
 export interface FieldProps {
   id?: number;
-  required?: boolean;
+  required?: true;
+  optional?: true;
   type: TypeRef;
   name: string;
   default?: ConstValue;
   annotations?: AnnotationMap;
   doc?: Children;
+  comment?: Children;
 }
 
 export interface FieldRegistry {
-  register(field: { id?: number; name: string; required?: boolean }): void;
+  register(field: { id?: number; name: string; required?: true }): void;
   terminator: string;
 }
 
@@ -38,7 +40,7 @@ export function createFieldRegistry(options: {
   return {
     register(field) {
       if (field.required && !options.allowRequired) {
-        throw new Error(`Union fields cannot be required.`);
+        throw new Error(`Required fields are not allowed in ${options.owner}.`);
       }
       if (field.id !== undefined) {
         if (ids.has(field.id)) {
@@ -69,8 +71,8 @@ export function createFieldRegistry(options: {
  * @example Struct field
  * ```tsx
  * <Struct name="User">
- *   <Field id={1} type="i64" name="id" required />
- *   <Field id={2} type="string" name="email" optional />
+ *   <Field id={1} type={i64} name="id" required />
+ *   <Field id={2} type={string} name="email" optional />
  * </Struct>
  * ```
  */
@@ -82,14 +84,24 @@ export function Field(props: FieldProps) {
     );
   }
 
+  if (props.required !== undefined && props.required !== true) {
+    throw new Error("Field 'required' must be true when provided.");
+  }
+  if (props.optional !== undefined && props.optional !== true) {
+    throw new Error("Field 'optional' must be true when provided.");
+  }
+  if (props.required && props.optional) {
+    throw new Error("Field cannot be both required and optional.");
+  }
+
   const namePolicy = useThriftNamePolicy();
   const name = namePolicy.getName(props.name, "field");
 
   registry.register({ id: props.id, name, required: props.required });
 
   const requirement =
-    props.required === true ? "required "
-    : props.required === false ? "optional "
+    props.required ? "required "
+    : props.optional ? "optional "
     : "";
   const defaultValue =
     props.default !== undefined ? ` = ${renderConstValue(props.default)}` : "";
@@ -107,6 +119,15 @@ export function Field(props: FieldProps) {
       {defaultValue}
       {annotationText}
       {terminator}
+      {props.comment ?
+        <>
+          <lineSuffix>
+            {" // "}
+            {props.comment}
+          </lineSuffix>
+          <lineSuffixBoundary />
+        </>
+      : null}
     </>
   );
 }

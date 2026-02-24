@@ -7,5 +7,8 @@
     "**/temp": true,
     "**/dist": true
   },
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "[thrift]": {
+    "editor.defaultFormatter": "alingse.thirft-formatter"
+  }
 }
