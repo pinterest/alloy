@@ -27,7 +27,10 @@ export interface ThriftFileContext {
   scope: ThriftFileScope;
   includes: Map<string, ThriftIncludeRecord>;
   namePolicy: NamePolicy<ThriftNameKind>;
-  registerInclude(path: string, options: RegisterIncludeOptions): ThriftIncludeRecord;
+  registerInclude(
+    path: string,
+    options: RegisterIncludeOptions,
+  ): ThriftIncludeRecord;
 }
 
 export const ThriftFileContext: ComponentContext<ThriftFileContext> =

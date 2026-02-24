@@ -4,14 +4,14 @@ import {
   Declaration,
   List,
   Name,
+  Refkey,
   childrenArray,
   isComponentCreator,
 } from "@alloy-js/core";
-import { Refkey } from "@alloy-js/core";
 import { useThriftNamePolicy } from "../name-policy.js";
 import { renderAnnotations, renderTypeRef } from "../render.js";
-import type { AnnotationMap, TypeRef } from "../types.js";
 import { createServiceSymbol } from "../symbols/factories.js";
+import type { AnnotationMap, TypeRef } from "../types.js";
 import { DocWhen } from "./DocComment.js";
 import { FieldContext, createFieldRegistry } from "./Field.js";
 
@@ -56,13 +56,16 @@ export function Service(props: ServiceProps) {
   const symbol = createServiceSymbol(props.name, props.refkey);
   const annotations = renderAnnotations(props.annotations);
   const annotationText = annotations ? ` ${annotations}` : "";
-  const extendsText = props.extends ? ` extends ${renderTypeRef(props.extends)}` : "";
+  const extendsText =
+    props.extends ? ` extends ${renderTypeRef(props.extends)}` : "";
 
   return (
     <>
       <DocWhen doc={props.doc} />
       <Declaration symbol={symbol}>
-        service <Name />{extendsText}{annotationText}{" "}
+        service <Name />
+        {extendsText}
+        {annotationText}{" "}
         <Block>
           <List hardline>{props.children}</List>
         </Block>
@@ -96,7 +99,10 @@ export function ServiceFunction(props: ServiceFunctionProps) {
     throw new Error("Oneway functions must return void.");
   }
 
-  const { params, throws } = splitFunctionChildren(props.children, props.throws);
+  const { params, throws } = splitFunctionChildren(
+    props.children,
+    props.throws,
+  );
   const paramRegistry = createFieldRegistry({
     allowRequired: true,
     owner: `function ${name}`,
@@ -117,15 +123,16 @@ export function ServiceFunction(props: ServiceFunctionProps) {
       {props.oneway ? "oneway " : ""}
       {renderTypeRef(returnType)} {name}(
       <FieldContext.Provider value={paramRegistry}>
-        <List comma line>{params}</List>
+        <List comma line>
+          {params}
+        </List>
       </FieldContext.Provider>
-      )
-      {throws ? " " : ""}
-      {throws ? (
+      ){throws ? " " : ""}
+      {throws ?
         <FieldContext.Provider value={throwsRegistry}>
           <Throws>{throws}</Throws>
         </FieldContext.Provider>
-      ) : null}
+      : null}
       {annotationText};
     </>
   );
@@ -148,13 +155,18 @@ export function Throws(props: ThrowsProps) {
   return (
     <>
       throws (
-      <List comma line>{props.children}</List>
+      <List comma line>
+        {props.children}
+      </List>
       )
     </>
   );
 }
 
-function splitFunctionChildren(children?: Children, throwsProp?: Children): {
+function splitFunctionChildren(
+  children?: Children,
+  throwsProp?: Children,
+): {
   params: Children[];
   throws?: Children;
 } {

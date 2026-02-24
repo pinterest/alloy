@@ -4,10 +4,10 @@ import {
   Declaration,
   List,
   Name,
+  Refkey,
   createNamedContext,
   useContext,
 } from "@alloy-js/core";
-import { Refkey } from "@alloy-js/core";
 import { useThriftNamePolicy } from "../name-policy.js";
 import { createTypeSymbol } from "../symbols/factories.js";
 import { DocWhen } from "./DocComment.js";
@@ -66,7 +66,9 @@ export function Enum(props: EnumProps) {
         enum <Name />{" "}
         <EnumValueContext.Provider value={registry}>
           <Block>
-            <List comma hardline>{props.children}</List>
+            <List comma hardline>
+              {props.children}
+            </List>
           </Block>
         </EnumValueContext.Provider>
       </Declaration>

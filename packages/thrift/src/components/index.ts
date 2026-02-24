@@ -10,8 +10,13 @@ export type { NamespaceProps } from "./Namespace.js";
 export { DocComment, DocWhen } from "./DocComment.js";
 export type { DocCommentProps, DocWhenProps } from "./DocComment.js";
 
-export { Struct, Union, Exception } from "./Struct.js";
-export type { StructLikeProps, StructProps, UnionProps, ExceptionProps } from "./Struct.js";
+export { Exception, Struct, Union } from "./Struct.js";
+export type {
+  ExceptionProps,
+  StructLikeProps,
+  StructProps,
+  UnionProps,
+} from "./Struct.js";
 
 export { Field, FieldContext, createFieldRegistry } from "./Field.js";
 export type { FieldProps, FieldRegistry } from "./Field.js";
@@ -27,8 +32,8 @@ export type { ConstProps } from "./Const.js";
 
 export { Service, ServiceFunction, Throws } from "./Service.js";
 export type {
-  ServiceProps,
   ServiceFunctionProps,
+  ServiceProps,
   ThrowsProps,
 } from "./Service.js";
 

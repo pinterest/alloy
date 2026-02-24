@@ -1,7 +1,7 @@
 import { createSymbol, Refkey } from "@alloy-js/core";
 import { useThriftNamePolicy } from "../name-policy.js";
-import { ThriftOutputSymbol } from "./thrift-output-symbol.js";
 import { useThriftFileScope } from "./scopes.js";
+import { ThriftOutputSymbol } from "./thrift-output-symbol.js";
 
 export interface CreateThriftSymbolOptions {
   refkey?: Refkey;
@@ -39,14 +39,27 @@ export function createThriftSymbol(
   return symbol;
 }
 
-export function createTypeSymbol(name: string, refkey?: Refkey): ThriftOutputSymbol {
+export function createTypeSymbol(
+  name: string,
+  refkey?: Refkey,
+): ThriftOutputSymbol {
   return createThriftSymbol(name, { nameKind: "type", kind: "type", refkey });
 }
 
-export function createConstSymbol(name: string, refkey?: Refkey): ThriftOutputSymbol {
+export function createConstSymbol(
+  name: string,
+  refkey?: Refkey,
+): ThriftOutputSymbol {
   return createThriftSymbol(name, { nameKind: "const", kind: "const", refkey });
 }
 
-export function createServiceSymbol(name: string, refkey?: Refkey): ThriftOutputSymbol {
-  return createThriftSymbol(name, { nameKind: "service", kind: "service", refkey });
+export function createServiceSymbol(
+  name: string,
+  refkey?: Refkey,
+): ThriftOutputSymbol {
+  return createThriftSymbol(name, {
+    nameKind: "service",
+    kind: "service",
+    refkey,
+  });
 }

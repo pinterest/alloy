@@ -1,7 +1,10 @@
-import { Children, Declaration, Name } from "@alloy-js/core";
-import { Refkey } from "@alloy-js/core";
+import { Children, Declaration, Name, Refkey } from "@alloy-js/core";
+import {
+  renderAnnotations,
+  renderConstValue,
+  renderTypeRef,
+} from "../render.js";
 import { createConstSymbol } from "../symbols/factories.js";
-import { renderAnnotations, renderConstValue, renderTypeRef } from "../render.js";
 import type { AnnotationMap, ConstValue, TypeRef } from "../types.js";
 import { DocWhen } from "./DocComment.js";
 
@@ -35,7 +38,8 @@ export function Const(props: ConstProps) {
     <>
       <DocWhen doc={props.doc} />
       <Declaration symbol={symbol}>
-        const {renderTypeRef(props.type)} <Name /> = {renderConstValue(props.value)}
+        const {renderTypeRef(props.type)} <Name /> ={" "}
+        {renderConstValue(props.value)}
         {annotationText}
       </Declaration>
     </>

@@ -1,4 +1,4 @@
-import { Children, Show } from "@alloy-js/core";
+import { Children } from "@alloy-js/core";
 import { useThriftNamePolicy } from "../name-policy.js";
 import { DocWhen } from "./DocComment.js";
 

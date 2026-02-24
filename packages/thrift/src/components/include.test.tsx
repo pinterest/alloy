@@ -1,7 +1,7 @@
+import { assertFileContents } from "#test/utils.jsx";
 import { Output, refkey, render } from "@alloy-js/core";
 import { describe, it } from "vitest";
 import * as thrift from "../index.js";
-import { assertFileContents } from "#test/utils.jsx";
 
 describe("Include", () => {
   it("adds include statements for cross-file references", () => {

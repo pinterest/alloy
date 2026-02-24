@@ -1,27 +1,24 @@
 import {
   Children,
-  NamePolicy,
-  NamePolicyContext,
-  Show,
-  SourceDirectoryContext,
-  SourceFile as CoreSourceFile,
-  Scope,
   childrenArray,
   computed,
+  SourceFile as CoreSourceFile,
   createScope,
   For,
   List,
+  NamePolicy,
+  NamePolicyContext,
+  Scope,
+  Show,
+  SourceDirectoryContext,
   useContext,
 } from "@alloy-js/core";
 import { join } from "pathe";
 import {
-  ThriftFileContext,
   createIncludeRegistry,
+  ThriftFileContext,
 } from "../context/thrift-file-context.js";
-import {
-  defaultThriftNamePolicy,
-  ThriftNameKind,
-} from "../name-policy.js";
+import { defaultThriftNamePolicy, ThriftNameKind } from "../name-policy.js";
 import { ThriftFileScope } from "../symbols/scopes.js";
 import { DocComment } from "./DocComment.js";
 import { Reference } from "./Reference.js";
@@ -77,9 +74,7 @@ export function SourceFile(props: SourceFileProps) {
   );
 
   const includeRecords = computed(() =>
-    Array.from(includes.values()).sort((a, b) =>
-      a.path.localeCompare(b.path),
-    ),
+    Array.from(includes.values()).sort((a, b) => a.path.localeCompare(b.path)),
   );
 
   const hasIncludes = computed(() => includeRecords.value.length > 0);
@@ -101,7 +96,13 @@ export function SourceFile(props: SourceFileProps) {
           {props.includes}
           <Show when={props.headerComment !== undefined}>
             <DocComment>{props.headerComment}</DocComment>
-            <Show when={hasIncludes.value || hasNamespaces.value || hasDeclarations.value}>
+            <Show
+              when={
+                hasIncludes.value ||
+                hasNamespaces.value ||
+                hasDeclarations.value
+              }
+            >
               <hbr />
               <hbr />
             </Show>

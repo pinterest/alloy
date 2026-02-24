@@ -11,10 +11,7 @@ import { dedent } from "@alloy-js/core/testing";
 import { expect } from "vitest";
 import * as thrift from "../src/index.js";
 
-export function toSourceText(
-  c: Children,
-  options?: PrintTreeOptions,
-): string {
+export function toSourceText(c: Children, options?: PrintTreeOptions): string {
   const res = render(
     <Output namePolicy={thrift.defaultThriftNamePolicy}>
       <thrift.SourceFile path="test.thrift">{c}</thrift.SourceFile>

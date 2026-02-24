@@ -1,8 +1,7 @@
-import { Children, Declaration, Name } from "@alloy-js/core";
-import { Refkey } from "@alloy-js/core";
+import { Children, Declaration, Name, Refkey } from "@alloy-js/core";
 import { renderAnnotations, renderTypeRef } from "../render.js";
-import type { AnnotationMap, TypeRef } from "../types.js";
 import { createTypeSymbol } from "../symbols/factories.js";
+import type { AnnotationMap, TypeRef } from "../types.js";
 import { DocWhen } from "./DocComment.js";
 
 export interface TypedefProps {
@@ -33,7 +32,8 @@ export function Typedef(props: TypedefProps) {
     <>
       <DocWhen doc={props.doc} />
       <Declaration symbol={symbol}>
-        typedef {renderTypeRef(props.type)} <Name />{annotationText}
+        typedef {renderTypeRef(props.type)} <Name />
+        {annotationText}
       </Declaration>
     </>
   );

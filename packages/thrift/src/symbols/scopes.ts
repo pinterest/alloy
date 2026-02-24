@@ -1,8 +1,4 @@
-import {
-  OutputScope,
-  OutputScopeOptions,
-  useScope,
-} from "@alloy-js/core";
+import { OutputScope, OutputScopeOptions, useScope } from "@alloy-js/core";
 
 export class ThriftOutputScope extends OutputScope {
   public static readonly declarationSpaces: readonly string[] = ["symbols"];

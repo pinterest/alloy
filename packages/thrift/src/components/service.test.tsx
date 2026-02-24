@@ -1,7 +1,7 @@
+import { toSourceText } from "#test/utils.jsx";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import * as thrift from "../index.js";
-import { toSourceText } from "#test/utils.jsx";
 
 describe("Service", () => {
   it("renders service functions with throws and annotations", () => {

@@ -1,8 +1,8 @@
 import {
+  createSymbol,
   OutputSpace,
   OutputSymbol,
   OutputSymbolOptions,
-  createSymbol,
   track,
   TrackOpTypes,
   trigger,

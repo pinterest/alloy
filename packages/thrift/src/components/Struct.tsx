@@ -1,5 +1,11 @@
-import { Block, Children, Declaration, List, Name } from "@alloy-js/core";
-import { Refkey } from "@alloy-js/core";
+import {
+  Block,
+  Children,
+  Declaration,
+  List,
+  Name,
+  Refkey,
+} from "@alloy-js/core";
 import { createTypeSymbol } from "../symbols/factories.js";
 import { DocWhen } from "./DocComment.js";
 import { FieldContext, createFieldRegistry } from "./Field.js";
@@ -11,7 +17,9 @@ export interface StructLikeProps {
   doc?: Children;
 }
 
-function StructLike(props: StructLikeProps & { keyword: string; allowRequired: boolean }) {
+function StructLike(
+  props: StructLikeProps & { keyword: string; allowRequired: boolean },
+) {
   const symbol = createTypeSymbol(props.name, props.refkey);
   const registry = createFieldRegistry({
     allowRequired: props.allowRequired,

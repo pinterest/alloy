@@ -1,6 +1,10 @@
 import { Children, createNamedContext, useContext } from "@alloy-js/core";
 import { useThriftNamePolicy } from "../name-policy.js";
-import { renderAnnotations, renderConstValue, renderTypeRef } from "../render.js";
+import {
+  renderAnnotations,
+  renderConstValue,
+  renderTypeRef,
+} from "../render.js";
 import type { AnnotationMap, ConstValue, TypeRef } from "../types.js";
 import { DocWhen } from "./DocComment.js";
 
@@ -45,7 +49,9 @@ export function createFieldRegistry(options: {
         ids.add(field.id);
       }
       if (names.has(field.name)) {
-        throw new Error(`${options.owner} has duplicate field name '${field.name}'.`);
+        throw new Error(
+          `${options.owner} has duplicate field name '${field.name}'.`,
+        );
       }
       names.add(field.name);
     },

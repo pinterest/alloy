@@ -7,8 +7,7 @@ import {
   useContext,
 } from "@alloy-js/core";
 import { ThriftFileContext } from "../context/thrift-file-context.js";
-import { ThriftOutputScope } from "./scopes.js";
-import { ThriftFileScope } from "./scopes.js";
+import { ThriftFileScope, ThriftOutputScope } from "./scopes.js";
 import { ThriftOutputSymbol } from "./thrift-output-symbol.js";
 
 export function ref(

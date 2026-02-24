@@ -1,8 +1,8 @@
+import { findFile } from "#test/utils.jsx";
 import { Output, render } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
 import * as thrift from "../index.js";
-import { findFile } from "#test/utils.jsx";
 
 describe("SourceFile", () => {
   it("renders header, includes, namespaces, and declarations in order", () => {
