@@ -131,10 +131,39 @@ export const files: SnapshotFile[] = [
           <Namespace lang="rb" value="CassandraThrift" />,
         ]}
       >
-        {/* const */}
-        <Const name="VERSION" type={string} value={"20.1.0"} />
+        <Const
+          name="VERSION"
+          type={string}
+          value={"20.1.0"}
+          doc={
+            <LineComment prefix="#">
+              {lines(`
+                The API version (NOT the product version), composed as a dot delimited
+                string with major, minor, and patch level components.
 
-        {/* data structures */}
+                 - Major: Incremented for backward incompatible changes. An example would
+                          be changes to the number or disposition of method arguments.
+                 - Minor: Incremented for backward compatible changes. An example would
+                          be the addition of a new (optional) method.
+                 - Patch: Incremented for bug fixes. The patch level should be increased
+                          for every edit that doesn't result in a change to major/minor.
+
+                See the Semantic Versioning Specification (SemVer) http://semver.org.
+
+                Note that this backwards compatibility is from the perspective of the server,
+                not the client. Cassandra should always be able to talk to older client
+                software, but client software may not be able to talk to older Cassandra
+                instances.
+
+                An effort should be made not to break forward-client-compatibility either
+                (e.g. one should avoid removing obsolete fields from the IDL), but no
+                guarantees in this respect are made by the Cassandra project.
+              `)}
+            </LineComment>
+          }
+        />
+
+        <LineComment prefix="#">{["", "data structures", ""]}</LineComment>
         <Struct
           name="Column"
           refkey={column}
@@ -202,7 +231,14 @@ export const files: SnapshotFile[] = [
           />
         </Struct>
 
-        {/* exceptions */}
+        <LineComment prefix="#">
+          {[
+            "",
+            "Exceptions",
+            "(note that internal server errors will raise a TApplicationException, courtesy of Thrift)",
+            "",
+          ]}
+        </LineComment>
         <Exception
           name="NotFoundException"
           refkey={notFoundException}
@@ -286,7 +322,6 @@ export const files: SnapshotFile[] = [
           `)}
         ></Exception>
 
-        {/* enums and remaining structs */}
         <Enum
           name="ConsistencyLevel"
           refkey={consistencyLevel}
@@ -916,9 +951,12 @@ export const files: SnapshotFile[] = [
           />
         </Struct>
 
-        {/* service */}
+        <LineComment prefix="#">{["", "service api", ""]}</LineComment>
         <Service name="Cassandra" refkey={cassandraService}>
-          <ServiceFunction name="login">
+          <ServiceFunction
+            name="login"
+            doc={<LineComment prefix="#">auth methods</LineComment>}
+          >
             <Field
               id={1}
               required
@@ -930,12 +968,16 @@ export const files: SnapshotFile[] = [
               <Field id={2} type={authorizationException} name="authzx" />
             </Throws>
           </ServiceFunction>
-          <ServiceFunction name="set_keyspace">
+          <ServiceFunction
+            name="set_keyspace"
+            doc={<LineComment prefix="#">set keyspace</LineComment>}
+          >
             <Field id={1} required type={string} name="keyspace" />
             <Throws>
               <Field id={1} type={invalidRequestException} name="ire" />
             </Throws>
           </ServiceFunction>
+          <LineComment prefix="#">retrieval methods</LineComment>
           <ServiceFunction
             name="get"
             returnType={columnOrSuperColumn}
@@ -1129,6 +1171,7 @@ export const files: SnapshotFile[] = [
               <Field id={3} type={timedOutException} name="te" />
             </Throws>
           </ServiceFunction>
+          <LineComment prefix="#">modification methods</LineComment>
           <ServiceFunction
             name="insert"
             breakParams

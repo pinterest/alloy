@@ -1,4 +1,9 @@
-import { Children, For, childrenArray } from "@alloy-js/core";
+import {
+  Children,
+  For,
+  childrenArray,
+  isComponentCreator,
+} from "@alloy-js/core";
 
 function splitLines(value: string): string[] {
   const lines = value.split(/\r?\n/);
@@ -14,7 +19,11 @@ function normalizeCommentChildren(children: Children): Children {
   }
   if (Array.isArray(children)) {
     return children.flatMap<Children[]>((child) =>
-      typeof child === "string" ? splitLines(child) : [child],
+      typeof child === "string" ?
+        child === "" ?
+          [""] // make sure we preserve empty lines
+        : splitLines(child)
+      : [child],
     );
   }
   return children;
@@ -81,14 +90,17 @@ export interface DocWhenProps {
  * ```
  */
 export function DocWhen(props: DocWhenProps) {
+  if (!props.doc) return null;
+
+  const content =
+    isComponentCreator(props.doc) ?
+      props.doc
+    : <DocComment>{props.doc}</DocComment>;
+
   return (
     <>
-      {props.doc ?
-        <>
-          <DocComment>{props.doc}</DocComment>
-          <hbr />
-        </>
-      : null}
+      {content}
+      <hbr />
     </>
   );
 }

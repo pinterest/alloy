@@ -6,16 +6,23 @@
 # to you under the Apache License, Version 2.0 (the
 # "License"); you may not use this file except in compliance
 # with the License.  You may obtain a copy of the License at
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # *** PLEASE REMEMBER TO EDIT THE VERSION CONSTANT WHEN MAKING CHANGES ***
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#
+#
 # Interface definition for Cassandra Service
+#
+#
 
 namespace java org.apache.cassandra.thrift
 namespace cpp org.apache.cassandra
@@ -25,7 +32,32 @@ namespace php cassandra
 namespace perl Cassandra
 namespace rb CassandraThrift
 
+# The API version (NOT the product version), composed as a dot delimited
+# string with major, minor, and patch level components.
+#
+#  - Major: Incremented for backward incompatible changes. An example would
+#           be changes to the number or disposition of method arguments.
+#  - Minor: Incremented for backward compatible changes. An example would
+#           be the addition of a new (optional) method.
+#  - Patch: Incremented for bug fixes. The patch level should be increased
+#           for every edit that doesn't result in a change to major/minor.
+#
+# See the Semantic Versioning Specification (SemVer) http://semver.org.
+#
+# Note that this backwards compatibility is from the perspective of the server,
+# not the client. Cassandra should always be able to talk to older client
+# software, but client software may not be able to talk to older Cassandra
+# instances.
+#
+# An effort should be made not to break forward-client-compatibility either
+# (e.g. one should avoid removing obsolete fields from the IDL), but no
+# guarantees in this respect are made by the Cassandra project.
+#
 const string VERSION = "20.1.0"
+
+#
+# data structures
+#
 
 /**
  * Basic unit of data within a ColumnFamily.
@@ -33,6 +65,7 @@ const string VERSION = "20.1.0"
  * @param value. The data associated with the name.  Maximum 2GB long, but in practice you should limit it to small numbers of MB (since Thrift must read the full value into memory to operate on it).
  * @param timestamp. The timestamp is used for conflict detection/resolution when two columns with same name need to be compared.
  * @param ttl. An optional, positive delay (in seconds) after which the column will be automatically deleted.
+ *
  */
 struct Column {
   1: required binary name,
@@ -46,6 +79,7 @@ struct Column {
  * @param name. see Column.name.
  * @param columns. A collection of standard Columns.  The columns within a super column are defined in an adhoc manner.
  *                 Columns within a super column do not have to have matching structures (similarly named child columns).
+ *
  */
 struct SuperColumn {
   1: required binary name,
@@ -68,12 +102,15 @@ struct CounterSuperColumn {
  * instances of ColumnOrSuperColumn will have the requested SuperColumn in the attribute super_column. For queries resulting
  * in Columns, those values will be in the attribute column. This change was made between 0.3 and 0.4 to standardize on
  * single query methods that may return either a SuperColumn or Column.
+ *
  * If the query was on a counter column family, you will either get a counter_column (instead of a column) or a
  * counter_super_column (instead of a super_column)
+ *
  * @param column. The Column returned by get() or get_slice().
  * @param super_column. The SuperColumn returned by get() or get_slice().
  * @param counter_column. The Counterolumn returned by get() or get_slice().
  * @param counter_super_column. The CounterSuperColumn returned by get() or get_slice().
+ *
  */
 struct ColumnOrSuperColumn {
   1: optional Column column,
@@ -81,6 +118,11 @@ struct ColumnOrSuperColumn {
   3: optional CounterColumn counter_column,
   4: optional CounterSuperColumn counter_super_column,
 }
+
+#
+# Exceptions
+# (note that internal server errors will raise a TApplicationException, courtesy of Thrift)
+#
 
 /**
  * A specific column was requested that does not exist.
@@ -91,6 +133,7 @@ exception NotFoundException {
 /**
  * Invalid request could mean keyspace or column family does not exist, required parameters are missing, or a parameter is malformed.
  * why contains an associated error message.
+ *
  */
 exception InvalidRequestException {
   1: required string why,
@@ -111,16 +154,19 @@ exception TimedOutException {
    * satisfy the required ConsistencyLevel, the number of successful
    * replies will be given here. In case of atomic_batch_mutate method this field
    * will be set to -1 if the batch was written to the batchlog and to 0 if it wasn't.
+   *
    */
   1: optional i32 acknowledged_by,
   /**
    * in case of atomic_batch_mutate method this field tells if the batch
    * was written to the batchlog.
+   *
    */
   2: optional bool acknowledged_by_batchlog,
   /**
    * for the CAS method, this field tells if we timed out during the paxos
    * protocol, as opposed to during the commit of our update
+   *
    */
   3: optional bool paxos_in_progress,
 }
@@ -142,7 +188,9 @@ exception AuthorizationException {
 /**
  * NOTE: This up outdated exception left for backward compatibility reasons,
  * no actual schema agreement validation is done starting from Cassandra 1.2
+ *
  * schemas are not in agreement across all nodes
+ *
  */
 exception SchemaDisagreementException {
 }
@@ -152,6 +200,7 @@ exception SchemaDisagreementException {
  * behavior based on the ReplicationFactor of the keyspace.  The
  * different consistency levels have different meanings, depending on
  * if you're doing a write or read operation.
+ *
  * If W + R > ReplicationFactor, where W is the number of nodes to
  * block for on write, and R the number to block for on reads, you
  * will have strongly consistent behavior; that is, readers will
@@ -160,12 +209,14 @@ exception SchemaDisagreementException {
  * still allowing availability in the face of node failures up to half
  * of <ReplicationFactor>. Of course if latency is more important than
  * consistency then you can use lower values for either or both.
+ *
  * Some ConsistencyLevels (ONE, TWO, THREE) refer to a specific number
  * of replicas rather than a logical concept that adjusts
  * automatically with the replication factor.  Of these, only ONE is
  * commonly used; TWO and (even more rarely) THREE are only useful
  * when you care more about guaranteeing a certain level of
  * durability, than consistency.
+ *
  * Write consistency levels make the following guarantees before reporting success to the client:
  *   ANY          Ensure that the write has been written once somewhere, including possibly being hinted in a non-target node.
  *   ONE          Ensure that the write has been written to at least 1 node's commit log and memory table
@@ -176,6 +227,7 @@ exception SchemaDisagreementException {
  *   LOCAL_QUORUM Ensure that the write has been written to <ReplicationFactor> / 2 + 1 nodes, within the local datacenter (requires NetworkTopologyStrategy)
  *   EACH_QUORUM  Ensure that the write has been written to <ReplicationFactor> / 2 + 1 nodes in each datacenter (requires NetworkTopologyStrategy)
  *   ALL          Ensure that the write is written to <code>&lt;ReplicationFactor&gt;</code> nodes before responding to the client.
+ *
  * Read consistency levels make the following guarantees before returning successful results to the client:
  *   ANY          Not supported. You probably want ONE instead.
  *   ONE          Returns the record obtained from a single replica.
@@ -186,6 +238,7 @@ exception SchemaDisagreementException {
  *   LOCAL_QUORUM Returns the record with the most recent timestamp once a majority of replicas within the local datacenter have replied.
  *   EACH_QUORUM  Returns the record with the most recent timestamp once a majority of replicas within each datacenter have replied.
  *   ALL          Returns the record with the most recent timestamp once all replicas have replied (implies no replica may be down)..
+ *
  */
 enum ConsistencyLevel {
   ONE = 1,
@@ -204,7 +257,9 @@ enum ConsistencyLevel {
 /**
  * ColumnParent is used when selecting groups of columns from the same ColumnFamily. In directory structure terms, imagine
  * ColumnParent as ColumnPath + '/../'.
+ *
  * See also <a href="cassandra.html#Struct_ColumnPath">ColumnPath</a>
+ *
  */
 struct ColumnParent {
   3: required string column_family,
@@ -214,10 +269,13 @@ struct ColumnParent {
 /**
  * The ColumnPath is the path to a single column in Cassandra. It might make sense to think of ColumnPath and
  * ColumnParent in terms of a directory structure.
+ *
  * ColumnPath is used to looking up a single column.
+ *
  * @param column_family. The name of the CF of the column being looked up.
  * @param super_column. The super column name.
  * @param column. The column name.
+ *
  */
 struct ColumnPath {
   3: required string column_family,
@@ -228,6 +286,7 @@ struct ColumnPath {
 /**
  * A slice range is a structure that stores basic range, ordering and limit information for a query that will return
  * multiple columns. It could be thought of as Cassandra's version of LIMIT and ORDER BY
+ *
  * @param start. The column name to start the slice with. This attribute is not required, though there is no default value,
  *               and can be safely set to '', i.e., an empty byte array, to start with the first column name. Otherwise, it
  *               must a valid value under the rules of the Comparator defined for the given ColumnFamily.
@@ -239,6 +298,7 @@ struct ColumnPath {
  *               materialize the whole result into memory before returning it to the client, so be aware that you may
  *               be better served by iterating through slices by passing the last value of one call in as the 'start'
  *               of the next instead of increasing 'count' arbitrarily large.
+ *
  */
 struct SliceRange {
   1: required binary start,
@@ -250,12 +310,15 @@ struct SliceRange {
 /**
  * A SlicePredicate is similar to a mathematic predicate (see http://en.wikipedia.org/wiki/Predicate_(mathematical_logic)),
  * which is described as "a property that the elements of a set have in common."
+ *
  * SlicePredicate's in Cassandra are described with either a list of column_names or a SliceRange.  If column_names is
  * specified, slice_range is ignored.
+ *
  * @param column_name. A list of column names to retrieve. This can be used similar to Memcached's "multi-get" feature
  *                     to fetch N known column names. For instance, if you know you wish to fetch columns 'Joe', 'Jack',
  *                     and 'Jim' you can pass those column names as a list to fetch all three at once.
  * @param slice_range. A SliceRange describing how to range, order, and/or limit the slice.
+ *
  */
 struct SlicePredicate {
   1: optional list<binary> column_names,
@@ -292,6 +355,7 @@ struct IndexClause {
  * than the start one.  Thus, a range from keyX to keyX is a
  * one-element range, but a range from tokenY to tokenY is the
  * full ring.
+ *
  */
 struct KeyRange {
   1: optional binary start_key,
@@ -304,9 +368,11 @@ struct KeyRange {
 
 /**
  * A KeySlice is key followed by the data it maps to. A collection of KeySlice is returned by the get_range_slice operation.
+ *
  * @param key. a row key
  * @param columns. List of data represented by the key. Typically, the list is pared down to only the columns specified by
  *                 a SlicePredicate.
+ *
  */
 struct KeySlice {
   1: required binary key,
@@ -331,6 +397,7 @@ struct Deletion {
  * A Mutation is either an insert (represented by filling column_or_supercolumn) or a deletion (represented by filling the deletion attribute).
  * @param column_or_supercolumn. An insert to a column or supercolumn (possibly counter column or supercolumn)
  * @param deletion. A deletion of a column or supercolumn
+ *
  */
 struct Mutation {
   1: optional ColumnOrSuperColumn column_or_supercolumn,
@@ -355,6 +422,7 @@ struct CASResult {
  * @param end_token The last token in the range
  * @param endpoints The endpoints responsible for the range (listed by their configured listen_address)
  * @param rpc_endpoints The endpoints responsible for the range (listed by their configured rpc_address)
+ *
  */
 struct TokenRange {
   1: required string start_token,
@@ -392,6 +460,7 @@ struct ColumnDef {
  * Describes a trigger.
  * `options` should include at least 'class' param.
  * Other options are not supported yet.
+ *
  */
 struct TriggerDef {
   1: required string name,
@@ -515,10 +584,12 @@ enum CqlResultType {
 
 /**
  * Row returned from a CQL query.
+ *
  * This struct is used for both CQL2 and CQL3 queries.  For CQL2, the partition key
  * is special-cased and is always returned.  For CQL3, it is not special cased;
  * it will be included in the columns list if it was included in the SELECT and
  * the key field is always null.
+ *
  */
 struct CqlRow {
   1: required binary key,
@@ -561,6 +632,7 @@ struct CfSplit {
  * end-of value.
  * @param start. The start of the ColumnSlice inclusive
  * @param finish. The end of the ColumnSlice inclusive
+ *
  */
 struct ColumnSlice {
   1: optional binary start,
@@ -575,6 +647,7 @@ struct ColumnSlice {
  * @param reversed. Direction of slice
  * @param count. Maximum number of columns
  * @param consistency_level. Level to perform the operation at
+ *
  */
 struct MultiSliceRequest {
   1: optional binary key,
@@ -585,14 +658,23 @@ struct MultiSliceRequest {
   6: optional ConsistencyLevel consistency_level = ConsistencyLevel.ONE,
 }
 
+#
+# service api
+#
+
 service Cassandra {
+  # auth methods
   void login(1: required AuthenticationRequest auth_request) throws (1: AuthenticationException authnx, 2: AuthorizationException authzx),
 
+  # set keyspace
   void set_keyspace(1: required string keyspace) throws (1: InvalidRequestException ire),
+
+  # retrieval methods
 
   /**
    * Get the Column or SuperColumn at the given column_path. If no value is present, NotFoundException is thrown. (This is
    * the only method that can throw an exception under non-failure conditions.)
+   *
    */
   ColumnOrSuperColumn get(1: required binary key,
     2: required ColumnPath column_path,
@@ -602,6 +684,7 @@ service Cassandra {
   /**
    * Get the group of columns contained by column_parent (either a ColumnFamily name or a ColumnFamily/SuperColumn name
    * pair) specified by the given SlicePredicate. If no matching values are found, an empty list is returned.
+   *
    */
   list<ColumnOrSuperColumn> get_slice(1: required binary key,
     2: required ColumnParent column_parent,
@@ -612,6 +695,7 @@ service Cassandra {
   /**
    * returns the number of columns matching <code>predicate</code> for a particular <code>key</code>,
    * <code>ColumnFamily</code> and optionally <code>SuperColumn</code>.
+   *
    */
   i32 get_count(1: required binary key,
     2: required ColumnParent column_parent,
@@ -658,12 +742,15 @@ service Cassandra {
   /**
    * Returns the subset of columns specified in SlicePredicate for the rows matching the IndexClause
    * @deprecated use get_range_slices instead with range.row_filter specified
+   *
    */
   list<KeySlice> get_indexed_slices(1: required ColumnParent column_parent,
     2: required IndexClause index_clause,
     3: required SlicePredicate column_predicate,
     4: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
   throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
+
+  # modification methods
 
   /**
    * Insert a Column at the given column_parent.column_family and optional column_parent.super_column.
@@ -685,9 +772,11 @@ service Cassandra {
 
   /**
    * Atomic compare and set.
+   *
    * If the cas is successfull, the success boolean in CASResult will be true and there will be no current_values.
    * Otherwise, success will be false and current_values will contain the current values for the columns in
    * expected (that, by definition of compare-and-set, will differ from the values in expected).
+   *
    * A cas operation takes 2 consistency level. The first one, serial_consistency_level, simply indicates the
    * level of serialization required. This can be either ConsistencyLevel.SERIAL or ConsistencyLevel.LOCAL_SERIAL.
    * The second one, commit_consistency_level, defines the consistency level for the commit phase of the cas. This
@@ -696,6 +785,7 @@ service Cassandra {
    * guaranteed that a followup QUORUM read will see the cas write (if that one was successful obviously). If
    * commit_consistency_level is ANY, you will need to use a SERIAL/LOCAL_SERIAL read to be guaranteed to see
    * the write.
+   *
    */
   CASResult cas(1: required binary key,
     2: required string column_family,
@@ -709,6 +799,7 @@ service Cassandra {
    * Remove data from the row specified by key at the granularity specified by column_path, and the given timestamp. Note
    * that all the values in column_path besides column_path.column_family are truly optional: you can remove the entire
    * row by just specifying the ColumnFamily, or you can remove a SuperColumn or a single Column by specifying those levels too.
+   *
    */
   void remove(1: required binary key,
     2: required ColumnPath column_path,
@@ -720,6 +811,7 @@ service Cassandra {
    * Remove a counter at the specified location.
    * Note that counters have limited support for deletes: if you remove a counter, you must wait to issue any following update
    * until the delete has reached all the nodes and all of them have been fully compacted.
+   *
    */
   void remove_counter(1: required binary key,
     2: required ColumnPath path,
@@ -728,7 +820,9 @@ service Cassandra {
 
   /**
    * Mutate many columns or super columns for many row keys. See also: Mutation.
+   *
    * mutation_map maps key to column family to a list of Mutation objects to take place at that scope.
+   *
    */
   void batch_mutate(1: required map<binary, map<string, list<Mutation>>> mutation_map,
     2: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
@@ -736,7 +830,9 @@ service Cassandra {
 
   /**
    * Atomically mutate many columns or super columns for many row keys. See also: Mutation.
+   *
    * mutation_map maps key to column family to a list of Mutation objects to take place at that scope.
+   *
    */
   void atomic_batch_mutate(1: required map<binary, map<string, list<Mutation>>> mutation_map,
     2: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
@@ -749,6 +845,7 @@ service Cassandra {
    * only marks the data as deleted.
    * The operation succeeds only if all hosts in the cluster at available and will throw an UnavailableException if
    * some hosts are down.
+   *
    */
   void truncate(1: required string cfname) throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
 
@@ -761,6 +858,7 @@ service Cassandra {
    * for each schema version present in the cluster, returns a list of nodes at that version.
    * hosts that do not respond will be under the key DatabaseDescriptor.INITIAL_VERSION.
    * the cluster is all on the same version if the size of the map is 1.
+   *
    */
   map<string, list<string>> describe_schema_versions() throws (1: InvalidRequestException ire),
 
@@ -785,8 +883,10 @@ service Cassandra {
    * to list of endpoints, because you can't use Thrift structs as
    * map keys:
    * https://issues.apache.org/jira/browse/THRIFT-162
+   *
    * for the same reason, we can't return a set here, even though
    * order is neither important nor predictable.
+   *
    */
   list<TokenRange> describe_ring(1: required string keyspace) throws (1: InvalidRequestException ire),
 
@@ -799,6 +899,7 @@ service Cassandra {
    * get the mapping between token->node ip
    * without taking replication into consideration
    * https://issues.apache.org/jira/browse/CASSANDRA-4092
+   *
    */
   map<string, string> describe_token_map() throws (1: InvalidRequestException ire),
 
@@ -820,8 +921,10 @@ service Cassandra {
   /**
    * experimental API for hadoop/parallel query support.
    * may change violently and without warning.
+   *
    * returns list of token strings such that first subrange is (list[0], list[1]],
    * next is (list[1], list[2]], etc.
+   *
    */
   list<string> describe_splits(1: required string cfName,
     2: required string start_token,
@@ -832,6 +935,7 @@ service Cassandra {
   /**
    * Enables tracing for the next query in this connection and returns the UUID for that trace session
    * The next query will be traced idependently of trace probability and the returned UUID can be used to query the trace keyspace
+   *
    */
   binary trace_next_query(),
 
@@ -879,6 +983,7 @@ service Cassandra {
   /**
    * Executes a CQL3 (Cassandra Query Language) statement and returns a
    * CqlResult containing the results.
+   *
    */
   CqlResult execute_cql3_query(1: required binary query, 2: required Compression compression, 3: required ConsistencyLevel consistency) throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te, 4: SchemaDisagreementException sde),
 
@@ -892,6 +997,7 @@ service Cassandra {
    * - the type of CQL statement
    * - an id token of the compiled CQL stored on the server side.
    * - a count of the discovered bound markers in the statement
+   *
    */
   CqlPreparedResult prepare_cql3_query(1: required binary query, 2: required Compression compression) throws (1: InvalidRequestException ire),
 
@@ -903,6 +1009,7 @@ service Cassandra {
   /**
    * Executes a prepared CQL3 (Cassandra Query Language) statement by passing an id token, a list of variables
    * to bind, and the consistency level, and returns a CqlResult containing the results.
+   *
    */
   CqlResult execute_prepared_cql3_query(1: required i32 itemId, 2: required list<binary> values, 3: required ConsistencyLevel consistency) throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te, 4: SchemaDisagreementException sde),
 

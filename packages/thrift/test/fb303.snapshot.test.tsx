@@ -16,7 +16,6 @@ import {
 } from "../src/index.js";
 import {
   SnapshotFile,
-  lines,
   loadFixture,
   permissiveNamePolicy,
   renderThriftFiles,
@@ -36,24 +35,24 @@ export const files: SnapshotFile[] = [
         namePolicy={permissiveNamePolicy}
         header={
           <BlockComment>
-            {lines(`
-              Licensed to the Apache Software Foundation (ASF) under one
-              or more contributor license agreements. See the NOTICE file
-              distributed with this work for additional information
-              regarding copyright ownership. The ASF licenses this file
-              to you under the Apache License, Version 2.0 (the
-              "License"); you may not use this file except in compliance
-              with the License. You may obtain a copy of the License at
-
-                http://www.apache.org/licenses/LICENSE-2.0
-
-              Unless required by applicable law or agreed to in writing,
-              software distributed under the License is distributed on an
-              "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-              KIND, either express or implied. See the License for the
-              specific language governing permissions and limitations
-              under the License.
-            `)}
+            {[
+              "Licensed to the Apache Software Foundation (ASF) under one",
+              "or more contributor license agreements. See the NOTICE file",
+              "distributed with this work for additional information",
+              "regarding copyright ownership. The ASF licenses this file",
+              "to you under the Apache License, Version 2.0 (the",
+              '"License"); you may not use this file except in compliance',
+              "with the License. You may obtain a copy of the License at",
+              "",
+              "  http://www.apache.org/licenses/LICENSE-2.0",
+              "",
+              "Unless required by applicable law or agreed to in writing,",
+              "software distributed under the License is distributed on an",
+              '"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY',
+              "KIND, either express or implied. See the License for the",
+              "specific language governing permissions and limitations",
+              "under the License.",
+            ]}
           </BlockComment>
         }
         headerComment="fb303.thrift"
@@ -67,9 +66,7 @@ export const files: SnapshotFile[] = [
         <Enum
           name="fb_status"
           refkey={fbStatus}
-          doc={lines(`
-            Common status reporting mechanism across all services
-          `)}
+          doc="Common status reporting mechanism across all services"
         >
           <EnumValue name="DEAD" value={0} />
           <EnumValue name="STARTING" value={1} />
@@ -78,116 +75,89 @@ export const files: SnapshotFile[] = [
           <EnumValue name="STOPPED" value={4} />
           <EnumValue name="WARNING" value={5} />
         </Enum>
-        <Service
-          name="FacebookService"
-          doc={lines(`
-            Standard base service
-          `)}
-        >
+        <Service name="FacebookService" doc="Standard base service">
           <>
             <hbr />
             <ServiceFunction
               name="getName"
               returnType={string}
-              doc={lines(`
-                Returns a descriptive name of the service
-              `)}
+              doc="Returns a descriptive name of the service"
             ></ServiceFunction>
           </>
           <ServiceFunction
             name="getVersion"
             returnType={string}
-            doc={lines(`
-              Returns the version of the service
-            `)}
+            doc="Returns the version of the service"
           ></ServiceFunction>
           <ServiceFunction
             name="getStatus"
             returnType={fbStatus}
-            doc={lines(`
-              Gets the status of this service
-            `)}
+            doc="Gets the status of this service"
           ></ServiceFunction>
           <ServiceFunction
             name="getStatusDetails"
             returnType={string}
-            doc={lines(`
-              User friendly description of status, such as why the service is in
-              the dead or warning state, or what is being started or stopped.
-            `)}
+            doc={[
+              "User friendly description of status, such as why the service is in",
+              "the dead or warning state, or what is being started or stopped.",
+            ]}
           ></ServiceFunction>
           <ServiceFunction
             name="getCounters"
             returnType={mapOf(string, i64)}
-            doc={lines(`
-              Gets the counters for this service
-            `)}
+            doc="Gets the counters for this service"
           ></ServiceFunction>
           <ServiceFunction
             name="getCounter"
             returnType={i64}
-            doc={lines(`
-              Gets the value of a single counter
-            `)}
+            doc="Gets the value of a single counter"
           >
             <Field id={1} type={string} name="key" />
           </ServiceFunction>
-          <ServiceFunction
-            name="setOption"
-            doc={lines(`
-              Sets an option
-            `)}
-          >
+          <ServiceFunction name="setOption" doc="Sets an option">
             <Field id={1} type={string} name="key" />
             <Field id={2} type={string} name="value" />
           </ServiceFunction>
           <ServiceFunction
             name="getOption"
             returnType={string}
-            doc={lines(`
-              Gets an option
-            `)}
+            doc="Gets an option"
           >
             <Field id={1} type={string} name="key" />
           </ServiceFunction>
           <ServiceFunction
             name="getOptions"
             returnType={mapOf(string, string)}
-            doc={lines(`
-              Gets all options
-            `)}
+            doc="Gets all options"
           ></ServiceFunction>
           <ServiceFunction
             name="getCpuProfile"
             returnType={string}
-            doc={lines(`
-              Returns a CPU profile over the given time interval (client and server
-              must agree on the profile format).
-            `)}
+            doc={[
+              "Returns a CPU profile over the given time interval (client and server",
+              "must agree on the profile format).",
+            ]}
           >
             <Field id={1} type={i32} name="profileDurationInSec" />
           </ServiceFunction>
           <ServiceFunction
             name="aliveSince"
             returnType={i64}
-            doc={lines(`
-              Returns the unix time that the server has been running since
-            `)}
+            doc="Returns the unix time that the server has been running since"
           ></ServiceFunction>
           <ServiceFunction
             name="reinitialize"
             oneway
-            doc={lines(`
-              Tell the server to reload its configuration, reopen log files, etc
-            `)}
+            doc="Tell the server to reload its configuration, reopen log files, etc"
           ></ServiceFunction>
-          <ServiceFunction
-            name="shutdown"
-            oneway
-            doc={lines(`
-              Suggest a shutdown to the server
-            `)}
-          ></ServiceFunction>
+          <>
+            <ServiceFunction
+              name="shutdown"
+              oneway
+              doc="Suggest a shutdown to the server"
+            ></ServiceFunction>
+            <hbr />
+          </>
         </Service>
       </SourceFile>
     ),
