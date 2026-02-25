@@ -40,12 +40,11 @@ export type { TypedefProps } from "./Typedef.js";
 export { Const } from "./Const.js";
 export type { ConstProps } from "./Const.js";
 
-export { Service, ServiceFunction, Throws } from "./Service.js";
-export type {
-  ServiceFunctionProps,
-  ServiceProps,
-  ThrowsProps,
-} from "./Service.js";
+export { Service } from "./Service.js";
+export type { ServiceProps } from "./Service.js";
+
+export { ServiceFunction, Throws } from "./ServiceFunction.js";
+export type { ServiceFunctionProps, ThrowsProps } from "./ServiceFunction.js";
 
 export { Reference } from "./Reference.js";
 export type { ReferenceProps } from "./Reference.js";

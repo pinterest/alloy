@@ -26,7 +26,9 @@ function renderCommentLines(content: Children) {
     <For each={lines} joiner="">
       {(line, index) => (
         <>
-          {index > 0 ? <hbr /> : null}
+          {index > 0 ?
+            <hbr />
+          : null}
           {line}
         </>
       )}
@@ -56,9 +58,7 @@ export function DocComment(props: DocCommentProps) {
       {"/**"}
       <hbr />
       {" * "}
-      <align string=" * ">
-        {renderCommentLines(content)}
-      </align>
+      <align string=" * ">{renderCommentLines(content)}</align>
       <hbr />
       {" */"}
     </>
@@ -112,9 +112,7 @@ export function BlockComment(props: BlockCommentProps) {
       {"/*"}
       <hbr />
       {" * "}
-      <align string=" * ">
-        {renderCommentLines(content)}
-      </align>
+      <align string=" * ">{renderCommentLines(content)}</align>
       <hbr />
       {" */"}
     </>

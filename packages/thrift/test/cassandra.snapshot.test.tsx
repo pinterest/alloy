@@ -598,11 +598,7 @@ export const files: SnapshotFile[] = [
           <Field id={1} required type={string} name="name" />
           <Field id={2} required type={mapOf(string, string)} name="options" />
         </Struct>
-        <Struct
-          name="CfDef"
-          refkey={cfDef}
-          doc="describes a column family."
-        >
+        <Struct name="CfDef" refkey={cfDef} doc="describes a column family.">
           <Field id={1} required type={string} name="keyspace" />
           <Field id={2} required type={string} name="name" />
           <Field
@@ -692,8 +688,20 @@ export const files: SnapshotFile[] = [
           />
           <Field id={45} optional type={i32} name="min_index_interval" />
           <Field id={46} optional type={i32} name="max_index_interval" />
-          <Field id={9} optional type={double} name="row_cache_size" doc="@deprecated" />
-          <Field id={11} optional type={double} name="key_cache_size" doc="@deprecated" />
+          <Field
+            id={9}
+            optional
+            type={double}
+            name="row_cache_size"
+            doc="@deprecated"
+          />
+          <Field
+            id={11}
+            optional
+            type={double}
+            name="key_cache_size"
+            doc="@deprecated"
+          />
           <Field
             id={19}
             optional
@@ -708,8 +716,20 @@ export const files: SnapshotFile[] = [
             name="key_cache_save_period_in_seconds"
             doc="@deprecated"
           />
-          <Field id={21} optional type={i32} name="memtable_flush_after_mins" doc="@deprecated" />
-          <Field id={22} optional type={i32} name="memtable_throughput_in_mb" doc="@deprecated" />
+          <Field
+            id={21}
+            optional
+            type={i32}
+            name="memtable_flush_after_mins"
+            doc="@deprecated"
+          />
+          <Field
+            id={22}
+            optional
+            type={i32}
+            name="memtable_throughput_in_mb"
+            doc="@deprecated"
+          />
           <Field
             id={23}
             optional
@@ -717,10 +737,34 @@ export const files: SnapshotFile[] = [
             name="memtable_operations_in_millions"
             doc="@deprecated"
           />
-          <Field id={24} optional type={bool} name="replicate_on_write" doc="@deprecated" />
-          <Field id={25} optional type={double} name="merge_shards_chance" doc="@deprecated" />
-          <Field id={27} optional type={string} name="row_cache_provider" doc="@deprecated" />
-          <Field id={31} optional type={i32} name="row_cache_keys_to_save" doc="@deprecated" />
+          <Field
+            id={24}
+            optional
+            type={bool}
+            name="replicate_on_write"
+            doc="@deprecated"
+          />
+          <Field
+            id={25}
+            optional
+            type={double}
+            name="merge_shards_chance"
+            doc="@deprecated"
+          />
+          <Field
+            id={27}
+            optional
+            type={string}
+            name="row_cache_provider"
+            doc="@deprecated"
+          />
+          <Field
+            id={31}
+            optional
+            type={i32}
+            name="row_cache_keys_to_save"
+            doc="@deprecated"
+          />
           <Field
             id={38}
             optional
@@ -728,13 +772,15 @@ export const files: SnapshotFile[] = [
             name="populate_io_cache_on_flush"
             doc="@deprecated"
           />
-          <Field id={41} optional type={i32} name="index_interval" doc="@deprecated" />
+          <Field
+            id={41}
+            optional
+            type={i32}
+            name="index_interval"
+            doc="@deprecated"
+          />
         </Struct>
-        <Struct
-          name="KsDef"
-          refkey={ksDef}
-          doc="describes a keyspace."
-        >
+        <Struct name="KsDef" refkey={ksDef} doc="describes a keyspace.">
           <Field id={1} required type={string} name="name" />
           <Field id={2} required type={string} name="strategy_class" />
           <Field
@@ -743,7 +789,13 @@ export const files: SnapshotFile[] = [
             type={mapOf(string, string)}
             name="strategy_options"
           />
-          <Field id={4} optional type={i32} name="replication_factor" doc="@deprecated ignored" />
+          <Field
+            id={4}
+            optional
+            type={i32}
+            name="replication_factor"
+            doc="@deprecated ignored"
+          />
           <Field id={5} required type={listOf(cfDef)} name="cf_defs" />
           <Field
             id={6}

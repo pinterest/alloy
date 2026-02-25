@@ -613,11 +613,7 @@ export const files: SnapshotFile[] = [
           <Field id={2} type={string} name="hello" />
         </Struct>
         <Struct name="GuessProtocolStruct" refkey={guessProtocolStruct}>
-          <Field
-            id={7}
-            type={mapOf(string, string)}
-            name="map_field"
-          />
+          <Field id={7} type={mapOf(string, string)} name="map_field" />
         </Struct>
         <Struct name="LargeDeltas" refkey={largeDeltas}>
           <Field id={1} type={bools} name="b1" />
@@ -632,25 +628,13 @@ export const files: SnapshotFile[] = [
           <Field id={4000} type={listOf(i32)} name="big_numbers" />
         </Struct>
         <Struct name="NestedListsI32x2" refkey={nestedListsI32x2}>
-          <Field
-            id={1}
-            type={listOf(listOf(i32))}
-            name="integerlist"
-          />
+          <Field id={1} type={listOf(listOf(i32))} name="integerlist" />
         </Struct>
         <Struct name="NestedListsI32x3" refkey={nestedListsI32x3}>
-          <Field
-            id={1}
-            type={listOf(listOf(listOf(i32)))}
-            name="integerlist"
-          />
+          <Field id={1} type={listOf(listOf(listOf(i32)))} name="integerlist" />
         </Struct>
         <Struct name="NestedMixedx2" refkey={nestedMixedx2}>
-          <Field
-            id={1}
-            type={listOf(setOf(i32))}
-            name="int_set_list"
-          />
+          <Field id={1} type={listOf(setOf(i32))} name="int_set_list" />
           <Field
             id={2}
             type={mapOf(i32, setOf(string))}
@@ -666,11 +650,7 @@ export const files: SnapshotFile[] = [
           <Field id={1} type={listOf(bonk)} name="bonk" />
         </Struct>
         <Struct name="NestedListsBonk" refkey={nestedListsBonk}>
-          <Field
-            id={1}
-            type={listOf(listOf(listOf(bonk)))}
-            name="bonk"
-          />
+          <Field id={1} type={listOf(listOf(listOf(bonk)))} name="bonk" />
         </Struct>
         <Struct name="BoolTest" refkey={boolTest}>
           <Field id={1} optional type={bool} name="b" default={true} />

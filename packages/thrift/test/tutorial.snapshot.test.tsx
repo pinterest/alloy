@@ -258,11 +258,7 @@ export const files: SnapshotFile[] = [
               <Field id={1} type={invalidOperation} name="ouch" />
             </Throws>
           </ServiceFunction>
-          <ServiceFunction
-            name="zip"
-            oneway
-            doc={onewayDoc}
-          ></ServiceFunction>
+          <ServiceFunction name="zip" oneway doc={onewayDoc}></ServiceFunction>
         </Service>
         <DocComment>{closingDoc}</DocComment>
       </SourceFile>
