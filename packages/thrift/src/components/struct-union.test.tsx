@@ -33,6 +33,18 @@ describe("Struct/Union", () => {
     ).toThrow("struct has duplicate field id 1.");
   });
 
+  it("rejects field ids outside int16 range", () => {
+    expect(() =>
+      toSourceText(
+        <Struct name="User">
+          <Field id={40000} type={string} name="name" />
+        </Struct>,
+      ),
+    ).toThrow(
+      "Field id 40000 is out of range; must be between -32768 and 32767.",
+    );
+  });
+
   it("rejects required fields on unions", () => {
     expect(() =>
       toSourceText(

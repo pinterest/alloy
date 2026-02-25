@@ -8,7 +8,7 @@ describe("Enum", () => {
     const text = toSourceText(
       <Enum name="Color">
         <EnumValue name="RED" value={1} />
-        <EnumValue name="GREEN" />
+        <EnumValue name="GREEN" value={2} />
         <EnumValue name="BLUE" value={3} />
       </Enum>,
     );
@@ -16,8 +16,8 @@ describe("Enum", () => {
     expect(text).toBe(d`
       enum Color {
         RED = 1,
-        GREEN,
-        BLUE = 3
+        GREEN = 2,
+        BLUE = 3,
       }
     `);
   });
@@ -26,10 +26,42 @@ describe("Enum", () => {
     expect(() =>
       toSourceText(
         <Enum name="Color">
-          <EnumValue name="RED" />
-          <EnumValue name="RED" />
+          <EnumValue name="RED" value={1} />
+          <EnumValue name="RED" value={2} />
         </Enum>,
       ),
     ).toThrow("Enum has duplicate value 'RED'.");
+  });
+
+  it("rejects missing enum value numbers", () => {
+    expect(() =>
+      toSourceText(
+        <Enum name="Color">
+          {/* @ts-expect-error value is required */}
+          <EnumValue name="RED" />
+        </Enum>,
+      ),
+    ).toThrow("Enum value 'RED' must specify a numeric value.");
+  });
+
+  it("rejects duplicate enum value numbers", () => {
+    expect(() =>
+      toSourceText(
+        <Enum name="Color">
+          <EnumValue name="RED" value={1} />
+          <EnumValue name="GREEN" value={1} />
+        </Enum>,
+      ),
+    ).toThrow("Enum has duplicate value number 1.");
+  });
+
+  it("rejects enum values outside int32 range", () => {
+    expect(() =>
+      toSourceText(
+        <Enum name="Color">
+          <EnumValue name="RED" value={2147483648} />
+        </Enum>,
+      ),
+    ).toThrow("Enum value 'RED' must be a 32-bit signed integer.");
   });
 });

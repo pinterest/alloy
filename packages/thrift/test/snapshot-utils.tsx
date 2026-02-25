@@ -34,7 +34,7 @@ export function renderThriftFiles(files: SnapshotFile[]) {
     <Output namePolicy={permissiveNamePolicy}>
       {entries.map((entry) => entry.file)}
     </Output>,
-    { insertFinalNewLine: false, tabWidth: 4 },
+    { insertFinalNewLine: false, tabWidth: 2 },
   );
 
   const output: Record<string, string> = {};

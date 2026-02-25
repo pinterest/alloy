@@ -29,6 +29,9 @@ export const FieldContext = createNamedContext<FieldRegistry | undefined>(
   "@alloy-js/thrift FieldContext",
 );
 
+const MIN_I16 = -32768;
+const MAX_I16 = 32767;
+
 export function createFieldRegistry(options: {
   allowRequired: boolean;
   owner: string;
@@ -43,6 +46,15 @@ export function createFieldRegistry(options: {
         throw new Error(`Required fields are not allowed in ${options.owner}.`);
       }
       if (field.id !== undefined) {
+        if (
+          !Number.isInteger(field.id) ||
+          field.id < MIN_I16 ||
+          field.id > MAX_I16
+        ) {
+          throw new Error(
+            `Field id ${field.id} is out of range; must be between ${MIN_I16} and ${MAX_I16}.`,
+          );
+        }
         if (ids.has(field.id)) {
           throw new Error(
             `${options.owner} has duplicate field id ${field.id}.`,
@@ -122,7 +134,7 @@ export function Field(props: FieldProps) {
       {props.comment ?
         <>
           <lineSuffix>
-            {" // "}
+            {"  // "}
             {props.comment}
           </lineSuffix>
           <lineSuffixBoundary />

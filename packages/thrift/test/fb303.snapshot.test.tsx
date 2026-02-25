@@ -23,6 +23,8 @@ import {
   updateFixture,
 } from "./snapshot-utils.jsx";
 
+// Based on https://github.com/apache/thrift/blob/32776c0f46f5fd79b296391d66236c23b20af072/contrib/fb303/if/fb303.thrift
+
 const fbStatus = refkey();
 
 export const files: SnapshotFile[] = [
@@ -82,13 +84,16 @@ export const files: SnapshotFile[] = [
             Standard base service
           `)}
         >
-          <ServiceFunction
-            name="getName"
-            returnType={string}
-            doc={lines(`
-              Returns a descriptive name of the service
-            `)}
-          ></ServiceFunction>
+          <>
+            <hbr />
+            <ServiceFunction
+              name="getName"
+              returnType={string}
+              doc={lines(`
+                Returns a descriptive name of the service
+              `)}
+            ></ServiceFunction>
+          </>
           <ServiceFunction
             name="getVersion"
             returnType={string}

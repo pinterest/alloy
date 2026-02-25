@@ -21,12 +21,12 @@ export interface EnumProps {
 
 export interface EnumValueProps {
   name: string;
-  value?: number;
+  value: number;
   doc?: Children;
 }
 
 interface EnumRegistry {
-  register(name: string): void;
+  register(name: string, value: number): void;
 }
 
 const EnumValueContext = createNamedContext<EnumRegistry | undefined>(
@@ -50,12 +50,25 @@ const EnumValueContext = createNamedContext<EnumRegistry | undefined>(
 export function Enum(props: EnumProps) {
   const symbol = createTypeSymbol(props.name, props.refkey);
   const registryNames = new Set<string>();
+  const registryValues = new Set<number>();
   const registry: EnumRegistry = {
-    register(name) {
+    register(name, value) {
       if (registryNames.has(name)) {
         throw new Error(`Enum has duplicate value '${name}'.`);
       }
+      if (!Number.isInteger(value)) {
+        throw new Error(`Enum value '${name}' must be an integer.`);
+      }
+      if (value < -2147483648 || value > 2147483647) {
+        throw new Error(
+          `Enum value '${name}' must be a 32-bit signed integer.`,
+        );
+      }
+      if (registryValues.has(value)) {
+        throw new Error(`Enum has duplicate value number ${value}.`);
+      }
       registryNames.add(name);
+      registryValues.add(value);
     },
   };
 
@@ -66,7 +79,7 @@ export function Enum(props: EnumProps) {
         enum <Name />{" "}
         <EnumValueContext.Provider value={registry}>
           <Block>
-            <List comma hardline>
+            <List comma hardline enderPunctuation>
               {props.children}
             </List>
           </Block>
@@ -96,13 +109,16 @@ export function EnumValue(props: EnumValueProps) {
   }
 
   const name = useThriftNamePolicy().getName(props.name, "enum-value");
-  registry.register(name);
+  if (props.value === undefined) {
+    throw new Error(`Enum value '${name}' must specify a numeric value.`);
+  }
+  registry.register(name, props.value);
 
   return (
     <>
       <DocWhen doc={props.doc} />
       {name}
-      {props.value !== undefined ? ` = ${props.value}` : ""}
+      {` = ${props.value}`}
     </>
   );
 }

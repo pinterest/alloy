@@ -31,11 +31,14 @@ import {
   updateFixture,
 } from "./snapshot-utils.jsx";
 
+// Based on https://github.com/apache/thrift/tree/32776c0f46f5fd79b296391d66236c23b20af072/tutorial
+
 const operation = refkey();
 const myInteger = refkey();
 const work = refkey();
 const invalidOperation = refkey();
 const calculator = refkey();
+
 const sharedStruct = refkey();
 const sharedService = refkey();
 
@@ -220,9 +223,9 @@ export const files: SnapshotFile[] = [
           <EnumValue name="DIVIDE" value={4} />
         </Enum>
         <Struct name="Work" refkey={work} doc={structDoc}>
-          <Field id={1} required type={i32} name="num1" default={0} />
-          <Field id={2} required type={i32} name="num2" />
-          <Field id={3} required type={operation} name="op" />
+          <Field id={1} type={i32} name="num1" default={0} />
+          <Field id={2} type={i32} name="num2" />
+          <Field id={3} type={operation} name="op" />
           <Field id={4} optional type={string} name="comment" />
         </Struct>
         <Exception
@@ -230,8 +233,8 @@ export const files: SnapshotFile[] = [
           refkey={invalidOperation}
           doc={exceptionDoc}
         >
-          <Field id={1} required type={i32} name="whatOp" />
-          <Field id={2} required type={string} name="why" />
+          <Field id={1} type={i32} name="whatOp" />
+          <Field id={2} type={string} name="why" />
         </Exception>
         <Service
           name="Calculator"
@@ -242,7 +245,6 @@ export const files: SnapshotFile[] = [
           <>
             <hbr />
             <DocComment>{methodDefinitionDoc}</DocComment>
-            <hbr />
           </>
           <ServiceFunction name="ping"></ServiceFunction>
           <ServiceFunction name="add" returnType={i32}>
@@ -256,14 +258,11 @@ export const files: SnapshotFile[] = [
               <Field id={1} type={invalidOperation} name="ouch" />
             </Throws>
           </ServiceFunction>
-          <>
-            <hbr />
-            <ServiceFunction
-              name="zip"
-              oneway
-              doc={onewayDoc}
-            ></ServiceFunction>
-          </>
+          <ServiceFunction
+            name="zip"
+            oneway
+            doc={onewayDoc}
+          ></ServiceFunction>
         </Service>
         <DocComment>{closingDoc}</DocComment>
       </SourceFile>
@@ -302,8 +301,8 @@ export const files: SnapshotFile[] = [
         ]}
       >
         <Struct name="SharedStruct" refkey={sharedStruct}>
-          <Field id={1} required type={i32} name="key" />
-          <Field id={2} required type={string} name="value" />
+          <Field id={1} type={i32} name="key" />
+          <Field id={2} type={string} name="value" />
         </Struct>
         <Service name="SharedService" refkey={sharedService}>
           <ServiceFunction name="getStruct" returnType={sharedStruct}>

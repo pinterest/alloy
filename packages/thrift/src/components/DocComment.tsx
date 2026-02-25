@@ -1,4 +1,4 @@
-import { Children, For, List, childrenArray } from "@alloy-js/core";
+import { Children, For, childrenArray } from "@alloy-js/core";
 
 function splitLines(value: string): string[] {
   const lines = value.split(/\r?\n/);
@@ -13,48 +13,29 @@ function normalizeCommentChildren(children: Children): Children {
     return splitLines(children);
   }
   if (Array.isArray(children)) {
-    return children.reduce<Children[]>(
-      (normalized, child) =>
-        normalized.concat(
-          ...(typeof child === "string" ? splitLines(child) : [child]),
-        ),
-      [],
+    return children.flatMap<Children[]>((child) =>
+      typeof child === "string" ? splitLines(child) : [child],
     );
   }
   return children;
 }
 
-export interface DocCommentProps {
-  children: Children;
+function renderCommentLines(content: Children) {
+  const lines = childrenArray(() => content, { preserveFragments: true });
+  return (
+    <For each={lines} joiner="">
+      {(line, index) => (
+        <>
+          {index > 0 ? <hbr /> : null}
+          {line}
+        </>
+      )}
+    </For>
+  );
 }
 
-function renderDocComment(props: {
+export interface DocCommentProps {
   children: Children;
-  linePrefix: string;
-  closingLine: string;
-  alignWidth?: number;
-}) {
-  const content = normalizeCommentChildren(props.children);
-  const body = (
-    <>
-      {props.linePrefix}
-      <align string={props.linePrefix}>
-        <List>{content}</List>
-      </align>
-      <hbr />
-      {props.closingLine}
-    </>
-  );
-
-  return (
-    <>
-      {"/**"}
-      <hbr />
-      {props.alignWidth !== undefined ?
-        <align width={props.alignWidth}>{body}</align>
-      : body}
-    </>
-  );
 }
 
 /**
@@ -69,11 +50,19 @@ function renderDocComment(props: {
  * ```
  */
 export function DocComment(props: DocCommentProps) {
-  return renderDocComment({
-    children: props.children,
-    linePrefix: " * ",
-    closingLine: " */",
-  });
+  const content = normalizeCommentChildren(props.children);
+  return (
+    <>
+      {"/**"}
+      <hbr />
+      {" * "}
+      <align string=" * ">
+        {renderCommentLines(content)}
+      </align>
+      <hbr />
+      {" */"}
+    </>
+  );
 }
 
 export interface DocWhenProps {
@@ -124,7 +113,7 @@ export function BlockComment(props: BlockCommentProps) {
       <hbr />
       {" * "}
       <align string=" * ">
-        <List>{content}</List>
+        {renderCommentLines(content)}
       </align>
       <hbr />
       {" */"}

@@ -85,7 +85,6 @@ export function SourceFile(props: SourceFileProps) {
   const hasNamespaces = computed(() => namespaceChildren.value.length > 0);
   const hasHeader = computed(() => headerChildren.value.length > 0);
   const hasDeclarations = computed(() => declarationChildren.value.length > 0);
-
   return (
     <CoreSourceFile path={props.path} filetype="thrift" reference={Reference}>
       <NamePolicyContext.Provider value={namePolicy}>

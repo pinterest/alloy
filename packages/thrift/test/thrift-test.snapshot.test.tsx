@@ -40,6 +40,8 @@ import {
   updateFixture,
 } from "./snapshot-utils.jsx";
 
+// Based on https://github.com/apache/thrift/blob/32776c0f46f5fd79b296391d66236c23b20af072/test/ThriftTest.thrift
+
 const numberz = refkey();
 const userId = refkey();
 const mapType = refkey();
@@ -272,23 +274,29 @@ export const files: SnapshotFile[] = [
               uri: rawAnnotation("'http://thrift.apache.org/ns/ThriftTest'"),
             }}
           />,
-          <LineComment>
-            Presence of namespaces and sub-namespaces for which there is
-          </LineComment>,
-          <LineComment>
-            no generator should compile with warnings only
-          </LineComment>,
+          <>
+            <hbr />
+            <LineComment>
+              Presence of namespaces and sub-namespaces for which there is
+            </LineComment>
+            <LineComment>
+              no generator should compile with warnings only
+            </LineComment>
+          </>,
           <Namespace lang="noexist" value="ThriftTest" />,
           <Namespace lang="cpp.noexist" value="ThriftTest" />,
-          <Namespace lang="*" value="thrift.test" />,
+          <>
+            <hbr />
+            <Namespace lang="*" value="thrift.test" />
+          </>,
         ]}
       >
         <Enum name="Numberz" refkey={numberz} doc="Docstring!">
           <EnumValue name="ONE" value={1} />
-          <EnumValue name="TWO" />
-          <EnumValue name="THREE" />
+          <EnumValue name="TWO" value={2} />
+          <EnumValue name="THREE" value={3} />
           <EnumValue name="FIVE" value={5} />
-          <EnumValue name="SIX" />
+          <EnumValue name="SIX" value={6} />
           <EnumValue name="EIGHT" value={8} />
         </Enum>
         <Const
@@ -304,47 +312,46 @@ export const files: SnapshotFile[] = [
         </LineComment>
         <Typedef name="UserId" type={i64} refkey={userId} />
         <Struct name="Bonk" refkey={bonk}>
-          <Field id={1} required type={string} name="message" />
-          <Field id={2} required type={i32} name="type" />
+          <Field id={1} type={string} name="message" />
+          <Field id={2} type={i32} name="type" />
         </Struct>
         <Typedef name="MapType" type={mapOf(string, bonk)} refkey={mapType} />
         <Struct name="Bools" refkey={bools}>
-          <Field id={1} required type={bool} name="im_true" />
-          <Field id={2} required type={bool} name="im_false" />
+          <Field id={1} type={bool} name="im_true" />
+          <Field id={2} type={bool} name="im_false" />
         </Struct>
         <Struct name="Xtruct" refkey={xtruct}>
-          <Field id={1} required type={string} name="string_thing" />
-          <Field id={4} required type={i8} name="byte_thing" />
-          <Field id={9} required type={i32} name="i32_thing" />
-          <Field id={11} required type={i64} name="i64_thing" />
+          <Field id={1} type={string} name="string_thing" />
+          <Field id={4} type={i8} name="byte_thing" />
+          <Field id={9} type={i32} name="i32_thing" />
+          <Field id={11} type={i64} name="i64_thing" />
         </Struct>
         <Struct name="Xtruct2" refkey={xtruct2}>
           <Field
             id={1}
-            required
             type={i8}
             name="byte_thing"
             comment="used to be byte, hence the name"
           />
-          <Field id={2} required type={xtruct} name="struct_thing" />
-          <Field id={3} required type={i32} name="i32_thing" />
+          <Field id={2} type={xtruct} name="struct_thing" />
+          <Field id={3} type={i32} name="i32_thing" />
         </Struct>
         <Struct name="Xtruct3" refkey={xtruct3}>
-          <Field id={1} required type={string} name="string_thing" />
-          <Field id={4} required type={i32} name="changed" />
-          <Field id={9} required type={i32} name="i32_thing" />
-          <Field id={11} required type={i64} name="i64_thing" />
+          <Field id={1} type={string} name="string_thing" />
+          <Field id={4} type={i32} name="changed" />
+          <Field id={9} type={i32} name="i32_thing" />
+          <Field id={11} type={i64} name="i64_thing" />
         </Struct>
         <Struct
           name="Insanity"
           refkey={insanity}
           annotations={{ "python.immutable": "" }}
         >
-          <Field id={1} required type={mapOf(numberz, userId)} name="userMap" />
-          <Field id={2} required type={listOf(xtruct)} name="xtructs" />
+          <Field id={1} type={mapOf(numberz, userId)} name="userMap" />
+          <Field id={2} type={listOf(xtruct)} name="xtructs" />
         </Struct>
         <Struct name="CrazyNesting" refkey={crazyNesting}>
-          <Field id={1} required type={string} name="string_field" />
+          <Field id={1} type={string} name="string_field" />
           <Field id={2} optional type={setOf(insanity)} name="set_field" />
           <LineComment>
             Do not insert line break as test/go/Makefile.am is removing this
@@ -369,8 +376,8 @@ export const files: SnapshotFile[] = [
             )}
             name="list_field"
           />
-          <Field id={4} required type={binary} name="binary_field" />
-          <Field id={5} required type="uuid" name="uuid_field" />
+          <Field id={4} type={binary} name="binary_field" />
+          <Field id={5} type="uuid" name="uuid_field" />
         </Struct>
         <Union name="SomeUnion" refkey={someUnion}>
           <Field id={1} type={mapOf(numberz, userId)} name="map_thing" />
@@ -380,22 +387,25 @@ export const files: SnapshotFile[] = [
           <Field id={5} type={insanity} name="insanity_thing" />
         </Union>
         <Exception name="Xception" refkey={xception}>
-          <Field id={1} required type={i32} name="errorCode" />
-          <Field id={2} required type={string} name="message" />
+          <Field id={1} type={i32} name="errorCode" />
+          <Field id={2} type={string} name="message" />
         </Exception>
         <Exception name="Xception2" refkey={xception2}>
-          <Field id={1} required type={i32} name="errorCode" />
-          <Field id={2} required type={xtruct} name="struct_thing" />
+          <Field id={1} type={i32} name="errorCode" />
+          <Field id={2} type={xtruct} name="struct_thing" />
         </Exception>
         <Struct name="EmptyStruct" refkey={emptyStruct}></Struct>
         <Struct name="OneField" refkey={oneField}>
-          <Field id={1} required type={emptyStruct} name="field" />
+          <Field id={1} type={emptyStruct} name="field" />
         </Struct>
         <Service name="ThriftTest" refkey={thriftTest}>
-          <ServiceFunction
-            name="testVoid"
-            doc={serviceDocs.testVoid}
-          ></ServiceFunction>
+          <>
+            <hbr />
+            <ServiceFunction
+              name="testVoid"
+              doc={serviceDocs.testVoid}
+            ></ServiceFunction>
+          </>
           <ServiceFunction
             name="testString"
             returnType={string}
@@ -561,65 +571,69 @@ export const files: SnapshotFile[] = [
           </ServiceFunction>
         </Service>
         <Service name="SecondService" refkey={secondService}>
-          <ServiceFunction
-            name="secondtestString"
-            returnType={string}
-            doc={serviceDocs.secondtestString}
-          >
-            <Field id={1} type={string} name="thing" />
-          </ServiceFunction>
+          <>
+            <hbr />
+            <ServiceFunction
+              name="secondtestString"
+              returnType={string}
+              doc={serviceDocs.secondtestString}
+            >
+              <Field id={1} type={string} name="thing" />
+            </ServiceFunction>
+          </>
         </Service>
         <Struct name="VersioningTestV1" refkey={versioningTestV1}>
-          <Field id={1} required type={i32} name="begin_in_both" />
-          <Field id={3} required type={string} name="old_string" />
-          <Field id={12} required type={i32} name="end_in_both" />
+          <Field id={1} type={i32} name="begin_in_both" />
+          <Field id={3} type={string} name="old_string" />
+          <Field id={12} type={i32} name="end_in_both" />
         </Struct>
         <Struct name="VersioningTestV2" refkey={versioningTestV2}>
-          <Field id={1} required type={i32} name="begin_in_both" />
-          <Field id={2} required type={i32} name="newint" />
-          <Field id={3} required type={i8} name="newbyte" />
-          <Field id={4} required type={i16} name="newshort" />
-          <Field id={5} required type={i64} name="newlong" />
-          <Field id={6} required type={double} name="newdouble" />
-          <Field id={7} required type={bonk} name="newstruct" />
-          <Field id={8} required type={listOf(i32)} name="newlist" />
-          <Field id={9} required type={setOf(i32)} name="newset" />
-          <Field id={10} required type={mapOf(i32, i32)} name="newmap" />
-          <Field id={11} required type={string} name="newstring" />
-          <Field id={12} required type={i32} name="end_in_both" />
+          <Field id={1} type={i32} name="begin_in_both" />
+          <>
+            <hbr />
+            <Field id={2} type={i32} name="newint" />
+          </>
+          <Field id={3} type={i8} name="newbyte" />
+          <Field id={4} type={i16} name="newshort" />
+          <Field id={5} type={i64} name="newlong" />
+          <Field id={6} type={double} name="newdouble" />
+          <Field id={7} type={bonk} name="newstruct" />
+          <Field id={8} type={listOf(i32)} name="newlist" />
+          <Field id={9} type={setOf(i32)} name="newset" />
+          <Field id={10} type={mapOf(i32, i32)} name="newmap" />
+          <Field id={11} type={string} name="newstring" />
+          <Field id={12} type={i32} name="end_in_both" />
         </Struct>
         <Struct name="ListTypeVersioningV1" refkey={listTypeVersioningV1}>
-          <Field id={1} required type={listOf(i32)} name="myints" />
-          <Field id={2} required type={string} name="hello" />
+          <Field id={1} type={listOf(i32)} name="myints" />
+          <Field id={2} type={string} name="hello" />
         </Struct>
         <Struct name="ListTypeVersioningV2" refkey={listTypeVersioningV2}>
-          <Field id={1} required type={listOf(string)} name="strings" />
-          <Field id={2} required type={string} name="hello" />
+          <Field id={1} type={listOf(string)} name="strings" />
+          <Field id={2} type={string} name="hello" />
         </Struct>
         <Struct name="GuessProtocolStruct" refkey={guessProtocolStruct}>
           <Field
             id={7}
-            required
             type={mapOf(string, string)}
             name="map_field"
           />
         </Struct>
         <Struct name="LargeDeltas" refkey={largeDeltas}>
-          <Field id={1} required type={bools} name="b1" />
-          <Field id={10} required type={bools} name="b10" />
-          <Field id={100} required type={bools} name="b100" />
-          <Field id={500} required type={bool} name="check_true" />
-          <Field id={1000} required type={bools} name="b1000" />
-          <Field id={1500} required type={bool} name="check_false" />
-          <Field id={2000} required type={versioningTestV2} name="vertwo2000" />
-          <Field id={2500} required type={setOf(string)} name="a_set2500" />
-          <Field id={3000} required type={versioningTestV2} name="vertwo3000" />
-          <Field id={4000} required type={listOf(i32)} name="big_numbers" />
+          <Field id={1} type={bools} name="b1" />
+          <Field id={10} type={bools} name="b10" />
+          <Field id={100} type={bools} name="b100" />
+          <Field id={500} type={bool} name="check_true" />
+          <Field id={1000} type={bools} name="b1000" />
+          <Field id={1500} type={bool} name="check_false" />
+          <Field id={2000} type={versioningTestV2} name="vertwo2000" />
+          <Field id={2500} type={setOf(string)} name="a_set2500" />
+          <Field id={3000} type={versioningTestV2} name="vertwo3000" />
+          <Field id={4000} type={listOf(i32)} name="big_numbers" />
         </Struct>
         <Struct name="NestedListsI32x2" refkey={nestedListsI32x2}>
           <Field
             id={1}
-            required
             type={listOf(listOf(i32))}
             name="integerlist"
           />
@@ -627,7 +641,6 @@ export const files: SnapshotFile[] = [
         <Struct name="NestedListsI32x3" refkey={nestedListsI32x3}>
           <Field
             id={1}
-            required
             type={listOf(listOf(listOf(i32)))}
             name="integerlist"
           />
@@ -635,30 +648,26 @@ export const files: SnapshotFile[] = [
         <Struct name="NestedMixedx2" refkey={nestedMixedx2}>
           <Field
             id={1}
-            required
             type={listOf(setOf(i32))}
             name="int_set_list"
           />
           <Field
             id={2}
-            required
             type={mapOf(i32, setOf(string))}
             name="map_int_strset"
           />
           <Field
             id={3}
-            required
             type={listOf(mapOf(i32, setOf(string)))}
             name="map_int_strset_list"
           />
         </Struct>
         <Struct name="ListBonks" refkey={listBonks}>
-          <Field id={1} required type={listOf(bonk)} name="bonk" />
+          <Field id={1} type={listOf(bonk)} name="bonk" />
         </Struct>
         <Struct name="NestedListsBonk" refkey={nestedListsBonk}>
           <Field
             id={1}
-            required
             type={listOf(listOf(listOf(bonk)))}
             name="bonk"
           />

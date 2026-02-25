@@ -32,6 +32,11 @@ export interface ServiceFunctionProps {
   children?: Children;
   throws?: Children;
   doc?: Children;
+  /**
+   * When true, render each parameter on its own line with indentation,
+   * and place the throws clause on a separate line.
+   */
+  breakParams?: boolean;
 }
 
 export interface ThrowsProps {
@@ -56,6 +61,9 @@ export function Service(props: ServiceProps) {
   const symbol = createServiceSymbol(props.name, props.refkey);
   const annotations = renderAnnotations(props.annotations);
   const annotationText = annotations ? ` ${annotations}` : "";
+  const children = childrenArray(() => props.children, {
+    preserveFragments: true,
+  });
 
   return (
     <>
@@ -70,7 +78,7 @@ export function Service(props: ServiceProps) {
         : ""}
         {annotationText}{" "}
         <Block>
-          <List hardline>{props.children}</List>
+          <List doubleHardline>{children}</List>
         </Block>
       </Declaration>
     </>
@@ -120,23 +128,52 @@ export function ServiceFunction(props: ServiceFunctionProps) {
   const annotations = renderAnnotations(props.annotations);
   const annotationText = annotations ? ` ${annotations}` : "";
 
+  const throwsClause = throws ? (
+    <FieldContext.Provider value={throwsRegistry}>
+      <Throws>{throws}</Throws>
+    </FieldContext.Provider>
+  ) : null;
+
+  if (props.breakParams) {
+    return (
+      <>
+        <DocWhen doc={props.doc} />
+        {props.oneway ? "oneway " : ""}
+        {renderTypeRef(returnType)} {name}(
+        <indent>
+          <FieldContext.Provider value={paramRegistry}>
+            <List comma hardline>
+              {params}
+            </List>
+          </FieldContext.Provider>
+        </indent>
+        )
+        {throwsClause ?
+          <>
+            <hbr />
+            <indent>{throwsClause}</indent>
+          </>
+        : null}
+        {annotationText},
+      </>
+    );
+  }
+
   return (
     <>
       <DocWhen doc={props.doc} />
-      {props.oneway ? "oneway " : ""}
-      {renderTypeRef(returnType)} {name}(
-      <FieldContext.Provider value={paramRegistry}>
-        <List comma line>
-          {params}
-        </List>
-      </FieldContext.Provider>
-      ){throws ? " " : ""}
-      {throws ?
-        <FieldContext.Provider value={throwsRegistry}>
-          <Throws>{throws}</Throws>
+      <group>
+        {props.oneway ? "oneway " : ""}
+        {renderTypeRef(returnType)} {name}(
+        <FieldContext.Provider value={paramRegistry}>
+          <List comma space>
+            {params}
+          </List>
         </FieldContext.Provider>
-      : null}
-      {annotationText},
+        ){throws ? " " : ""}
+        {throwsClause}
+        {annotationText},
+      </group>
     </>
   );
 }
@@ -155,14 +192,17 @@ export function ServiceFunction(props: ServiceFunctionProps) {
  * ```
  */
 export function Throws(props: ThrowsProps) {
+  const entries = childrenArray(() => props.children, {
+    preserveFragments: true,
+  });
   return (
-    <>
-      throws(
-      <List comma line>
-        {props.children}
+    <group>
+      throws (
+      <List comma space>
+        {entries}
       </List>
       )
-    </>
+    </group>
   );
 }
 

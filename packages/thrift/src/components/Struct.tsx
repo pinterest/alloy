@@ -5,6 +5,7 @@ import {
   List,
   Name,
   Refkey,
+  childrenArray,
 } from "@alloy-js/core";
 import { renderAnnotations } from "../render.js";
 import { createTypeSymbol } from "../symbols/factories.js";
@@ -31,6 +32,10 @@ function StructLike(
   });
   const annotations = renderAnnotations(props.annotations);
   const annotationText = annotations ? ` ${annotations}` : "";
+  const fields = childrenArray(() => props.children, {
+    preserveFragments: true,
+  });
+  const hasFields = fields.length > 0;
 
   return (
     <>
@@ -38,9 +43,16 @@ function StructLike(
       <Declaration symbol={symbol}>
         {props.keyword} <Name />{" "}
         <FieldContext.Provider value={registry}>
-          <Block>
-            <List hardline>{props.children}</List>
-          </Block>
+          {hasFields ?
+            <Block>
+              <List hardline>{fields}</List>
+            </Block>
+          : <group>
+              {"{"}
+              <hbr />
+              {"}"}
+            </group>
+          }
         </FieldContext.Provider>
         {annotationText}
       </Declaration>

@@ -58,7 +58,7 @@ export function renderTypeRef(type: TypeRef): Children {
       {", "}
       {renderTypeRef(type.valueType)}
       {">"}
-      {annotations ? ` ${annotations}` : ""}
+      {annotations ? annotations : ""}
     </>
   );
 }

@@ -45,7 +45,8 @@ describe("Service", () => {
 
       service UserService {
         oneway void ping(1: string message),
-        string getUser(1: i64 id) throws(1: NotFound notFound) (deprecated = true),
+
+        string getUser(1: i64 id) throws (1: NotFound notFound) (deprecated = true),
       }
     `);
   });
