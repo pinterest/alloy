@@ -37,7 +37,7 @@ namespace rb Thrift.Test
 namespace st ThriftTest
 namespace xsd test (uri = 'http://thrift.apache.org/ns/ThriftTest')
 
-// Presence of namespaces and sub-namespaces for which there is// no generator should compile with warnings only
+// Presence of namespaces and sub-namespaces for which there is no generator should compile with warnings only
 namespace noexist ThriftTest
 namespace cpp.noexist ThriftTest
 
@@ -59,7 +59,6 @@ const Numberz myNumberz = Numberz.ONE
 
 // the following is expected to fail:
 // const Numberz urNumberz = ONE;
-//
 
 typedef i64 UserId
 
@@ -128,8 +127,7 @@ exception Xception2 {
   2: Xtruct struct_thing,
 }
 
-struct EmptyStruct {
-}
+struct EmptyStruct {}
 
 struct OneField {
   1: EmptyStruct field,
@@ -139,7 +137,6 @@ service ThriftTest {
 
   /**
    * Prints "testVoid()" and returns nothing.
-   *
    */
   void testVoid(),
 
@@ -147,7 +144,6 @@ service ThriftTest {
    * Prints 'testString("%s")' with thing as '%s'
    * @param string thing - the string to print
    * @return string - returns the string 'thing'
-   *
    */
   string testString(1: string thing),
 
@@ -155,7 +151,6 @@ service ThriftTest {
    * Prints 'testBool("%s")' where '%s' with thing as 'true' or 'false'
    * @param bool  thing - the bool data to print
    * @return bool  - returns the bool 'thing'
-   *
    */
   bool testBool(1: bool thing),
 
@@ -164,7 +159,6 @@ service ThriftTest {
    * The types i8 and byte are synonyms, use of i8 is encouraged, byte still exists for the sake of compatibility.
    * @param byte thing - the i8/byte to print
    * @return i8 - returns the i8/byte 'thing'
-   *
    */
   i8 testByte(1: i8 thing),
 
@@ -172,7 +166,6 @@ service ThriftTest {
    * Prints 'testI32("%d")' with thing as '%d'
    * @param i32 thing - the i32 to print
    * @return i32 - returns the i32 'thing'
-   *
    */
   i32 testI32(1: i32 thing),
 
@@ -180,7 +173,6 @@ service ThriftTest {
    * Prints 'testI64("%d")' with thing as '%d'
    * @param i64 thing - the i64 to print
    * @return i64 - returns the i64 'thing'
-   *
    */
   i64 testI64(1: i64 thing),
 
@@ -188,7 +180,6 @@ service ThriftTest {
    * Prints 'testDouble("%f")' with thing as '%f'
    * @param double thing - the double to print
    * @return double - returns the double 'thing'
-   *
    */
   double testDouble(1: double thing),
 
@@ -196,7 +187,6 @@ service ThriftTest {
    * Prints 'testBinary("%s")' where '%s' is a hex-formatted string of thing's data
    * @param binary  thing - the binary data to print
    * @return binary  - returns the binary 'thing'
-   *
    */
   binary testBinary(1: binary thing),
 
@@ -204,7 +194,6 @@ service ThriftTest {
    * Prints 'testUuid("%s")' where '%s' is the uuid given. Note that the uuid byte order should be correct.
    * @param uuid  thing - the uuid to print
    * @return uuid  - returns the uuid 'thing'
-   *
    */
   uuid testUuid(1: uuid thing),
 
@@ -212,7 +201,6 @@ service ThriftTest {
    * Prints 'testStruct("{%s}")' where thing has been formatted into a string of comma separated values
    * @param Xtruct thing - the Xtruct to print
    * @return Xtruct - returns the Xtruct 'thing'
-   *
    */
   Xtruct testStruct(1: Xtruct thing),
 
@@ -220,7 +208,6 @@ service ThriftTest {
    * Prints 'testNest("{%s}")' where thing has been formatted into a string of the nested struct
    * @param Xtruct2 thing - the Xtruct2 to print
    * @return Xtruct2 - returns the Xtruct2 'thing'
-   *
    */
   Xtruct2 testNest(1: Xtruct2 thing),
 
@@ -229,7 +216,6 @@ service ThriftTest {
    *  separated by commas and new lines
    * @param map<i32,i32> thing - the map<i32,i32> to print
    * @return map<i32,i32> - returns the map<i32,i32> 'thing'
-   *
    */
   map<i32, i32> testMap(1: map<i32, i32> thing),
 
@@ -238,7 +224,6 @@ service ThriftTest {
    *  separated by commas and new lines
    * @param map<string,string> thing - the map<string,string> to print
    * @return map<string,string> - returns the map<string,string> 'thing'
-   *
    */
   map<string, string> testStringMap(1: map<string, string> thing),
 
@@ -247,7 +232,6 @@ service ThriftTest {
    *  separated by commas and new lines
    * @param set<i32> thing - the set<i32> to print
    * @return set<i32> - returns the set<i32> 'thing'
-   *
    */
   set<i32> testSet(1: set<i32> thing),
 
@@ -256,7 +240,6 @@ service ThriftTest {
    *  separated by commas and new lines
    * @param list<i32> thing - the list<i32> to print
    * @return list<i32> - returns the list<i32> 'thing'
-   *
    */
   list<i32> testList(1: list<i32> thing),
 
@@ -264,7 +247,6 @@ service ThriftTest {
    * Prints 'testEnum("%d")' where thing has been formatted into its numeric value
    * @param Numberz thing - the Numberz to print
    * @return Numberz - returns the Numberz 'thing'
-   *
    */
   Numberz testEnum(1: Numberz thing),
 
@@ -272,7 +254,6 @@ service ThriftTest {
    * Prints 'testTypedef("%d")' with thing as '%d'
    * @param UserId thing - the UserId to print
    * @return UserId - returns the UserId 'thing'
-   *
    */
   UserId testTypedef(1: UserId thing),
 
@@ -281,7 +262,6 @@ service ThriftTest {
    * @param i32 hello - the i32 to print
    * @return map<i32,map<i32,i32>> - returns a dictionary with these values:
    *   {-4 => {-4 => -4, -3 => -3, -2 => -2, -1 => -1, }, 4 => {1 => 1, 2 => 2, 3 => 3, 4 => 4, }, }
-   *
    */
   map<i32, map<i32, i32>> testMapMap(1: i32 hello),
 
@@ -295,7 +275,6 @@ service ThriftTest {
    *     2 => { 6 => <empty Insanity struct>, },
    *   }
    * @return map<UserId, map<Numberz,Insanity>> - a map with the above values
-   *
    */
   map<UserId, map<Numberz, Insanity>> testInsanity(1: Insanity argument),
 
@@ -309,7 +288,6 @@ service ThriftTest {
    * @param UserId arg5 -
    * @return Xtruct - returns an Xtruct with string_thing = "Hello2, byte_thing = arg0, i32_thing = arg1
    *    and i64_thing = arg2
-   *
    */
   Xtruct testMulti(1: i8 arg0, 2: i32 arg1, 3: i64 arg2, 4: map<i16, string> arg3, 5: Numberz arg4, 6: UserId arg5),
 
@@ -319,7 +297,6 @@ service ThriftTest {
    * if arg == "Xception" throw Xception with errorCode = 1001 and message = arg
    * else if arg == "TException" throw TException
    * else do not throw anything
-   *
    */
   void testException(1: string arg) throws (1: Xception err1),
 
@@ -330,7 +307,6 @@ service ThriftTest {
    * else if arg0 == "Xception2" throw Xception2 with errorCode = 2002 and struct_thing.string_thing = "This is an Xception2"
    * else do not throw anything
    * @return Xtruct - an Xtruct with string_thing = arg1
-   *
    */
   Xtruct testMultiException(1: string arg0, 2: string arg1) throws (1: Xception err1, 2: Xception2 err2),
 
@@ -339,7 +315,6 @@ service ThriftTest {
    * sleep 'secondsToSleep'
    * Print 'testOneway(%d): done sleeping!' with secondsToSleep as '%d'
    * @param i32 secondsToSleep - the number of seconds to sleep
-   *
    */
   oneway void testOneway(1: i32 secondsToSleep),
 }
@@ -350,7 +325,6 @@ service SecondService {
    * Prints 'testString("%s")' with thing as '%s'
    * @param string thing - the string to print
    * @return string - returns the string 'thing'
-   *
    */
   string secondtestString(1: string thing),
 }

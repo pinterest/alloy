@@ -14,14 +14,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # *** PLEASE REMEMBER TO EDIT THE VERSION CONSTANT WHEN MAKING CHANGES ***
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#
+
 #
 # Interface definition for Cassandra Service
-#
 #
 
 namespace java org.apache.cassandra.thrift
@@ -30,6 +29,10 @@ namespace csharp Apache.Cassandra
 namespace py cassandra
 namespace php cassandra
 namespace perl Cassandra
+
+# Thrift.rb has a bug where top-level modules that include modules 
+# with the same name are not properly referenced, so we can't do
+# Cassandra::Cassandra::Client.
 namespace rb CassandraThrift
 
 # The API version (NOT the product version), composed as a dot delimited
@@ -52,8 +55,8 @@ namespace rb CassandraThrift
 # An effort should be made not to break forward-client-compatibility either
 # (e.g. one should avoid removing obsolete fields from the IDL), but no
 # guarantees in this respect are made by the Cassandra project.
-#
 const string VERSION = "20.1.0"
+
 
 #
 # data structures
@@ -65,7 +68,6 @@ const string VERSION = "20.1.0"
  * @param value. The data associated with the name.  Maximum 2GB long, but in practice you should limit it to small numbers of MB (since Thrift must read the full value into memory to operate on it).
  * @param timestamp. The timestamp is used for conflict detection/resolution when two columns with same name need to be compared.
  * @param ttl. An optional, positive delay (in seconds) after which the column will be automatically deleted.
- *
  */
 struct Column {
   1: required binary name,
@@ -79,7 +81,6 @@ struct Column {
  * @param name. see Column.name.
  * @param columns. A collection of standard Columns.  The columns within a super column are defined in an adhoc manner.
  *                 Columns within a super column do not have to have matching structures (similarly named child columns).
- *
  */
 struct SuperColumn {
   1: required binary name,
@@ -110,7 +111,6 @@ struct CounterSuperColumn {
  * @param super_column. The SuperColumn returned by get() or get_slice().
  * @param counter_column. The Counterolumn returned by get() or get_slice().
  * @param counter_super_column. The CounterSuperColumn returned by get() or get_slice().
- *
  */
 struct ColumnOrSuperColumn {
   1: optional Column column,
@@ -119,35 +119,29 @@ struct ColumnOrSuperColumn {
   4: optional CounterSuperColumn counter_super_column,
 }
 
+
 #
 # Exceptions
 # (note that internal server errors will raise a TApplicationException, courtesy of Thrift)
 #
 
-/**
- * A specific column was requested that does not exist.
- */
+/** A specific column was requested that does not exist. */
 exception NotFoundException {
 }
 
 /**
  * Invalid request could mean keyspace or column family does not exist, required parameters are missing, or a parameter is malformed.
  * why contains an associated error message.
- *
  */
 exception InvalidRequestException {
   1: required string why,
 }
 
-/**
- * Not all the replicas required could be created and/or read.
- */
+/** Not all the replicas required could be created and/or read. */
 exception UnavailableException {
 }
 
-/**
- * RPC timeout was exceeded.  either a node failed mid-operation, or load was too high, or the requested op was too large.
- */
+/** RPC timeout was exceeded.  either a node failed mid-operation, or load was too high, or the requested op was too large. */
 exception TimedOutException {
   /**
    * if a write operation was acknowledged by some replicas but not by enough to
@@ -157,12 +151,14 @@ exception TimedOutException {
    *
    */
   1: optional i32 acknowledged_by,
+
   /**
    * in case of atomic_batch_mutate method this field tells if the batch
    * was written to the batchlog.
    *
    */
   2: optional bool acknowledged_by_batchlog,
+
   /**
    * for the CAS method, this field tells if we timed out during the paxos
    * protocol, as opposed to during the commit of our update
@@ -171,16 +167,12 @@ exception TimedOutException {
   3: optional bool paxos_in_progress,
 }
 
-/**
- * invalid authentication request (invalid keyspace, user does not exist, or credentials invalid)
- */
+/** invalid authentication request (invalid keyspace, user does not exist, or credentials invalid) */
 exception AuthenticationException {
   1: required string why,
 }
 
-/**
- * invalid authorization request (user does not have access to keyspace)
- */
+/** invalid authorization request (user does not have access to keyspace) */
 exception AuthorizationException {
   1: required string why,
 }
@@ -190,11 +182,14 @@ exception AuthorizationException {
  * no actual schema agreement validation is done starting from Cassandra 1.2
  *
  * schemas are not in agreement across all nodes
- *
  */
 exception SchemaDisagreementException {
 }
 
+
+#
+# service api
+#
 /**
  * The ConsistencyLevel is an enum that controls both read and write
  * behavior based on the ReplicationFactor of the keyspace.  The
@@ -238,7 +233,6 @@ exception SchemaDisagreementException {
  *   LOCAL_QUORUM Returns the record with the most recent timestamp once a majority of replicas within the local datacenter have replied.
  *   EACH_QUORUM  Returns the record with the most recent timestamp once a majority of replicas within each datacenter have replied.
  *   ALL          Returns the record with the most recent timestamp once all replicas have replied (implies no replica may be down)..
- *
  */
 enum ConsistencyLevel {
   ONE = 1,
@@ -259,7 +253,6 @@ enum ConsistencyLevel {
  * ColumnParent as ColumnPath + '/../'.
  *
  * See also <a href="cassandra.html#Struct_ColumnPath">ColumnPath</a>
- *
  */
 struct ColumnParent {
   3: required string column_family,
@@ -275,7 +268,6 @@ struct ColumnParent {
  * @param column_family. The name of the CF of the column being looked up.
  * @param super_column. The super column name.
  * @param column. The column name.
- *
  */
 struct ColumnPath {
   3: required string column_family,
@@ -298,7 +290,6 @@ struct ColumnPath {
  *               materialize the whole result into memory before returning it to the client, so be aware that you may
  *               be better served by iterating through slices by passing the last value of one call in as the 'start'
  *               of the next instead of increasing 'count' arbitrarily large.
- *
  */
 struct SliceRange {
   1: required binary start,
@@ -318,7 +309,6 @@ struct SliceRange {
  *                     to fetch N known column names. For instance, if you know you wish to fetch columns 'Joe', 'Jack',
  *                     and 'Jim' you can pass those column names as a list to fetch all three at once.
  * @param slice_range. A SliceRange describing how to range, order, and/or limit the slice.
- *
  */
 struct SlicePredicate {
   1: optional list<binary> column_names,
@@ -348,6 +338,7 @@ struct IndexClause {
   3: required i32 count = 100,
 }
 
+
 /**
  * The semantics of start keys and tokens are slightly different.
  * Keys are start-inclusive; tokens are start-exclusive.  Token
@@ -355,7 +346,6 @@ struct IndexClause {
  * than the start one.  Thus, a range from keyX to keyX is a
  * one-element range, but a range from tokenY to tokenY is the
  * full ring.
- *
  */
 struct KeyRange {
   1: optional binary start_key,
@@ -372,7 +362,6 @@ struct KeyRange {
  * @param key. a row key
  * @param columns. List of data represented by the key. Typically, the list is pared down to only the columns specified by
  *                 a SlicePredicate.
- *
  */
 struct KeySlice {
   1: required binary key,
@@ -397,7 +386,6 @@ struct Deletion {
  * A Mutation is either an insert (represented by filling column_or_supercolumn) or a deletion (represented by filling the deletion attribute).
  * @param column_or_supercolumn. An insert to a column or supercolumn (possibly counter column or supercolumn)
  * @param deletion. A deletion of a column or supercolumn
- *
  */
 struct Mutation {
   1: optional ColumnOrSuperColumn column_or_supercolumn,
@@ -422,7 +410,6 @@ struct CASResult {
  * @param end_token The last token in the range
  * @param endpoints The endpoints responsible for the range (listed by their configured listen_address)
  * @param rpc_endpoints The endpoints responsible for the range (listed by their configured rpc_address)
- *
  */
 struct TokenRange {
   1: required string start_token,
@@ -445,9 +432,7 @@ enum IndexType {
   COMPOSITES = 2,
 }
 
-/**
- * describes a column in a column family.
- */
+/* describes a column in a column family. */
 struct ColumnDef {
   1: required binary name,
   2: required string validation_class,
@@ -460,16 +445,13 @@ struct ColumnDef {
  * Describes a trigger.
  * `options` should include at least 'class' param.
  * Other options are not supported yet.
- *
  */
 struct TriggerDef {
   1: required string name,
   2: required map<string, string> options,
 }
 
-/**
- * describes a column family.
- */
+/* describes a column family. */
 struct CfDef {
   1: required string keyspace,
   2: required string name,
@@ -553,24 +535,18 @@ struct CfDef {
   41: optional i32 index_interval,
 }
 
-/**
- * describes a keyspace.
- */
+/* describes a keyspace. */
 struct KsDef {
   1: required string name,
   2: required string strategy_class,
   3: optional map<string, string> strategy_options,
-  /**
-   * @deprecated ignored
-   */
+  /** @deprecated ignored */
   4: optional i32 replication_factor,
   5: required list<CfDef> cf_defs,
   6: optional bool durable_writes = 1,
 }
 
-/**
- * CQL query compression
- */
+/** CQL query compression */
 enum Compression {
   GZIP = 1,
   NONE = 2,
@@ -589,7 +565,6 @@ enum CqlResultType {
  * is special-cased and is always returned.  For CQL3, it is not special cased;
  * it will be included in the columns list if it was included in the SELECT and
  * the key field is always null.
- *
  */
 struct CqlRow {
   1: required binary key,
@@ -617,9 +592,7 @@ struct CqlPreparedResult {
   4: optional list<string> variable_names,
 }
 
-/**
- * Represents input splits used by hadoop ColumnFamilyRecordReaders
- */
+/** Represents input splits used by hadoop ColumnFamilyRecordReaders */
 struct CfSplit {
   1: required string start_token,
   2: required string end_token,
@@ -632,7 +605,6 @@ struct CfSplit {
  * end-of value.
  * @param start. The start of the ColumnSlice inclusive
  * @param finish. The end of the ColumnSlice inclusive
- *
  */
 struct ColumnSlice {
   1: optional binary start,
@@ -647,7 +619,6 @@ struct ColumnSlice {
  * @param reversed. Direction of slice
  * @param count. Maximum number of columns
  * @param consistency_level. Level to perform the operation at
- *
  */
 struct MultiSliceRequest {
   1: optional binary key,
@@ -674,81 +645,77 @@ service Cassandra {
   /**
    * Get the Column or SuperColumn at the given column_path. If no value is present, NotFoundException is thrown. (This is
    * the only method that can throw an exception under non-failure conditions.)
-   *
    */
   ColumnOrSuperColumn get(1: required binary key,
-    2: required ColumnPath column_path,
-    3: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
-  throws (1: InvalidRequestException ire, 2: NotFoundException nfe, 3: UnavailableException ue, 4: TimedOutException te),
+                          2: required ColumnPath column_path,
+                          3: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
+                      throws (1: InvalidRequestException ire, 2: NotFoundException nfe, 3: UnavailableException ue, 4: TimedOutException te),
 
   /**
    * Get the group of columns contained by column_parent (either a ColumnFamily name or a ColumnFamily/SuperColumn name
    * pair) specified by the given SlicePredicate. If no matching values are found, an empty list is returned.
-   *
    */
   list<ColumnOrSuperColumn> get_slice(1: required binary key,
-    2: required ColumnParent column_parent,
-    3: required SlicePredicate predicate,
-    4: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
-  throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
+                                      2: required ColumnParent column_parent,
+                                      3: required SlicePredicate predicate,
+                                      4: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
+                            throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
 
   /**
    * returns the number of columns matching <code>predicate</code> for a particular <code>key</code>,
    * <code>ColumnFamily</code> and optionally <code>SuperColumn</code>.
-   *
    */
   i32 get_count(1: required binary key,
-    2: required ColumnParent column_parent,
-    3: required SlicePredicate predicate,
-    4: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
-  throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
+                2: required ColumnParent column_parent,
+                3: required SlicePredicate predicate,
+                4: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
+      throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
 
   /**
    * Performs a get_slice for column_parent and predicate for the given keys in parallel.
    */
-  map<binary, list<ColumnOrSuperColumn>> multiget_slice(1: required list<binary> keys,
-    2: required ColumnParent column_parent,
-    3: required SlicePredicate predicate,
-    4: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
-  throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
+  map<binary,list<ColumnOrSuperColumn>> multiget_slice(1: required list<binary> keys,
+                                                       2: required ColumnParent column_parent,
+                                                       3: required SlicePredicate predicate,
+                                                       4: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
+                                        throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
 
   /**
    * Perform a get_count in parallel on the given list<binary> keys. The return value maps keys to the count found.
    */
   map<binary, i32> multiget_count(1: required list<binary> keys,
-    2: required ColumnParent column_parent,
-    3: required SlicePredicate predicate,
-    4: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
-  throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
+                2: required ColumnParent column_parent,
+                3: required SlicePredicate predicate,
+                4: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
+      throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
 
   /**
    * returns a subset of columns for a contiguous range of keys.
    */
   list<KeySlice> get_range_slices(1: required ColumnParent column_parent,
-    2: required SlicePredicate predicate,
-    3: required KeyRange range,
-    4: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
-  throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
+                                  2: required SlicePredicate predicate,
+                                  3: required KeyRange range,
+                                  4: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
+                 throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
 
   /**
    * returns a range of columns, wrapping to the next rows if necessary to collect max_results.
    */
   list<KeySlice> get_paged_slice(1: required string column_family,
-    2: required KeyRange range,
-    3: required binary start_column,
-    4: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
-  throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
+                                 2: required KeyRange range,
+                                 3: required binary start_column,
+                                 4: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
+                 throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
 
   /**
    * Returns the subset of columns specified in SlicePredicate for the rows matching the IndexClause
    * @deprecated use get_range_slices instead with range.row_filter specified
-   *
    */
   list<KeySlice> get_indexed_slices(1: required ColumnParent column_parent,
-    2: required IndexClause index_clause,
-    3: required SlicePredicate column_predicate,
-    4: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
-  throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
+                                    2: required IndexClause index_clause,
+                                    3: required SlicePredicate column_predicate,
+                                    4: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
+                 throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
 
   # modification methods
 
@@ -756,19 +723,19 @@ service Cassandra {
    * Insert a Column at the given column_parent.column_family and optional column_parent.super_column.
    */
   void insert(1: required binary key,
-    2: required ColumnParent column_parent,
-    3: required Column column,
-    4: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
-  throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
+              2: required ColumnParent column_parent,
+              3: required Column column,
+              4: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
+       throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
 
   /**
    * Increment or decrement a counter.
    */
   void add(1: required binary key,
-    2: required ColumnParent column_parent,
-    3: required CounterColumn column,
-    4: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
-  throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
+           2: required ColumnParent column_parent,
+           3: required CounterColumn column,
+           4: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
+       throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
 
   /**
    * Atomic compare and set.
@@ -785,58 +752,53 @@ service Cassandra {
    * guaranteed that a followup QUORUM read will see the cas write (if that one was successful obviously). If
    * commit_consistency_level is ANY, you will need to use a SERIAL/LOCAL_SERIAL read to be guaranteed to see
    * the write.
-   *
    */
   CASResult cas(1: required binary key,
-    2: required string column_family,
-    3: list<Column> expected,
-    4: list<Column> updates,
-    5: required ConsistencyLevel serial_consistency_level = ConsistencyLevel.SERIAL,
-    6: required ConsistencyLevel commit_consistency_level = ConsistencyLevel.QUORUM)
-  throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
+                2: required string column_family,
+                3: list<Column> expected,
+                4: list<Column> updates,
+                5: required ConsistencyLevel serial_consistency_level = ConsistencyLevel.SERIAL,
+                6: required ConsistencyLevel commit_consistency_level = ConsistencyLevel.QUORUM)
+       throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
 
   /**
    * Remove data from the row specified by key at the granularity specified by column_path, and the given timestamp. Note
    * that all the values in column_path besides column_path.column_family are truly optional: you can remove the entire
    * row by just specifying the ColumnFamily, or you can remove a SuperColumn or a single Column by specifying those levels too.
-   *
    */
   void remove(1: required binary key,
-    2: required ColumnPath column_path,
-    3: required i64 timestamp,
-    4: ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
-  throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
+              2: required ColumnPath column_path,
+              3: required i64 timestamp,
+              4: ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
+       throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
 
   /**
    * Remove a counter at the specified location.
    * Note that counters have limited support for deletes: if you remove a counter, you must wait to issue any following update
    * until the delete has reached all the nodes and all of them have been fully compacted.
-   *
    */
   void remove_counter(1: required binary key,
-    2: required ColumnPath path,
-    3: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
-  throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
+                      2: required ColumnPath path,
+                      3: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
+      throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
 
   /**
    * Mutate many columns or super columns for many row keys. See also: Mutation.
    *
    * mutation_map maps key to column family to a list of Mutation objects to take place at that scope.
-   *
    */
   void batch_mutate(1: required map<binary, map<string, list<Mutation>>> mutation_map,
-    2: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
-  throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
+                    2: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
+       throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
 
   /**
    * Atomically mutate many columns or super columns for many row keys. See also: Mutation.
    *
    * mutation_map maps key to column family to a list of Mutation objects to take place at that scope.
-   *
    */
   void atomic_batch_mutate(1: required map<binary, map<string, list<Mutation>>> mutation_map,
-    2: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
-  throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
+                           2: required ConsistencyLevel consistency_level = ConsistencyLevel.ONE)
+       throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
 
   /**
    * Truncate will mark and entire column family as deleted.
@@ -845,36 +807,35 @@ service Cassandra {
    * only marks the data as deleted.
    * The operation succeeds only if all hosts in the cluster at available and will throw an UnavailableException if
    * some hosts are down.
-   *
    */
-  void truncate(1: required string cfname) throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
+  void truncate(1: required string cfname)
+       throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
 
   /**
    * Select multiple slices of a key in a single RPC operation
    */
-  list<ColumnOrSuperColumn> get_multi_slice(1: required MultiSliceRequest request) throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
-
+  list<ColumnOrSuperColumn> get_multi_slice(1: required MultiSliceRequest request)
+       throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te),
+    
+  // Meta-APIs -- APIs to get information about the node or cluster,
+  // rather than user data.  The nodeprobe program provides usage examples.
+  
   /**
    * for each schema version present in the cluster, returns a list of nodes at that version.
    * hosts that do not respond will be under the key DatabaseDescriptor.INITIAL_VERSION.
    * the cluster is all on the same version if the size of the map is 1.
-   *
    */
-  map<string, list<string>> describe_schema_versions() throws (1: InvalidRequestException ire),
+  map<string, list<string>> describe_schema_versions()
+       throws (1: InvalidRequestException ire),
 
-  /**
-   * list the defined keyspaces in this cluster
-   */
-  list<KsDef> describe_keyspaces() throws (1: InvalidRequestException ire),
+  /** list the defined keyspaces in this cluster */
+  list<KsDef> describe_keyspaces()
+    throws (1: InvalidRequestException ire),
 
-  /**
-   * get the cluster name
-   */
+  /** get the cluster name */
   string describe_cluster_name(),
 
-  /**
-   * get the thrift api version
-   */
+  /** get the thrift api version */
   string describe_version(),
 
   /**
@@ -886,37 +847,32 @@ service Cassandra {
    *
    * for the same reason, we can't return a set here, even though
    * order is neither important nor predictable.
-   *
    */
-  list<TokenRange> describe_ring(1: required string keyspace) throws (1: InvalidRequestException ire),
+  list<TokenRange> describe_ring(1: required string keyspace)
+                   throws (1: InvalidRequestException ire),
 
-  /**
-   * same as describe_ring, but considers only nodes in the local DC
-   */
-  list<TokenRange> describe_local_ring(1: required string keyspace) throws (1: InvalidRequestException ire),
+
+  /** same as describe_ring, but considers only nodes in the local DC */
+  list<TokenRange> describe_local_ring(1: required string keyspace)
+                   throws (1: InvalidRequestException ire),
 
   /**
    * get the mapping between token->node ip
    * without taking replication into consideration
    * https://issues.apache.org/jira/browse/CASSANDRA-4092
-   *
    */
-  map<string, string> describe_token_map() throws (1: InvalidRequestException ire),
-
-  /**
-   * returns the partitioner used by this cluster
-   */
+  map<string, string> describe_token_map()
+                    throws (1: InvalidRequestException ire),
+  
+  /** returns the partitioner used by this cluster */
   string describe_partitioner(),
 
-  /**
-   * returns the snitch used by this cluster
-   */
+  /** returns the snitch used by this cluster */
   string describe_snitch(),
 
-  /**
-   * describe specified keyspace
-   */
-  KsDef describe_keyspace(1: required string keyspace) throws (1: NotFoundException nfe, 2: InvalidRequestException ire),
+  /** describe specified keyspace */
+  KsDef describe_keyspace(1: required string keyspace)
+    throws (1: NotFoundException nfe, 2: InvalidRequestException ire),
 
   /**
    * experimental API for hadoop/parallel query support.
@@ -924,97 +880,107 @@ service Cassandra {
    *
    * returns list of token strings such that first subrange is (list[0], list[1]],
    * next is (list[1], list[2]], etc.
-   *
    */
   list<string> describe_splits(1: required string cfName,
-    2: required string start_token,
-    3: required string end_token,
-    4: required i32 keys_per_split)
-  throws (1: InvalidRequestException ire),
+                               2: required string start_token,
+                               3: required string end_token,
+                               4: required i32 keys_per_split)
+    throws (1: InvalidRequestException ire),
 
   /**
    * Enables tracing for the next query in this connection and returns the UUID for that trace session
-   * The next query will be traced idependently of trace probability and the returned UUID can be used to query the trace keyspace
-   *
+   * The next query will be traced independently of trace probability and the returned UUID can be used to query the trace keyspace
    */
   binary trace_next_query(),
 
   list<CfSplit> describe_splits_ex(1: required string cfName,
-    2: required string start_token,
-    3: required string end_token,
-    4: required i32 keys_per_split)
-  throws (1: InvalidRequestException ire),
+                                   2: required string start_token,
+                                   3: required string end_token,
+                                   4: required i32 keys_per_split)
+    throws (1: InvalidRequestException ire),
 
-  /**
-   * adds a column family. returns the new schema id.
-   */
-  string system_add_column_family(1: required CfDef cf_def) throws (1: InvalidRequestException ire, 2: SchemaDisagreementException sde),
+  /** adds a column family. returns the new schema id. */
+  string system_add_column_family(1: required CfDef cf_def)
+    throws (1: InvalidRequestException ire, 2: SchemaDisagreementException sde),
+    
+  /** drops a column family. returns the new schema id. */
+  string system_drop_column_family(1: required string column_family)
+    throws (1: InvalidRequestException ire, 2: SchemaDisagreementException sde), 
+  
+  /** adds a keyspace and any column families that are part of it. returns the new schema id. */
+  string system_add_keyspace(1: required KsDef ks_def)
+    throws (1: InvalidRequestException ire, 2: SchemaDisagreementException sde),
+  
+  /** drops a keyspace and any column families that are part of it. returns the new schema id. */
+  string system_drop_keyspace(1: required string keyspace)
+    throws (1: InvalidRequestException ire, 2: SchemaDisagreementException sde),
+  
+  /** updates properties of a keyspace. returns the new schema id. */
+  string system_update_keyspace(1: required KsDef ks_def)
+    throws (1: InvalidRequestException ire, 2: SchemaDisagreementException sde),
+        
+  /** updates properties of a column family. returns the new schema id. */
+  string system_update_column_family(1: required CfDef cf_def)
+    throws (1: InvalidRequestException ire, 2: SchemaDisagreementException sde),
 
-  /**
-   * drops a column family. returns the new schema id.
-   */
-  string system_drop_column_family(1: required string column_family) throws (1: InvalidRequestException ire, 2: SchemaDisagreementException sde),
-
-  /**
-   * adds a keyspace and any column families that are part of it. returns the new schema id.
-   */
-  string system_add_keyspace(1: required KsDef ks_def) throws (1: InvalidRequestException ire, 2: SchemaDisagreementException sde),
-
-  /**
-   * drops a keyspace and any column families that are part of it. returns the new schema id.
-   */
-  string system_drop_keyspace(1: required string keyspace) throws (1: InvalidRequestException ire, 2: SchemaDisagreementException sde),
-
-  /**
-   * updates properties of a keyspace. returns the new schema id.
-   */
-  string system_update_keyspace(1: required KsDef ks_def) throws (1: InvalidRequestException ire, 2: SchemaDisagreementException sde),
-
-  /**
-   * updates properties of a column family. returns the new schema id.
-   */
-  string system_update_column_family(1: required CfDef cf_def) throws (1: InvalidRequestException ire, 2: SchemaDisagreementException sde),
 
   /**
    * @deprecated Throws InvalidRequestException since 2.2. Please use the CQL3 version instead.
    */
-  CqlResult execute_cql_query(1: required binary query, 2: required Compression compression) throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te, 4: SchemaDisagreementException sde),
+  CqlResult execute_cql_query(1: required binary query, 2: required Compression compression)
+    throws (1: InvalidRequestException ire,
+            2: UnavailableException ue,
+            3: TimedOutException te,
+            4: SchemaDisagreementException sde)
 
   /**
    * Executes a CQL3 (Cassandra Query Language) statement and returns a
    * CqlResult containing the results.
-   *
    */
-  CqlResult execute_cql3_query(1: required binary query, 2: required Compression compression, 3: required ConsistencyLevel consistency) throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te, 4: SchemaDisagreementException sde),
+  CqlResult execute_cql3_query(1: required binary query, 2: required Compression compression, 3: required ConsistencyLevel consistency)
+    throws (1: InvalidRequestException ire,
+            2: UnavailableException ue,
+            3: TimedOutException te,
+            4: SchemaDisagreementException sde)
+
 
   /**
    * @deprecated Throws InvalidRequestException since 2.2. Please use the CQL3 version instead.
    */
-  CqlPreparedResult prepare_cql_query(1: required binary query, 2: required Compression compression) throws (1: InvalidRequestException ire),
+  CqlPreparedResult prepare_cql_query(1: required binary query, 2: required Compression compression)
+    throws (1: InvalidRequestException ire)
 
   /**
    * Prepare a CQL3 (Cassandra Query Language) statement by compiling and returning
    * - the type of CQL statement
    * - an id token of the compiled CQL stored on the server side.
    * - a count of the discovered bound markers in the statement
-   *
    */
-  CqlPreparedResult prepare_cql3_query(1: required binary query, 2: required Compression compression) throws (1: InvalidRequestException ire),
+  CqlPreparedResult prepare_cql3_query(1: required binary query, 2: required Compression compression)
+    throws (1: InvalidRequestException ire)
+
 
   /**
    * @deprecated Throws InvalidRequestException since 2.2. Please use the CQL3 version instead.
    */
-  CqlResult execute_prepared_cql_query(1: required i32 itemId, 2: required list<binary> values) throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te, 4: SchemaDisagreementException sde),
+  CqlResult execute_prepared_cql_query(1: required i32 itemId, 2: required list<binary> values)
+    throws (1: InvalidRequestException ire,
+            2: UnavailableException ue,
+            3: TimedOutException te,
+            4: SchemaDisagreementException sde)
 
   /**
    * Executes a prepared CQL3 (Cassandra Query Language) statement by passing an id token, a list of variables
    * to bind, and the consistency level, and returns a CqlResult containing the results.
-   *
    */
-  CqlResult execute_prepared_cql3_query(1: required i32 itemId, 2: required list<binary> values, 3: required ConsistencyLevel consistency) throws (1: InvalidRequestException ire, 2: UnavailableException ue, 3: TimedOutException te, 4: SchemaDisagreementException sde),
+  CqlResult execute_prepared_cql3_query(1: required i32 itemId, 2: required list<binary> values, 3: required ConsistencyLevel consistency)
+    throws (1: InvalidRequestException ire,
+            2: UnavailableException ue,
+            3: TimedOutException te,
+            4: SchemaDisagreementException sde)
 
   /**
    * @deprecated This is now a no-op. Please use the CQL3 specific methods instead.
    */
-  void set_cql_version(1: required string version) throws (1: InvalidRequestException ire),
+  void set_cql_version(1: required string version) throws (1: InvalidRequestException ire)
 }

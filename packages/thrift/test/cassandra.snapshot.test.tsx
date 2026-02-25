@@ -1513,7 +1513,7 @@ export const files: SnapshotFile[] = [
             returnType={binary}
             doc={lines(`
               Enables tracing for the next query in this connection and returns the UUID for that trace session
-              The next query will be traced idependently of trace probability and the returned UUID can be used to query the trace keyspace
+              The next query will be traced independently of trace probability and the returned UUID can be used to query the trace keyspace
             `)}
           ></ServiceFunction>
           <ServiceFunction
