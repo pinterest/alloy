@@ -24,6 +24,7 @@ import {
   reportDiagnostics,
 } from "./diagnostics.js";
 import {
+  flattenTreeToString,
   isPrintHook,
   printHookTag,
   type PrintHook,
@@ -324,6 +325,7 @@ function reportDiagnosticsForTree(tree: RenderedTextTree) {
 
 // Re-export from print-hook.ts to maintain backwards compatibility
 export {
+  flattenTreeToString,
   isPrintHook,
   printHookTag,
   type PrintHook,
@@ -740,7 +742,43 @@ function appendChild(node: RenderedTextTree, rawChild: Child) {
         case "lbr":
           return formatHook(literalline);
         case "align":
-          {
+          if ("prefix" in child.props) {
+            const hook = createRenderTreeHook(newNode, {
+              print(tree, print) {
+                const prefixTree = (tree as RenderedTextTree[])[0];
+                const childrenTree = (tree as RenderedTextTree[])[1];
+                const width = flattenTreeToString(prefixTree).length;
+                return [print(prefixTree), align(width, print(childrenTree))];
+              },
+            });
+            debug.render.appendPrintHook(
+              node,
+              node.length,
+              hook,
+              intrinsic.name,
+              newNode,
+            );
+            node.push(hook);
+            newNode.push([], []);
+            debug.render.appendFragmentChild(
+              newNode,
+              newNode[0] as RenderedTextTree,
+            );
+            debug.render.appendFragmentChild(
+              newNode,
+              newNode[1] as RenderedTextTree,
+            );
+            renderWorker(
+              newNode[0] as RenderedTextTree,
+              (child as any).props.prefix,
+            );
+            renderWorker(
+              newNode[1] as RenderedTextTree,
+              (child as any).props.children,
+            );
+            notifyFileUpdateForNode(node);
+            return;
+          } else {
             const hook = createRenderTreeHook(newNode, {
               print(tree, print) {
                 return align(

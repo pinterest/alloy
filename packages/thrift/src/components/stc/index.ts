@@ -1,0 +1,21 @@
+import * as core from "@alloy-js/core";
+import * as Jsx from "../index.js";
+
+export const SourceFile = core.stc(Jsx.SourceFile);
+export const Include = core.stc(Jsx.Include);
+export const Namespace = core.stc(Jsx.Namespace);
+export const BlockComment = core.stc(Jsx.BlockComment);
+export const DocComment = core.stc(Jsx.DocComment);
+export const LineComment = core.stc(Jsx.LineComment);
+export const Struct = core.stc(Jsx.Struct);
+export const Union = core.stc(Jsx.Union);
+export const Exception = core.stc(Jsx.Exception);
+export const Field = core.stc(Jsx.Field);
+export const Enum = core.stc(Jsx.Enum);
+export const EnumValue = core.stc(Jsx.EnumValue);
+export const Typedef = core.stc(Jsx.Typedef);
+export const Const = core.stc(Jsx.Const);
+export const Service = core.stc(Jsx.Service);
+export const ServiceFunction = core.stc(Jsx.ServiceFunction);
+export const Throws = core.stc(Jsx.Throws);
+export const Reference = core.stc(Jsx.Reference);
