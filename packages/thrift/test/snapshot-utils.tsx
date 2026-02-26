@@ -34,7 +34,7 @@ export function renderThriftFiles(files: SnapshotFile[]) {
     <Output namePolicy={permissiveNamePolicy}>
       {entries.map((entry) => entry.file)}
     </Output>,
-    { insertFinalNewLine: false, tabWidth: 2 },
+    { insertFinalNewLine: true, tabWidth: 2 },
   );
 
   const output: Record<string, string> = {};
@@ -57,7 +57,11 @@ export function lines(text: string): string[] {
     .filter((line) => line.trim().length > 0)
     .map((line) => line.match(/^\s*/)?.[0].length ?? 0);
   const minIndent = indents.length > 0 ? Math.min(...indents) : 0;
-  return rawLines.map((line) => line.slice(minIndent));
+  const result = rawLines.map((line) => line.slice(minIndent));
+  while (result.length > 0 && result[result.length - 1] === "") {
+    result.pop();
+  }
+  return result;
 }
 
 function findFile(res: OutputDirectory, path: string): ContentOutputFile {

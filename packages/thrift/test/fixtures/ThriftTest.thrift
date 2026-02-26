@@ -37,15 +37,13 @@ namespace rb Thrift.Test
 namespace st ThriftTest
 namespace xsd test (uri = 'http://thrift.apache.org/ns/ThriftTest')
 
-// Presence of namespaces and sub-namespaces for which there is no generator should compile with warnings only
+// Presence of namespaces and sub-namespaces for which there is// no generator should compile with warnings only
 namespace noexist ThriftTest
 namespace cpp.noexist ThriftTest
 
 namespace * thrift.test
 
-/**
- * Docstring!
- */
+/** Docstring! */
 enum Numberz {
   ONE = 1,
   TWO = 2,
@@ -127,7 +125,8 @@ exception Xception2 {
   2: Xtruct struct_thing,
 }
 
-struct EmptyStruct {}
+struct EmptyStruct {
+}
 
 struct OneField {
   1: EmptyStruct field,
@@ -135,9 +134,7 @@ struct OneField {
 
 service ThriftTest {
 
-  /**
-   * Prints "testVoid()" and returns nothing.
-   */
+  /** Prints "testVoid()" and returns nothing. */
   void testVoid(),
 
   /**

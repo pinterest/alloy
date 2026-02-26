@@ -83,22 +83,29 @@ export function ServiceFunction(props: ServiceFunctionProps) {
     return (
       <>
         <DocWhen doc={props.doc} />
-        {props.oneway ? "oneway " : ""}
-        {renderTypeRef(returnType)} {name}(
-        <indent>
-          <FieldContext.Provider value={paramRegistry}>
-            <List comma hardline>
-              {params}
-            </List>
-          </FieldContext.Provider>
-        </indent>
-        )
-        {throwsClause ?
-          <>
-            <hbr />
-            <indent>{throwsClause}</indent>
-          </>
-        : null}
+        <align
+          prefix={
+            <>
+              {props.oneway ? "oneway " : ""}
+              {renderTypeRef(returnType)}{" "}
+            </>
+          }
+        >
+          <align prefix={<>{name}(</>}>
+            <FieldContext.Provider value={paramRegistry}>
+              <List comma hardline>
+                {params}
+              </List>
+            </FieldContext.Provider>
+          </align>
+          )
+          {throwsClause ?
+            <>
+              <hbr />
+              {throwsClause}
+            </>
+          : null}
+        </align>
         {annotationText},
       </>
     );

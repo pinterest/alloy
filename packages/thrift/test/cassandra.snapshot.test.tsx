@@ -109,15 +109,19 @@ export const files: SnapshotFile[] = [
                 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
                 See the License for the specific language governing permissions and
                 limitations under the License.
-
+              `)}
+            </LineComment>
+            <hbr />
+            <LineComment prefix="#">
+              {lines(`
                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 *** PLEASE REMEMBER TO EDIT THE VERSION CONSTANT WHEN MAKING CHANGES ***
                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-                Interface definition for Cassandra Service
-
               `)}
+            </LineComment>
+            <hbr />
+            <LineComment prefix="#">
+              {["", "Interface definition for Cassandra Service", ""]}
             </LineComment>
           </>
         }
@@ -128,6 +132,16 @@ export const files: SnapshotFile[] = [
           <Namespace lang="py" value="cassandra" />,
           <Namespace lang="php" value="cassandra" />,
           <Namespace lang="perl" value="Cassandra" />,
+          <>
+            <hbr />
+            <LineComment prefix="#">
+              {[
+                "Thrift.rb has a bug where top-level modules that include modules ",
+                "with the same name are not properly referenced, so we can't do",
+                "Cassandra::Cassandra::Client.",
+              ]}
+            </LineComment>
+          </>,
           <Namespace lang="rb" value="CassandraThrift" />,
         ]}
       >
@@ -269,32 +283,41 @@ export const files: SnapshotFile[] = [
             optional
             type={i32}
             name="acknowledged_by"
-            doc={lines(`
+            doc={[
+              ...lines(`
               if a write operation was acknowledged by some replicas but not by enough to
               satisfy the required ConsistencyLevel, the number of successful
               replies will be given here. In case of atomic_batch_mutate method this field
               will be set to -1 if the batch was written to the batchlog and to 0 if it wasn't.
-            `)}
+            `),
+              "",
+            ]}
           />
           <Field
             id={2}
             optional
             type={bool}
             name="acknowledged_by_batchlog"
-            doc={lines(`
+            doc={[
+              ...lines(`
               in case of atomic_batch_mutate method this field tells if the batch
               was written to the batchlog.
-            `)}
+            `),
+              "",
+            ]}
           />
           <Field
             id={3}
             optional
             type={bool}
             name="paxos_in_progress"
-            doc={lines(`
+            doc={[
+              ...lines(`
               for the CAS method, this field tells if we timed out during the paxos
               protocol, as opposed to during the commit of our update
-            `)}
+            `),
+              "",
+            ]}
           />
         </Exception>
         <Exception
@@ -322,6 +345,7 @@ export const files: SnapshotFile[] = [
           `)}
         ></Exception>
 
+        <LineComment prefix="#">{["", "service api", ""]}</LineComment>
         <Enum
           name="ConsistencyLevel"
           refkey={consistencyLevel}
@@ -951,7 +975,6 @@ export const files: SnapshotFile[] = [
           />
         </Struct>
 
-        <LineComment prefix="#">{["", "service api", ""]}</LineComment>
         <Service name="Cassandra" refkey={cassandraService}>
           <ServiceFunction
             name="login"
@@ -1393,6 +1416,12 @@ export const files: SnapshotFile[] = [
               <Field id={3} type={timedOutException} name="te" />
             </Throws>
           </ServiceFunction>
+          <LineComment>
+            {[
+              "Meta-APIs -- APIs to get information about the node or cluster,",
+              "rather than user data.  The nodeprobe program provides usage examples.",
+            ]}
+          </LineComment>
           <ServiceFunction
             name="describe_schema_versions"
             returnType={mapOf(string, listOf(string))}

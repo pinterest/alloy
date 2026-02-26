@@ -62,6 +62,15 @@ export interface DocCommentProps {
  */
 export function DocComment(props: DocCommentProps) {
   const content = normalizeCommentChildren(props.children);
+
+  if (
+    Array.isArray(content) &&
+    content.length === 1 &&
+    typeof content[0] === "string"
+  ) {
+    return <>{`/** ${content[0]} */`}</>;
+  }
+
   return (
     <>
       {"/**"}

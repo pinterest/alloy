@@ -24,7 +24,6 @@ exports[`Thrift snapshots > renders tutorial.thrift + shared.thrift 1`] = `
 /**
  * This Thrift file can be included by other Thrift files that want to share
  * these definitions.
- *
  */
 
 namespace cl shared
@@ -45,7 +44,8 @@ struct SharedStruct {
 
 service SharedService {
   SharedStruct getStruct(1: i32 key),
-}",
+}
+",
   "tutorial.thrift": "/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
@@ -161,9 +161,7 @@ struct Work {
   4: optional string comment,
 }
 
-/**
- * Structs can also be exceptions, if they are nasty.
- */
+/** Structs can also be exceptions, if they are nasty. */
 exception InvalidOperation {
   1: i32 whatOp,
   2: string why,
@@ -201,6 +199,7 @@ service Calculator extends shared.SharedService {
  * detailed examples. After you run this file, your generated code shows up
  * in folders with names gen-<language>. The generated code isn't too scary
  * to look at. It even has pretty indentation.
- */",
+ */
+",
 }
 `;

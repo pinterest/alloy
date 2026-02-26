@@ -113,9 +113,7 @@ struct Work {
   4: optional string comment,
 }
 
-/**
- * Structs can also be exceptions, if they are nasty.
- */
+/** Structs can also be exceptions, if they are nasty. */
 exception InvalidOperation {
   1: i32 whatOp,
   2: string why,
