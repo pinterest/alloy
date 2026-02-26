@@ -4,29 +4,98 @@ function createBuiltin(name: BuiltinType): BuiltinTypeRef {
   return { kind: "builtin", name };
 }
 
-/** A boolean value (true or false) */
+/**
+ * A Thrift `bool` — a boolean value (true or false).
+ *
+ * @example
+ * ```tsx
+ * <Field id={1} type={bool} name="active" />
+ * ```
+ */
 export const bool = createBuiltin("bool");
 
-/** An 8-bit signed integer */
+/**
+ * A Thrift `byte` — an 8-bit signed integer.
+ *
+ * @remarks
+ * Alias for {@link i8}. Both emit the same type.
+ *
+ * @example
+ * ```tsx
+ * <Field id={1} type={byte} name="flags" />
+ * ```
+ */
 export const byte = createBuiltin("byte");
 
-/** An 8-bit signed integer */
+/**
+ * A Thrift `i8` — an 8-bit signed integer.
+ *
+ * @remarks
+ * Alias for {@link byte}. Both emit the same type.
+ *
+ * @example
+ * ```tsx
+ * <Field id={1} type={i8} name="flags" />
+ * ```
+ */
 export const i8 = createBuiltin("i8");
 
-/** A 16-bit signed integer */
+/**
+ * A Thrift `i16` — a 16-bit signed integer.
+ *
+ * @example
+ * ```tsx
+ * <Field id={1} type={i16} name="port" />
+ * ```
+ */
 export const i16 = createBuiltin("i16");
 
-/** A 32-bit signed integer */
+/**
+ * A Thrift `i32` — a 32-bit signed integer.
+ *
+ * @example
+ * ```tsx
+ * <Field id={1} type={i32} name="count" />
+ * ```
+ */
 export const i32 = createBuiltin("i32");
 
-/** A 64-bit signed integer */
+/**
+ * A Thrift `i64` — a 64-bit signed integer.
+ *
+ * @example
+ * ```tsx
+ * <Field id={1} type={i64} name="timestamp" />
+ * ```
+ */
 export const i64 = createBuiltin("i64");
 
-/** A 64-bit floating point number */
+/**
+ * A Thrift `double` — a 64-bit IEEE 754 floating point number.
+ *
+ * @example
+ * ```tsx
+ * <Field id={1} type={double} name="latitude" />
+ * ```
+ */
 export const double = createBuiltin("double");
 
-/** A text string encoded using UTF-8 encoding */
+/**
+ * A Thrift `string` — a UTF-8 encoded text string.
+ *
+ * @example
+ * ```tsx
+ * <Field id={1} type={string} name="email" />
+ * ```
+ */
 export const string = createBuiltin("string");
 
-/** A sequence of arbitrary bytes */
+/**
+ * A Thrift `binary` — a sequence of arbitrary unencoded bytes.
+ *
+ * @example
+ * ```tsx
+ * <Field id={1} type={binary} name="payload" />
+ * ```
+ */
 export const binary = createBuiltin("binary");

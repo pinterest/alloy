@@ -2,6 +2,7 @@ import { computed, emitSymbol, Refkey } from "@alloy-js/core";
 import { ref } from "../symbols/reference.js";
 
 export interface ReferenceProps {
+  /** The refkey to resolve and render. */
   refkey: Refkey;
 }
 

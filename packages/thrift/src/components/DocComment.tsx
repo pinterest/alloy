@@ -46,18 +46,29 @@ function renderCommentLines(content: Children) {
 }
 
 export interface DocCommentProps {
+  /** The content to render inside the doc comment block. */
   children: Children;
 }
 
 /**
- * Render a Thrift-style doc comment block (`/** ... *\/`).
+ * Render a Thrift-style doc comment block.
  *
  * @remarks
- * Prefer the `doc` prop on other components; this is the low-level building block.
+ * Most components accept a `doc` prop that wraps content in a `DocComment`
+ * automatically. Use this component directly when you need full control over
+ * comment placement or formatting.
  *
- * @example Doc comment
+ * Single-line content is rendered inline. Multi-line content
+ * uses the standard block format with ` * ` prefixed lines.
+ *
+ * @example Single-line
  * ```tsx
  * <DocComment>Returns a user by id.</DocComment>
+ * ```
+ *
+ * @example Multi-line
+ * ```tsx
+ * <DocComment>{"Get a user by id.\nReturns null if not found."}</DocComment>
  * ```
  */
 export function DocComment(props: DocCommentProps) {
@@ -84,6 +95,13 @@ export function DocComment(props: DocCommentProps) {
 }
 
 export interface DocWhenProps {
+  /**
+   * The doc content to render, or `undefined` to render nothing.
+   *
+   * @remarks
+   * If the value is already a `DocComment` component creator, it is rendered
+   * as-is. Otherwise the content is wrapped in a {@link DocComment}.
+   */
   doc: Children | undefined;
 }
 
@@ -91,7 +109,10 @@ export interface DocWhenProps {
  * Conditionally render a doc comment when `doc` is provided.
  *
  * @remarks
- * Used internally by most Thrift components to keep `doc` optional.
+ * Used internally by most Thrift components to make the `doc` prop optional.
+ * When `doc` is `undefined`, nothing is rendered. When `doc` is a string or
+ * other children, it is wrapped in a {@link DocComment} and followed by a
+ * line break.
  *
  * @example Conditional doc
  * ```tsx
@@ -115,15 +136,21 @@ export function DocWhen(props: DocWhenProps) {
 }
 
 export interface BlockCommentProps {
+  /** The content to render inside the block comment. */
   children: Children;
 }
 
 /**
- * Render a Thrift-style block comment (`/* ... *\/`).
+ * Render a Thrift-style block comment.
+ *
+ * @remarks
+ * Unlike {@link DocComment}, block comments use `/*` instead of `/**` and are
+ * not treated as documentation by Thrift tooling. Useful for license headers
+ * or internal notes.
  *
  * @example Block comment
  * ```tsx
- * <BlockComment>License header</BlockComment>
+ * <BlockComment>{"Copyright 2025\nAll rights reserved."}</BlockComment>
  * ```
  */
 export function BlockComment(props: BlockCommentProps) {
@@ -141,16 +168,42 @@ export function BlockComment(props: BlockCommentProps) {
 }
 
 export interface LineCommentProps {
+  /** The content to render as one or more line comments. */
   children: Children;
+  /**
+   * The comment prefix character(s).
+   *
+   * @remarks
+   * Defaults to `"//"`. Thrift also supports `"#"` as a line comment prefix.
+   */
   prefix?: string;
 }
 
 /**
- * Render a Thrift line comment (`//` or `#`).
+ * Render one or more Thrift line comments.
  *
- * @example Line comment
+ * @remarks
+ * Multi-line content is split and each line is prefixed independently.
+ * Use the `prefix` prop to switch between `//` (default) and `#` style.
+ *
+ * @example Double-slash comment
  * ```tsx
  * <LineComment>TODO: add docs</LineComment>
+ * ```
+ *
+ * Produces:
+ * ```thrift
+ * // TODO: add docs
+ * ```
+ *
+ * @example Hash-style comment
+ * ```tsx
+ * <LineComment prefix="#">Deprecated</LineComment>
+ * ```
+ *
+ * Produces:
+ * ```thrift
+ * # Deprecated
  * ```
  */
 export function LineComment(props: LineCommentProps) {

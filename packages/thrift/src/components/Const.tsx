@@ -9,11 +9,23 @@ import type { AnnotationMap, ConstValue, TypeRef } from "../types.js";
 import { DocWhen } from "./DocComment.js";
 
 export interface ConstProps {
+  /** The constant name. */
   name: string;
+  /** The Thrift type of the constant. */
   type: TypeRef;
+  /**
+   * The constant's value.
+   *
+   * @remarks
+   * Accepts JavaScript primitives, arrays (Thrift lists), maps, objects,
+   * {@link constRef} references, or {@link rawConst} for unescaped literals.
+   */
   value: ConstValue;
+  /** Optional refkey for cross-file references to this constant. */
   refkey?: Refkey;
+  /** Annotations appended after the constant declaration. */
   annotations?: AnnotationMap;
+  /** Doc comment rendered above the constant. */
   doc?: Children;
 }
 
@@ -21,12 +33,29 @@ export interface ConstProps {
  * Define a Thrift constant.
  *
  * @remarks
- * Values can be literals, lists, or maps. Use `ConstValue` helpers for complex
- * values.
+ * Values can be literals, lists, maps, or references to other constants.
+ * Use the {@link constRef} and {@link rawConst} helpers for special value
+ * forms.
  *
- * @example Constant value
+ * @example Scalar constant
  * ```tsx
  * <Const name="DefaultPageSize" type={i32} value={50} />
+ * ```
+ *
+ * Produces:
+ * ```thrift
+ * const i32 DefaultPageSize = 50
+ * ```
+ *
+ * @example List constant
+ * ```tsx
+ * <Const name="SupportedLangs" type={listOf(string)}
+ *   value={["en", "fr", "de"]} />
+ * ```
+ *
+ * Produces:
+ * ```thrift
+ * const list<string> SupportedLangs = [ "en" , "fr" , "de" ]
  * ```
  */
 export function Const(props: ConstProps) {

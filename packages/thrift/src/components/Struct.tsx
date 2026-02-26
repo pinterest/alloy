@@ -13,11 +13,19 @@ import type { AnnotationMap } from "../types.js";
 import { DocWhen } from "./DocComment.js";
 import { FieldContext, createFieldRegistry } from "./Field.js";
 
+/**
+ * Common props shared by {@link Struct}, {@link Union}, and {@link Exception}.
+ */
 export interface StructLikeProps {
+  /** The name of the declaration. */
   name: string;
+  /** Optional refkey for cross-file references to this type. */
   refkey?: Refkey;
+  /** {@link Field} children defining the members of this declaration. */
   children?: Children;
+  /** Doc comment rendered above the declaration. */
   doc?: Children;
+  /** Annotations appended after the closing brace. */
   annotations?: AnnotationMap;
 }
 
@@ -68,14 +76,24 @@ export interface ExceptionProps extends StructLikeProps {}
  * Define a Thrift struct.
  *
  * @remarks
- * Struct fields may be `required`, `optional`, or unspecified.
+ * Struct fields may be `required`, `optional`, or left unspecified (default
+ * requiredness). Field IDs must be unique within the struct and fall within
+ * the signed 16-bit integer range (-32768 to 32767).
  *
- * @example Struct
+ * @example Struct with fields
  * ```tsx
  * <Struct name="User">
- *   <Field id={1} type={i64} name="id" />
+ *   <Field id={1} type={i64} name="id" required />
  *   <Field id={2} type={string} name="name" />
  * </Struct>
+ * ```
+ *
+ * Produces:
+ * ```thrift
+ * struct User {
+ *   1: required i64 id,
+ *   2: string name,
+ * }
  * ```
  */
 export function Struct(props: StructProps) {
@@ -86,7 +104,9 @@ export function Struct(props: StructProps) {
  * Define a Thrift union.
  *
  * @remarks
- * Union fields are typically optional; some IDLs still mark them as `required`.
+ * A union represents a value that is exactly one of its fields at a time.
+ * Union fields cannot be marked `required` — doing so throws an error.
+ * Fields may be `optional` or left unspecified.
  *
  * @example Union
  * ```tsx
@@ -94,6 +114,14 @@ export function Struct(props: StructProps) {
  *   <Field id={1} type="User" name="user" />
  *   <Field id={2} type="Group" name="group" />
  * </Union>
+ * ```
+ *
+ * Produces:
+ * ```thrift
+ * union SearchResult {
+ *   1: User user,
+ *   2: Group group,
+ * }
  * ```
  */
 export function Union(props: UnionProps) {
@@ -104,13 +132,22 @@ export function Union(props: UnionProps) {
  * Define a Thrift exception.
  *
  * @remarks
- * Exceptions are declared like structs and can be used in `Throws` clauses.
+ * Exceptions are declared like structs and can be referenced in
+ * {@link Throws} clauses of service functions. Fields follow the same
+ * rules as struct fields (required, optional, or default requiredness).
  *
  * @example Exception
  * ```tsx
  * <Exception name="NotFound">
  *   <Field id={1} type={string} name="message" />
  * </Exception>
+ * ```
+ *
+ * Produces:
+ * ```thrift
+ * exception NotFound {
+ *   1: string message,
+ * }
  * ```
  */
 export function Exception(props: ExceptionProps) {

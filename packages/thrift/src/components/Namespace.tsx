@@ -5,10 +5,21 @@ import type { AnnotationMap } from "../types.js";
 import { DocWhen } from "./DocComment.js";
 
 export interface NamespaceProps {
+  /**
+   * The target language or scope identifier.
+   *
+   * @remarks
+   * Use `"*"` for a wildcard namespace that applies to all languages.
+   * Common values include `"java"`, `"py"`, `"cpp"`, `"js"`, `"go"`, etc.
+   */
   lang: string;
+  /** The namespace value (e.g. `"com.example.api"`). */
   value: string;
+  /** Optional annotations on the namespace directive. */
   annotations?: AnnotationMap;
+  /** Doc comment rendered above the namespace directive. */
   doc?: Children;
+  /** Inline comment appended after the namespace directive. */
   comment?: Children;
 }
 
@@ -16,11 +27,28 @@ export interface NamespaceProps {
  * Emit a Thrift namespace directive.
  *
  * @remarks
- * Use `lang="*"` to declare the default namespace for all languages.
+ * Namespace directives tell the Thrift compiler which package or module name to
+ * use for generated code in each target language. Use `lang="*"` to declare a
+ * default namespace for all languages.
  *
- * @example Namespace
+ * @example Single language
  * ```tsx
  * <Namespace lang="java" value="com.example.api" />
+ * ```
+ *
+ * Produces:
+ * ```thrift
+ * namespace java com.example.api
+ * ```
+ *
+ * @example Wildcard namespace
+ * ```tsx
+ * <Namespace lang="*" value="example.api" />
+ * ```
+ *
+ * Produces:
+ * ```thrift
+ * namespace * example.api
  * ```
  */
 export function Namespace(props: NamespaceProps) {

@@ -9,12 +9,31 @@ import {
   TriggerOpTypes,
 } from "@alloy-js/core";
 
+/**
+ * The category of a Thrift top-level declaration.
+ *
+ * @remarks
+ * Used to classify symbols so the reference resolver can emit the correct
+ * qualified name.
+ */
 export type ThriftSymbolKind = "type" | "service" | "const";
 
+/**
+ * Options for constructing a {@link ThriftOutputSymbol}.
+ */
 export interface ThriftSymbolOptions extends OutputSymbolOptions {
+  /** The declaration kind for this symbol. */
   kind?: ThriftSymbolKind;
 }
 
+/**
+ * An output symbol representing a Thrift top-level declaration.
+ *
+ * @remarks
+ * Extends the core `OutputSymbol` with a reactive {@link ThriftSymbolKind}
+ * property so that the reference resolver can distinguish types, services,
+ * and constants.
+ */
 export class ThriftOutputSymbol extends OutputSymbol {
   #kind: ThriftSymbolKind | undefined;
 

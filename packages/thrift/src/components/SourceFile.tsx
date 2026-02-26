@@ -24,12 +24,39 @@ import { DocComment } from "./DocComment.js";
 import { Reference } from "./Reference.js";
 
 export interface SourceFileProps {
+  /** Output file path, typically ending in `.thrift`. */
   path: string;
+  /** Top-level declarations (structs, enums, services, etc.). */
   children?: Children;
+  /**
+   * Content placed at the very top of the file, before includes.
+   *
+   * @remarks
+   * Useful for license headers or auto-generated file warnings.
+   */
   header?: Children;
+  /**
+   * A doc comment rendered after the header and before includes.
+   *
+   * @remarks
+   * Wrapped in a doc comment block automatically.
+   */
   headerComment?: Children;
+  /**
+   * Manual {@link Include} components for this file.
+   *
+   * @remarks
+   * Auto-includes from refkey references are merged with these. Manual
+   * includes take precedence when both exist for the same path.
+   */
   includes?: Children;
+  /** {@link Namespace} directives placed after includes. */
   namespaces?: Children;
+  /**
+   * Override the default Thrift name policy for this file.
+   *
+   * @see {@link createThriftNamePolicy}
+   */
   namePolicy?: NamePolicy<ThriftNameKind>;
 }
 
@@ -37,8 +64,10 @@ export interface SourceFileProps {
  * Define a Thrift source file.
  *
  * @remarks
- * Use `includes` and `namespaces` for the header sections. Top-level
- * declarations go in `children`.
+ * The component lays out sections in the standard Thrift file order: header,
+ * header comment, includes, namespaces, then top-level declarations. Includes
+ * added automatically via refkey references are merged with explicit
+ * {@link Include} components, sorted alphabetically, and deduplicated.
  *
  * @example Basic file
  * ```tsx
@@ -47,6 +76,13 @@ export interface SourceFileProps {
  *     <Field id={1} type={i64} name="id" />
  *   </Struct>
  * </SourceFile>
+ * ```
+ *
+ * Produces:
+ * ```thrift
+ * struct User {
+ *   1: i64 id,
+ * }
  * ```
  *
  * @example Includes and namespaces
@@ -58,6 +94,16 @@ export interface SourceFileProps {
  * >
  *   <Service name="UserService">...</Service>
  * </SourceFile>
+ * ```
+ *
+ * Produces:
+ * ```thrift
+ * include "shared.thrift"
+ *
+ * namespace js example.api
+ *
+ * service UserService {
+ * }
  * ```
  */
 export function SourceFile(props: SourceFileProps) {

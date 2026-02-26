@@ -1,5 +1,12 @@
 import { OutputScope, OutputScopeOptions, useScope } from "@alloy-js/core";
 
+/**
+ * A Thrift output scope containing a single `"symbols"` declaration space.
+ *
+ * @remarks
+ * All Thrift top-level declarations (types, constants, services) are registered
+ * in the `symbols` space.
+ */
 export class ThriftOutputScope extends OutputScope {
   public static readonly declarationSpaces: readonly string[] = ["symbols"];
 
@@ -12,6 +19,14 @@ export class ThriftOutputScope extends OutputScope {
   }
 }
 
+/**
+ * A file-level Thrift scope that tracks the source file path.
+ *
+ * @remarks
+ * Created by {@link SourceFile} to represent a single `.thrift` output file.
+ * The `filePath` property is used by the reference resolver to determine whether
+ * a cross-file include is needed.
+ */
 export class ThriftFileScope extends ThriftOutputScope {
   readonly filePath: string;
 
@@ -33,6 +48,11 @@ export class ThriftFileScope extends ThriftOutputScope {
   }
 }
 
+/**
+ * Walk up the scope chain to find the nearest {@link ThriftFileScope}.
+ *
+ * @returns The enclosing `ThriftFileScope`, or `undefined` if there is none.
+ */
 export function useThriftFileScope(): ThriftFileScope | undefined {
   let scope: OutputScope | undefined = useScope();
   while (scope) {

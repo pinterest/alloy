@@ -13,15 +13,28 @@ import { createTypeSymbol } from "../symbols/factories.js";
 import { DocWhen } from "./DocComment.js";
 
 export interface EnumProps {
+  /** The name of the enum type. */
   name: string;
+  /** Optional refkey for cross-file references to this enum. */
   refkey?: Refkey;
+  /** {@link EnumValue} children defining the members of this enum. */
   children?: Children;
+  /** Doc comment rendered above the enum declaration. */
   doc?: Children;
 }
 
 export interface EnumValueProps {
+  /** The name of the enum member. */
   name: string;
+  /**
+   * The integer value assigned to this member.
+   *
+   * @remarks
+   * Must be a 32-bit signed integer (-2147483648 to 2147483647). Values
+   * must be unique within the enclosing enum.
+   */
   value: number;
+  /** Doc comment rendered above this enum value. */
   doc?: Children;
 }
 
@@ -37,7 +50,8 @@ const EnumValueContext = createNamedContext<EnumRegistry | undefined>(
  * Define a Thrift enum.
  *
  * @remarks
- * Enum values must be unique within the enum.
+ * Both names and numeric values must be unique within the enum. Values must
+ * be 32-bit signed integers.
  *
  * @example Basic enum
  * ```tsx
@@ -45,6 +59,14 @@ const EnumValueContext = createNamedContext<EnumRegistry | undefined>(
  *   <EnumValue name="ADMIN" value={1} />
  *   <EnumValue name="USER" value={2} />
  * </Enum>
+ * ```
+ *
+ * Produces:
+ * ```thrift
+ * enum Role {
+ *   ADMIN = 1,
+ *   USER = 2,
+ * }
  * ```
  */
 export function Enum(props: EnumProps) {
@@ -90,16 +112,27 @@ export function Enum(props: EnumProps) {
 }
 
 /**
- * Define a value inside a {@link Enum}.
+ * Define a value inside an {@link Enum}.
  *
  * @remarks
- * This component must be used as a child of `Enum`.
+ * Must be used as a child of {@link Enum}. The name is validated against the
+ * active name policy, and both the name and numeric value are checked for
+ * uniqueness within the parent enum.
  *
- * @example Enum value
+ * @example Enum values
  * ```tsx
  * <Enum name="Status">
- *   <EnumValue name="OK" value={0} />
+ *   <EnumValue name="ACTIVE" value={0} />
+ *   <EnumValue name="INACTIVE" value={1} />
  * </Enum>
+ * ```
+ *
+ * Produces:
+ * ```thrift
+ * enum Status {
+ *   ACTIVE = 0,
+ *   INACTIVE = 1,
+ * }
  * ```
  */
 export function EnumValue(props: EnumValueProps) {

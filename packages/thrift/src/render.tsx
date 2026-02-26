@@ -5,6 +5,7 @@ import type {
   AnnotationValue,
   ConstRef,
   ConstValue,
+  ListTypeRef,
   MapTypeRef,
   RawAnnotationValue,
   RawConstValue,
@@ -13,6 +14,18 @@ import type {
 } from "./types.js";
 import { isBuiltinType } from "./types.js";
 
+/**
+ * Render a {@link TypeRef} to its Thrift IDL string representation.
+ *
+ * @remarks
+ * Handles all `TypeRef` variants: builtin types are emitted by name, refkeys
+ * are resolved via {@link Reference} (adding includes as needed), plain strings
+ * are emitted verbatim, and container types are rendered recursively
+ * (e.g. `list<string>`, `map<string, i32>`).
+ *
+ * @param type - The type reference to render.
+ * @returns The rendered Thrift type expression as component children.
+ */
 export function renderTypeRef(type: TypeRef): Children {
   if (isRefkey(type)) {
     return <Reference refkey={type} />;
@@ -63,10 +76,33 @@ export function renderTypeRef(type: TypeRef): Children {
   );
 }
 
+/**
+ * Render a {@link ConstValue} to its Thrift IDL literal representation.
+ *
+ * @remarks
+ * Strings are quoted and escaped. Numbers and booleans are emitted as literals.
+ * Arrays are rendered as Thrift list literals (`[...]`), maps and objects as
+ * Thrift map literals (`{...}`), and {@link ConstRef} values are emitted by
+ * name.
+ *
+ * @param value - The constant value to render.
+ * @returns The rendered Thrift constant expression.
+ */
 export function renderConstValue(value: ConstValue): Children {
   return formatConstValue(value);
 }
 
+/**
+ * Render an {@link AnnotationMap} to its Thrift IDL parenthesized form.
+ *
+ * @remarks
+ * Entries are sorted alphabetically by key and formatted as
+ * `(key1 = value1, key2 = value2)`. Returns an empty string when the map
+ * is `undefined` or empty.
+ *
+ * @param annotations - The annotation map to render.
+ * @returns A formatted annotation string, or `""` if there are no annotations.
+ */
 export function renderAnnotations(annotations?: AnnotationMap): string {
   if (!annotations || Object.keys(annotations).length === 0) {
     return "";
@@ -176,8 +212,15 @@ function escapeString(value: string): string {
   return value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
 }
 
+/**
+ * Check whether a {@link TypeRef} is a container type (`list`, `set`, or `map`).
+ *
+ * @param type - The type reference to check.
+ * @returns `true` if the type is a {@link ListTypeRef}, {@link SetTypeRef}, or
+ *   {@link MapTypeRef}.
+ */
 export function isContainerType(
   type: TypeRef,
-): type is SetTypeRef | MapTypeRef {
+): type is ListTypeRef | SetTypeRef | MapTypeRef {
   return typeof type === "object" && !isRefkey(type) && !isBuiltinType(type);
 }

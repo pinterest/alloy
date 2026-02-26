@@ -11,21 +11,47 @@ import { DocWhen } from "./DocComment.js";
 import { FieldContext, createFieldRegistry } from "./Field.js";
 
 export interface ServiceFunctionProps {
+  /** The function name. */
   name: string;
+  /**
+   * The return type of the function.
+   *
+   * @remarks
+   * Defaults to `"void"` when omitted. Must be `"void"` for oneway functions.
+   */
   returnType?: TypeRef;
+  /**
+   * Mark this function as oneway (fire-and-forget).
+   *
+   * @remarks
+   * Oneway functions must return `void` and cannot have a throws clause.
+   */
   oneway?: boolean;
+  /** Annotations appended after the function signature. */
   annotations?: AnnotationMap;
+  /**
+   * {@link Field} children defining the function parameters.
+   *
+   * @remarks
+   * A {@link Throws} component may also appear among the children to define
+   * the exception list.
+   */
   children?: Children;
-  throws?: Children;
+  /** Doc comment rendered above the function. */
   doc?: Children;
   /**
    * When true, render each parameter on its own line with indentation,
    * and place the throws clause on a separate line.
+   *
+   * @remarks
+   * Useful for functions with many parameters that would otherwise produce
+   * very long lines.
    */
   breakParams?: boolean;
 }
 
 export interface ThrowsProps {
+  /** {@link Field} children defining the exception fields. */
   children?: Children;
 }
 
@@ -33,8 +59,21 @@ export interface ThrowsProps {
  * Define a Thrift service function (method).
  *
  * @remarks
- * Oneway functions must return `void`. Add exceptions using the `Throws` child
- * component or the `throws` prop.
+ * Parameters are defined as {@link Field} children. Exceptions can be declared
+ * via a {@link Throws} child component.
+ *
+ * Oneway functions must return `void` — specifying a non-void return type
+ * with `oneway` throws an error.
+ *
+ * @example Simple function
+ * ```tsx
+ * <ServiceFunction name="ping" />
+ * ```
+ *
+ * Produces:
+ * ```thrift
+ * void ping(),
+ * ```
  *
  * @example Function with parameters and throws
  * ```tsx
@@ -45,6 +84,11 @@ export interface ThrowsProps {
  *   </Throws>
  * </ServiceFunction>
  * ```
+ *
+ * Produces:
+ * ```thrift
+ * User getUser(1: i64 id) throws (1: NotFound notFound),
+ * ```
  */
 export function ServiceFunction(props: ServiceFunctionProps) {
   const name = useThriftNamePolicy().getName(props.name, "function");
@@ -54,10 +98,7 @@ export function ServiceFunction(props: ServiceFunctionProps) {
     throw new Error("Oneway functions must return void.");
   }
 
-  const { params, throws } = splitFunctionChildren(
-    props.children,
-    props.throws,
-  );
+  const { params, throws } = splitFunctionChildren(props.children);
   const paramRegistry = createFieldRegistry({
     allowRequired: true,
     owner: `function ${name}`,
@@ -134,13 +175,24 @@ export function ServiceFunction(props: ServiceFunctionProps) {
  * Define the `throws` clause for a service function.
  *
  * @remarks
- * Use this component inside {@link ServiceFunction} to declare exceptions.
+ * Place this component inside a {@link ServiceFunction} to declare the
+ * exceptions that the function may throw. Each exception is defined as a
+ * {@link Field} child.
  *
  * @example Throws clause
  * ```tsx
- * <Throws>
- *   <Field id={1} type="NotFound" name="notFound" />
- * </Throws>
+ * <ServiceFunction name="deleteUser" returnType="void">
+ *   <Field id={1} type={i64} name="id" />
+ *   <Throws>
+ *     <Field id={1} type="NotFound" name="notFound" />
+ *     <Field id={2} type="PermissionDenied" name="denied" />
+ *   </Throws>
+ * </ServiceFunction>
+ * ```
+ *
+ * Produces:
+ * ```thrift
+ * void deleteUser(1: i64 id) throws (1: NotFound notFound, 2: PermissionDenied denied),
  * ```
  */
 export function Throws(props: ThrowsProps) {
@@ -158,15 +210,12 @@ export function Throws(props: ThrowsProps) {
   );
 }
 
-function splitFunctionChildren(
-  children?: Children,
-  throwsProp?: Children,
-): {
+function splitFunctionChildren(children?: Children): {
   params: Children[];
   throws?: Children;
 } {
   const params: Children[] = [];
-  let throws: Children | undefined = throwsProp;
+  let throws: Children | undefined;
 
   if (children) {
     const arr = childrenArray(() => children, { preserveFragments: true });
