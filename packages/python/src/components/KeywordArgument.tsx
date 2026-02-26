@@ -1,12 +1,13 @@
-import { Children, memo } from "@alloy-js/core";
+import { Children, isNamekey, memo, Namekey } from "@alloy-js/core";
 import { usePythonNamePolicy } from "../name-policy.js";
 import { Atom } from "./Atom.jsx";
 
 export interface KeywordArgumentProps {
   /**
-   * The name of the keyword argument.
+   * The name of the keyword argument. Can be a string or a Namekey.
+   * Using a Namekey is useful when you want to match a function parameter's name.
    */
-  name: string;
+  name: string | Namekey;
   /**
    * The value of the keyword argument.
    */
@@ -37,7 +38,8 @@ export interface KeywordArgumentProps {
  */
 export function KeywordArgument(props: KeywordArgumentProps) {
   const namePolicy = usePythonNamePolicy();
-  const name = namePolicy.getName(props.name, "variable");
+  const rawName = isNamekey(props.name) ? props.name.name : props.name;
+  const name = namePolicy.getName(rawName, "variable");
 
   const value =
     typeof props.value === "object" ? memo(() => props.value) : props.value;
