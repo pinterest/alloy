@@ -128,8 +128,7 @@ struct ColumnOrSuperColumn {
 #
 
 /** A specific column was requested that does not exist. */
-exception NotFoundException {
-}
+exception NotFoundException {}
 
 /**
  * Invalid request could mean keyspace or column family does not exist, required parameters are missing, or a parameter is malformed.
@@ -140,8 +139,7 @@ exception InvalidRequestException {
 }
 
 /** Not all the replicas required could be created and/or read. */
-exception UnavailableException {
-}
+exception UnavailableException {}
 
 /** RPC timeout was exceeded.  either a node failed mid-operation, or load was too high, or the requested op was too large. */
 exception TimedOutException {
@@ -183,8 +181,7 @@ exception AuthorizationException {
  *
  * schemas are not in agreement across all nodes
  */
-exception SchemaDisagreementException {
-}
+exception SchemaDisagreementException {}
 
 #
 # service api

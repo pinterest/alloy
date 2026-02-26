@@ -79,8 +79,7 @@ describe("Service", () => {
     const text = toSourceText(<Service name="Empty" />);
 
     expect(text).toBe(d`
-      service Empty {
-      }
+      service Empty {}
     `);
   });
 });

@@ -92,11 +92,7 @@ export function Service(props: ServiceProps) {
           <Block>
             <List doubleHardline>{children}</List>
           </Block>
-        : <group>
-            {"{"}
-            <hbr />
-            {"}"}
-          </group>
+        : "{}"
         }
         {annotationText}
       </Declaration>

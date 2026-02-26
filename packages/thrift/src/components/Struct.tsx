@@ -55,11 +55,7 @@ function StructLike(
             <Block>
               <List hardline>{fields}</List>
             </Block>
-          : <group>
-              {"{"}
-              <hbr />
-              {"}"}
-            </group>
+          : "{}"
           }
         </FieldContext.Provider>
         {annotationText}
