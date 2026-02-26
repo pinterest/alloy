@@ -406,6 +406,55 @@ describe("align", () => {
       `,
     );
   });
+
+  it("aligns contents using prefix width", () => {
+    expect(
+      <group shouldBreak>
+        <align prefix={<>func(</>}>
+          arg1,
+          <hbr />
+          arg2,
+          <hbr />
+          arg3
+        </align>
+        )
+      </group>,
+    ).toRenderTo(
+      `
+        func(arg1,
+             arg2,
+             arg3)
+      `,
+    );
+  });
+
+  it("aligns prefix with component children", () => {
+    function Prefix() {
+      return <>open(</>;
+    }
+    expect(
+      <group shouldBreak>
+        <align prefix={<Prefix />}>
+          a,
+          <hbr />b
+        </align>
+        )
+      </group>,
+    ).toRenderTo(
+      `
+        open(a,
+             b)
+      `,
+    );
+  });
+
+  it("displays prefix on first line without breaks", () => {
+    expect(<align prefix={<>hello </>}>world</align>).toRenderTo(
+      `
+        hello world
+      `,
+    );
+  });
 });
 
 it("all works together", () => {

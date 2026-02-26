@@ -20,3 +20,17 @@ export function isPrintHook(type: unknown): type is PrintHook {
 }
 
 export type RenderedTextTree = (string | RenderedTextTree | PrintHook)[];
+
+export function flattenTreeToString(tree: RenderedTextTree): string {
+  let result = "";
+  for (const node of tree) {
+    if (typeof node === "string") {
+      result += node;
+    } else if (isPrintHook(node)) {
+      // skip formatting intrinsics
+    } else {
+      result += flattenTreeToString(node);
+    }
+  }
+  return result;
+}

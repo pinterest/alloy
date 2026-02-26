@@ -113,7 +113,8 @@ export interface IntrinsicElements {
    */
   align:
     | { children: Children; width: number }
-    | { children: Children; string: string };
+    | { children: Children; string: string }
+    | { children: Children; prefix: Children };
 
   /**
    * Mark the current indentation level as "root" for the purposes of literal
