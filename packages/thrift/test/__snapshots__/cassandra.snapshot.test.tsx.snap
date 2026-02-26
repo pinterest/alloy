@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Thrift snapshots > renders cassandra.thrift 1`] = `
+exports[`renders cassandra.thrift 1`] = `
 {
   "cassandra.thrift": "#!/usr/local/bin/thrift --java --php --py
 # Licensed to the Apache Software Foundation (ASF) under one

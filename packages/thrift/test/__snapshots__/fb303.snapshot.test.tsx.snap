@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Thrift snapshots > renders fb303.thrift 1`] = `
+exports[`renders fb303.thrift 1`] = `
 {
   "fb303.thrift": "/*
  * Licensed to the Apache Software Foundation (ASF) under one

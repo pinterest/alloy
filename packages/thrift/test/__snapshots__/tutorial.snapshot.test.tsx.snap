@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Thrift snapshots > renders tutorial.thrift + shared.thrift 1`] = `
+exports[`renders tutorial.thrift + shared.thrift 1`] = `
 {
   "shared.thrift": "/*
  * Licensed to the Apache Software Foundation (ASF) under one

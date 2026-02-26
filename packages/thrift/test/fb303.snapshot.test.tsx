@@ -1,5 +1,5 @@
 import { refkey } from "@alloy-js/core";
-import { describe, expect, it } from "vitest";
+import { expect, it } from "vitest";
 import {
   BlockComment,
   Enum,
@@ -162,9 +162,7 @@ export const files: SnapshotFile[] = [
   },
 ];
 
-describe("Thrift snapshots", () => {
-  it("renders fb303.thrift", () => {
-    const output = renderThriftFiles(files);
-    expect(output).toMatchSnapshot();
-  });
+it("renders fb303.thrift", () => {
+  const output = renderThriftFiles(files);
+  expect(output).toMatchSnapshot();
 });
