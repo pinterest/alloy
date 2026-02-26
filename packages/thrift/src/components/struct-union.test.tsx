@@ -1,7 +1,16 @@
 import { toSourceText } from "#test/utils.jsx";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
-import { Field, Struct, Union, string } from "../index.js";
+import {
+  Field,
+  Struct,
+  Typedef,
+  Union,
+  i32,
+  i64,
+  listOf,
+  string,
+} from "../index.js";
 
 describe("Struct/Union", () => {
   it("renders required and optional fields", () => {
@@ -85,5 +94,37 @@ describe("Struct/Union", () => {
         </Struct>,
       ),
     ).toThrow("Field cannot be both required and optional.");
+  });
+
+  it("renders field default values", () => {
+    const text = toSourceText(
+      <Struct name="Config">
+        <Field id={1} type={i32} name="retries" default={3} />
+        <Field id={2} type={string} name="host" default="localhost" />
+      </Struct>,
+    );
+
+    expect(text).toBe(d`
+      struct Config {
+        1: i32 retries = 3,
+        2: string host = "localhost",
+      }
+    `);
+  });
+});
+
+describe("Typedef", () => {
+  it("renders a primitive typedef", () => {
+    const text = toSourceText(<Typedef name="UserId" type={i64} />);
+
+    expect(text).toBe("typedef i64 UserId");
+  });
+
+  it("renders a container typedef", () => {
+    const text = toSourceText(
+      <Typedef name="StringList" type={listOf(string)} />,
+    );
+
+    expect(text).toBe("typedef list<string> StringList");
   });
 });

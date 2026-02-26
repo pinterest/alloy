@@ -41,7 +41,7 @@ describe("Enum", () => {
           <EnumValue name="RED" />
         </Enum>,
       ),
-    ).toThrow("Enum value 'RED' must specify a numeric value.");
+    ).toThrow("Enum value 'RED' must be an integer.");
   });
 
   it("rejects duplicate enum value numbers", () => {

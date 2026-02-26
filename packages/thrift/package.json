@@ -1,7 +1,7 @@
 {
   "name": "@alloy-js/thrift",
   "version": "0.1.0",
-  "description": "",
+  "description": "Generate Apache Thrift IDL files using JSX components",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/alloy-framework/alloy.git"

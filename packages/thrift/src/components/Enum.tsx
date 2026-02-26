@@ -142,9 +142,6 @@ export function EnumValue(props: EnumValueProps) {
   }
 
   const name = useThriftNamePolicy().getName(props.name, "enum-value");
-  if (props.value === undefined) {
-    throw new Error(`Enum value '${name}' must specify a numeric value.`);
-  }
   registry.register(name, props.value);
 
   return (

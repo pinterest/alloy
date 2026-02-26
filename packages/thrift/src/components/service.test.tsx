@@ -60,4 +60,43 @@ describe("Service", () => {
       ),
     ).toThrow("Oneway functions must return void.");
   });
+
+  it("renders service annotations after the closing brace", () => {
+    const text = toSourceText(
+      <Service name="Legacy" annotations={{ deprecated: "use V2" }}>
+        <ServiceFunction name="ping" />
+      </Service>,
+    );
+
+    expect(text).toBe(d`
+      service Legacy {
+        void ping(),
+      } (deprecated = "use V2")
+    `);
+  });
+
+  it("renders empty service with collapsed braces", () => {
+    const text = toSourceText(<Service name="Empty" />);
+
+    expect(text).toBe(d`
+      service Empty {
+      }
+    `);
+  });
+});
+
+describe("Exception", () => {
+  it("renders with the exception keyword", () => {
+    const text = toSourceText(
+      <Exception name="NotFound">
+        <Field id={1} type={string} name="message" />
+      </Exception>,
+    );
+
+    expect(text).toBe(d`
+      exception NotFound {
+        1: string message,
+      }
+    `);
+  });
 });

@@ -3,6 +3,7 @@ import { Reference } from "./components/Reference.js";
 import type {
   AnnotationMap,
   AnnotationValue,
+  ConstMapEntries,
   ConstRef,
   ConstValue,
   ListTypeRef,
@@ -63,17 +64,21 @@ export function renderTypeRef(type: TypeRef): Children {
     );
   }
 
-  const annotations = renderAnnotations((type as MapTypeRef).annotations);
-  return (
-    <>
-      {"map<"}
-      {renderTypeRef(type.keyType)}
-      {", "}
-      {renderTypeRef(type.valueType)}
-      {">"}
-      {annotations ? annotations : ""}
-    </>
-  );
+  if (type.kind === "map") {
+    const annotations = renderAnnotations(type.annotations);
+    return (
+      <>
+        {"map<"}
+        {renderTypeRef(type.keyType)}
+        {", "}
+        {renderTypeRef(type.valueType)}
+        {">"}
+        {annotations ? ` ${annotations}` : ""}
+      </>
+    );
+  }
+
+  throw new Error(`Unknown TypeRef kind: ${(type as { kind: string }).kind}`);
 }
 
 /**
@@ -144,14 +149,13 @@ function formatConstValue(value: ConstValue): string {
   if (typeof value === "number" || typeof value === "boolean") {
     return String(value);
   }
+  if (isConstMapEntries(value)) {
+    const entries = value.entries
+      .map(([k, v]) => `${formatConstValue(k)} : ${formatConstValue(v)}`)
+      .join(" , ");
+    return `{ ${entries} }`;
+  }
   if (Array.isArray(value)) {
-    if (isConstMapEntries(value)) {
-      const entries = value
-        .map(([k, v]) => `${formatConstValue(k)} : ${formatConstValue(v)}`)
-        .join(" , ");
-      return `{ ${entries} }`;
-    }
-
     const items = value.map((item) => formatConstValue(item)).join(" , ");
     return `[ ${items} ]`;
   }
@@ -197,19 +201,21 @@ function isRawConstValue(value: ConstValue): value is RawConstValue {
   );
 }
 
-function isConstMapEntries(
-  value: ConstValue[],
-): value is Array<[ConstValue, ConstValue]> {
-  return value.every(
-    (entry) =>
-      Array.isArray(entry) &&
-      entry.length === 2 &&
-      entry.every((item) => typeof item !== "undefined"),
+function isConstMapEntries(value: ConstValue): value is ConstMapEntries {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    (value as ConstMapEntries).kind === "map-entries"
   );
 }
 
 function escapeString(value: string): string {
-  return value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  return value
+    .replace(/\\/g, "\\\\")
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, "\\n")
+    .replace(/\r/g, "\\r")
+    .replace(/\t/g, "\\t");
 }
 
 /**

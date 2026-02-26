@@ -1,6 +1,7 @@
 import { createSymbol, Refkey } from "@alloy-js/core";
-import { useThriftNamePolicy } from "../name-policy.js";
+import { type ThriftNameKind, useThriftNamePolicy } from "../name-policy.js";
 import { useThriftFileScope } from "./scopes.js";
+import type { ThriftSymbolKind } from "./thrift-output-symbol.js";
 import { ThriftOutputSymbol } from "./thrift-output-symbol.js";
 
 /**
@@ -10,17 +11,9 @@ export interface CreateThriftSymbolOptions {
   /** An optional refkey to associate with the symbol for cross-file references. */
   refkey?: Refkey;
   /** The name kind used to select the correct name policy formatting rule. */
-  nameKind:
-    | "type"
-    | "service"
-    | "const"
-    | "field"
-    | "enum"
-    | "enum-value"
-    | "typedef"
-    | "function";
+  nameKind: ThriftNameKind;
   /** The declaration kind stored on the resulting symbol. */
-  kind?: "type" | "service" | "const";
+  kind?: ThriftSymbolKind;
 }
 
 /**

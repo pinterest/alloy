@@ -4,6 +4,23 @@ function createBuiltin(name: BuiltinType): BuiltinTypeRef {
   return { kind: "builtin", name };
 }
 
+// NOTE: the `void` builtin is intentionally named `thriftVoid` to avoid
+// shadowing the TypeScript `void` keyword.
+
+/**
+ * A Thrift `void` — indicates no return value.
+ *
+ * @remarks
+ * Named `thriftVoid` to avoid colliding with TypeScript's `void` keyword.
+ * Primarily used as a service function return type.
+ *
+ * @example
+ * ```tsx
+ * <ServiceFunction name="ping" returnType={thriftVoid} />
+ * ```
+ */
+export const thriftVoid = createBuiltin("void");
+
 /**
  * A Thrift `bool` — a boolean value (true or false).
  *

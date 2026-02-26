@@ -1,4 +1,4 @@
-import { findFile } from "#test/utils.jsx";
+import { findFile, toSourceText } from "#test/utils.jsx";
 import { Output, render } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { describe, expect, it } from "vitest";
@@ -42,5 +42,21 @@ describe("SourceFile", () => {
         1: string name,
       }
     `);
+  });
+});
+
+describe("Namespace", () => {
+  it("accepts dotted namespace values", () => {
+    const text = toSourceText(
+      <Namespace lang="java" value="com.example.api" />,
+    );
+
+    expect(text).toBe("namespace java com.example.api");
+  });
+
+  it("rejects invalid namespace values", () => {
+    expect(() =>
+      toSourceText(<Namespace lang="java" value="has-dash" />),
+    ).toThrow("Invalid Thrift namespace value 'has-dash'.");
   });
 });

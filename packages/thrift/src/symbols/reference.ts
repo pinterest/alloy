@@ -29,9 +29,7 @@ export function ref(
   refkey: Refkey,
 ): () => [Children, ThriftOutputSymbol | undefined] {
   const sourceFile = useContext(ThriftFileContext);
-  const resolveResult = resolve<ThriftOutputScope, ThriftOutputSymbol>(
-    refkey as Refkey,
-  );
+  const resolveResult = resolve<ThriftOutputScope, ThriftOutputSymbol>(refkey);
 
   return memo(() => {
     if (resolveResult.value === undefined) {

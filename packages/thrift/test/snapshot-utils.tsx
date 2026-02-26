@@ -1,12 +1,7 @@
-import {
-  ContentOutputFile,
-  Output,
-  OutputDirectory,
-  OutputFile,
-  createNamePolicy,
-  render,
-} from "@alloy-js/core";
+import { Output, createNamePolicy, render } from "@alloy-js/core";
 import { JSX } from "@alloy-js/core/jsx-runtime";
+import { findFile } from "./utils.jsx";
+
 export interface SnapshotFile {
   path: string;
   file: JSX.Element;
@@ -49,29 +44,4 @@ export function lines(text: string): string[] {
     result.pop();
   }
   return result;
-}
-
-function findFile(res: OutputDirectory, path: string): ContentOutputFile {
-  const result = findFileWorker(res, path);
-
-  if (!result || result.kind !== "file" || !("contents" in result)) {
-    throw new Error("Expected to find file " + path);
-  }
-  return result;
-
-  function findFileWorker(
-    res: OutputDirectory,
-    path: string,
-  ): OutputFile | undefined {
-    for (const item of res.contents) {
-      if (item.kind === "file" && item.path === path) {
-        return item;
-      } else if (item.kind === "directory") {
-        const found = findFileWorker(item, path);
-        if (found) {
-          return found;
-        }
-      }
-    }
-  }
 }

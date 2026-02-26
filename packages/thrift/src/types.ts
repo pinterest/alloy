@@ -176,7 +176,7 @@ export type TypeRef =
  *
  * @remarks
  * Accepts JavaScript primitives (`string`, `number`, `boolean`), arrays
- * (rendered as Thrift lists), `Map` instances or `[key, value]` tuple arrays
+ * (rendered as Thrift lists), `Map` instances or {@link mapEntries} tuples
  * (rendered as Thrift maps), plain objects (rendered as Thrift maps with string
  * keys), {@link ConstRef} for referencing other constants, or
  * {@link RawConstValue} for unescaped literals.
@@ -194,18 +194,18 @@ export type TypeRef =
  * @example Map value
  * ```tsx
  * <Const name="Defaults" type={mapOf(string, i32)}
- *   value={[["timeout", 30], ["retries", 3]]} />
+ *   value={mapEntries([["timeout", 30], ["retries", 3]])} />
  * ```
  */
 export type ConstValue =
   | RawConstValue
   | ConstRef
+  | ConstMapEntries
   | string
   | number
   | boolean
   | ConstValue[]
   | Map<ConstValue, ConstValue>
-  | Array<[ConstValue, ConstValue]>
   | { [key: string]: ConstValue };
 
 /**
@@ -279,6 +279,44 @@ export function constRef(name: string): ConstRef {
  */
 export function rawConst(value: string): RawConstValue {
   return { kind: "raw-const", value };
+}
+
+/**
+ * A list of key-value tuples rendered as a Thrift map literal.
+ *
+ * @remarks
+ * Use {@link mapEntries} to construct this. Prefer this over bare
+ * `[key, value]` arrays so that lists of two-element lists are not
+ * ambiguous with map entries.
+ */
+export interface ConstMapEntries {
+  /** Discriminant identifying this as map entries. */
+  kind: "map-entries";
+  /** The key-value pairs for the map. */
+  entries: [ConstValue, ConstValue][];
+}
+
+/**
+ * Create a {@link ConstMapEntries} value from key-value tuples.
+ *
+ * @param entries - An array of `[key, value]` pairs.
+ * @returns A `ConstMapEntries` object.
+ *
+ * @example
+ * ```tsx
+ * <Const name="Defaults" type={mapOf(string, i32)}
+ *   value={mapEntries([["timeout", 30], ["retries", 3]])} />
+ * ```
+ *
+ * Produces:
+ * ```thrift
+ * const map<string, i32> Defaults = { "timeout" : 30 , "retries" : 3 }
+ * ```
+ */
+export function mapEntries(
+  entries: [ConstValue, ConstValue][],
+): ConstMapEntries {
+  return { kind: "map-entries", entries };
 }
 
 /**

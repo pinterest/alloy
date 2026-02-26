@@ -14,6 +14,7 @@ export class ThriftOutputScope extends OutputScope {
     return this.spaceFor("symbols")!;
   }
 
+  /** Thrift scopes have no owner symbol — required by the OutputScope contract. */
   get ownerSymbol(): undefined {
     return undefined;
   }

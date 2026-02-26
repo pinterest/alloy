@@ -75,6 +75,7 @@ export function Service(props: ServiceProps) {
   const children = childrenArray(() => props.children, {
     preserveFragments: true,
   });
+  const hasChildren = children.length > 0;
 
   return (
     <>
@@ -86,11 +87,18 @@ export function Service(props: ServiceProps) {
             {" extends "}
             {renderTypeRef(props.extends)}
           </>
-        : ""}
-        {annotationText}{" "}
-        <Block>
-          <List doubleHardline>{children}</List>
-        </Block>
+        : ""}{" "}
+        {hasChildren ?
+          <Block>
+            <List doubleHardline>{children}</List>
+          </Block>
+        : <group>
+            {"{"}
+            <hbr />
+            {"}"}
+          </group>
+        }
+        {annotationText}
       </Declaration>
     </>
   );

@@ -1,5 +1,4 @@
 import { Children } from "@alloy-js/core";
-import { useThriftNamePolicy } from "../name-policy.js";
 import { renderAnnotations } from "../render.js";
 import type { AnnotationMap } from "../types.js";
 import { DocWhen } from "./DocComment.js";
@@ -22,6 +21,8 @@ export interface NamespaceProps {
   /** Inline comment appended after the namespace directive. */
   comment?: Children;
 }
+
+const NAMESPACE_VALUE_REGEX = /^[A-Za-z_][A-Za-z0-9_.]*$/;
 
 /**
  * Emit a Thrift namespace directive.
@@ -52,9 +53,12 @@ export interface NamespaceProps {
  * ```
  */
 export function Namespace(props: NamespaceProps) {
-  const namePolicy = useThriftNamePolicy();
   const lang = props.lang === "*" ? "*" : props.lang;
-  const value = namePolicy.getName(props.value, "namespace");
+  const value = props.value;
+
+  if (!NAMESPACE_VALUE_REGEX.test(value)) {
+    throw new Error(`Invalid Thrift namespace value '${value}'.`);
+  }
   const annotations = renderAnnotations(props.annotations);
   const annotationText = annotations ? ` ${annotations}` : "";
 
