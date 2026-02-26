@@ -6,126 +6,24 @@ settings:
 
 catalogs:
   default:
-    '@babel/core':
-      specifier: ^7.24.7
-      version: 7.28.6
-    '@babel/generator':
-      specifier: ^7.27.0
-      version: 7.28.6
-    '@babel/helper-module-imports':
-      specifier: 7.27.1
-      version: 7.27.1
-    '@babel/plugin-syntax-jsx':
-      specifier: ^7.18.6
-      version: 7.27.1
-    '@babel/preset-typescript':
-      specifier: ^7.27.0
-      version: 7.27.1
-    '@babel/types':
-      specifier: ^7.27.0
-      version: 7.28.6
-    '@eslint/js':
-      specifier: ^9.32.0
-      version: 9.39.2
     '@microsoft/api-extractor':
       specifier: ~7.52.8
       version: 7.52.9
-    '@microsoft/api-extractor-model':
-      specifier: ~7.30.6
-      version: 7.30.7
-    '@microsoft/tsdoc':
-      specifier: 0.15.1
-      version: 0.15.1
-    '@rollup/plugin-babel':
-      specifier: ^6.0.4
-      version: 6.0.4
-    '@rollup/plugin-node-resolve':
-      specifier: ^16.0.1
-      version: 16.0.1
     '@rollup/plugin-typescript':
       specifier: ^12.1.2
       version: 12.1.4
-    '@types/babel__core':
-      specifier: ^7.20.5
-      version: 7.20.5
-    '@types/babel__generator':
-      specifier: ^7.6.8
-      version: 7.27.0
-    '@types/babel__traverse':
-      specifier: ^7.20.7
-      version: 7.20.7
-    '@types/node':
-      specifier: ^24.1.0
-      version: 24.10.9
-    '@vitest/eslint-plugin':
-      specifier: ^1.3.4
-      version: 1.3.4
-    '@vue/reactivity':
-      specifier: ^3.5.13
-      version: 3.5.18
-    babel-plugin-tester:
-      specifier: ^12.0.0
-      version: 12.0.0
-    change-case:
-      specifier: ^5.4.4
-      version: 5.4.4
-    cli-table3:
-      specifier: ^0.6.5
-      version: 0.6.5
     concurrently:
       specifier: ^9.2.0
       version: 9.2.0
-    devalue:
-      specifier: ^5.6.2
-      version: 5.6.2
-    eslint:
-      specifier: ^9.32.0
-      version: 9.39.2
-    fast-xml-parser:
-      specifier: ^5.2.5
-      version: 5.2.5
-    html-entities:
-      specifier: 2.6.0
-      version: 2.6.0
-    marked:
-      specifier: ^16.1.1
-      version: 16.1.1
     pathe:
       specifier: ^2.0.3
       version: 2.0.3
-    picocolors:
-      specifier: ^1.1.1
-      version: 1.1.1
-    prettier:
-      specifier: ^3.6.2
-      version: 3.6.2
-    prettier-plugin-organize-imports:
-      specifier: ^4.2.0
-      version: 4.2.0
-    rimraf:
-      specifier: ^6.0.1
-      version: 6.0.1
-    rollup:
-      specifier: ^4.39.0
-      version: 4.46.2
-    tsx:
-      specifier: ^4.19.3
-      version: 4.20.3
     typescript:
       specifier: ^5.8.3
       version: 5.9.3
-    typescript-eslint:
-      specifier: ^8.38.0
-      version: 8.53.0
-    validate-html-nesting:
-      specifier: ^1.2.1
-      version: 1.2.3
     vitest:
       specifier: 3.2.4
       version: 3.2.4
-    ws:
-      specifier: ^8.19.0
-      version: 8.19.0
 
 overrides:
   vite: npm:rolldown-vite@7.2.5
@@ -861,9 +759,6 @@ importers:
       concurrently:
         specifier: 'catalog:'
         version: 9.2.0
-      thrift-fmt-ts:
-        specifier: ^1.3.0
-        version: 1.3.0
       typescript:
         specifier: 'catalog:'
         version: 5.9.3
@@ -3555,9 +3450,6 @@ packages:
     resolution: {integrity: sha512-bN798gFfQX+viw3R7yrGWRqnrN2oRkEkUjjl4JNn4E8GxxbjtG3FbrEIIY3l8/hrwUwIeCZvi4QuOTP4MErVug==}
     engines: {node: '>=12'}
 
-  antlr4ts@0.5.0-alpha.4:
-    resolution: {integrity: sha512-WPQDt1B74OfPv/IMS2ekXAKkTZIHl88uMetg6q3OTqgFxZ/dxDXI0EWLyZid/1Pe6hTftyg5N7gel5wNAGxXyQ==}
-
   anymatch@3.1.3:
     resolution: {integrity: sha512-KMReFUr0B4t+D+OBkjR3KYqvocp2XaSzO55UcB6mgQMd3KbcE+mWTyvVV7D/zsdEbNnV6acZUutkiHQXvTr1Rw==}
     engines: {node: '>= 8'}
@@ -5855,12 +5747,6 @@ packages:
 
   temporal-spec@0.3.0:
     resolution: {integrity: sha512-n+noVpIqz4hYgFSMOSiINNOUOMFtV5cZQNCmmszA6GiVFVRt3G7AqVyhXjhCSmowvQn+NsGn+jMDMKJYHd3bSQ==}
-
-  thrift-fmt-ts@1.3.0:
-    resolution: {integrity: sha512-QhtqLfC/LBDIMrfopZMXEf18yu+KQgKWBNQX5muXCr/Zgb0c1AaZ6jYmy+MuHxmcJm1PGRpMaMski/uope2EdQ==}
-
-  thrift-parser-ts@1.0.8:
-    resolution: {integrity: sha512-LXrlEHipW9j6+Lnn9sEuzOxP2llH2b5q8kK3WPVmbu8D7HCynk56UoNQ29xYR/nl5V4xyx5fxthukVHAfglndg==}
 
   tiny-inflate@1.0.3:
     resolution: {integrity: sha512-pkY1fj1cKHb2seWDy0B16HeWyczlJA9/WW3u3c4z/NiWDsO3DOU5D7nhTLE9CF0yXv/QZFY7sEJmj24dK+Rrqw==}
@@ -9145,8 +9031,6 @@ snapshots:
 
   ansi-styles@6.2.1: {}
 
-  antlr4ts@0.5.0-alpha.4: {}
-
   anymatch@3.1.3:
     dependencies:
       normalize-path: 3.0.0
@@ -9547,6 +9431,10 @@ snapshots:
       lodash: 4.17.21
 
   debug@4.4.1:
+    dependencies:
+      ms: 2.1.3
+
+  debug@4.4.3:
     dependencies:
       ms: 2.1.3
 
@@ -12082,14 +11970,6 @@ snapshots:
 
   temporal-spec@0.3.0: {}
 
-  thrift-fmt-ts@1.3.0:
-    dependencies:
-      thrift-parser-ts: 1.0.8
-
-  thrift-parser-ts@1.0.8:
-    dependencies:
-      antlr4ts: 0.5.0-alpha.4
-
   tiny-inflate@1.0.3: {}
 
   tinybench@2.9.0: {}
@@ -12358,7 +12238,7 @@ snapshots:
   vite-node@3.2.4(@types/node@24.10.9)(esbuild@0.25.8)(jiti@2.6.1)(tsx@4.20.3)(yaml@2.8.0):
     dependencies:
       cac: 6.7.14
-      debug: 4.4.3(supports-color@8.1.1)
+      debug: 4.4.3
       es-module-lexer: 1.7.0
       pathe: 2.0.3
       vite: rolldown-vite@7.2.5(@types/node@24.10.9)(esbuild@0.25.8)(jiti@2.6.1)(tsx@4.20.3)(yaml@2.8.0)
@@ -12413,7 +12293,7 @@ snapshots:
       '@vitest/spy': 3.2.4
       '@vitest/utils': 3.2.4
       chai: 5.2.1
-      debug: 4.4.3(supports-color@8.1.1)
+      debug: 4.4.3
       expect-type: 1.2.2
       magic-string: 0.30.21
       pathe: 2.0.3
