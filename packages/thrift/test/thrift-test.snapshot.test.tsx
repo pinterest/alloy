@@ -34,10 +34,8 @@ import {
 import {
   SnapshotFile,
   lines,
-  loadFixture,
   permissiveNamePolicy,
   renderThriftFiles,
-  updateFixture,
 } from "./snapshot-utils.jsx";
 
 // Based on https://github.com/apache/thrift/blob/32776c0f46f5fd79b296391d66236c23b20af072/test/ThriftTest.thrift
@@ -696,11 +694,6 @@ export const files: SnapshotFile[] = [
 describe("Thrift snapshots", () => {
   it("renders ThriftTest.thrift", () => {
     const output = renderThriftFiles(files);
-    updateFixture("ThriftTest.thrift", output["ThriftTest.thrift"]);
-
-    expect(output).toEqual({
-      "ThriftTest.thrift": loadFixture("ThriftTest.thrift"),
-    });
     expect(output).toMatchSnapshot();
   });
 });

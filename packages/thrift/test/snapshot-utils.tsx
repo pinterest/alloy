@@ -7,25 +7,12 @@ import {
   render,
 } from "@alloy-js/core";
 import { JSX } from "@alloy-js/core/jsx-runtime";
-import { readFileSync, writeFileSync } from "node:fs";
-
 export interface SnapshotFile {
   path: string;
   file: JSX.Element;
 }
 
 export const permissiveNamePolicy = createNamePolicy((name) => name);
-
-export function loadFixture(path: string): string {
-  return readFileSync(new URL(`./fixtures/${path}`, import.meta.url), "utf8");
-}
-
-export function updateFixture(path: string, contents: string): void {
-  if (!process.env.UPDATE_THRIFT_FIXTURES) {
-    return;
-  }
-  writeFileSync(new URL(`./fixtures/${path}`, import.meta.url), contents);
-}
 
 export function renderThriftFiles(files: SnapshotFile[]) {
   const entries = [...files].sort((a, b) => a.path.localeCompare(b.path));

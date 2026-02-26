@@ -27,10 +27,8 @@ import {
 import {
   SnapshotFile,
   lines,
-  loadFixture,
   permissiveNamePolicy,
   renderThriftFiles,
-  updateFixture,
 } from "./snapshot-utils.jsx";
 
 const consistencyLevel = refkey();
@@ -1733,11 +1731,6 @@ export const files: SnapshotFile[] = [
 describe("Thrift snapshots", () => {
   it("renders cassandra.thrift", () => {
     const output = renderThriftFiles(files);
-    updateFixture("cassandra.thrift", output["cassandra.thrift"]);
-
-    expect(output).toEqual({
-      "cassandra.thrift": loadFixture("cassandra.thrift"),
-    });
     expect(output).toMatchSnapshot();
   });
 });
