@@ -85,27 +85,15 @@ describe("FunctionCallExpression", () => {
     expect(result).toRenderTo(expected);
   });
 
-  it("Method call without a reference and with call statement vars", () => {
+  it("Method call without a reference and with keyword arguments", () => {
     const result = toSourceText([
       <py.StatementList>
         <py.FunctionCallExpression
           target={"example_method"}
           args={[
-            <py.VariableDeclaration
-              name="name"
-              initializer={"A name"}
-              callStatementVar
-            />,
-            <py.VariableDeclaration
-              name="number"
-              initializer={42}
-              callStatementVar
-            />,
-            <py.VariableDeclaration
-              name="flag"
-              initializer={true}
-              callStatementVar
-            />,
+            <py.KeywordArgument name="name" value={"A name"} />,
+            <py.KeywordArgument name="number" value={42} />,
+            <py.KeywordArgument name="flag" value={true} />,
           ]}
         />
       </py.StatementList>,
@@ -116,29 +104,75 @@ describe("FunctionCallExpression", () => {
     expect(result).toRenderTo(expected);
   });
 
-  it("Method call without a reference mixing unnamed and named vars", () => {
+  it("Method call without a reference mixing unnamed and keyword arguments", () => {
     const result = toSourceText([
       <py.StatementList>
         <py.FunctionCallExpression
           target={"example_method"}
           args={[
             <py.Atom jsValue={"A name"} />,
-            <py.VariableDeclaration
-              name="number"
-              initializer={42}
-              callStatementVar
-            />,
-            <py.VariableDeclaration
-              name="flag"
-              initializer={true}
-              callStatementVar
-            />,
+            <py.KeywordArgument name="number" value={42} />,
+            <py.KeywordArgument name="flag" value={true} />,
           ]}
         />
       </py.StatementList>,
     ]);
     const expected = d`
       example_method("A name", number=42, flag=True)
+    `;
+    expect(result).toRenderTo(expected);
+  });
+
+  it("keyword argument name does not conflict with same-named variable", () => {
+    const resKey = refkey();
+    const kwargsKey = refkey();
+    const result = toSourceText([
+      <py.StatementList>
+        <py.VariableDeclaration
+          name="kwargs"
+          refkey={kwargsKey}
+          initializer={<py.Atom jsValue={{}} />}
+        />
+        <py.VariableDeclaration
+          name="res"
+          refkey={resKey}
+          initializer={
+            <py.FunctionCallExpression
+              target="resolve_with_adapter"
+              args={[
+                "obj",
+                "info",
+                <py.KeywordArgument
+                  name="operation"
+                  value={<>Operation.QUERY</>}
+                />,
+                <py.KeywordArgument name="data" value={kwargsKey} />,
+                <py.KeywordArgument name="is_v5" value={true} />,
+              ]}
+            />
+          }
+        />
+        <py.VariableDeclaration
+          name="data"
+          initializer={
+            <py.MemberExpression>
+              <py.MemberExpression.Part refkey={resKey} />
+              <py.MemberExpression.Part key={"data"} />
+            </py.MemberExpression>
+          }
+        />
+      </py.StatementList>,
+    ]);
+    const expected = d`
+      kwargs = {}
+      res = resolve_with_adapter(
+          obj,
+          info,
+          operation=Operation.QUERY,
+          data=kwargs,
+          is_v5=True
+      )
+      data = res["data"]
     `;
     expect(result).toRenderTo(expected);
   });

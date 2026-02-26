@@ -25,11 +25,6 @@ export interface VariableDeclarationProps extends BaseDeclarationProps {
    */
   omitNone?: boolean;
   /**
-   * Indicates if this is a call statement variable. Optional.
-   * This is used to handle cases where the variable is part of a call statement.
-   */
-  callStatementVar?: boolean;
-  /**
    * Indicates if this variable is an instance variable. Optional.
    * This is used to handle cases where the variable is part of a class instance.
    */
@@ -51,23 +46,11 @@ export interface VariableDeclarationProps extends BaseDeclarationProps {
  *   type="str"
  *   omitNone={true}
  * />
- * <VariableDeclaration
- *   name="myCallStmtVar"
- *   callStatementVar={true}
- *   initializer={12}
- * />
- * VariableDeclaration
- *   name=""
- *   callStatementVar={true}
- *   initializer={12}
- * />
  * ```
  * renders to
  * ```py
  * myVar: int = 42
  * myOtherVar: str
- * myCallStmtVar=12
- * 12
  * ```
  */
 export function VariableDeclaration(props: VariableDeclarationProps) {
@@ -90,7 +73,7 @@ export function VariableDeclaration(props: VariableDeclarationProps) {
 
   // Handle optional type annotation
   const type = memo(() => {
-    if (!props.type || props.callStatementVar) return undefined;
+    if (!props.type) return undefined;
     return (
       <>
         : <TypeSymbolSlot>{props.type}</TypeSymbolSlot>
@@ -103,36 +86,17 @@ export function VariableDeclaration(props: VariableDeclarationProps) {
     typeof props.initializer === "object" ?
       memo(() => props.initializer)
     : props.initializer;
-  const assignmentOperator = props.callStatementVar ? "=" : " = ";
-  const getRightSide = () => {
-    // Early return for omitNone case
-    if (props.omitNone && props.initializer === undefined) {
-      return [false, ""];
-    }
 
-    // Handle null/undefined values
-    if (value === null || value === undefined) {
-      return [true, <>None</>];
-    }
+  const omitAssignment = props.omitNone && props.initializer === undefined;
 
-    let renderRightSideOperator = true;
-    // Call statement with no name
-    if (
-      props.callStatementVar &&
-      (props.name === undefined || props.name === "")
-    ) {
-      renderRightSideOperator = false;
-    }
-
-    // Standard assignment
-    return [
-      renderRightSideOperator,
-      <ValueTypeSymbolSlot>
+  const rightSide = memo(() =>
+    value === null || value === undefined ?
+      <>None</>
+    : <ValueTypeSymbolSlot>
         <Atom jsValue={value} />
       </ValueTypeSymbolSlot>,
-    ];
-  };
-  const [renderRightSideOperator, rightSide] = getRightSide();
+  );
+
   return (
     <>
       <Show when={Boolean(props.doc)}>
@@ -140,10 +104,12 @@ export function VariableDeclaration(props: VariableDeclarationProps) {
         <hbr />
       </Show>
       <CoreDeclaration symbol={sym}>
-        {<Name />}
+        <Name />
         {type}
-        {renderRightSideOperator && assignmentOperator}
-        {rightSide}
+        <Show when={!omitAssignment}>
+          {" = "}
+          {rightSide}
+        </Show>
       </CoreDeclaration>
     </>
   );

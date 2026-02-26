@@ -72,27 +72,15 @@ it("Class instantiation without a reference", () => {
   expect(result).toRenderTo(expected);
 });
 
-it("Class instantiation without a reference and with call statement vars", () => {
+it("Class instantiation without a reference and with keyword arguments", () => {
   const result = toSourceText([
     <py.StatementList>
       <py.ClassInstantiation
         target={"ExampleClass"}
         args={[
-          <py.VariableDeclaration
-            name="name"
-            initializer={"A name"}
-            callStatementVar
-          />,
-          <py.VariableDeclaration
-            name="number"
-            initializer={42}
-            callStatementVar
-          />,
-          <py.VariableDeclaration
-            name="flag"
-            initializer={true}
-            callStatementVar
-          />,
+          <py.KeywordArgument name="name" value={"A name"} />,
+          <py.KeywordArgument name="number" value={42} />,
+          <py.KeywordArgument name="flag" value={true} />,
         ]}
       />
     </py.StatementList>,
@@ -103,23 +91,15 @@ it("Class instantiation without a reference and with call statement vars", () =>
   expect(result).toRenderTo(expected);
 });
 
-it("Class instantiation without a reference mixing unnamed and named vars", () => {
+it("Class instantiation without a reference mixing unnamed and keyword arguments", () => {
   const result = toSourceText([
     <py.StatementList>
       <py.ClassInstantiation
         target={"ExampleClass"}
         args={[
           <py.Atom jsValue={"A name"} />,
-          <py.VariableDeclaration
-            name="number"
-            initializer={42}
-            callStatementVar
-          />,
-          <py.VariableDeclaration
-            name="flag"
-            initializer={true}
-            callStatementVar
-          />,
+          <py.KeywordArgument name="number" value={42} />,
+          <py.KeywordArgument name="flag" value={true} />,
         ]}
       />
     </py.StatementList>,

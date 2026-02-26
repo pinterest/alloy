@@ -68,16 +68,10 @@ export function ClientMethod(props: ClientMethodProps) {
     returnCode = code`[${responseType}(**data) for data in response.json()]`;
   }
 
-  let requestsCallArgs = [
-    <py.VariableDeclaration name="" initializer={endpoint} callStatementVar />,
-  ];
+  let requestsCallArgs = [endpoint];
   if (op.verb === "post" || op.verb === "put") {
     requestsCallArgs.push(
-      <py.VariableDeclaration
-        name="json"
-        initializer={refkey(op, "requestBody")}
-        callStatementVar
-      />,
+      <py.KeywordArgument name="json" value={refkey(op, "requestBody")} />,
     );
   }
 

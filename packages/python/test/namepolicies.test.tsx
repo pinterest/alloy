@@ -82,15 +82,13 @@ it("correct formatting of call statement vars", () => {
       <py.ClassInstantiation
         target={"test"}
         args={[
-          <py.VariableDeclaration
+          <py.KeywordArgument
             name="this-is-a-long-name"
-            initializer={<py.Atom jsValue={"A name"} />}
-            callStatementVar
+            value={<py.Atom jsValue={"A name"} />}
           />,
-          <py.VariableDeclaration
+          <py.KeywordArgument
             name="andThisIsANumber"
-            initializer={<py.Atom jsValue={42} />}
-            callStatementVar
+            value={<py.Atom jsValue={42} />}
           />,
         ]}
       />
